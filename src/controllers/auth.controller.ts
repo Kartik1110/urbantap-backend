@@ -1,0 +1,52 @@
+import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+import logger from "../utils/logger";
+
+const prisma = new PrismaClient();
+
+// Signup controller
+export const signup = async (req: Request, res: Response) => {
+  const { email, password, name } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+      },
+    });
+    res.status(201).json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+    } else {
+      logger.error(String(error));
+    }
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Login controller
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      expiresIn: "1h",
+    });
+    res.json({ token });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+    } else {
+      logger.error(String(error));
+    }
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
