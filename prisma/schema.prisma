@@ -15,7 +15,7 @@ generator client {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
+  id       String      @id @default(uuid())
   email    String   @unique
   password String
   name     String?
@@ -25,7 +25,7 @@ model User {
 }
 
 model Broker {
-  id           Int       @id @default(autoincrement())
+  id           String       @id @default(uuid())
   name         String
   email        String    @unique
   info         String
@@ -36,24 +36,23 @@ model Broker {
   w_number     String
   ig_link      String?
   linkedin_link String?
-  company_id   Int
-  company      Company   @relation(fields: [company_id], references: [id])
+  company_id   String
+  company      Company @relation(fields: [company_id], references: [id])
   listings     Listing[]
 }
 
 model Company {
-  id      Int      @id @default(autoincrement())
-  name    String
-  logo    String
-  brokers Broker[]
+  id           String       @id @default(uuid())
+  name         String
+  brokers      Broker[]
 }
 
 model Listing {
-  id            Int    @id @default(autoincrement())
+  id            String    @id @default(uuid())
   selling_price Float
   sq_ft         Float
   locality      String
   type          String
-  broker_id     Int
+  broker_id     String
   broker        Broker @relation(fields: [broker_id], references: [id])
 }

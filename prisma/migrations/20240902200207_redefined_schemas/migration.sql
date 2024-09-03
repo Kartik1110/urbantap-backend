@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "name" TEXT,
@@ -13,7 +13,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Broker" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "info" TEXT NOT NULL,
@@ -24,28 +24,19 @@ CREATE TABLE "Broker" (
     "w_number" TEXT NOT NULL,
     "ig_link" TEXT,
     "linkedin_link" TEXT,
-    "company_id" INTEGER NOT NULL,
+    "company_name" TEXT NOT NULL,
 
     CONSTRAINT "Broker_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Company" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "logo" TEXT NOT NULL,
-
-    CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Listing" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "selling_price" DOUBLE PRECISION NOT NULL,
     "sq_ft" DOUBLE PRECISION NOT NULL,
     "locality" TEXT NOT NULL,
     "type" TEXT NOT NULL,
-    "broker_id" INTEGER NOT NULL,
+    "broker_id" TEXT NOT NULL,
 
     CONSTRAINT "Listing_pkey" PRIMARY KEY ("id")
 );
@@ -55,9 +46,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Broker_email_key" ON "Broker"("email");
-
--- AddForeignKey
-ALTER TABLE "Broker" ADD CONSTRAINT "Broker_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Listing" ADD CONSTRAINT "Listing_broker_id_fkey" FOREIGN KEY ("broker_id") REFERENCES "Broker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

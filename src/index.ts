@@ -1,9 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import logger from "./utils/logger";
 import brokersRoutes from "./routes/brokers.route";
 import listingsRoutes from "./routes/listings.route";
-import cors from "cors";
+import companyRoutes from "./routes/company.route";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", brokersRoutes);
 app.use("/api/v1", listingsRoutes);
+app.use("/api/v1", companyRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

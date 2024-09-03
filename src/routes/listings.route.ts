@@ -1,8 +1,12 @@
-import { Router } from 'express';
-import { getListings } from '../controllers/listings.controller';
+import { Router } from "express";
+import {
+  getListings,
+  bulkInsertListings,
+} from "../controllers/listings.controller";
 
 const router = Router();
 
-router.get('/listings', getListings);
+router.get("/listings", getListings);
+router.post("/listings/bulk", bulkInsertListings);
 
 export default router;
