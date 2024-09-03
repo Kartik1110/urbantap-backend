@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { bulkInsertCompaniesService } from "../services/company.service";
+import { bulkInsertCompaniesService, getCompaniesService } from "../services/company.service";
 
 export const bulkInsertCompanies = async (req: Request, res: Response) => {
   try {
@@ -13,6 +13,23 @@ export const bulkInsertCompanies = async (req: Request, res: Response) => {
     res.status(500).json({
       status: "error",
       message: "Failed to insert companies",
+      error: error,
+    });
+  }
+};
+
+export const getCompanies = async (req: Request, res: Response) => {
+  try {
+    const companies = await getCompaniesService();
+    res.json({
+      status: "success",
+      message: "Companies fetched successfully",
+      data: companies,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Failed to fetch companies",
       error: error,
     });
   }

@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { bulkInsertCompanies } from '../controllers/company.controller';
+import { bulkInsertCompanies, getCompanies } from '../controllers/company.controller';
 
 const router = Router();
 
-router.post('/companies/bulk', bulkInsertCompanies);
+router.post("/companies/bulk", bulkInsertCompanies);
+router.get("/companies", getCompanies);
 
 export default router;
