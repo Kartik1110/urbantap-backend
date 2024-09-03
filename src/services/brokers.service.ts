@@ -28,10 +28,36 @@ export const getBrokerListService = async () => {
 /* Bulk insert brokers */
 export const bulkInsertBrokersService = async (brokers: Broker[]) => {
   try {
-    const newBrokers = await prisma.broker.createMany({
+    // add brokers exists check
+    const existingBrokers = await prisma.broker.findMany({
+      where: {
+        email: {
+          in: brokers.map((broker) => broker.email),
+        },
+      },
+    });
+
+    if (existingBrokers.length > 0) {
+      throw new Error(
+        `Brokers with emails ${existingBrokers
+          .map((broker) => broker.email)
+          .join(", ")} already exist`
+      );
+    }
+
+    await prisma.broker.createMany({
       data: brokers,
     });
-    return newBrokers;
+
+    const createdBrokers = await prisma.broker.findMany({
+      where: {
+        email: {
+          in: brokers.map((broker) => broker.email),
+        },
+      },
+    });
+
+    return createdBrokers.map((broker) => broker.id);
   } catch (error) {
     console.error(error);
     throw error;

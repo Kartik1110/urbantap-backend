@@ -49,6 +49,9 @@ model Company {
 
 model Listing {
   id            String    @id @default(uuid())
+  title          String
+  description   String
+  image        String
   selling_price Float
   sq_ft         Float
   locality      String
