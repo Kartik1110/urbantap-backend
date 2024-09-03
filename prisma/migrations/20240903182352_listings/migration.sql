@@ -24,14 +24,25 @@ CREATE TABLE "Broker" (
     "w_number" TEXT NOT NULL,
     "ig_link" TEXT,
     "linkedin_link" TEXT,
-    "company_name" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
 
     CONSTRAINT "Broker_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "Company" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Listing" (
     "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
     "selling_price" DOUBLE PRECISION NOT NULL,
     "sq_ft" DOUBLE PRECISION NOT NULL,
     "locality" TEXT NOT NULL,
@@ -46,6 +57,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Broker_email_key" ON "Broker"("email");
+
+-- AddForeignKey
+ALTER TABLE "Broker" ADD CONSTRAINT "Broker_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Listing" ADD CONSTRAINT "Listing_broker_id_fkey" FOREIGN KEY ("broker_id") REFERENCES "Broker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

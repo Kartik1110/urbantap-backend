@@ -11,10 +11,14 @@ import { Broker, Listing, Company } from "@prisma/client";
 export const getBrokerDetail = async (req: Request, res: Response) => {
   const brokerId = req.params.id;
   try {
-    let response: {broker: Broker | null, listings: Listing[], company: Company | null} = {broker: null, listings: [], company: null}
+    let response: {
+      broker: Broker | null;
+      listings: Listing[];
+      company: Company | null;
+    } = { broker: null, listings: [], company: null };
 
     const broker = await getBrokerDetailService(brokerId);
-    response.broker = broker
+    response.broker = broker;
 
     if (!broker) {
       return res.status(404).json({
@@ -25,20 +29,20 @@ export const getBrokerDetail = async (req: Request, res: Response) => {
 
     const listings = await prisma.listing.findMany({
       where: {
-        broker_id: brokerId
-      }
+        broker_id: brokerId,
+      },
     });
 
     response.listings = listings;
 
     const company = await prisma.company.findUnique({
       where: {
-        id: broker.company_id
-      }
+        id: broker.company_id,
+      },
     });
 
     response.company = company;
-    
+
     res.json({
       status: "success",
       message: "Broker detail fetched successfully",
@@ -82,11 +86,17 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
       data: newBrokers,
     });
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Failed to insert brokers",
-      error: error,
-    });
+    if (error instanceof Error) {
+      res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        message: "Failed to insert brokers",
+        error: error,
+      });
+    }
   }
 };
-
