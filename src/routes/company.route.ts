@@ -3,7 +3,11 @@ import { bulkInsertCompanies, getCompanies } from '../controllers/company.contro
 
 const router = Router();
 
-router.post("/companies/bulk", bulkInsertCompanies);
+/* Get all companies */
 router.get("/companies", getCompanies);
+
+/* Bulk insert companies */
+router.post("/companies/bulk", bulkInsertCompanies);
+
 
 export default router;
