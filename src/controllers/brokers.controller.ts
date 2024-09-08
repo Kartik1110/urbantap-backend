@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
+import { Broker, Listing, Company } from "@prisma/client";
+import prisma from "../utils/prisma";
 import {
   getBrokerDetailService,
   getBrokerListService,
   bulkInsertBrokersService,
 } from "../services/brokers.service";
-import prisma from "../utils/prisma";
-import { Broker, Listing, Company } from "@prisma/client";
+import { uploadToS3 } from "../utils/s3Upload";
+
 
 /* Get broker detail by id */
 export const getBrokerDetail = async (req: Request, res: Response) => {
@@ -77,13 +79,52 @@ export const getBrokerList = async (req: Request, res: Response) => {
 
 // Bulk insert brokers
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
-  const brokers = req.body;
+  const file = req.file as Express.Multer.File;
+  const brokersJson = req.body.brokers;
+
+  let brokers = [];
   try {
-    const newBrokers = await bulkInsertBrokersService(brokers);
+    brokers = JSON.parse(brokersJson);
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid brokers data",
+    });
+  }
+
+  // Upload single profile picture to S3 and get URL
+  let profilePicUrl = '';
+  if (file) {
+    const fileExtension = file.originalname.split('.').pop();
+    try {
+      profilePicUrl = await uploadToS3(
+        // file.buffer,
+        file.path,
+      `profiles/${Date.now()}.${fileExtension}`
+    );
+    } catch (error) {
+      return res.status(400).json({
+        status: "error",
+        message: "Failed to upload file to S3",
+      });
+    }
+  }
+
+  const brokersWithPics = brokers.map((broker: Broker) => ({
+    ...broker,
+    profile_pic: profilePicUrl,
+  }));
+
+  try {
+    const newBrokers = await bulkInsertBrokersService(brokersWithPics);
+    const data = {
+      broker_id: newBrokers[0], // return the single broker
+      profilePicUrl: profilePicUrl,
+    };
     res.json({
       status: "success",
       message: "Brokers inserted successfully",
-      data: newBrokers,
+      data: data,
     });
   } catch (error) {
     if (error instanceof Error) {

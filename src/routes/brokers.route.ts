@@ -1,11 +1,15 @@
-import { Router } from 'express';
-import { getBrokerDetail, getBrokerList } from '../controllers/brokers.controller';
-import { bulkInsertBrokers } from '../controllers/brokers.controller';
+import express from "express";
+import { getBrokerDetail, getBrokerList, bulkInsertBrokers } from '../controllers/brokers.controller';
 
-const router = Router();
+const router = express.Router();
 
+/* Get all brokers */ 
 router.get('/brokers', getBrokerList);
-router.get('/brokers/:id', getBrokerDetail);
-router.post('/brokers/bulk', bulkInsertBrokers);
 
-export default router;
+/* Get a broker by id */ 
+router.get('/brokers/:id', getBrokerDetail);
+
+export default (upload: any) => {
+  router.post('/brokers/bulk', upload.single('file'), bulkInsertBrokers);
+  return router;
+};

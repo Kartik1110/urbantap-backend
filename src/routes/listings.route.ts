@@ -6,7 +6,11 @@ import {
 
 const router = Router();
 
+/* Get all listings */
 router.get("/listings", getListings);
-router.post("/listings/bulk", bulkInsertListings);
 
-export default router;
+/* Bulk insert listings */
+export default (upload: any) => {
+  router.post("/listings/bulk", upload.array("images"), bulkInsertListings);
+  return router;
+};
