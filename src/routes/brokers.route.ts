@@ -10,6 +10,6 @@ router.get('/brokers', getBrokerList);
 router.get('/brokers/:id', getBrokerDetail);
 
 export default (upload: any) => {
-  router.post('/brokers/bulk', upload.single('profile_pics'), bulkInsertBrokers);
+  router.post('/brokers/bulk', upload.single('file'), bulkInsertBrokers);
   return router;
 };

@@ -10,8 +10,7 @@ const s3Client = new S3Client({
 });
 
 export async function uploadToS3(
-//   fileBuffer: Buffer,
-filePath: string,
+  filePath: string,
   fileName: string
 ): Promise<string> {
   const params = {
@@ -20,16 +19,12 @@ filePath: string,
     Body: fs.readFileSync(filePath),
     ContentType: "image/jpeg",
   };
-
-
-  console.log("params>>>>", filePath)
-
   try {
     await s3Client.send(new PutObjectCommand(params));
-    
+
     // delete the file after uploading
     fs.unlinkSync(filePath);
-    
+
     return `https://${config.s3BucketName}.s3.${config.awsRegion}.amazonaws.com/${fileName}`;
   } catch (error) {
     console.error("Error uploading file to S3:", error);

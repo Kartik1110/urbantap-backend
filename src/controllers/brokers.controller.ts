@@ -118,7 +118,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
   try {
     const newBrokers = await bulkInsertBrokersService(brokersWithPics);
     const data = {
-      broker: newBrokers[0], // return the single broker
+      broker_id: newBrokers[0], // return the single broker
       profilePicUrl: profilePicUrl,
     };
     res.json({

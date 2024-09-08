@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Add multer middleware to routes that need file upload
 app.use("/api/v1", brokersRoutes(upload));
-app.use("/api/v1", listingsRoutes);
+app.use("/api/v1", listingsRoutes(upload));
 app.use("/api/v1", companyRoutes);
 
 app.get("/health", (req, res) => {

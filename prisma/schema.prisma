@@ -55,7 +55,52 @@ model Listing {
   selling_price Float
   sq_ft         Float
   locality      String
-  type          String
+  type          Type
+  category      Category
+  looking_for   Boolean
+  rental_frequency Rental_frequency
+  no_of_bedrooms Int
+  no_of_bathrooms Int
+  furnished Furnished
+  city City
+  amenities String[]
+  image_urls String[]
   broker_id     String
   broker        Broker @relation(fields: [broker_id], references: [id])
+}
+
+enum Category {
+  Ready_to_move
+  Off_plan
+  Rent
+}
+
+enum Type {
+  Apartment
+  Villa
+  Townhouse
+  Office
+}
+
+enum Rental_frequency {
+  Monthly
+  Quarterly
+  Yearly
+  Lease
+}
+
+enum Furnished {
+  Furnished
+  Semi_furnished
+  Unfurnished
+}
+
+enum City {
+  Dubai
+  Abu_Dhabi
+  Sharjah
+  Ajman
+  Ras_Al_Khaimah
+  Fujairah
+  Umm_Al_Quwain
 }

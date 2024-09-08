@@ -10,6 +10,7 @@ const router = Router();
 router.get("/listings", getListings);
 
 /* Bulk insert listings */
-router.post("/listings/bulk", bulkInsertListings);
-
-export default router;
+export default (upload: any) => {
+  router.post("/listings/bulk", upload.array("images"), bulkInsertListings);
+  return router;
+};
