@@ -10,63 +10,63 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 model User {
-  id       String      @id @default(uuid())
-  email    String   @unique
-  password String
-  name     String?
-  role     String   @default("USER")
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("USER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Broker {
-  id           String       @id @default(uuid())
-  name         String
-  email        String    @unique
-  info         String
-  y_o_e        Int
-  languages    String[]
-  is_certified Boolean
-  profile_pic  String
-  w_number     String
-  ig_link      String?
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  info          String
+  y_o_e         Int
+  languages     String[]
+  is_certified  Boolean
+  profile_pic   String
+  w_number      String
+  ig_link       String?
   linkedin_link String?
-  company_id   String
-  company      Company @relation(fields: [company_id], references: [id])
-  listings     Listing[]
+  company_id    String
+  company       Company   @relation(fields: [company_id], references: [id])
+  listings      Listing[]
 }
 
 model Company {
-  id           String       @id @default(uuid())
-  name         String
-  brokers      Broker[]
+  id      String   @id @default(uuid())
+  name    String
+  brokers Broker[]
 }
 
 model Listing {
-  id            String    @id @default(uuid())
-  title          String
-  description   String
-  image        String
-  selling_price Float
-  sq_ft         Float
-  locality      String
-  type          Type
-  category      Category
-  looking_for   Boolean
+  id               String           @id @default(uuid())
+  title            String
+  description      String
+  image            String
+  selling_price    Float
+  sq_ft            Float
+  locality         String
+  type             Type
+  category         Category
+  looking_for      Boolean
   rental_frequency Rental_frequency
-  no_of_bedrooms Int
-  no_of_bathrooms Int
-  furnished Furnished
-  city City
-  amenities String[]
-  image_urls String[]
-  broker_id     String
-  broker        Broker @relation(fields: [broker_id], references: [id])
+  no_of_bedrooms   Int
+  no_of_bathrooms  Int
+  furnished        Furnished
+  city             City
+  amenities        String[]
+  image_urls       String[]
+  broker_id        String
+  broker           Broker           @relation(fields: [broker_id], references: [id])
 }
 
 enum Category {

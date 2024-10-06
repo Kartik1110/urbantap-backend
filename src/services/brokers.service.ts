@@ -63,3 +63,16 @@ export const bulkInsertBrokersService = async (brokers: Broker[]) => {
     throw error;
   }
 };
+
+/* Update a broker by id */ 
+export const updateBrokerService = async (brokerId: string, data: any) => {
+  try {
+    await prisma.broker.update({
+      where: { id: brokerId },
+      data: data,
+    });
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
