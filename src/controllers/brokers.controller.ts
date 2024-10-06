@@ -5,9 +5,9 @@ import {
   getBrokerDetailService,
   getBrokerListService,
   bulkInsertBrokersService,
+  updateBrokerService,
 } from "../services/brokers.service";
 import { uploadToS3 } from "../utils/s3Upload";
-
 
 /* Get broker detail by id */
 export const getBrokerDetail = async (req: Request, res: Response) => {
@@ -77,7 +77,7 @@ export const getBrokerList = async (req: Request, res: Response) => {
   }
 };
 
-// Bulk insert brokers
+/* Bulk insert brokers */
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
   const file = req.file as Express.Multer.File;
   const brokersJson = req.body.brokers;
@@ -93,15 +93,15 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
   }
 
   // Upload single profile picture to S3 and get URL
-  let profilePicUrl = '';
+  let profilePicUrl = "";
   if (file) {
-    const fileExtension = file.originalname.split('.').pop();
+    const fileExtension = file.originalname.split(".").pop();
     try {
       profilePicUrl = await uploadToS3(
         // file.buffer,
         file.path,
-      `profiles/${Date.now()}.${fileExtension}`
-    );
+        `profiles/${Date.now()}.${fileExtension}`
+      );
     } catch (error) {
       return res.status(400).json({
         status: "error",
@@ -139,5 +139,27 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         error: error,
       });
     }
+  }
+};
+
+/* Update Broker */
+export const updateBroker = async (req: Request, res: Response) => {
+  const brokerId = req.params.id;
+  const updateData = req.body;
+
+  try {
+    const updatedBroker = updateBrokerService(brokerId, updateData);
+
+    res.json({
+      status: "success",
+      message: "Broker updated successfully",
+      data: updatedBroker,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Failed to update broker",
+      error: error,
+    });
   }
 };
