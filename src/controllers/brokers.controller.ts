@@ -11,50 +11,33 @@ import { uploadToS3 } from "../utils/s3Upload";
 
 /* Get broker detail by id */
 export const getBrokerDetail = async (req: Request, res: Response) => {
-  const brokerId = req.params.id;
   try {
-    let response: {
-      broker: Broker | null;
-      listings: Listing[];
-      company: Company | null;
-    } = { broker: null, listings: [], company: null };
-
-    const broker = await getBrokerDetailService(brokerId);
-    response.broker = broker;
-
-    if (!broker) {
-      return res.status(404).json({
-        status: "error",
-        message: "Broker not found",
+    const brokerId = req.params.id;
+    if (!brokerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Broker ID is required'
       });
     }
 
-    const listings = await prisma.listing.findMany({
-      where: {
-        broker_id: brokerId,
-      },
+    const broker = await getBrokerDetailService(brokerId);
+    if (!broker) {
+      return res.status(404).json({
+        success: false,
+        message: 'Broker not found'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: broker
     });
 
-    response.listings = listings;
-
-    const company = await prisma.company.findUnique({
-      where: {
-        id: broker.company_id,
-      },
-    });
-
-    response.company = company;
-
-    res.json({
-      status: "success",
-      message: "Broker detail fetched successfully",
-      data: response,
-    });
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Failed to fetch broker detail",
-      error: error,
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
