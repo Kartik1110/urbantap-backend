@@ -2,9 +2,15 @@ import prisma from "../utils/prisma";
 import { Listing } from "@prisma/client";
 
 /* Get listings */
-export const getListingsService = async () => {
+interface ListingFilters {
+  [key: string]: any;  // TODO: Define the type of filters
+}
+
+export const getListingsService = async (filters: ListingFilters): Promise<Listing[]> => {
   try {
-    const listings = await prisma.listing.findMany();
+    const listings = await prisma.listing.findMany({
+      where: filters,
+    });
     return listings;
   } catch (error) {
     console.error(error);
