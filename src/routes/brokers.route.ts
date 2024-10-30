@@ -14,7 +14,7 @@ router.get("/brokers", getBrokerList);
 /* Get a broker by id */
 router.get("/brokers/:id", getBrokerDetail);
 
-router.post("/brokers/:id", updateBroker);
+router.put("/brokers/:id", updateBroker);
 
 export default (upload: any) => {
   router.post('/brokers/bulk', upload.single('file'), bulkInsertBrokers);
