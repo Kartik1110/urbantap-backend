@@ -33,10 +33,19 @@ export const signup = async (req: Request, res: Response) => {
         name,
       },
     });
+
+    // Generate a token for the newly created user
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      expiresIn: "1h",
+    });
+
     res.status(201).json({
       status: "success",
       message: "User created successfully",
-      data: user,
+      data: {
+        user,
+        token,
+      },
     });
   } catch (error) {
     if (error instanceof Error) {
