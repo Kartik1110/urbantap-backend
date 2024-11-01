@@ -17,7 +17,11 @@ export const getBrokerDetailService = async (id: string) => {
 /* Get broker list */
 export const getBrokerListService = async () => {
   try {
-    const brokers = await prisma.broker.findMany();
+    const brokers = await prisma.broker.findMany({
+      include: {
+        company: true
+      },
+    });
     return brokers;
   } catch (error) {
     console.error(error);
