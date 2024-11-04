@@ -8,6 +8,7 @@ import listingsRoutes from "./routes/listings.route";
 import companyRoutes from "./routes/company.route";
 import authRoutes from "./routes/auth.route";
 import { authMiddleware } from "./middlewares/auth.middleware";
+import notificationsRoutes from './routes/notifications.routes';
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", companyRoutes);
 app.use("/api/v1", authRoutes);
+
+app.use("/api/v1", notificationsRoutes);
 
 // Add multer middleware to routes that need file upload
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
