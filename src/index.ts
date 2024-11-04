@@ -20,12 +20,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/v1", companyRoutes);
+app.use("/api/v1", authRoutes);
+
 // Add multer middleware to routes that need file upload
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
 
-app.use("/api/v1", companyRoutes);
-app.use("/api/v1", authRoutes);
 
 app.get("/health", (req, res) => {
   res.send("OK");
