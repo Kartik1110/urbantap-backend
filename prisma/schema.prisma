@@ -105,3 +105,55 @@ enum City {
   Fujairah
   Umm_Al_Quwain
 }
+
+model Notification {
+  id         String   @id @default(uuid())
+  broker_id  String
+  broker     Broker   @relation(fields: [broker_id], references: [id])
+  timestamp  DateTime @default(now())
+  text       String
+  type       NotificationType
+}
+
+enum NotificationType {
+  General
+  Enquiries
+  Network
+}
+
+model ConnectionRequest {
+  id         String         @id @default(uuid())
+  sent_by_id String
+  sent_to_id String
+  sent_by    Broker         @relation("SentBy", fields: [sent_by_id], references: [id])
+  sent_to    Broker         @relation("SentTo", fields: [sent_to_id], references: [id])
+  timestamp  DateTime       @default(now())
+  status     RequestStatus
+}
+
+enum RequestStatus {
+  Accepted
+  Rejected
+  Pending
+}
+
+model Connections {
+  id        String   @id @default(uuid())
+  broker1_id String
+  broker2_id String
+  broker1   Broker   @relation("Broker1", fields: [broker1_id], references: [id])
+  broker2   Broker   @relation("Broker2", fields: [broker2_id], references: [id])
+  timestamp DateTime @default(now())
+}
+
+model Inquiry {
+  id         String   @id @default(uuid())
+  sent_by_id String
+  sent_to_id String
+  sent_by    Broker   @relation("InquirySentBy", fields: [sent_by_id], references: [id])
+  sent_to    Broker   @relation("InquirySentTo", fields: [sent_to_id], references: [id])
+  timestamp  DateTime @default(now())
+  listing_id String
+  listing    Listing  @relation(fields: [listing_id], references: [id])
+  text       String
+}
