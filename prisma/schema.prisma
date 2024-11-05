@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -22,6 +16,7 @@ model User {
   role      String   @default("USER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  brokers   Broker[]
 }
 
 model Broker {
@@ -37,8 +32,10 @@ model Broker {
   ig_link       String?
   linkedin_link String?
   company_id    String
+  user_id       String?
   company       Company   @relation(fields: [company_id], references: [id])
   listings      Listing[]
+  user          User?     @relation(fields: [user_id], references: [id])
 }
 
 model Company {
@@ -52,7 +49,8 @@ model Listing {
   title            String
   description      String
   image            String
-  selling_price    Float
+  min_price        Float?            @default(0)
+  max_price        Float?            @default(0)
   sq_ft            Float
   locality         String
   type             Type
@@ -63,6 +61,7 @@ model Listing {
   no_of_bathrooms  Int
   furnished        Furnished
   city             City
+  address          String?           @default("")
   amenities        String[]
   image_urls       String[]
   broker_id        String
