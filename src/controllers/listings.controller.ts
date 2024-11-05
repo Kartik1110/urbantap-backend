@@ -9,8 +9,10 @@ import { uploadToS3 } from "../utils/s3Upload";
 
 /* Get listings */
 export const getListings = async (req: Request, res: Response) => {
+  const filters = req.body || {};
+
   try {
-    const listings = await getListingsService();
+    const listings = await getListingsService(filters);
 
     const listingsWithBrokers = await Promise.all(
       listings.map(async (listing) => {
@@ -21,7 +23,6 @@ export const getListings = async (req: Request, res: Response) => {
         };
       })
     );
-
 
     res.json({
       status: "success",
