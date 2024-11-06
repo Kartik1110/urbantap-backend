@@ -39,9 +39,11 @@ model Broker {
 }
 
 model Company {
-  id      String   @id @default(uuid())
-  name    String
-  brokers Broker[]
+  id          String   @id @default(uuid())
+  name        String
+  description String   @default("")
+  logo        String   @default("")
+  brokers     Broker[]
 }
 
 model Listing {
@@ -49,8 +51,8 @@ model Listing {
   title            String
   description      String
   image            String
-  min_price        Float?            @default(0)
-  max_price        Float?            @default(0)
+  min_price        Float?           @default(0)
+  max_price        Float?           @default(0)
   sq_ft            Float
   locality         String
   type             Type
@@ -61,7 +63,7 @@ model Listing {
   no_of_bathrooms  Int
   furnished        Furnished
   city             City
-  address          String?           @default("")
+  address          String?          @default("")
   amenities        String[]
   image_urls       String[]
   broker_id        String
