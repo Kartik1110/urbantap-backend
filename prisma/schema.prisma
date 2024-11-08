@@ -199,4 +199,8 @@ model Inquiry {
   listing_id String
   listing    Listing  @relation(fields: [listing_id], references: [id])
   text       String
+  email      String   // New field
+  name       String   // New field
+  phone_no   String   // New field
 }
+
