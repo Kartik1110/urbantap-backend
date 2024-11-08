@@ -146,12 +146,16 @@ enum Sale_Type {
 }
 
 model Notification {
-  id         String   @id @default(uuid())
-  broker_id  String
-  broker     Broker   @relation(fields: [broker_id], references: [id])
-  timestamp  DateTime @default(now())
-  text       String
-  type       NotificationType
+  id                 String            @id @default(uuid())
+  broker_id          String
+  broker             Broker            @relation(fields: [broker_id], references: [id])
+  timestamp          DateTime          @default(now())
+  text               String
+  type               NotificationType
+  inquiry_id         String?           @default(null)
+  inquiry            Inquiry?          @relation(fields: [inquiry_id], references: [id])
+  connectionRequest_id String?         @default(null)
+  connectionRequest  ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id])
 }
 
 enum NotificationType {
