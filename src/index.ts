@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.route";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import notificationsRoutes from './routes/notifications.route';
 import inquiriesRoutes from './routes/inquiries.route';
+import connectionsRoutes from './routes/connections.route';
 
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use("/api/v1", authRoutes);
 
 app.use("/api/v1", notificationsRoutes);
 app.use("/api/v1", inquiriesRoutes);
+app.use("/api/v1", connectionsRoutes);
 
 // Add multer middleware to routes that need file upload
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
