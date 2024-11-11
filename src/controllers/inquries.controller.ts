@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createInquiryAndNotify, getInquiryById } from './service';
+import { createInquiryAndNotify, getInquiryById } from '../services/inquiries.service';
 
 export const createInquiry = async (req: Request, res: Response) => {
     const { listing_id } = req.params;

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getConnectionsByBrokerId, createConnectionRequest, updateConnectionRequestStatus } from './connections.controller';
+import { getConnectionsByBrokerId, createConnectionRequest, updateConnectionRequestStatus } from '../controllers/connections.controller';
 
 const router = express.Router();
 
