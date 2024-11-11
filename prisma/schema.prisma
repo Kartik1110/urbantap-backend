@@ -43,6 +43,13 @@ model Broker {
   company       Company?  @relation(fields: [company_id], references: [id])
   listings      Listing[]
   user          User?     @relation(fields: [user_id], references: [id])
+  notifications Notification[]
+  sentByConnectionRequests ConnectionRequest[] @relation("SentBy")
+  sentToConnectionRequests ConnectionRequest[] @relation("SentTo")
+  sentByInquiries Inquiry[] @relation("InquirySentBy")
+  sentToInquiries Inquiry[] @relation("InquirySentTo")
+  broker1Connections Connections[] @relation("Broker1")
+  broker2Connections Connections[] @relation("Broker2")
 }
 
 model Company {
@@ -76,8 +83,9 @@ model Listing {
   payment_plan     Payment_Plan?
   sale_type        Sale_Type?
   broker_id        String
-  created_at       DateTime           @default(now())
-  broker           Broker             @relation(fields: [broker_id], references: [id])
+  created_at       DateTime         @default(now())
+  broker           Broker           @relation(fields: [broker_id], references: [id])
+  inquiries        Inquiry[]
 }
 
 enum Category {
@@ -152,10 +160,10 @@ model Notification {
   timestamp          DateTime          @default(now())
   text               String
   type               NotificationType
-  inquiry_id         String?           @default(null)
-  inquiry            Inquiry?          @relation(fields: [inquiry_id], references: [id])
-  connectionRequest_id String?         @default(null)
-  connectionRequest  ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id])
+  inquiry_id         String?
+  inquiry            Inquiry?          @relation(fields: [inquiry_id], references: [id], name: "InquiryNotifications")
+  connectionRequest_id String?         
+  connectionRequest  ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
 }
 
 enum NotificationType {
@@ -172,6 +180,7 @@ model ConnectionRequest {
   sent_to    Broker         @relation("SentTo", fields: [sent_to_id], references: [id])
   timestamp  DateTime       @default(now())
   status     RequestStatus
+  notifications Notification[] @relation("ConnectionRequestNotifications")
 }
 
 enum RequestStatus {
@@ -202,5 +211,6 @@ model Inquiry {
   email      String   // New field
   name       String   // New field
   phone_no   String   // New field
+  notifications Notification[] @relation("InquiryNotifications")
 }
 

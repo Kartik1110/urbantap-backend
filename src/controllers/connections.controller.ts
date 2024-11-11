@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { fetchConnectionsByBrokerId, addConnectionRequest, updateConnectionStatus } from './connections.service';
+import { fetchConnectionsByBrokerId, addConnectionRequest, updateConnectionStatus } from '../services/connections.service';
 
 export const getConnectionsByBrokerId = async (req: Request, res: Response) => {
     const { broker_id } = req.params;
