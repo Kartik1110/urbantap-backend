@@ -4,7 +4,6 @@ import {
   getListingsService,
   bulkInsertListingsService,
 } from "../services/listings.service";
-import { getBrokerDetailService } from "../services/brokers.service";
 import { uploadToS3 } from "../utils/s3Upload";
 
 /* Get listings */
@@ -14,20 +13,10 @@ export const getListings = async (req: Request, res: Response) => {
   try {
     const listings = await getListingsService(filters);
 
-    const listingsWithBrokers = await Promise.all(
-      listings.map(async (listing) => {
-        const brokerDetail = await getBrokerDetailService(listing.broker_id);
-        return {
-          ...listing,
-          broker_name: brokerDetail?.name,
-        };
-      })
-    );
-
     res.json({
       status: "success",
       message: "Listings fetched successfully",
-      data: listingsWithBrokers,
+      data: listings,
     });
   } catch (error) {
     res.status(500).json({

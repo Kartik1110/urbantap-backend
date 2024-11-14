@@ -6,10 +6,17 @@ interface ListingFilters {
   [key: string]: any;  // TODO: Define the type of filters
 }
 
-export const getListingsService = async (filters: ListingFilters): Promise<Listing[]> => {
+export const getListingsService = async (filters: ListingFilters): Promise<(Listing & { broker: any })[]> => {
   try {
     const listings = await prisma.listing.findMany({
       where: filters,
+      include: {
+        broker: {
+          select: {
+            company: true,
+          },
+        },
+      },
     });
     return listings;
   } catch (error) {

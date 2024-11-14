@@ -67,6 +67,7 @@ model Listing {
   amenities        String[]
   image_urls       String[]
   broker_id        String
+  created_at       DateTime         @default(now())
   broker           Broker           @relation(fields: [broker_id], references: [id])
 }
 
