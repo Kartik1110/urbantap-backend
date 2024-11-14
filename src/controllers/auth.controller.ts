@@ -35,9 +35,7 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     // Generate a token for the newly created user
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
 
     res.status(201).json({
       status: "success",
@@ -68,9 +66,7 @@ export const login = async (req: Request, res: Response) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
     res.json({
       status: "success",
       message: "User logged in successfully!",
