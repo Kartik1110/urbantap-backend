@@ -14,6 +14,7 @@ export const getListingsService = async (filters: ListingFilters): Promise<(List
         broker: {
           select: {
             company: true,
+            name: true
           },
         },
       },
