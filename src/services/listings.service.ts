@@ -3,23 +3,68 @@ import { Listing } from "@prisma/client";
 
 /* Get listings */
 interface ListingFilters {
-  [key: string]: any;  // TODO: Define the type of filters
+  [key: string]: any; // TODO: Define the type of filters
 }
 
-export const getListingsService = async (filters: ListingFilters): Promise<(Listing & { broker: any })[]> => {
+export const getListingsService = async (
+  filters: ListingFilters
+): Promise<
+  Array<{
+    listing: Partial<Listing>;
+    broker: {
+      id: string;
+      name: string;
+      profile_pic: string;
+    };
+    company: {
+      name: string;
+    };
+  }>
+> => {
   try {
     const listings = await prisma.listing.findMany({
       where: filters,
       include: {
         broker: {
           select: {
-            company: true,
-            name: true
+            id: true,
+            name: true,
+            profile_pic: true,
+            company: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
     });
-    return listings;
+
+    if (listings.length === 0) {
+      return [
+        {
+          listing: {},
+          broker: { id: "", name: "", profile_pic: "" },
+          company: { name: "" },
+        },
+      ];
+    }
+
+    // Transform each listing into the desired format
+    return listings.map((listing) => {
+      const { broker_id, broker, ...listingWithoutBroker } = listing;
+      return {
+        listing: listingWithoutBroker,
+        broker: {
+          id: listing.broker.id,
+          name: listing.broker.name,
+          profile_pic: listing.broker.profile_pic,
+        },
+        company: {
+          name: listing.broker.company.name,
+        },
+      };
+    });
   } catch (error) {
     console.error(error);
     throw error;
