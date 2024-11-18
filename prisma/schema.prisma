@@ -58,8 +58,8 @@ model Listing {
   category         Category
   looking_for      Boolean
   rental_frequency Rental_frequency
-  no_of_bedrooms   Int
-  no_of_bathrooms  Int
+  no_of_bedrooms   Bedrooms?
+  no_of_bathrooms  Bathrooms?
   furnished        Furnished
   city             City
   address          String?          @default("")
@@ -104,4 +104,18 @@ enum City {
   Ras_Al_Khaimah
   Fujairah
   Umm_Al_Quwain
+}
+
+enum Bedrooms {
+  Studio
+  One
+  Two
+  Three
+  Four_Plus
+}
+
+enum Bathrooms {
+  One
+  Two
+  Three_Plus
 }
