@@ -53,8 +53,8 @@ model Listing {
   image            String
   min_price        Float?           @default(0)
   max_price        Float?           @default(0)
-  sq_ft            Float
-  locality         String
+  min_sq_ft        Float?
+  max_sq_ft        Float?
   type             Type
   category         Category
   looking_for      Boolean

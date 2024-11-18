@@ -7,7 +7,12 @@ interface ListingFilters {
 }
 
 export const getListingsService = async (
-  filters: ListingFilters
+  filters: {
+    min_price?: number;
+    max_price?: number;
+    min_sqft?: number;
+    max_sqft?: number;
+  } & ListingFilters
 ): Promise<
   Array<{
     listing: Partial<Listing>;
@@ -22,8 +27,40 @@ export const getListingsService = async (
   }>
 > => {
   try {
+    const { min_price, max_price, min_sq_ft, max_sq_ft, ...otherFilters } =
+      filters;
+    console.log("filters", filters);
+
     const listings = await prisma.listing.findMany({
-      where: filters,
+      where: {
+        ...otherFilters,
+        AND: [
+          {
+            OR: [
+              {
+                min_price: {
+                  gte: min_price,
+                },
+                max_price: {
+                  lte: max_price,
+                },
+              },
+            ],
+          },
+          {
+            OR: [
+              {
+                min_sq_ft: {
+                  gte: min_sq_ft,
+                },
+                max_sq_ft: {
+                  lte: max_sq_ft,
+                },
+              },
+            ],
+          },
+        ],
+      },
       include: {
         broker: {
           select: {
@@ -50,7 +87,6 @@ export const getListingsService = async (
       ];
     }
 
-    // Transform each listing into the desired format
     return listings.map((listing) => {
       const { broker_id, broker, ...listingWithoutBroker } = listing;
       return {
