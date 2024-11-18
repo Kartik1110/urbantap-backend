@@ -29,51 +29,44 @@ export const getListingsService = async (
   try {
     const { min_price, max_price, min_sq_ft, max_sq_ft, ...otherFilters } =
       filters;
-    console.log("filters", filters);
 
     const listings = await prisma.listing.findMany({
       where: {
-        ...otherFilters,
-        AND: [
+      ...otherFilters,
+      AND: [
+        {
+        OR: [
           {
-            OR: [
-              {
-                min_price: {
-                  gte: min_price,
-                },
-                max_price: {
-                  lte: max_price,
-                },
-              },
-            ],
+          min_price: {
+            gte: min_price,
           },
-          {
-            OR: [
-              {
-                min_sq_ft: {
-                  gte: min_sq_ft,
-                },
-                max_sq_ft: {
-                  lte: max_sq_ft,
-                },
-              },
-            ],
+          max_price: {
+            lte: max_price,
+          },
           },
         ],
+        },
+        {
+        sq_ft: {
+          ...(min_sq_ft && { gte: min_sq_ft }),
+          ...(max_sq_ft && { lte: max_sq_ft }),
+        },
+        },
+      ],
       },
       include: {
-        broker: {
+      broker: {
+        select: {
+        id: true,
+        name: true,
+        profile_pic: true,
+        company: {
           select: {
-            id: true,
-            name: true,
-            profile_pic: true,
-            company: {
-              select: {
-                name: true,
-              },
-            },
+          name: true,
           },
         },
+        },
+      },
       },
     });
 
