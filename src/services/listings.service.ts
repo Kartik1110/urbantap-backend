@@ -107,10 +107,6 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
       data: listings,
     });
 
-    await prisma.listing.createMany({
-      data: listings,
-    });
-
     return newListings;
   } catch (error) {
     console.error(error);
