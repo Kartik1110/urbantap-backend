@@ -13,10 +13,16 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      String   @default("USER")
+  role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   brokers   Broker[]
+}
+
+enum Role {
+  BROKER
+  OTHER
+  ADMIN
 }
 
 model Broker {

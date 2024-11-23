@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 // Signup controller
 export const signup = async (req: Request, res: Response) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, role } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -31,6 +31,7 @@ export const signup = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         name,
+        role
       },
     });
 

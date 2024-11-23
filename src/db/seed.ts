@@ -14,6 +14,7 @@ async function main() {
       name: "John Doe",
       email: "john@realestatepro.com",
       password: "password",
+      role: "BROKER",
     },
   });
 
