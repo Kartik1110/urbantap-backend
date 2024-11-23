@@ -130,21 +130,50 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
 /* Update Broker */
 export const updateBroker = async (req: Request, res: Response) => {
   const brokerId = req.params.id;
-  const updateData = req.body;
+  const updateData = JSON.parse(req.body.data);
+  
+  const file = req.file as Express.Multer.File | undefined;
+  let profilePicUrl;
+
+  if (file) {
+    const fileExtension = file.originalname.split(".").pop();
+    try {
+      profilePicUrl = await uploadToS3(
+        file.path,
+        `profiles/${Date.now()}.${fileExtension}`
+      );
+    } catch (error) {
+      return res.status(400).json({
+        status: "error",
+        message: "Failed to upload file to S3",
+      });
+    }
+  }
+
+  const updatedBrokerData = {
+    ...updateData,
+    profile_pic: profilePicUrl || updateData.profile_pic
+  };
 
   try {
-    const updatedBroker = updateBrokerService(brokerId, updateData);
+    await updateBrokerService(brokerId, updatedBrokerData);
 
     res.json({
-      status: "success",
+      status: "success", 
       message: "Broker updated successfully",
-      data: updatedBroker,
     });
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Failed to update broker",
-      error: error,
-    });
+    if (error instanceof Error) {
+      res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        message: "Failed to update broker",
+        error: error,
+      });
+    }
   }
 };
