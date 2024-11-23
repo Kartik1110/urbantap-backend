@@ -1,7 +1,8 @@
 import prisma from "../utils/prisma";
 import { Company } from "@prisma/client";
+import { CreateCompanyInput } from '../schemas/company.schema';
 
-export const bulkInsertCompaniesService = async (companies: Company[]) => {
+export const bulkInsertCompaniesService = async (companies: CreateCompanyInput[]) => {
   try {
     return await prisma.company.createMany({
       data: companies,

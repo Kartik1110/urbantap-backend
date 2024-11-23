@@ -31,9 +31,9 @@ model Broker {
   w_number      String
   ig_link       String?
   linkedin_link String?
-  company_id    String
+  company_id    String?
   user_id       String?
-  company       Company   @relation(fields: [company_id], references: [id])
+  company       Company?   @relation(fields: [company_id], references: [id])
   listings      Listing[]
   user          User?     @relation(fields: [user_id], references: [id])
 }

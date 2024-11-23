@@ -3,11 +3,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import logger from "../utils/logger";
+import { CreateUserInput, LoginInput } from '../schemas/user.schema';
 
 const prisma = new PrismaClient();
 
 // Signup controller
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request<{}, {}, CreateUserInput>, res: Response) => {
   const { email, password, name } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -56,7 +57,7 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 // Login controller
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request<{}, {}, LoginInput>, res: Response) => {
   const { email, password } = req.body;
   try {
     const user = await prisma.user.findUnique({ where: { email } });

@@ -62,7 +62,7 @@ export const getBrokerList = async (req: Request, res: Response) => {
 
 /* Bulk insert brokers */
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
-  const file = req.file as Express.Multer.File;
+  const file = req.file as Express.Multer.File | undefined;
   const brokersJson = req.body.brokers;
 
   let brokers = [];
@@ -70,18 +70,17 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
     brokers = JSON.parse(brokersJson);
   } catch (error) {
     return res.status(400).json({
-      status: "error",
+      status: "error", 
       message: "Invalid brokers data",
     });
   }
 
-  // Upload single profile picture to S3 and get URL
+  // Upload single profile picture to S3 and get URL if file exists
   let profilePicUrl = "";
   if (file) {
     const fileExtension = file.originalname.split(".").pop();
     try {
       profilePicUrl = await uploadToS3(
-        // file.buffer,
         file.path,
         `profiles/${Date.now()}.${fileExtension}`
       );
@@ -95,7 +94,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
 
   const brokersWithPics = brokers.map((broker: Broker) => ({
     ...broker,
-    profile_pic: profilePicUrl,
+    profile_pic: profilePicUrl || broker.profile_pic || "", // Use existing pic if no new one uploaded
   }));
 
   try {
@@ -106,7 +105,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
     };
     res.json({
       status: "success",
-      message: "Brokers inserted successfully",
+      message: "Brokers inserted successfully", 
       data: data,
     });
   } catch (error) {

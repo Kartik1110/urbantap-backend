@@ -1,5 +1,6 @@
 import { Broker } from "@prisma/client";
 import prisma from "../utils/prisma";
+import { CreateBrokerInput, UpdateBrokerInput } from '../schemas/broker.schema';
 
 /* Get broker detail by id */
 export const getBrokerDetailService = async (id: string) => {
@@ -67,7 +68,7 @@ export const getBrokerListService = async () => {
 };
 
 /* Bulk insert brokers */
-export const bulkInsertBrokersService = async (brokers: Broker[]) => {
+export const bulkInsertBrokersService = async (brokers: CreateBrokerInput[]) => {
   try {
     // add brokers exists check
     const existingBrokers = await prisma.broker.findMany({
@@ -106,7 +107,7 @@ export const bulkInsertBrokersService = async (brokers: Broker[]) => {
 };
 
 /* Update a broker by id */
-export const updateBrokerService = async (brokerId: string, data: any) => {
+export const updateBrokerService = async (brokerId: string, data: UpdateBrokerInput) => {
   try {
     await prisma.broker.update({
       where: { id: brokerId },

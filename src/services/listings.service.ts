@@ -1,72 +1,50 @@
 import prisma from "../utils/prisma";
 import { Listing } from "@prisma/client";
+import { ListingFilters, CreateListingInput } from '../schemas/listing.schema';
 
 /* Get listings */
-interface ListingFilters {
-  [key: string]: any; // TODO: Define the type of filters
-}
-
-export const getListingsService = async (
-  filters: {
-    min_price?: number;
-    max_price?: number;
-    min_sqft?: number;
-    max_sqft?: number;
-  } & ListingFilters
-): Promise<
-  Array<{
-    listing: Partial<Listing>;
-    broker: {
-      id: string;
-      name: string;
-      profile_pic: string;
-    };
-    company: {
-      name: string;
-    };
-  }>
-> => {
+export const getListingsService = async (filters: ListingFilters) => {
   try {
-    const { min_price, max_price, min_sq_ft, max_sq_ft, ...otherFilters } =
+    const { min_price, max_price, min_sqft, max_sqft, ...otherFilters } =
       filters;
 
     const listings = await prisma.listing.findMany({
       where: {
-      ...otherFilters,
-      AND: [
-        {
-        OR: [
+        ...otherFilters,
+        AND: [
           {
-          min_price: {
-            gte: min_price,
+            OR: [
+              {
+                min_price: min_price ? {
+                  gte: min_price,
+                } : undefined,
+                max_price: max_price ? {
+                  lte: max_price,
+                } : undefined,
+              },
+            ],
           },
-          max_price: {
-            lte: max_price,
+          {
+            sq_ft: {
+              ...(min_sqft && { gte: min_sqft }),
+              ...(max_sqft && { lte: max_sqft }),
+            },
           },
-          },
-        ],
-        },
-        {
-        sq_ft: {
-          ...(min_sq_ft && { gte: min_sq_ft }),
-          ...(max_sq_ft && { lte: max_sq_ft }),
-        },
-        },
-      ],
+        ].filter(Boolean),
       },
       include: {
-      broker: {
-        select: {
-        id: true,
-        name: true,
-        profile_pic: true,
-        company: {
+        broker: {
           select: {
-          name: true,
+            id: true,
+            name: true,
+            profile_pic: true,
+            company: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
-        },
-      },
       },
     });
 
@@ -90,7 +68,7 @@ export const getListingsService = async (
           profile_pic: listing.broker.profile_pic,
         },
         company: {
-          name: listing.broker.company.name,
+          name: listing.broker.company?.name || "",
         },
       };
     });
@@ -101,7 +79,7 @@ export const getListingsService = async (
 };
 
 /* Bulk insert listings */
-export const bulkInsertListingsService = async (listings: Listing[]) => {
+export const bulkInsertListingsService = async (listings: CreateListingInput[]) => {
   try {
     const newListings = await prisma.listing.createMany({
       data: listings,
