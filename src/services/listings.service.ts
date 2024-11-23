@@ -90,7 +90,7 @@ export const getListingsService = async (
           profile_pic: listing.broker.profile_pic,
         },
         company: {
-          name: listing.broker.company.name,
+          name: listing.broker.company?.name || "",
         },
       };
     });
