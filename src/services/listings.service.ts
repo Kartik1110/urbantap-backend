@@ -12,6 +12,15 @@ export const getListingsService = async (
     max_price?: number;
     min_sqft?: number;
     max_sqft?: number;
+    no_of_bathrooms?: ("One" | "Two" | "Three_Plus")[];
+    no_of_bedrooms?: ("Studio" | "One" | "Two" | "Three" | "Four_Plus")[];
+    furnished?: ("Furnished" | "Semi_furnished" | "Unfurnished")[];
+    type?: ("Apartment" | "Villa" | "Townhouse" | "Office")[];
+    rental_frequency?: ("Monthly" | "Quarterly" | "Yearly" | "Lease")[];
+    project_age?: ("Less_than_5_years" | "More_than_5_years")[];
+    payment_plan?: ("Payment_done" | "Payment_Pending")[];
+    sale_type?: ("Direct" | "Resale")[];
+    amenities?: string[];
   } & ListingFilters
 ): Promise<
   Array<{
@@ -27,46 +36,91 @@ export const getListingsService = async (
   }>
 > => {
   try {
-    const { min_price, max_price, min_sq_ft, max_sq_ft, ...otherFilters } =
+    const { min_price, max_price, min_sq_ft, max_sq_ft, no_of_bathrooms, no_of_bedrooms, furnished, type, rental_frequency, project_age, payment_plan, sale_type, amenities, ...otherFilters } =
       filters;
 
     const listings = await prisma.listing.findMany({
       where: {
-      ...otherFilters,
-      AND: [
-        {
-        OR: [
+        ...otherFilters,
+        AND: [
           {
-          min_price: {
-            gte: min_price,
+            OR: [
+              {
+                min_price: {
+                  gte: min_price,
+                },
+                max_price: {
+                  lte: max_price,
+                },
+              },
+            ],
           },
-          max_price: {
-            lte: max_price,
+          {
+            sq_ft: {
+              ...(min_sq_ft && { gte: min_sq_ft }),
+              ...(max_sq_ft && { lte: max_sq_ft }),
+            },
           },
-          },
+          ...(no_of_bathrooms ? [{
+            no_of_bathrooms: {
+              in: no_of_bathrooms
+            }
+          }] : []),
+          ...(no_of_bedrooms ? [{
+            no_of_bedrooms: {
+              in: no_of_bedrooms
+            }
+          }] : []),
+          ...(furnished ? [{
+            furnished: {
+              in: furnished
+            }
+          }] : []),
+          ...(type ? [{
+            type: {
+              in: type
+            }
+          }] : []),
+          ...(rental_frequency ? [{
+            rental_frequency: {
+              in: rental_frequency
+            }
+          }] : []),
+          ...(project_age ? [{
+            project_age: {
+              in: project_age
+            }
+          }] : []),
+          ...(payment_plan ? [{
+            payment_plan: {
+              in: payment_plan
+            }
+          }] : []),
+          ...(sale_type ? [{
+            sale_type: {
+              in: sale_type
+            }
+          }] : []),
+          ...(amenities ? [{
+            amenities: {
+              hasSome: amenities
+            }
+          }] : []),
         ],
-        },
-        {
-        sq_ft: {
-          ...(min_sq_ft && { gte: min_sq_ft }),
-          ...(max_sq_ft && { lte: max_sq_ft }),
-        },
-        },
-      ],
       },
       include: {
-      broker: {
-        select: {
-        id: true,
-        name: true,
-        profile_pic: true,
-        company: {
+        broker: {
           select: {
-          name: true,
+            id: true,
+            name: true,
+            profile_pic: true,
+            company: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
-        },
-      },
       },
     });
 
@@ -80,17 +134,17 @@ export const getListingsService = async (
       ];
     }
 
-    return listings.map((listing) => {
-      const { broker_id, broker, ...listingWithoutBroker } = listing;
+    return listings.map((listing: any) => {
+      const { broker, ...listingWithoutBroker } = listing;
       return {
         listing: listingWithoutBroker,
         broker: {
-          id: listing.broker.id,
-          name: listing.broker.name,
-          profile_pic: listing.broker.profile_pic,
+          id: broker.id,
+          name: broker.name,
+          profile_pic: broker.profile_pic,
         },
         company: {
-          name: listing.broker.company?.name || "",
+          name: broker.company?.name || "",
         },
       };
     });
