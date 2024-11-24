@@ -71,6 +71,9 @@ model Listing {
   address          String?          @default("")
   amenities        String[]
   image_urls       String[]
+  project_age      Project_Age?
+  payment_plan     Payment_Plan?
+  sale_type        Sale_Type?
   broker_id        String
   created_at       DateTime         @default(now())
   broker           Broker           @relation(fields: [broker_id], references: [id])
@@ -124,4 +127,19 @@ enum Bathrooms {
   One
   Two
   Three_Plus
+}
+
+enum Project_Age {
+  Less_than_5_years
+  More_than_5_years
+}
+
+enum Payment_Plan {
+  Payment_done
+  Payment_Pending
+}
+
+enum Sale_Type {
+  Direct
+  Resale
 }
