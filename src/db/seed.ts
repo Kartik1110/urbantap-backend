@@ -39,6 +39,7 @@ async function main() {
       ig_link: "thevarunchopra",
       linkedin_link: "https://linkedin.com/in/kartik-pal-dev/",
       profile_pic: "https://randomuser.me/api/portraits",
+      designation: "Broker",
       company_id: company.id,
       user_id: user.id,
     },

@@ -108,6 +108,11 @@ export const bulkInsertBrokersService = async (brokers: Broker[]) => {
 /* Update a broker by id */
 export const updateBrokerService = async (brokerId: string, data: any) => {
   try {
+    // If company_id is empty string, set it to null instead
+    if (data.company_id === "") {
+      data.company_id = null;
+    }
+
     await prisma.broker.update({
       where: { id: brokerId },
       data: data,
