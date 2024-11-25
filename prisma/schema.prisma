@@ -37,6 +37,7 @@ model Broker {
   w_number      String
   ig_link       String?
   linkedin_link String?
+  designation   String?
   company_id    String?
   user_id       String?
   company       Company?   @relation(fields: [company_id], references: [id])
