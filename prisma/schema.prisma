@@ -40,7 +40,7 @@ model Broker {
   designation   String?
   company_id    String?
   user_id       String?
-  company       Company?   @relation(fields: [company_id], references: [id])
+  company       Company?  @relation(fields: [company_id], references: [id])
   listings      Listing[]
   user          User?     @relation(fields: [user_id], references: [id])
 }
@@ -54,30 +54,30 @@ model Company {
 }
 
 model Listing {
-  id               String           @id @default(uuid())
+  id               String             @id @default(uuid())
   title            String
   description      String
   image            String
-  min_price        Float?           @default(0)
-  max_price        Float?           @default(0)
+  min_price        Float?             @default(0)
+  max_price        Float?             @default(0)
   sq_ft            Float?
   type             Type
   category         Category
-  looking_for      Boolean
-  rental_frequency Rental_frequency
+  looking_for      Boolean // looking for or renting
+  rental_frequency Rental_frequency?
   no_of_bedrooms   Bedrooms?
   no_of_bathrooms  Bathrooms?
-  furnished        Furnished
+  furnished        Furnished?
   city             City
-  address          String?          @default("")
+  address          String?            @default("")
   amenities        String[]
   image_urls       String[]
   project_age      Project_Age?
   payment_plan     Payment_Plan?
   sale_type        Sale_Type?
   broker_id        String
-  created_at       DateTime         @default(now())
-  broker           Broker           @relation(fields: [broker_id], references: [id])
+  created_at       DateTime           @default(now())
+  broker           Broker             @relation(fields: [broker_id], references: [id])
 }
 
 enum Category {

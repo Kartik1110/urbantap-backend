@@ -29,22 +29,25 @@ export const getListings = async (req: Request, res: Response) => {
 
 /* Bulk insert listings */
 export const bulkInsertListings = async (req: Request, res: Response) => {
-  const images = req.files as Express.Multer.File[];
+  const images = req.files as Express.Multer.File[] | undefined;
   const listings = req.body.listings;
 
-  // Upload images to S3 and get URLs
   let imageUrls: string[] = [];
-  try {
-    imageUrls = await Promise.all(images.map(async (image) => {
-      const fileExtension = image.originalname.split('.').pop();
-    return await uploadToS3(image.path, `listings/${Date.now()}.${fileExtension}`);
-  }));
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Failed to upload images to S3",
-      error: error,
-    });
+  
+  // Only process images if they exist
+  if (images && images.length > 0) {
+    try {
+      imageUrls = await Promise.all(images.map(async (image) => {
+        const fileExtension = image.originalname.split('.').pop();
+        return await uploadToS3(image.path, `listings/${Date.now()}.${fileExtension}`);
+      }));
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Failed to upload images to S3",
+        error: error,
+      });
+    }
   }
 
   const listingsWithImages = JSON.parse(listings).map((listing: Listing) => ({

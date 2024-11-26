@@ -8,10 +8,14 @@ interface ListingFilters {
 
 export const getListingsService = async (
   filters: {
+    looking_for?: boolean;
+    category?: "Ready_to_move" | "Off_plan" | "Rent";
     min_price?: number;
     max_price?: number;
     min_sqft?: number;
     max_sqft?: number;
+    city?: string;
+    address?: string;
     no_of_bathrooms?: ("One" | "Two" | "Three_Plus")[];
     no_of_bedrooms?: ("Studio" | "One" | "Two" | "Three" | "Four_Plus")[];
     furnished?: ("Furnished" | "Semi_furnished" | "Unfurnished")[];
@@ -36,8 +40,26 @@ export const getListingsService = async (
   }>
 > => {
   try {
-    const { min_price, max_price, min_sq_ft, max_sq_ft, no_of_bathrooms, no_of_bedrooms, furnished, type, rental_frequency, project_age, payment_plan, sale_type, amenities, ...otherFilters } =
-      filters;
+    const {
+      looking_for,
+      category,
+      city,
+      address,
+      min_price,
+      max_price,
+      min_sq_ft,
+      max_sq_ft,
+      no_of_bathrooms,
+      no_of_bedrooms,
+      furnished,
+      type,
+      rental_frequency,
+      project_age,
+      payment_plan,
+      sale_type,
+      amenities,
+      ...otherFilters
+    } = filters;
 
     const listings = await prisma.listing.findMany({
       where: {
@@ -61,51 +83,87 @@ export const getListingsService = async (
               ...(max_sq_ft && { lte: max_sq_ft }),
             },
           },
-          ...(no_of_bathrooms ? [{
-            no_of_bathrooms: {
-              in: no_of_bathrooms
-            }
-          }] : []),
-          ...(no_of_bedrooms ? [{
-            no_of_bedrooms: {
-              in: no_of_bedrooms
-            }
-          }] : []),
-          ...(furnished ? [{
-            furnished: {
-              in: furnished
-            }
-          }] : []),
-          ...(type ? [{
-            type: {
-              in: type
-            }
-          }] : []),
-          ...(rental_frequency ? [{
-            rental_frequency: {
-              in: rental_frequency
-            }
-          }] : []),
-          ...(project_age ? [{
-            project_age: {
-              in: project_age
-            }
-          }] : []),
-          ...(payment_plan ? [{
-            payment_plan: {
-              in: payment_plan
-            }
-          }] : []),
-          ...(sale_type ? [{
-            sale_type: {
-              in: sale_type
-            }
-          }] : []),
-          ...(amenities ? [{
-            amenities: {
-              hasSome: amenities
-            }
-          }] : []),
+          ...(no_of_bathrooms
+            ? [
+                {
+                  no_of_bathrooms: {
+                    in: no_of_bathrooms,
+                  },
+                },
+              ]
+            : []),
+          ...(no_of_bedrooms
+            ? [
+                {
+                  no_of_bedrooms: {
+                    in: no_of_bedrooms,
+                  },
+                },
+              ]
+            : []),
+          ...(furnished
+            ? [
+                {
+                  furnished: {
+                    in: furnished,
+                  },
+                },
+              ]
+            : []),
+          ...(type
+            ? [
+                {
+                  type: {
+                    in: type,
+                  },
+                },
+              ]
+            : []),
+          ...(rental_frequency
+            ? [
+                {
+                  rental_frequency: {
+                    in: rental_frequency,
+                  },
+                },
+              ]
+            : []),
+          ...(project_age
+            ? [
+                {
+                  project_age: {
+                    in: project_age,
+                  },
+                },
+              ]
+            : []),
+          ...(payment_plan
+            ? [
+                {
+                  payment_plan: {
+                    in: payment_plan,
+                  },
+                },
+              ]
+            : []),
+          ...(sale_type
+            ? [
+                {
+                  sale_type: {
+                    in: sale_type,
+                  },
+                },
+              ]
+            : []),
+          ...(amenities
+            ? [
+                {
+                  amenities: {
+                    hasSome: amenities,
+                  },
+                },
+              ]
+            : []),
         ],
       },
       include: {
