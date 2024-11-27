@@ -14,6 +14,12 @@ export const fetchConnectionsByBrokerId = async (broker_id: string) => {
   });
 };
 
+export const fetchConnectionRequestsByBrokerId = async (broker_id: string) => {
+  return prisma.connectionRequest.findMany({
+    where: { sent_to_id: broker_id },
+  });
+};
+
 export const addConnectionRequest = async (
   broker_id: string,
   sent_to_id: string
@@ -88,6 +94,11 @@ export const updateConnectionStatus = async (
           ],
         });
       }
+    }
+    if (status === "Rejected") {
+      await prisma.connectionRequest.delete({
+        where: { id: request_id },
+      });
     }
   });
 };

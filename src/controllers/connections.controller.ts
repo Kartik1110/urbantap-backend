@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { fetchConnectionsByBrokerId, addConnectionRequest, updateConnectionStatus } from '../services/connections.service';
+import { fetchConnectionsByBrokerId, addConnectionRequest, updateConnectionStatus, fetchConnectionRequestsByBrokerId } from '../services/connections.service';
 
 export const getConnectionsByBrokerId = async (req: Request, res: Response) => {
     const { broker_id } = req.params;
@@ -12,6 +12,17 @@ export const getConnectionsByBrokerId = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Failed to retrieve connections.' });
     }
 };
+
+export const getConnectionRequestsByBrokerId = async (req: Request, res: Response) => {
+    const { broker_id } = req.params;
+    try {
+        const requests = await fetchConnectionRequestsByBrokerId(broker_id);
+        res.status(200).json(requests);
+    } catch (error) {
+        console.error('Error fetching connection requests:', error);
+        res.status(500).json({ message: 'Failed to retrieve connection requests.' });
+    }
+}
 
 export const createConnectionRequest = async (req: Request, res: Response) => {
     const { broker_id } = req.params;
