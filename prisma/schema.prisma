@@ -21,6 +21,7 @@ model User {
 
 enum Role {
   BROKER
+  HR
   OTHER
   ADMIN
 }
