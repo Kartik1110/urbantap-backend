@@ -13,7 +13,7 @@ add auth middleware to check if the broker id requesting is indeed the logged in
 export class NotificationsController {
   async getNotifications(req: Request, res: Response) {
     const { broker_id } = req.params;
-    const { type = 'all' } = req.query;
+    const { type = 'General' } = req.query;
 
     try {
       const notifications = await notificationsService.getNotifications(broker_id, type as string);

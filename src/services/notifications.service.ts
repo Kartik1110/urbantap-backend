@@ -7,9 +7,9 @@ export class NotificationsService {
     let whereClause: any = { broker_id: brokerId };
 
     // Determine the type filter
-    if (type === 'network') {
+    if (type === 'Network') {
       whereClause.type = NotificationType.Network;
-    } else if (type === 'enquiries') {
+    } else if (type === 'Enquiries') {
       whereClause.type = NotificationType.Enquiries;
     }
 
