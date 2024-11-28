@@ -64,6 +64,8 @@ export const getListingsService = async (
     const listings = await prisma.listing.findMany({
       where: {
         ...otherFilters,
+        ...(looking_for ? { looking_for } : {}),
+        ...(category ? { category } : {}),
         AND: [
           {
             OR: [
