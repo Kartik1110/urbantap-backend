@@ -14,7 +14,7 @@ export const getListingsService = async (
     max_price?: number;
     min_sqft?: number;
     max_sqft?: number;
-    city?: string;
+    city?: "Dubai" | "Abu_Dhabi" | "Sharjah" | "Ajman" | "Ras_Al_Khaimah" | "Fujairah" | "Umm_Al_Quwain";
     address?: string;
     no_of_bathrooms?: ("One" | "Two" | "Three_Plus")[];
     no_of_bedrooms?: ("Studio" | "One" | "Two" | "Three" | "Four_Plus")[];
@@ -66,6 +66,8 @@ export const getListingsService = async (
         ...otherFilters,
         ...(looking_for ? { looking_for } : {}),
         ...(category ? { category } : {}),
+        ...(city ? { city } : {}),
+        ...(address ? { address } : {}),
         AND: [
           {
             OR: [
