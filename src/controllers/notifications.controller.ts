@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { NotificationsService } from '../services/notifications.service';
+import { NotificationType } from '@prisma/client';
 
 const notificationsService = new NotificationsService();
 
@@ -15,8 +16,15 @@ export class NotificationsController {
     const { broker_id } = req.params;
     const { type = 'General' } = req.query;
 
+    // Validate notification type
+    if (!Object.values(NotificationType).includes(type as NotificationType)) {
+      return res.status(400).json({ 
+        message: `Invalid notification type. Must be one of: ${Object.values(NotificationType).join(', ')}`
+      });
+    }
+
     try {
-      const notifications = await notificationsService.getNotifications(broker_id, type as string);
+      const notifications = await notificationsService.getNotifications(broker_id, type as NotificationType);
       res.status(200).json(notifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);

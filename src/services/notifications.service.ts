@@ -1,15 +1,15 @@
-import { PrismaClient, NotificationType } from '@prisma/client';
+import { PrismaClient, NotificationType, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export class NotificationsService {
-  async getNotifications(brokerId: string, type: string) {
-    let whereClause: any = { broker_id: brokerId };
+  async getNotifications(brokerId: string, type: NotificationType) {
+    let whereClause: Prisma.NotificationWhereInput = { broker_id: brokerId };
 
     // Determine the type filter
-    if (type === 'Network') {
+    if (type === NotificationType.Network) {
       whereClause.type = NotificationType.Network;
-    } else if (type === 'Enquiries') {
+    } else if (type === NotificationType.Enquiries) {
       whereClause.type = NotificationType.Enquiries;
     }
 

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { fetchConnectionsByBrokerId, addConnectionRequest, updateConnectionStatus, fetchConnectionRequestsByBrokerId } from '../services/connections.service';
 
+// Retrieve all connections for a specific broker
 export const getConnectionsByBrokerId = async (req: Request, res: Response) => {
     const { broker_id } = req.params;
 
@@ -13,6 +14,7 @@ export const getConnectionsByBrokerId = async (req: Request, res: Response) => {
     }
 };
 
+// Retrieve all connection requests for a specific broker
 export const getConnectionRequestsByBrokerId = async (req: Request, res: Response) => {
     const { broker_id } = req.params;
     try {

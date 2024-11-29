@@ -6,6 +6,7 @@ const router = express.Router();
 // GET endpoint to retrieve all connections for a specific broker
 router.get('/connections/:broker_id', getConnectionsByBrokerId);
 
+// GET endpoint to retrieve all connection requests for a specific broker
 router.get('/connections/my-requests/:broker_id', getConnectionRequestsByBrokerId);
 
 // POST endpoint to create a connection request
