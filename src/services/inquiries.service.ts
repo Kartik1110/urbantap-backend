@@ -20,9 +20,9 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
         const inquiry = await prisma.inquiry.create({
             data: {
                 listing_id,
-                text,
                 sent_by_id,
                 sent_to_id,
+                text,
                 email,
                 name,
                 phone_no
@@ -44,5 +44,27 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
 export const getInquiryById = async (inquiry_id: string) => {
     return prisma.inquiry.findUnique({
         where: { id: inquiry_id },
+        select: {
+            id: true,
+            sent_by_id: true,
+            sent_by: {
+                select: {
+                    name: true,
+                    profile_pic: true,
+                    company: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
+            }, 
+            sent_to_id: true,
+            timestamp: true,
+            listing_id: true,
+            text: true,
+            email: true,
+            name: true,
+            phone_no: true
+        }
     });
 };

@@ -24,17 +24,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Unprotected routes
 app.use("/api/v1", companyRoutes);
 app.use("/api/v1", authRoutes);
 
-app.use("/api/v1", notificationsRoutes);
-app.use("/api/v1", inquiriesRoutes);
-app.use("/api/v1", connectionsRoutes);
+// Protected routes
+app.use("/api/v1", authMiddleware, notificationsRoutes);
+app.use("/api/v1", authMiddleware, inquiriesRoutes);
+app.use("/api/v1", authMiddleware, connectionsRoutes);
 
-// Add multer middleware to routes that need file upload
+// File upload routes (also protected)
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
-
 
 app.get("/health", (req, res) => {
   res.send("OK");

@@ -7,9 +7,29 @@ export const fetchConnectionsByBrokerId = async (broker_id: string) => {
     where: { broker1_id: broker_id },
     select: {
       id: true,
-      broker1_id: true,
-      broker2_id: true,
       timestamp: true,
+      broker1: {
+        select: {
+          name: true,
+          profile_pic: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      broker2: {
+        select: {
+          name: true,
+          profile_pic: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 };
@@ -17,6 +37,23 @@ export const fetchConnectionsByBrokerId = async (broker_id: string) => {
 export const fetchConnectionRequestsByBrokerId = async (broker_id: string) => {
   return prisma.connectionRequest.findMany({
     where: { sent_to_id: broker_id },
+    select: {
+      id: true,
+      timestamp: true,
+      status: true,
+      sent_by: {
+        select: {
+          id: true,
+          name: true,
+          profile_pic: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
   });
 };
 
@@ -34,11 +71,18 @@ export const addConnectionRequest = async (
       },
     });
 
+    const sentByBrokerName = await prisma.broker.findUnique({
+      where: { id: broker_id },
+      select: {
+        name: true,
+      },
+    });
+
     // Step 2: Create a notification for the recipient
     await prisma.notification.create({
       data: {
         broker_id: sent_to_id,
-        text: `New connection request received from broker ${broker_id}`,
+        text: `New connection request received from broker ${sentByBrokerName?.name}`,
         type: "Network",
         connectionRequest_id: connectionRequest.id,
       },
@@ -70,11 +114,18 @@ export const updateConnectionStatus = async (
       });
 
       if (brokerSentBy && brokerSentTo) {
+        const sentByBrokerName = await prisma.broker.findUnique({
+          where: { id: sent_by_id },
+          select: {
+            name: true,
+          },
+        });
+
         // Create a notification for the accepted connection
         await prisma.notification.create({
           data: {
             broker_id: sent_to_id,
-            text: `Connection request from broker ${sent_by_id} has been accepted.`,
+            text: `Connection request from broker ${sentByBrokerName?.name} has been accepted.`,
             type: "Network",
             connectionRequest_id: request_id,
           },
