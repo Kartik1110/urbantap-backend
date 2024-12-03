@@ -1,0 +1,57 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat >>~/.ssh/config <<END
+          Host ec2
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile=/dev/null
+          END
+
+      - name: Check SSH connection
+        run: ssh ec2 'echo "SSH connection successful"'
+
+      - name: Deploy to EC2
+        run: |
+          ssh ec2 '
+            set -e
+            echo "Starting deployment..."
+            
+            cd urbantap-backend
+            git stash
+            
+            git checkout master
+            git pull origin master
+            
+            echo "Installing dependencies..."
+            npm i
+            
+            echo "Building application..."
+            rm -rf dist
+            npm run build
+            
+            echo "Restarting PM2 services..."
+            pm2 reload all --update-env
+            
+            echo "Deployment completed successfully"
+          '
