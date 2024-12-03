@@ -3,40 +3,53 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const fetchConnectionsByBrokerId = async (broker_id: string) => {
-  return prisma.connections.findMany({
+  const connections = await prisma.connections.findMany({
     where: { broker1_id: broker_id },
+    distinct: ["broker2_id"],
+    orderBy: {
+      timestamp: "desc",
+    },
     select: {
       id: true,
       timestamp: true,
-      broker1: {
-        select: {
-          name: true,
-          profile_pic: true,
-          company: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
       broker2: {
         select: {
+          id: true,
           name: true,
+          email: true,
+          info: true,
+          y_o_e: true,
+          languages: true,
+          is_certified: true,
           profile_pic: true,
+          w_number: true,
+          ig_link: true,
+          linkedin_link: true,
+          designation: true,
+          company_id: true,
+          user_id: true,
           company: {
             select: {
+              id: true,
               name: true,
+              description: true,
+              logo: true,
             },
           },
         },
       },
     },
   });
+
+  return connections.map(({ broker2, ...rest }) => ({
+    ...rest,
+    broker: broker2
+  }));
 };
 
 export const fetchConnectionRequestsByBrokerId = async (broker_id: string) => {
   return prisma.connectionRequest.findMany({
-    where: { sent_to_id: broker_id },
+    where: { sent_to_id: broker_id, status: "Pending" },
     select: {
       id: true,
       timestamp: true,
