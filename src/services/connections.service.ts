@@ -54,6 +54,7 @@ export const fetchConnectionRequestsByBrokerId = async (broker_id: string) => {
       id: true,
       timestamp: true,
       status: true,
+      text: true,
       sent_by: {
         select: {
           id: true,
@@ -72,7 +73,8 @@ export const fetchConnectionRequestsByBrokerId = async (broker_id: string) => {
 
 export const addConnectionRequest = async (
   broker_id: string,
-  sent_to_id: string
+  sent_to_id: string,
+  text?: string
 ) => {
   await prisma.$transaction(async (prisma) => {
     // Step 1: Create the connection request with a Pending status
@@ -81,6 +83,7 @@ export const addConnectionRequest = async (
         sent_by_id: broker_id,
         sent_to_id,
         status: "Pending",
+        text: text || "",
       },
     });
 
@@ -95,7 +98,7 @@ export const addConnectionRequest = async (
     await prisma.notification.create({
       data: {
         broker_id: sent_to_id,
-        text: `New connection request received from broker ${sentByBrokerName?.name}`,
+        text: text || `New connection request received from broker ${sentByBrokerName?.name}`,
         type: "Network",
         connectionRequest_id: connectionRequest.id,
       },

@@ -181,6 +181,7 @@ model ConnectionRequest {
   sent_to    Broker         @relation("SentTo", fields: [sent_to_id], references: [id])
   timestamp  DateTime       @default(now())
   status     RequestStatus
+  text       String?
   notifications Notification[] @relation("ConnectionRequestNotifications")
 }
 
