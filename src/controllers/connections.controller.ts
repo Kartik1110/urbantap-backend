@@ -28,10 +28,10 @@ export const getConnectionRequestsByBrokerId = async (req: Request, res: Respons
 
 export const createConnectionRequest = async (req: Request, res: Response) => {
     const { broker_id } = req.params;
-    const { sent_to_id } = req.body;
+    const { sent_to_id, text } = req.body;
 
     try {
-        await addConnectionRequest(broker_id, sent_to_id);
+        await addConnectionRequest(broker_id, sent_to_id, text);
         res.status(200).json({ message: 'Connection request and notification created successfully.' });
     } catch (error) {
         console.error('Error creating connection request:', error);
