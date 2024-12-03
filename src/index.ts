@@ -8,6 +8,10 @@ import listingsRoutes from "./routes/listings.route";
 import companyRoutes from "./routes/company.route";
 import authRoutes from "./routes/auth.route";
 import { authMiddleware } from "./middlewares/auth.middleware";
+import notificationsRoutes from './routes/notifications.route';
+import inquiriesRoutes from './routes/inquiries.route';
+import connectionsRoutes from './routes/connections.route';
+
 
 dotenv.config();
 
@@ -20,13 +24,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Unprotected routes
 app.use("/api/v1", companyRoutes);
 app.use("/api/v1", authRoutes);
 
-// Add multer middleware to routes that need file upload
+// Protected routes
+app.use("/api/v1", authMiddleware, notificationsRoutes);
+app.use("/api/v1", authMiddleware, inquiriesRoutes);
+app.use("/api/v1", authMiddleware, connectionsRoutes);
+
+// File upload routes (also protected)
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
-
 
 app.get("/health", (req, res) => {
   res.send("OK");

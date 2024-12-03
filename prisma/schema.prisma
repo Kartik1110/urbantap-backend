@@ -21,6 +21,7 @@ model User {
 
 enum Role {
   BROKER
+  HR
   OTHER
   ADMIN
 }
@@ -43,6 +44,13 @@ model Broker {
   company       Company?  @relation(fields: [company_id], references: [id])
   listings      Listing[]
   user          User?     @relation(fields: [user_id], references: [id])
+  notifications Notification[]
+  sentByConnectionRequests ConnectionRequest[] @relation("SentBy")
+  sentToConnectionRequests ConnectionRequest[] @relation("SentTo")
+  sentByInquiries Inquiry[] @relation("InquirySentBy")
+  sentToInquiries Inquiry[] @relation("InquirySentTo")
+  broker1Connections Connections[] @relation("Broker1")
+  broker2Connections Connections[] @relation("Broker2")
 }
 
 model Company {
@@ -76,8 +84,9 @@ model Listing {
   payment_plan     Payment_Plan?
   sale_type        Sale_Type?
   broker_id        String
-  created_at       DateTime           @default(now())
-  broker           Broker             @relation(fields: [broker_id], references: [id])
+  created_at       DateTime         @default(now())
+  broker           Broker           @relation(fields: [broker_id], references: [id])
+  inquiries        Inquiry[]
 }
 
 enum Category {
@@ -144,3 +153,65 @@ enum Sale_Type {
   Direct
   Resale
 }
+
+model Notification {
+  id                 String            @id @default(uuid())
+  broker_id          String
+  broker             Broker            @relation(fields: [broker_id], references: [id])
+  timestamp          DateTime          @default(now())
+  text               String
+  type               NotificationType
+  inquiry_id         String?
+  inquiry            Inquiry?          @relation(fields: [inquiry_id], references: [id], name: "InquiryNotifications")
+  connectionRequest_id String?         
+  connectionRequest  ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
+}
+
+enum NotificationType {
+  General
+  Enquiries
+  Network
+}
+
+model ConnectionRequest {
+  id         String         @id @default(uuid())
+  sent_by_id String
+  sent_to_id String
+  sent_by    Broker         @relation("SentBy", fields: [sent_by_id], references: [id])
+  sent_to    Broker         @relation("SentTo", fields: [sent_to_id], references: [id])
+  timestamp  DateTime       @default(now())
+  status     RequestStatus
+  notifications Notification[] @relation("ConnectionRequestNotifications")
+}
+
+enum RequestStatus {
+  Accepted
+  Rejected
+  Pending
+}
+
+model Connections {
+  id        String   @id @default(uuid())
+  broker1_id String
+  broker2_id String
+  broker1   Broker   @relation("Broker1", fields: [broker1_id], references: [id])
+  broker2   Broker   @relation("Broker2", fields: [broker2_id], references: [id])
+  timestamp DateTime @default(now())
+}
+
+model Inquiry {
+  id         String   @id @default(uuid())
+  sent_by_id String
+  sent_to_id String
+  sent_by    Broker   @relation("InquirySentBy", fields: [sent_by_id], references: [id])
+  sent_to    Broker   @relation("InquirySentTo", fields: [sent_to_id], references: [id])
+  timestamp  DateTime @default(now())
+  listing_id String
+  listing    Listing  @relation(fields: [listing_id], references: [id])
+  text       String
+  email      String   // New field
+  name       String   // New field
+  phone_no   String   // New field
+  notifications Notification[] @relation("InquiryNotifications")
+}
+
