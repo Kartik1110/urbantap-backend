@@ -44,11 +44,11 @@ jobs:
             git pull origin master
             
             echo "Installing dependencies..."
-            npm i
+            /home/ubuntu/.nvm/versions/node/v20.16.0/bin/npm i
             
             echo "Building application..."
             rm -rf dist
-            npm run build
+            /home/ubuntu/.nvm/versions/node/v20.16.0/bin/npm run build
             
             echo "Restarting PM2 services..."
             pm2 reload all --update-env
