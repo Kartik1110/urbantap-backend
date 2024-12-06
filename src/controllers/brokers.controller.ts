@@ -13,6 +13,8 @@ import { uploadToS3 } from "../utils/s3Upload";
 export const getBrokerDetail = async (req: Request, res: Response) => {
   try {
     const brokerId = req.params.id;
+    const token = req.headers.authorization;
+
     if (!brokerId) {
       return res.status(400).json({
         success: false,
@@ -20,7 +22,7 @@ export const getBrokerDetail = async (req: Request, res: Response) => {
       });
     }
 
-    const broker = await getBrokerDetailService(brokerId);
+    const broker = await getBrokerDetailService(brokerId, token as string);
     if (!broker) {
       return res.status(404).json({
         success: false,

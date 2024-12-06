@@ -31,8 +31,8 @@ export const createConnectionRequest = async (req: Request, res: Response) => {
     const { sent_to_id, text } = req.body;
 
     try {
-        await addConnectionRequest(broker_id, sent_to_id, text);
-        res.status(200).json({ message: 'Connection request and notification created successfully.' });
+        const response = await addConnectionRequest(broker_id, sent_to_id, text);
+        res.status(200).json(response);
     } catch (error) {
         console.error('Error creating connection request:', error);
         res.status(500).json({ message: 'Failed to create connection request and notification.' });
