@@ -16,6 +16,7 @@ jobs:
           SSH_HOST: ${{ secrets.EC2_HOST }}
           SSH_USER: ${{ secrets.EC2_USER }}
         run: |
+          echo "🔑 Setting up SSH for EC2..."
           mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
@@ -27,34 +28,53 @@ jobs:
             StrictHostKeyChecking no
             UserKnownHostsFile=/dev/null
           END
+          echo "✅ SSH setup completed."
 
       - name: Check SSH connection
-        run: ssh ec2 'echo "SSH connection successful"'
+        run: |
+          echo "🔌 Checking SSH connection to EC2 instance..."
+          ssh ec2 'echo "🔑 SSH connection successful to EC2 instance!"'
+          echo "✅ SSH connection verified."
 
       - name: Deploy to EC2
         run: |
+          echo "🚀 Starting deployment on EC2 instance..."
+
+          # SSH into EC2 instance
           ssh ec2 '
             set -e
-            echo "Starting deployment..."
-            
-            cd urbantap-backend
-            git stash
-            
-            git checkout master
-            git pull origin master
-            
-            source ~/.nvm/nvm.sh
-            nvm use v20.16.0
 
-            echo "Installing dependencies..."
-            npm ci
-            
-            echo "Building application..."
-            rm -rf dist
-            npm run build
-            
-            echo "Restarting PM2 services..."
-            pm2 reload all --update-env
-            
-            echo "Deployment completed successfully"
+            cd urbantap-backend || { echo "❌ Failed to change directory to urbantap-backend"; exit 1; }
+
+            echo "🔄 Stashing any uncommitted changes..."
+            git stash || { echo "❌ Git stash failed"; exit 1; }
+
+            git checkout master || { echo "❌ Git checkout master failed"; exit 1; }
+            git pull origin master || { echo "❌ Git pull failed"; exit 1; }
+
+            source ~/.nvm/nvm.sh || { echo "❌ Failed to load nvm"; exit 1; }
+
+            nvm use v20.16.0 || { echo "❌ Failed to use Node.js v20.16.0"; exit 1; }
+
+            echo "📦 Installing dependencies with npm ci (clean install)..."
+            npm ci || { echo "❌ npm ci failed"; exit 1; }
+
+            echo "✅ Dependencies installed successfully."
+
+            echo "🧹 Cleaning up previous build..."
+            rm -rf dist || { echo "❌ Failed to remove dist directory"; exit 1; }
+
+            echo "🔨 Building the application..."
+            npm run build || { echo "❌ npm run build failed"; exit 1; }
+
+            echo "✅ Build completed successfully."
+
+            echo "⚙️ Restarting PM2 services..."
+            pm2 reload all --update-env || { echo "❌ PM2 restart failed"; exit 1; }
+
+            echo "✅ PM2 services restarted successfully."
+
+            echo "🎉 Deployment completed successfully on EC2 instance."
           '
+
+          echo "🚀 Deployment process finished on EC2."
