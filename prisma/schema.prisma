@@ -84,7 +84,7 @@ model Listing {
   address          String?           @default("")
   amenities        String[]
   image_urls       String[]
-  project_age      Project_Age?
+  project_age      Int?
   payment_plan     Payment_Plan?
   sale_type        Sale_Type?
   broker_id        String
@@ -141,11 +141,6 @@ enum Bathrooms {
   One
   Two
   Three_Plus
-}
-
-enum Project_Age {
-  Less_than_5_years
-  More_than_5_years
 }
 
 enum Payment_Plan {
