@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { Broker, Listing, Company } from "@prisma/client";
-import prisma from "../utils/prisma";
+import { Broker } from "@prisma/client";
 import {
   getBrokerDetailService,
   getBrokerListService,
