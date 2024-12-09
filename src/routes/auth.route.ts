@@ -1,9 +1,13 @@
-import { Router } from 'express';
-import { signup, login } from '../controllers/auth.controller';
+import { Router } from "express";
+import { signup, login, googleSignIn } from "../controllers/auth.controller";
 
 const router = Router();
 
-router.post('/signup', signup);
-router.post('/login', login);
+// Mobile app routes
+router.post("/google/signin", googleSignIn);
+
+// Regular auth routes
+router.post("/signup", signup);
+router.post("/login", login);
 
 export default router;

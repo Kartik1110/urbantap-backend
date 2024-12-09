@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import logger from "../utils/logger";
 
 const prisma = new PrismaClient();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Signup controller
 export const signup = async (req: Request, res: Response) => {
@@ -20,7 +22,7 @@ export const signup = async (req: Request, res: Response) => {
 
     if (userExists) {
       return res.status(400).json({
-        status: "false",
+        status: false,
         message: "User with this email already exists",
         data: null,
       });
@@ -39,7 +41,7 @@ export const signup = async (req: Request, res: Response) => {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
 
     res.status(201).json({
-      status: "success",
+      status: true,
       message: "User created successfully",
       data: {
         user,
@@ -69,7 +71,7 @@ export const login = async (req: Request, res: Response) => {
     }
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
     res.json({
-      status: "success",
+      status: true,
       message: "User logged in successfully!",
       data: {
         token,
@@ -84,5 +86,86 @@ export const login = async (req: Request, res: Response) => {
       logger.error(String(error));
     }
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Google Sign-in controller
+export const googleSignIn = async (req: Request, res: Response) => {
+  try {
+    const { idToken } = req.body;
+
+    // Verify the Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid Google token payload",
+        data: null,
+      });
+    }
+
+    // Find or create user
+    let user = await prisma.user.findUnique({
+      where: { email: payload.email }
+    });
+
+    if (!user) {
+      // Create new user
+      user = await prisma.user.create({
+        data: {
+          email: payload.email,
+          name: payload.name || "",
+          googleId: payload.sub,
+          password: "",
+          role: "BROKER"
+        }
+      });
+    } else {
+      // Update existing user's Google ID if not set
+      if (!user.googleId) {
+        user = await prisma.user.update({
+          where: { email: payload.email },
+          data: { googleId: payload.sub }
+        });
+      }
+    }
+
+    // Check if user has an associated broker
+    const broker = await prisma.broker.findUnique({ 
+      where: { email: payload.email } 
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET!
+    );
+
+    res.json({
+      status: true,
+      message: "User logged in successfully!",
+      data: {
+        token,
+        email: user.email,
+        brokerId: broker ? broker.id : null,
+      }
+    });
+
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+    } else {
+      logger.error(String(error));
+    }
+    res.status(500).json({ 
+      status: false,
+      message: "Internal server error",
+      data: null
+    });
   }
 };
