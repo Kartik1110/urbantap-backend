@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response) => {
 // Google Sign-in controller
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    const { idToken } = req.body;
+    const { idToken }: { idToken: string } = req.body;
 
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
