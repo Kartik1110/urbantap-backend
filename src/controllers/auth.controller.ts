@@ -155,6 +155,8 @@ export const googleSignIn = async (req: Request, res: Response) => {
       message: "User logged in successfully!",
       data: {
         token,
+        user_id: user.id,
+        name: user.name,
         email: user.email,
         brokerId: broker ? broker.id : null,
       }
