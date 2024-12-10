@@ -97,7 +97,11 @@ export const googleSignIn = async (req: Request, res: Response) => {
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: process.env.GOOGLE_CLIENT_ID
+      // audience: process.env.GOOGLE_CLIENT_ID
+      audience: [
+        process.env.GOOGLE_CLIENT_ID_ANDROID!,
+        process.env.GOOGLE_CLIENT_ID_IOS!
+      ]
     });
 
     const payload = ticket.getPayload();
