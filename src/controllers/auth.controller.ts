@@ -97,11 +97,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
       idToken,
-      // audience: process.env.GOOGLE_CLIENT_ID
-      audience: [
-        process.env.GOOGLE_CLIENT_ID_ANDROID!,
-        process.env.GOOGLE_CLIENT_ID_IOS!
-      ]
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -115,7 +111,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
 
     // Find or create user
     let user = await prisma.user.findUnique({
-      where: { email: payload.email }
+      where: { email: payload.email },
     });
 
     if (!user) {
@@ -126,29 +122,26 @@ export const googleSignIn = async (req: Request, res: Response) => {
           name: payload.name || "",
           googleId: payload.sub,
           password: "",
-          role: "BROKER"
-        }
+          role: "BROKER",
+        },
       });
     } else {
       // Update existing user's Google ID if not set
       if (!user.googleId) {
         user = await prisma.user.update({
           where: { email: payload.email },
-          data: { googleId: payload.sub }
+          data: { googleId: payload.sub },
         });
       }
     }
 
     // Check if user has an associated broker
-    const broker = await prisma.broker.findUnique({ 
-      where: { email: payload.email } 
+    const broker = await prisma.broker.findUnique({
+      where: { email: payload.email },
     });
 
     // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET!
-    );
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
 
     res.json({
       status: true,
@@ -159,19 +152,18 @@ export const googleSignIn = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         brokerId: broker ? broker.id : null,
-      }
+      },
     });
-
   } catch (error) {
     if (error instanceof Error) {
       logger.error(error.message);
     } else {
       logger.error(String(error));
     }
-    res.status(500).json({ 
+    res.status(500).json({
       status: false,
       message: "Internal server error",
-      data: null
+      data: null,
     });
   }
 };
