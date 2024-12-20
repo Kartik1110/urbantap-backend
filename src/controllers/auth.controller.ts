@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response) => {
 // Google Sign-in controller
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    const { idToken }: { idToken: string } = req.body;
+    const { idToken, name }: { idToken: string, name: string } = req.body;
 
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
@@ -119,7 +119,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
       user = await prisma.user.create({
         data: {
           email: payload.email,
-          name: payload.name || "",
+          name: name,
           googleId: payload.sub,
           password: "",
           role: "BROKER",
