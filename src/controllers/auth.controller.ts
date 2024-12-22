@@ -121,6 +121,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
           email: payload.email,
           googleId: payload.sub,
           password: "",
+          name: payload.name || "",
           role: "BROKER",
         },
       });
