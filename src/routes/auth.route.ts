@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signup, login, googleSignIn } from "../controllers/auth.controller";
+import { signup, login, googleSignIn, updateUser } from "../controllers/auth.controller";
 
 const router = Router();
 
@@ -9,5 +9,7 @@ router.post("/google/signin", googleSignIn);
 // Regular auth routes
 router.post("/signup", signup);
 router.post("/login", login);
+
+router.put('/user/:id', updateUser)
 
 export default router;

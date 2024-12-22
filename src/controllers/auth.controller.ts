@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response) => {
 // Google Sign-in controller
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    const { idToken, name }: { idToken: string, name: string } = req.body;
+    const { idToken }: { idToken: string } = req.body;
 
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
@@ -119,7 +119,6 @@ export const googleSignIn = async (req: Request, res: Response) => {
       user = await prisma.user.create({
         data: {
           email: payload.email,
-          name: name,
           googleId: payload.sub,
           password: "",
           role: "BROKER",
@@ -167,3 +166,36 @@ export const googleSignIn = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+
+    if (!userId) {
+      return res.status(400).json({
+        status: false,
+        message: "User ID is required",
+        data: null,
+      });
+    }
+    
+    console.log("userId", userId);
+    const { name, role } = req.body;
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { name, role },
+    });
+    res.json({
+      status: true,
+      message: "User updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+    } else {
+      logger.error(String(error));
+    }
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
