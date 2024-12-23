@@ -200,3 +200,105 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+// Delete user controller
+export const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    // First check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        brokers: {
+          include: {
+            listings: true,
+            notifications: true,
+            sentByConnectionRequests: true,
+            sentToConnectionRequests: true,
+            sentByInquiries: true,
+            sentToInquiries: true,
+            broker1Connections: true,
+            broker2Connections: true
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+        data: null,
+      });
+    }
+
+    // Start a transaction to ensure all deletions are atomic
+    await prisma.$transaction(async (prisma) => {
+      // For each broker associated with the user
+      for (const broker of user.brokers) {
+        // Delete all inquiries where this broker is involved
+        await prisma.inquiry.deleteMany({
+          where: {
+            OR: [
+              { sent_by_id: broker.id },
+              { sent_to_id: broker.id }
+            ]
+          }
+        });
+
+        // Delete all connection requests where this broker is involved
+        await prisma.connectionRequest.deleteMany({
+          where: {
+            OR: [
+              { sent_by_id: broker.id },
+              { sent_to_id: broker.id }
+            ]
+          }
+        });
+
+        // Delete all connections where this broker is involved
+        await prisma.connections.deleteMany({
+          where: {
+            OR: [
+              { broker1_id: broker.id },
+              { broker2_id: broker.id }
+            ]
+          }
+        });
+
+        // Delete all notifications for this broker
+        await prisma.notification.deleteMany({
+          where: { broker_id: broker.id }
+        });
+
+        // Delete all listings for this broker
+        await prisma.listing.deleteMany({
+          where: { broker_id: broker.id }
+        });
+
+        // Finally delete the broker
+        await prisma.broker.delete({
+          where: { id: broker.id }
+        });
+      }
+
+      // Finally delete the user
+      await prisma.user.delete({
+        where: { id }
+      });
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "User and all related data deleted successfully",
+      data: null,
+    });
+  } catch (error) {
+    logger.error("Error deleting user:", error);
+    res.status(500).json({
+      status: false,
+      message: "Error deleting user and related data",
+      data: null,
+    });
+  }
+};
