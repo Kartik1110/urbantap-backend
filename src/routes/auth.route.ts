@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signup, login, googleSignIn, updateUser } from "../controllers/auth.controller";
+import { signup, login, googleSignIn, updateUser, deleteUser } from "../controllers/auth.controller";
 
 const router = Router();
 
@@ -11,5 +11,6 @@ router.post("/signup", signup);
 router.post("/login", login);
 
 router.put('/user/:id', updateUser)
+router.delete('/user/:id', deleteUser)
 
 export default router;
