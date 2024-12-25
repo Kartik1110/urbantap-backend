@@ -34,7 +34,7 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
             data: {
                 broker_id: sent_to_id,
                 text: `New inquiry received for listing ${listing_id}`,
-                type: 'Enquiries',
+                type: 'Inquiries',
                 inquiry_id: inquiry.id
             }
         });

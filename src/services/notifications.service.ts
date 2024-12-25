@@ -9,8 +9,8 @@ export class NotificationsService {
     // Determine the type filter
     if (type === NotificationType.Network) {
       whereClause.type = NotificationType.Network;
-    } else if (type === NotificationType.Enquiries) {
-      whereClause.type = NotificationType.Enquiries;
+    } else if (type === NotificationType.Inquiries) {
+      whereClause.type = NotificationType.Inquiries;
     }
 
     // Fetch notifications based on the broker ID and type
