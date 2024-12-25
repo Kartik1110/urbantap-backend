@@ -25,6 +25,7 @@ model User {
 enum Role {
   BROKER
   HR
+  SM
   OTHER
   ADMIN
 }
@@ -168,7 +169,7 @@ model Notification {
 
 enum NotificationType {
   General
-  Enquiries
+  Inquiries
   Network
 }
 
