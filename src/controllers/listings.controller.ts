@@ -3,6 +3,8 @@ import { Listing } from "@prisma/client";
 import {
   getListingsService,
   bulkInsertListingsService,
+  deleteListingbyId , 
+  getListingByIdService
 } from "../services/listings.service";
 import { uploadToS3 } from "../utils/s3Upload";
 
@@ -70,3 +72,47 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
     });
   }
 };
+
+/* Delete Listing by Id */
+export const deleteListing = async(req: Request, res: Response) => {
+  const {listingId, brokerId} = req.body;
+  
+  if(!listingId || !brokerId){
+      return res.status(400).json({
+          status: "error",
+          message: "Missing 'listingId' or 'brokerId' in request body"
+      });
+  }
+  
+  const listingDetails = await getListingByIdService(listingId);
+  
+   // Check if listing details are empty
+   if(!listingDetails.listing || Object.keys(listingDetails.listing).length === 0){
+    return res.status(404).json({
+        status: "error",
+        message: "Failed to fetch listing details - Listing not found"
+    });
+}
+
+  //check if broker id and listingId matches
+  if(listingDetails.broker.id !== brokerId){
+      console.log(listingDetails.broker.id)
+      return res.status(403).json({
+          message: "You are not allowed to delete this listing"
+      });
+  }
+  
+  try {
+      await deleteListingbyId(listingId);
+      return res.status(200).json({
+          status: "success",
+          message: `Listing with id ${listingId} deleted successfully`,
+      });
+  } catch(error) {
+      return res.status(500).json({
+          status: "error",
+          message: "Failed to delete listing",
+          error: error,
+      });
+  }
+}
