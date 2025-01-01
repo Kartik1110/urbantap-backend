@@ -12,7 +12,6 @@ import notificationsRoutes from './routes/notifications.route';
 import inquiriesRoutes from './routes/inquiries.route';
 import connectionsRoutes from './routes/connections.route';
 
-
 dotenv.config();
 
 const app = express();

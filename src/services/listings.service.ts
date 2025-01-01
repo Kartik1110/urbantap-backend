@@ -274,3 +274,20 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
     throw error;
   }
 };
+
+/*Delete Listing by Id */
+export const deleteListingbyId = async (listingId : string) => {
+  try{
+    const deletedListing = await prisma.listing.delete({
+      where:{
+        id: listingId
+      }
+    })
+
+    return deletedListing
+  } catch(error){
+    console.error(error);
+    throw error;
+  }
+}
+
