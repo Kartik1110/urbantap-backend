@@ -3,7 +3,7 @@ import { createInquiryAndNotify, getInquiryById } from '../services/inquiries.se
 
 export const createInquiry = async (req: Request, res: Response) => {
     const { listing_id } = req.params;
-    const { text, sent_by_id, sent_to_id, email, name, phone_no } = req.body;
+    const { text, sent_by_id, sent_to_id, email, name, phone_no, country_code} = req.body;
 
     try {
         await createInquiryAndNotify({
@@ -13,7 +13,8 @@ export const createInquiry = async (req: Request, res: Response) => {
             sent_to_id,
             email,
             name,
-            phone_no
+            phone_no,
+            country_code
         });
 
         res.status(200).json({ message: 'Inquiry and notification created successfully.' });
