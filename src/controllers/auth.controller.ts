@@ -1,8 +1,9 @@
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import appleSignin from "apple-signin-auth";
 import { PrismaClient } from "@prisma/client";
 import { OAuth2Client } from "google-auth-library";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import logger from "../utils/logger";
 
 const prisma = new PrismaClient();
@@ -141,6 +142,86 @@ export const googleSignIn = async (req: Request, res: Response) => {
     // Check if user has an associated broker
     const broker = await prisma.broker.findUnique({
       where: { email: payload.email },
+    });
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+
+    res.json({
+      status: true,
+      message: "User logged in successfully!",
+      data: {
+        token,
+        user_id: user.id,
+        name: user.name,
+        email: user.email,
+        brokerId: broker ? broker.id : null,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+    } else {
+      logger.error(String(error));
+    }
+    res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};
+
+// Apple Sign-in controller
+export const appleSignIn = async (req: Request, res: Response) => {
+  try {
+    const { id_token } = req.body;
+
+    // Verify the Apple ID token
+    const appleUser = await appleSignin.verifyIdToken(
+      id_token,
+      {
+        audience: process.env.APPLE_CLIENT_ID,
+        ignoreExpiration: true,
+      }
+    );
+
+    if (!appleUser.email) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid Apple token payload",
+        data: null,
+      });
+    }
+
+    // Find or create user
+    let user = await prisma.user.findUnique({
+      where: { email: appleUser.email },
+    });
+
+    if (!user) {
+      // Create new user
+      user = await prisma.user.create({
+        data: {
+          email: appleUser.email,
+          appleId: appleUser.sub,
+          password: "",
+          name: "",
+          role: "BROKER",
+        },
+      });
+    } else {
+      if (!user.appleId) {
+        user = await prisma.user.update({
+          where: { email: appleUser.email },
+          data: { appleId: appleUser.sub },
+        });
+      }
+    }
+
+    // Check if user has an associated broker
+    const broker = await prisma.broker.findUnique({
+      where: { email: appleUser.email },
     });
 
     // Generate JWT token

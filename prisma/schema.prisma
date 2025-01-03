@@ -20,6 +20,9 @@ model User {
   googleId String? @unique
   googleAccessToken String?
   googleRefreshToken String?
+  appleId String? @unique
+  appleAccessToken String?
+  appleRefreshToken String?
 }
 
 enum Role {
