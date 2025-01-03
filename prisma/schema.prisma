@@ -208,6 +208,7 @@ model Inquiry {
   sent_to       Broker         @relation("InquirySentTo", fields: [sent_to_id], references: [id])
   timestamp     DateTime       @default(now())
   listing_id    String
+  country_code  String
   listing       Listing        @relation(fields: [listing_id], references: [id])
   text          String
   email         String // New field

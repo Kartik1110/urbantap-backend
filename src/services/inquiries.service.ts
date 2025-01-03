@@ -10,10 +10,11 @@ interface InquiryData {
     email: string;
     name: string;
     phone_no: string;
+    country_code: string;
 }
 
 export const createInquiryAndNotify = async (data: InquiryData): Promise<void> => {
-    const { listing_id, text, sent_by_id, sent_to_id, email, name, phone_no } = data;
+    const { listing_id, text, sent_by_id, sent_to_id, email, name, phone_no, country_code } = data;
 
     await prisma.$transaction(async (prisma) => {
         // Create the inquiry
@@ -25,7 +26,8 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
                 text,
                 email,
                 name,
-                phone_no
+                phone_no,
+                country_code
             }
         });
 

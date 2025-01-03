@@ -12,7 +12,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 export const signup = async (req: Request, res: Response) => {
   const { email, password, name, role } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10); 
 
     const userExists = await prisma.user.findUnique({
       where: {
@@ -77,6 +77,9 @@ export const login = async (req: Request, res: Response) => {
         token,
         email,
         brokerId: broker ? broker.id : null,
+        brokerName : broker ? broker.name : null , 
+        brokerEmail: broker ? broker.email : null , 
+        brokerNumber : broker ? broker.w_number : null 
       },
     });
   } catch (error) {
