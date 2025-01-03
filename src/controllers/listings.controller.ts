@@ -29,6 +29,17 @@ export const getListings = async (req: Request, res: Response) => {
   }
 };
 
+/* Get listing by id */
+export const getListingById = async (req: Request, res: Response) => {
+  const listingId = req.params.id;
+  const listing = await getListingByIdService(listingId);
+  res.json({
+    status: "success",
+    message: "Listing fetched successfully",
+    data: listing,
+  });
+};
+
 /* Bulk insert listings */
 export const bulkInsertListings = async (req: Request, res: Response) => {
   const images = req.files as Express.Multer.File[] | undefined;
