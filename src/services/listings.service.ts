@@ -1,3 +1,4 @@
+import logger from "../utils/logger";
 import prisma from "../utils/prisma";
 import { Listing } from "@prisma/client";
 
@@ -48,6 +49,7 @@ export const getListingByIdService = async (id: string) => {
     };
   } catch (error) {
     console.error(error);
+    logger.error(error);
     throw error;
   }
 };
@@ -71,8 +73,6 @@ export const getListingsService = async (
     payment_plan?: ("Payment_done" | "Payment_Pending")[];
     sale_type?: ("Direct" | "Resale")[];
     amenities?: string[];
-    // page?: number;
-    // limit?: number;
   } & ListingFilters
 ): Promise<
   Array<{
@@ -108,52 +108,6 @@ export const getListingsService = async (
       amenities,
       ...otherFilters
     } = filters;
-
-
-    // Get total count for pagination
-    // const total = await prisma.listing.count({
-    //   where: {
-    //     AND: [
-    //       // Base filters as AND conditions
-    //       ...(Object.keys(otherFilters).length > 0 ? [otherFilters as any] : []),
-    //       ...(looking_for !== undefined ? [{ looking_for }] : []),
-    //       ...(category ? [{ category }] : []),
-    //       ...(city ? [{ city }] : []),
-    //       ...(address ? [{ address }] : []),
-          
-    //       // Price range condition
-    //       ...(min_price || max_price
-    //         ? [{
-    //             AND: [
-    //               ...(min_price ? [{ min_price: { gte: min_price } }] : []),
-    //               ...(max_price ? [{ max_price: { lte: max_price } }] : [])
-    //             ]
-    //           }]
-    //         : []),
-
-    //       // Square footage condition
-    //       ...(min_sq_ft || max_sq_ft
-    //         ? [{
-    //             sq_ft: {
-    //               ...(min_sq_ft && { gte: min_sq_ft }),
-    //               ...(max_sq_ft && { lte: max_sq_ft })
-    //             }
-    //           }]
-    //         : []),
-
-    //       // Array filters as OR conditions within their groups
-    //       ...(no_of_bathrooms ? [{ no_of_bathrooms: { in: no_of_bathrooms } }] : []),
-    //       ...(no_of_bedrooms ? [{ no_of_bedrooms: { in: no_of_bedrooms } }] : []),
-    //       ...(furnished ? [{ furnished: { in: furnished } }] : []),
-    //       ...(type ? [{ type: { in: type } }] : []),
-    //       ...(rental_frequency ? [{ rental_frequency: { in: rental_frequency } }] : []),
-    //       ...(project_age ? [{ project_age: { in: project_age } }] : []),
-    //       ...(payment_plan ? [{ payment_plan: { in: payment_plan } }] : []),
-    //       ...(sale_type ? [{ sale_type: { in: sale_type } }] : []),
-    //       ...(amenities ? [{ amenities: { hasSome: amenities } }] : [])
-    //     ]
-    //   }
-    // });
 
     const listings = await prisma.listing.findMany({
       where: {
@@ -238,6 +192,7 @@ export const getListingsService = async (
     });
   } catch (error) {
     console.error(error);
+    logger.error(error);
     throw error;
   }
 };
@@ -252,6 +207,7 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
     return newListings;
   } catch (error) {
     console.error(error);
+    logger.error(error);
     throw error;
   }
 };
@@ -268,6 +224,7 @@ export const deleteListingbyId = async (listingId : string) => {
     return deletedListing
   } catch(error){
     console.error(error);
+    logger.error(error);
     throw error;
   }
 }

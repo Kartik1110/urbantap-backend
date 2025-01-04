@@ -7,6 +7,7 @@ import {
   updateBrokerService,
 } from "../services/brokers.service";
 import { uploadToS3 } from "../utils/s3Upload";
+import logger from "../utils/logger";
 
 /* Get broker detail by id */
 export const getBrokerDetail = async (req: Request, res: Response) => {
@@ -53,6 +54,7 @@ export const getBrokerList = async (req: Request, res: Response) => {
       data: brokers,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       status: "error",
       message: "Failed to fetch broker list",
