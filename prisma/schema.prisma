@@ -209,7 +209,7 @@ model Inquiry {
   timestamp     DateTime       @default(now())
   listing_id    String
   country_code  String
-  listing       Listing        @relation(fields: [listing_id], references: [id])
+  listing       Listing        @relation(fields: [listing_id], references: [id] ,onDelete: Cascade)
   text          String
   email         String // New field
   name          String // New field
