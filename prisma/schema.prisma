@@ -163,6 +163,7 @@ model Notification {
   broker               Broker             @relation(fields: [broker_id], references: [id])
   timestamp            DateTime           @default(now())
   text                 String
+  message              String?
   type                 NotificationType
   inquiry_id           String?
   inquiry              Inquiry?           @relation(fields: [inquiry_id], references: [id], name: "InquiryNotifications")

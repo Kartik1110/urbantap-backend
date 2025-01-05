@@ -66,7 +66,8 @@ export const getInquiryById = async (inquiry_id: string) => {
             text: true,
             email: true,
             name: true,
-            phone_no: true
+            phone_no: true,
+            country_code: true
         }
     });
 };
