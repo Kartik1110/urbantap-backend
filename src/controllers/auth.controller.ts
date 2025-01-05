@@ -96,7 +96,7 @@ export const login = async (req: Request, res: Response) => {
 // Google Sign-in controller
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    const { idToken, role }: { idToken: string, role: Role } = req.body;
+    const { idToken }: { idToken: string } = req.body;
 
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
@@ -126,7 +126,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
           googleId: payload.sub,
           password: "",
           name: payload.name || "",
-          role: role,
+          role: Role.BROKER,
         },
       });
     } else {
@@ -175,7 +175,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
 // Apple Sign-in controller
 export const appleSignIn = async (req: Request, res: Response) => {
   try {
-    const { id_token, userIdentifier, email, name, role } = req.body;
+    const { id_token, userIdentifier, email, name } = req.body;
 
     // Verify the Apple ID token
     const appleUser = await appleSignin.verifyIdToken(
@@ -211,14 +211,14 @@ export const appleSignIn = async (req: Request, res: Response) => {
           email: email || appleUser.email,
           password: "",
           name: name || "",
-          role: role,
+          role: Role.BROKER,
           appleId: userIdentifier,
         },
       });
-    } else {
+    } else if (!user.appleId) {
       try {
         user = await prisma.user.update({
-          where: { email: email || appleUser.email },
+          where: { id: user.id },
           data: { appleId: userIdentifier },
         });
       } catch (error) {
