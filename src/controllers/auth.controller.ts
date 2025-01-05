@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import appleSignin from "apple-signin-auth";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import { OAuth2Client } from "google-auth-library";
 import logger from "../utils/logger";
 
@@ -78,8 +78,8 @@ export const login = async (req: Request, res: Response) => {
         token,
         email,
         brokerId: broker ? broker.id : null,
-        brokerName : broker ? broker.name : null , 
-        brokerEmail: broker ? broker.email : null , 
+        brokerName : user ? user.name : null , 
+        brokerEmail: user ? user.email : null , 
         brokerNumber : broker ? broker.w_number : null 
       },
     });
@@ -96,7 +96,7 @@ export const login = async (req: Request, res: Response) => {
 // Google Sign-in controller
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    const { idToken }: { idToken: string } = req.body;
+    const { idToken, role }: { idToken: string, role: Role } = req.body;
 
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
@@ -126,7 +126,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
           googleId: payload.sub,
           password: "",
           name: payload.name || "",
-          role: "BROKER",
+          role: role,
         },
       });
     } else {
@@ -175,7 +175,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
 // Apple Sign-in controller
 export const appleSignIn = async (req: Request, res: Response) => {
   try {
-    const { id_token } = req.body;
+    const { id_token, userIdentifier, email, name, role } = req.body;
 
     // Verify the Apple ID token
     const appleUser = await appleSignin.verifyIdToken(
@@ -195,33 +195,40 @@ export const appleSignIn = async (req: Request, res: Response) => {
     }
 
     // Find or create user
-    let user = await prisma.user.findUnique({
-      where: { email: appleUser.email },
+    let user = await prisma.user.findFirst({
+      where: { 
+        OR: [
+          { email: email },
+          { appleId: userIdentifier }
+        ]
+      },
     });
 
     if (!user) {
       // Create new user
       user = await prisma.user.create({
         data: {
-          email: appleUser.email,
-          appleId: appleUser.sub,
+          email: email || appleUser.email,
           password: "",
-          name: "",
-          role: "BROKER",
+          name: name || "",
+          role: role,
+          appleId: userIdentifier,
         },
       });
     } else {
-      if (!user.appleId) {
+      try {
         user = await prisma.user.update({
-          where: { email: appleUser.email },
-          data: { appleId: appleUser.sub },
+          where: { email: email || appleUser.email },
+          data: { appleId: userIdentifier },
         });
+      } catch (error) {
+        logger.warn('Unable to update appleId - field may not exist in schema');
       }
     }
 
     // Check if user has an associated broker
     const broker = await prisma.broker.findUnique({
-      where: { email: appleUser.email },
+      where: { email: email || appleUser.email },
     });
 
     // Generate JWT token
