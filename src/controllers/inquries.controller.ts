@@ -17,7 +17,9 @@ export const createInquiry = async (req: Request, res: Response) => {
             country_code
         });
 
-        res.status(200).json({ message: 'Inquiry and notification created successfully.' });
+        res.status(200).json({
+            message: 'Inquiry and notification created successfully.',
+        });
     } catch (error) {
         console.error('Error creating inquiry and notification:', error);
         res.status(500).json({ message: 'Failed to create inquiry and notification.' });
