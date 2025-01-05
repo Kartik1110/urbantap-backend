@@ -175,11 +175,11 @@ export const googleSignIn = async (req: Request, res: Response) => {
 // Apple Sign-in controller
 export const appleSignIn = async (req: Request, res: Response) => {
   try {
-    const { id_token, userIdentifier, email, name } = req.body;
+    const { idToken, userIdentifier, email, name } = req.body;
 
     // Verify the Apple ID token
     const appleUser = await appleSignin.verifyIdToken(
-      id_token,
+      idToken,
       {
         audience: process.env.APPLE_CLIENT_ID,
         ignoreExpiration: true,
