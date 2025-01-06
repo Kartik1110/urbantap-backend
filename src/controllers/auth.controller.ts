@@ -11,7 +11,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Signup controller
 export const signup = async (req: Request, res: Response) => {
-  const { email, password, name, role, w_number } = req.body;
+  const { email, password, name, role, w_number, country_code } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10); 
 
@@ -35,7 +35,8 @@ export const signup = async (req: Request, res: Response) => {
         password: hashedPassword,
         name,
         role,
-        w_number
+        w_number,
+        country_code
       },
     });
 
