@@ -78,11 +78,8 @@ export const login = async (req: Request, res: Response) => {
       message: "User logged in successfully!",
       data: {
         token,
-        email,
+        user,
         brokerId: broker ? broker.id : null,
-        brokerName : user ? user.name : null , 
-        brokerEmail: user ? user.email : null , 
-        brokerNumber : user ? user.w_number : null 
       },
     });
   } catch (error) {
