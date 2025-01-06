@@ -9,21 +9,22 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  role      Role
-  w_number  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  brokers   Broker[]
-  googleId String? @unique
-  googleAccessToken String?
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  password           String
+  name               String?
+  role               Role
+  country_code       String?
+  w_number           String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  brokers            Broker[]
+  googleId           String?  @unique
+  googleAccessToken  String?
   googleRefreshToken String?
-  appleId String? @unique
-  appleAccessToken String?
-  appleRefreshToken String?
+  appleId            String?  @unique
+  appleAccessToken   String?
+  appleRefreshToken  String?
 }
 
 enum Role {
