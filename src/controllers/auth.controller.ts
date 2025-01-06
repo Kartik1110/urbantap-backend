@@ -80,7 +80,7 @@ export const login = async (req: Request, res: Response) => {
         brokerId: broker ? broker.id : null,
         brokerName : user ? user.name : null , 
         brokerEmail: user ? user.email : null , 
-        brokerNumber : broker ? broker.w_number : null 
+        brokerNumber : user ? user.w_number : null 
       },
     });
   } catch (error) {
