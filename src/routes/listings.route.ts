@@ -3,15 +3,15 @@ import {
   getListings,
   bulkInsertListings,
   deleteListing,
+  getListingById,
 } from "../controllers/listings.controller";
-import { getListingByIdService } from "../services/listings.service";
 
 const router = Router();
 
 /* Get all listings */
 router.get("/listings", getListings);
 
-router.get("/listings/:id", getListingByIdService);
+router.get("/listings/:id", getListingById);
 
 /* Bulk insert listings */
 export default (upload: any) => {
