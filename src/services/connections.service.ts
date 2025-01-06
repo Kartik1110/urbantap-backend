@@ -121,9 +121,10 @@ export const addConnectionRequest = async (
       // Step 2: Create a notification for the recipient
       await prisma.notification.create({
         data: {
+          sent_by_id: broker_id,
           broker_id: sent_to_id,
-          text: text || "",
-          message: `New connection request received from broker ${sentByBrokerName?.name}`,
+          message: text || "",
+          text: `New connection request received from broker ${sentByBrokerName?.name}`,
           type: "Network",
           connectionRequest_id: connectionRequest.id,
         },
@@ -170,6 +171,7 @@ export const updateConnectionStatus = async (
         // Create a notification for the accepted connection
         await prisma.notification.create({
           data: {
+            sent_by_id: sent_by_id,
             broker_id: sent_to_id,
             text: `Connection request from broker ${sentByBrokerName?.name} has been accepted.`,
             type: "Network",

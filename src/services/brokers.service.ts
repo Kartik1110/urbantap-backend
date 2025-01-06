@@ -18,48 +18,6 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       throw new Error('User not found');
     }
 
-    // If user is not a broker, return basic details with mask 0
-    // if (user.role !== 'BROKER') {
-    //   const broker = await prisma.broker.findUnique({
-    //     where: { id },
-    //     include: {
-    //       listings: {
-    //         select: {
-    //           id: true,
-    //           title: true,
-    //           description: true,
-    //           image: true,
-    //           min_price: true,
-    //           max_price: true,
-    //           sq_ft: true,
-    //           type: true,
-    //           category: true,
-    //           looking_for: true,
-    //           rental_frequency: true,
-    //           no_of_bedrooms: true,
-    //           no_of_bathrooms: true,
-    //           furnished: true,
-    //           city: true,
-    //           address: true,
-    //           amenities: true,
-    //           image_urls: true,
-    //           created_at: true,
-    //         },
-    //       },
-    //       company: true,
-    //     },
-    //   });
-
-    //   if (!broker) return null;
-    //   const { listings, company, ...brokerData } = broker;
-    //   return {
-    //     listings: listings || [],
-    //     broker: brokerData,
-    //     company: company || {},
-    //     mask: null,
-    //   };
-    // }
-
     // Get requesting broker's ID using the user_id
     const requestingBroker = await prisma.broker.findFirst({
       where: { user_id: decoded.userId },
