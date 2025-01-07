@@ -67,7 +67,6 @@ export const getBrokerList = async (req: Request, res: Response) => {
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
   const file = req.file as Express.Multer.File | undefined;
   const brokersJson = req.body.brokers;
-  const companyId = req.body.company_id;
 
   let brokers = [];
   try {
@@ -99,7 +98,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
   const brokersWithPics = brokers.map((broker: Broker) => ({
     ...broker,
     profile_pic: profilePicUrl,
-    company_id: companyId || null
+    company_id: broker.company_id || null
   }));
 
   try {
@@ -107,7 +106,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
     const data = {
       broker_id: newBrokers[0], // return the single broker
       profilePicUrl: profilePicUrl,
-      company_id: companyId || null
+      company_id: brokersWithPics[0].company_id || null
     };
     res.json({
       status: "success",
