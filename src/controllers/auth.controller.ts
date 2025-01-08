@@ -270,12 +270,32 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
     
-    console.log("userId", userId);
-    const { name, role } = req.body;
+    const{ name, role, w_number, country_code } = req.body;
+
+    // Create update data object with required fields
+    const updateData: any = { name, role };
+    
+    // Add optional fields if they exist
+    if (w_number !== undefined) updateData.w_number = w_number;
+    if (country_code !== undefined) updateData.country_code = country_code;
+
+    // Update user
     const user = await prisma.user.update({
       where: { id: userId },
-      data: { name, role },
+      data: updateData,
     });
+
+    // If w_number or country_code is present, update broker as well
+    if (w_number !== undefined || country_code !== undefined) {
+      await prisma.broker.updateMany({
+        where: { user_id: userId },
+        data: {
+          ...(w_number !== undefined && { w_number }),
+          ...(country_code !== undefined && { country_code }),
+        },
+      });
+    }
+
     res.json({
       status: true,
       message: "User updated successfully",
