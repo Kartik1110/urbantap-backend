@@ -70,6 +70,11 @@ export const getBrokerDetailService = async (id: string, token: string) => {
             sent_by_id: requestingBroker.id,
           },
         },
+        sentByConnectionRequests: {
+          where: {
+            sent_to_id: requestingBroker.id,
+          },
+        }
       },
     });
 
@@ -81,11 +86,15 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       broker1Connections, 
       broker2Connections, 
       sentToConnectionRequests,
+      sentByConnectionRequests,
       ...brokerData 
     } = broker;
 
     const isConnected = broker1Connections.length > 0 || broker2Connections.length > 0;
     const pendingRequest = sentToConnectionRequests.some(
+      request => request.status === 'Pending'
+    );
+    const pendingRequestSent = sentByConnectionRequests.some(
       request => request.status === 'Pending'
     );
     const hasRejectedRequest = sentToConnectionRequests.some(
@@ -97,6 +106,8 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       mask = "CONNECTED"; // Connected
     } else if (pendingRequest) {
       mask = "REQUEST_PENDING"; // Request pending
+    } else if (pendingRequestSent) {
+      mask = "REQUEST_PENDING_SENT"; // Request pending sent
     } else if (hasRejectedRequest) {
       mask = "REQUEST_REJECTED"; // Request rejected
     }
