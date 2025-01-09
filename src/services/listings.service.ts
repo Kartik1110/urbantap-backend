@@ -17,6 +17,8 @@ export const getListingByIdService = async (id: string) => {
             id: true,
             name: true,
             profile_pic: true,
+            country_code: true,
+            w_number: true,
             company: {
               select: {
                 name: true,
@@ -30,7 +32,7 @@ export const getListingByIdService = async (id: string) => {
     if (!listing) {
       return {
         listing: {},
-        broker: { id: "", name: "", profile_pic: "" },
+        broker: { id: "", name: "", profile_pic: "", country_code: "", w_number: "" },
         company: { name: "" },
       };
     }
@@ -42,6 +44,8 @@ export const getListingByIdService = async (id: string) => {
         id: broker.id,
         name: broker.name,
         profile_pic: broker.profile_pic,
+        country_code: broker.country_code,
+        w_number: broker.w_number,
       },
       company: {
         name: broker.company?.name || "",
@@ -81,6 +85,8 @@ export const getListingsService = async (
       id: string;
       name: string;
       profile_pic: string;
+      country_code: string;
+      w_number: string;
     };
     company: {
       name: string;
@@ -157,6 +163,8 @@ export const getListingsService = async (
             id: true,
             name: true,
             profile_pic: true,
+            country_code: true,
+            w_number: true,
             company: {
               select: {
                 name: true,
@@ -170,7 +178,7 @@ export const getListingsService = async (
     if (listings.length === 0) {
       return [{
           listing: {},
-          broker: { id: "", name: "", profile_pic: "" },
+          broker: { id: "", name: "", profile_pic: "", country_code: "", w_number: "" },
           company: { name: "" },
         }
       ];
@@ -184,6 +192,8 @@ export const getListingsService = async (
           id: broker.id,
           name: broker.name,
           profile_pic: broker.profile_pic,
+          country_code: broker.country_code,
+          w_number: broker.w_number,
         },
         company: {
           name: broker.company?.name || "",
