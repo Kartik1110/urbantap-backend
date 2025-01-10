@@ -101,13 +101,27 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       request => request.status === 'Rejected'
     );
 
+    let request_id = "";
     let mask = "NOT_CONNECTED"; // Default: Not connected
+
     if (isConnected) {
       mask = "CONNECTED"; // Connected
     } else if (pendingRequest) {
       mask = "REQUEST_PENDING"; // Request pending
     } else if (pendingRequestSent) {
       mask = "REQUEST_PENDING_SENT"; // Request pending sent
+      const connectionRequest = await prisma.connectionRequest.findFirst({
+        where: {
+          sent_by_id: requestingBroker.id,
+          sent_to_id: broker.id,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      request_id = connectionRequest?.id || "";
+
     } else if (hasRejectedRequest) {
       mask = "REQUEST_REJECTED"; // Request rejected
     }
@@ -117,6 +131,7 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       broker: brokerData,
       company: company || {},
       mask,
+      request_id,
     };
   } catch (error) {
     console.error(error);
