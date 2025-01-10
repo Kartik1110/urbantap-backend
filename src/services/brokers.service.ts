@@ -112,8 +112,8 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       mask = "REQUEST_PENDING_SENT"; // Request pending sent
       const connectionRequest = await prisma.connectionRequest.findFirst({
         where: {
-          sent_by_id: requestingBroker.id,
-          sent_to_id: broker.id,
+          sent_by_id: broker.id,
+          sent_to_id: requestingBroker.id,
         },
         select: {
           id: true,
