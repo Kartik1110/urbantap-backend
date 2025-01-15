@@ -200,6 +200,9 @@ export const getListingsService = async (
       },
       skip,
       take: page_size,
+      orderBy: {
+        created_at: 'desc'
+      },
       include: {
         broker: {
           select: {
