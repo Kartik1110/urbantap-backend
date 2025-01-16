@@ -9,22 +9,24 @@ generator client {
 }
 
 model User {
-  id                 String   @id @default(uuid())
-  email              String   @unique
+  id                 String        @id @default(uuid())
+  email              String        @unique
   password           String
   name               String?
   role               Role
   country_code       String?
   w_number           String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
   brokers            Broker[]
-  googleId           String?  @unique
+  googleId           String?       @unique
   googleAccessToken  String?
   googleRefreshToken String?
-  appleId            String?  @unique
+  appleId            String?       @unique
   appleAccessToken   String?
   appleRefreshToken  String?
+  jobs               Job[]
+  applications       Application[]
 }
 
 enum Role {
@@ -69,6 +71,7 @@ model Company {
   description String   @default("")
   logo        String   @default("")
   brokers     Broker[]
+  jobs        Job[]
 }
 
 model Listing {
@@ -216,10 +219,62 @@ model Inquiry {
   timestamp     DateTime       @default(now())
   listing_id    String
   country_code  String
-  listing       Listing        @relation(fields: [listing_id], references: [id] ,onDelete: Cascade)
+  listing       Listing        @relation(fields: [listing_id], references: [id], onDelete: Cascade)
   text          String
   email         String // New field
   name          String // New field
   phone_no      String // New field
   notifications Notification[] @relation("InquiryNotifications")
+}
+
+model Job {
+  id            String        @id @default(uuid())
+  title         String
+  companyId     String
+  company       Company       @relation(fields: [companyId], references: [id])
+  workplaceType WorkplaceType
+  location      String
+  jobType       JobType
+  description   String
+  userId        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id])
+  applications  Application[]
+}
+
+enum WorkplaceType {
+  On_site
+  Remote
+  Hybrid
+}
+
+enum JobType {
+  Full_time
+  Part_time
+  Internship
+  Contract
+}
+
+model Application {
+  id          String            @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String
+  phoneNumber String
+  coverLetter String?
+  resume      String // File path or URL to the uploaded CV
+  jobId       String
+  userId      String
+  status      ApplicationStatus @default(Under_Review)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  job         Job               @relation(fields: [jobId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
+}
+
+enum ApplicationStatus {
+  Under_Review
+  Accepted
+  Rejected
 }
