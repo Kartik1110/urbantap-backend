@@ -140,14 +140,53 @@ export const getBrokerDetailService = async (id: string, token: string) => {
 };
 
 /* Get broker list */
-export const getBrokerListService = async () => {
+export const getBrokerListService = async ({ 
+  page, 
+  page_size 
+}: { 
+  page: number; 
+  page_size: number; 
+}): Promise<{
+  brokers: Broker[];
+  pagination: {
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+  };
+}> => {
   try {
     const brokers = await prisma.broker.findMany({
+      skip: (page - 1) * page_size,
+      take: page_size,
       include: {
         company: true,
       },
     });
-    return brokers;
+
+    const total = await prisma.broker.count();
+
+    if (brokers.length === 0) {
+      return {
+        brokers: [],
+        pagination: {
+          total: 0,
+          page,
+          page_size,
+          total_pages: 0,
+        }
+      };
+    }
+
+    return {
+      brokers,
+      pagination: {
+        total,
+        page,
+        page_size,
+        total_pages: Math.ceil(total / page_size)
+      }
+    };
   } catch (error) {
     console.error(error);
     throw error;
