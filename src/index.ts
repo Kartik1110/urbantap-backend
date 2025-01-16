@@ -2,15 +2,20 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import multer from "multer";
+
 import logger from "./utils/logger";
+import { authMiddleware } from "./middlewares/auth.middleware";
+
 import brokersRoutes from "./routes/brokers.route";
 import listingsRoutes from "./routes/listings.route";
 import companyRoutes from "./routes/company.route";
 import authRoutes from "./routes/auth.route";
-import { authMiddleware } from "./middlewares/auth.middleware";
 import notificationsRoutes from './routes/notifications.route';
 import inquiriesRoutes from './routes/inquiries.route';
 import connectionsRoutes from './routes/connections.route';
+import jobRoutes from './routes/job.route';
+import validateSchema from "./middlewares/validate.middleware";
+import { jobSchema } from "./schema/job.schema";
 
 dotenv.config();
 
@@ -35,6 +40,7 @@ app.use("/api/v1", authMiddleware, connectionsRoutes);
 // File upload routes (also protected)
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
+app.use("/api/v1", authMiddleware, validateSchema(jobSchema), jobRoutes);
 
 app.get("/health", (req, res) => {
   res.send("OK");
