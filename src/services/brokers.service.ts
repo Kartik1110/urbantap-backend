@@ -142,10 +142,12 @@ export const getBrokerDetailService = async (id: string, token: string) => {
 /* Get broker list */
 export const getBrokerListService = async ({ 
   page, 
-  page_size 
+  page_size,
+  token 
 }: { 
   page: number; 
-  page_size: number; 
+  page_size: number;
+  token: string;
 }): Promise<{
   brokers: Broker[];
   pagination: {
@@ -156,7 +158,22 @@ export const getBrokerListService = async ({
   };
 }> => {
   try {
+    // Decode token to get userId
+    const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET!) as { userId: string };
+    
+    // Get current broker's ID
+    const currentBroker = await prisma.broker.findFirst({
+      where: { user_id: decoded.userId },
+      select: { id: true },
+    });
+
     const brokers = await prisma.broker.findMany({
+      where: {
+        // Exclude current broker from results
+        NOT: {
+          id: currentBroker?.id
+        }
+      },
       skip: (page - 1) * page_size,
       take: page_size,
       include: {
@@ -164,7 +181,14 @@ export const getBrokerListService = async ({
       },
     });
 
-    const total = await prisma.broker.count();
+    // Count total excluding current broker
+    const total = await prisma.broker.count({
+      where: {
+        NOT: {
+          id: currentBroker?.id
+        }
+      }
+    });
 
     if (brokers.length === 0) {
       return {
