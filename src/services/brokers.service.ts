@@ -1,4 +1,4 @@
-import { Broker } from "@prisma/client";
+import { Broker, Prisma } from "@prisma/client";
 import prisma from "../utils/prisma";
 import jwt from "jsonwebtoken";
 
@@ -143,11 +143,13 @@ export const getBrokerDetailService = async (id: string, token: string) => {
 export const getBrokerListService = async ({ 
   page, 
   page_size,
-  token 
+  token,
+  search = ''
 }: { 
   page: number; 
   page_size: number;
   token: string;
+  search?: string;
 }): Promise<{
   brokers: Broker[];
   pagination: {
@@ -167,12 +169,18 @@ export const getBrokerListService = async ({
       select: { id: true },
     });
 
+    const searchCondition = search ? {
+      OR: [
+        { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+      ]
+    } : {};
+
     const brokers = await prisma.broker.findMany({
       where: {
-        // Exclude current broker from results
-        NOT: {
-          id: currentBroker?.id
-        }
+        AND: [
+          { NOT: { id: currentBroker?.id } },
+          searchCondition
+        ]
       },
       skip: (page - 1) * page_size,
       take: page_size,
@@ -181,12 +189,13 @@ export const getBrokerListService = async ({
       },
     });
 
-    // Count total excluding current broker
+    // Update total count to include search condition
     const total = await prisma.broker.count({
       where: {
-        NOT: {
-          id: currentBroker?.id
-        }
+        AND: [
+          { NOT: { id: currentBroker?.id } },
+          searchCondition
+        ]
       }
     });
 
