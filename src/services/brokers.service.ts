@@ -1,4 +1,4 @@
-import { Broker } from "@prisma/client";
+import { Broker, Prisma } from "@prisma/client";
 import prisma from "../utils/prisma";
 import jwt from "jsonwebtoken";
 
@@ -140,14 +140,86 @@ export const getBrokerDetailService = async (id: string, token: string) => {
 };
 
 /* Get broker list */
-export const getBrokerListService = async () => {
+export const getBrokerListService = async ({ 
+  page, 
+  page_size,
+  token,
+  search = ''
+}: { 
+  page: number; 
+  page_size: number;
+  token: string;
+  search?: string;
+}): Promise<{
+  brokers: Broker[];
+  pagination: {
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+  };
+}> => {
   try {
+    // Decode token to get userId
+    const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET!) as { userId: string };
+    
+    // Get current broker's ID
+    const currentBroker = await prisma.broker.findFirst({
+      where: { user_id: decoded.userId },
+      select: { id: true },
+    });
+
+    const searchCondition = search ? {
+      OR: [
+        { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+      ]
+    } : {};
+
     const brokers = await prisma.broker.findMany({
+      where: {
+        AND: [
+          { NOT: { id: currentBroker?.id } },
+          searchCondition
+        ]
+      },
+      skip: (page - 1) * page_size,
+      take: page_size,
       include: {
         company: true,
       },
     });
-    return brokers;
+
+    // Update total count to include search condition
+    const total = await prisma.broker.count({
+      where: {
+        AND: [
+          { NOT: { id: currentBroker?.id } },
+          searchCondition
+        ]
+      }
+    });
+
+    if (brokers.length === 0) {
+      return {
+        brokers: [],
+        pagination: {
+          total: 0,
+          page,
+          page_size,
+          total_pages: 0,
+        }
+      };
+    }
+
+    return {
+      brokers,
+      pagination: {
+        total,
+        page,
+        page_size,
+        total_pages: Math.ceil(total / page_size)
+      }
+    };
   } catch (error) {
     console.error(error);
     throw error;
