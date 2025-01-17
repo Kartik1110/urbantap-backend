@@ -14,8 +14,6 @@ import notificationsRoutes from './routes/notifications.route';
 import inquiriesRoutes from './routes/inquiries.route';
 import connectionsRoutes from './routes/connections.route';
 import jobRoutes from './routes/job.route';
-import validateSchema from "./middlewares/validate.middleware";
-import { jobSchema } from "./schema/job.schema";
 
 dotenv.config();
 
@@ -40,7 +38,7 @@ app.use("/api/v1", authMiddleware, connectionsRoutes);
 // File upload routes (also protected)
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
-app.use("/api/v1", authMiddleware, validateSchema(jobSchema), jobRoutes);
+app.use("/api/v1", authMiddleware, jobRoutes);
 
 app.get("/health", (req, res) => {
   res.send("OK");
