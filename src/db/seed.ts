@@ -8,7 +8,8 @@ async function main() {
   await prisma.user.deleteMany({});
   await prisma.broker.deleteMany({});
   await prisma.company.deleteMany({});
-
+  await prisma.job.deleteMany({});
+  
   // Create multiple users with different roles
   const users = await Promise.all([
     prisma.user.create({
@@ -163,6 +164,58 @@ async function main() {
         furnished: "Semi_furnished",
         project_age: 1,
         sale_type: "Resale",
+      },
+    }),
+  ]);
+
+  // Create multiple job listings
+  const jobs = await Promise.all([
+    prisma.job.create({
+      data: {
+        title: "Senior Real Estate Broker",
+        description: "Looking for experienced real estate broker with proven track record in luxury property sales. Must have strong network and excellent negotiation skills.",
+        workplaceType: "On_site",
+        location: "Dubai",
+        jobType: "Full_time",
+        min_salary: 20000,
+        max_salary: 30000,
+        currency: "AED",
+        min_experience: 5,
+        max_experience: 10,
+        companyId: companies[0].id,
+        userId: users[2].id, // Mike HR
+      },
+    }),
+    prisma.job.create({
+      data: {
+        title: "Property Consultant",
+        description: "Join our luxury property division as a property consultant. Looking for dynamic individuals with strong sales background.",
+        workplaceType: "Hybrid",
+        location: "Dubai",
+        jobType: "Full_time",
+        min_salary: 15000,
+        max_salary: 25000,
+        currency: "AED",
+        min_experience: 3,
+        max_experience: 7,
+        companyId: companies[1].id,
+        userId: users[2].id, // Mike HR
+      },
+    }),
+    prisma.job.create({
+      data: {
+        title: "Listing Coordinator",
+        description: "Support our brokers with property listings and documentation. Perfect opportunity for detail-oriented professionals.",
+        workplaceType: "On_site",
+        location: "Dubai",
+        jobType: "Part_time",
+        min_salary: 8000,
+        max_salary: 12000,
+        currency: "AED",
+        min_experience: 1,
+        max_experience: 3,
+        companyId: companies[0].id,
+        userId: users[2].id, // Mike HR
       },
     }),
   ]);

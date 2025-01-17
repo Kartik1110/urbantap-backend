@@ -33,7 +33,20 @@ export const getJobsService = async (
   const skip = (page - 1) * page_size;
   const take = page_size;
 
-  const jobs = await prisma.job.findMany({ skip, take, orderBy: { createdAt: 'desc' } });
+  const jobs = await prisma.job.findMany({
+    skip,
+    take,
+    orderBy: { createdAt: "desc" },
+    include: {
+      company: {
+        select: {
+          id: true,
+          name: true,
+          logo: true,
+        },
+      },
+    },
+  });
 
   const totalJobs = await prisma.job.count();
   const totalPages = Math.ceil(totalJobs / page_size);
