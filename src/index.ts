@@ -38,7 +38,7 @@ app.use("/api/v1", authMiddleware, connectionsRoutes);
 // File upload routes (also protected)
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
-app.use("/api/v1", authMiddleware, jobRoutes);
+app.use("/api/v1", authMiddleware, jobRoutes(upload));
 
 app.get("/health", (req, res) => {
   res.send("OK");
