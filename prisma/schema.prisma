@@ -269,11 +269,6 @@ enum JobType {
 
 model Application {
   id          String            @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String
-  phoneNumber String
-  coverLetter String?
   resume      String // File path or URL to the uploaded CV
   jobId       String
   userId      String

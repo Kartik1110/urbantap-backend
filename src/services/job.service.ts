@@ -1,6 +1,32 @@
 import { PrismaClient, Job, Role } from "@prisma/client";
+import { ApplyJobInput } from "../schema/job.schema";
+import { uploadToS3 } from "../utils/s3Upload";
 
 const prisma = new PrismaClient();
+
+export const applyJobService = async (job: ApplyJobInput, userId: string, resume: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const jobToApply = await prisma.job.findUnique({
+    where: { id: job.jobId },
+  });
+
+  if (!jobToApply) {
+    throw new Error("Job not found");
+  }
+
+  const resumeUrl = await uploadToS3(resume, `resumes/${user.id}-${Date.now()}.pdf`);
+
+  return await prisma.application.create({
+    data: { jobId: jobToApply.id, userId: user.id, resume: resumeUrl },
+  });
+};
 
 export const createJobService = async (job: Job) => {
   if (job.userId) {
