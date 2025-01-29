@@ -99,7 +99,8 @@ export const addConnectionRequest = async (
     };
   }
 
-  await prisma.$transaction(async (prisma) => {
+  // TODO: Add transaction
+  // await prisma.$transaction(async (prisma) => {
     // Step 1: Create the connection request with a Pending status
     const connectionRequest = await prisma.connectionRequest.create({
       data: {
@@ -126,7 +127,7 @@ export const addConnectionRequest = async (
       type: "Network",
       connectionRequest_id: connectionRequest.id,
     });
-  });
+  // });
 
   return {
     message: "Connection request created successfully",
