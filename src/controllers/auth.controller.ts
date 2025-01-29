@@ -168,9 +168,9 @@ export const deleteUser = async (req: Request, res: Response) => {
 export const updateFcmTokenHandler = async (req: Request, res: Response) => {
   try {
     const { fcmToken } = req.body;
-    const userId = req.params.id;
+    const token = req.headers.authorization;
 
-    const user = await updateFcmTokenService(userId, fcmToken);
+    const user = await updateFcmTokenService(fcmToken, token as string);
     
     res.json({
       status: true,
