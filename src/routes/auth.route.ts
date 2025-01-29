@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { signup, login, googleSignIn, appleSignIn, updateUser, deleteUser } from "../controllers/auth.controller";
+import { signup, login, googleSignIn, appleSignIn, updateUser, deleteUser, updateFcmTokenHandler } from "../controllers/auth.controller";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -13,5 +14,8 @@ router.post("/login", login);
 
 router.put('/user/:id', updateUser)
 router.delete('/user/:id', deleteUser)
+
+// FCM token route (protected)
+router.post('/fcm-token/:id', authMiddleware, updateFcmTokenHandler);
 
 export default router;

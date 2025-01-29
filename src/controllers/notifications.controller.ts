@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { NotificationsService } from '../services/notifications.service';
+import { getNotifications } from '../services/notifications.service';
 import { NotificationType } from '@prisma/client';
-
-const notificationsService = new NotificationsService();
 
 /*
 TODO:
@@ -24,7 +22,7 @@ export class NotificationsController {
     }
 
     try {
-      const notifications = await notificationsService.getNotifications(broker_id, type as NotificationType);
+      const notifications = await getNotifications(broker_id, type as NotificationType);
       res.status(200).json(notifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);

@@ -258,3 +258,10 @@ export const deleteUserService = async (id: string) => {
     });
   });
 };
+
+export const updateFcmTokenService = async (userId: string, fcmToken: string) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { fcm_token: fcmToken }
+  });
+};

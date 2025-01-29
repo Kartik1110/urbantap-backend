@@ -25,6 +25,7 @@ model User {
   appleId            String?       @unique
   appleAccessToken   String?
   appleRefreshToken  String?
+  fcm_token          String?
   jobs               Job[]
   applications       Application[]
 }

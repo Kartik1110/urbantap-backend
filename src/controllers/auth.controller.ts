@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { signupService, loginService, googleSignInService, appleSignInService, updateUserService, deleteUserService } from "../services/auth.service";
+import { signupService, loginService, googleSignInService, appleSignInService, updateUserService, deleteUserService, updateFcmTokenService } from "../services/auth.service";
 import logger from "../utils/logger";
 
 // Signup controller
@@ -162,5 +162,27 @@ export const deleteUser = async (req: Request, res: Response) => {
       message: "Error deleting user and related data",
       data: null,
     });
+  }
+};
+
+export const updateFcmTokenHandler = async (req: Request, res: Response) => {
+  try {
+    const { fcmToken } = req.body;
+    const userId = req.params.id;
+
+    const user = await updateFcmTokenService(userId, fcmToken);
+    
+    res.json({
+      status: true,
+      message: "FCM token updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+    } else {
+      logger.error(String(error));
+    }
+    res.status(500).json({ error: "Internal server error" });
   }
 };
