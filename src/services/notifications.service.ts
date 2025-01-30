@@ -53,7 +53,15 @@ export const createNotification = async (data: {
         title: "New Notification",
         body: data.text,
         data: {
-          notification: JSON.stringify(notification),
+          id: notification.id,
+          broker_id: notification.broker_id, // sent_to_id
+          sent_by_id: notification.sent_by_id, // sent_by_id
+          type: notification.type,
+          timestamp: notification.timestamp.toISOString(),
+          text: notification.text || "",
+          message: notification.message || "",
+          inquiry_id: notification.inquiry_id || "",
+          connectionRequest_id: notification.connectionRequest_id || "",
         },
       });
     }
