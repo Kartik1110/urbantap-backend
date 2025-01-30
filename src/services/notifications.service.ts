@@ -1,10 +1,13 @@
-import { PrismaClient, NotificationType, Prisma } from '@prisma/client';
-import { sendPushNotification } from './firebase.service';
-import logger from '../utils/logger';
+import { PrismaClient, NotificationType, Prisma } from "@prisma/client";
+import { sendPushNotification } from "./firebase.service";
+import logger from "../utils/logger";
 
 const prisma = new PrismaClient();
 
-export const getNotifications = async (brokerId: string, type: NotificationType) => {
+export const getNotifications = async (
+  brokerId: string,
+  type: NotificationType
+) => {
   let whereClause: Prisma.NotificationWhereInput = { broker_id: brokerId };
 
   // Determine the type filter
@@ -17,7 +20,7 @@ export const getNotifications = async (brokerId: string, type: NotificationType)
   // Fetch notifications based on the broker ID and type
   return await prisma.notification.findMany({
     where: whereClause,
-    orderBy: { timestamp: 'desc' },
+    orderBy: { timestamp: "desc" },
   });
 };
 
@@ -37,30 +40,27 @@ export const createNotification = async (data: {
       include: {
         broker: {
           include: {
-            user: true
-          }
-        }
-      }
+            user: true,
+          },
+        },
+      },
     });
 
     // Send push notification if user has FCM token
     if (notification.broker?.user?.fcm_token) {
       await sendPushNotification({
         token: notification.broker.user.fcm_token,
-        title: 'New Notification',
+        title: "New Notification",
         body: data.text,
         data: {
-          type: data.type,
-          notificationId: notification.id,
-          ...(data.inquiry_id && { inquiryId: data.inquiry_id }),
-          ...(data.connectionRequest_id && { connectionRequestId: data.connectionRequest_id })
-        }
+          notification: JSON.stringify(notification),
+        },
       });
     }
 
     return notification;
   } catch (error) {
-    logger.error('Error creating notification:', error);
+    logger.error("Error creating notification:", error);
     throw error;
   }
 };
