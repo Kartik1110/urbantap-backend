@@ -25,6 +25,7 @@ export const getNotifications = async (
 };
 
 export const createNotification = async (data: {
+  token?: string;
   sent_by_id: string;
   broker_id: string;
   text: string;
@@ -47,9 +48,9 @@ export const createNotification = async (data: {
     });
 
     // Send push notification if user has FCM token
-    if (notification.broker?.user?.fcm_token) {
+    if (data.token || notification.broker?.user?.fcm_token) {
       await sendPushNotification({
-        token: notification.broker.user.fcm_token,
+        token: data.token || notification.broker?.user?.fcm_token || "",
         title: "New Notification",
         body: data.text,
         data: {

@@ -165,13 +165,22 @@ export const updateConnectionStatus = async (
           },
         });
 
-        // Create a notification for the accepted connection using the notification service
+        const sendToBroker = await prisma.broker.findUnique({
+          where: { id: sent_to_id },
+          select: {
+            user: true,
+            name: true,
+          },
+        });
+
+        // notification to the broker who sent the request
         await createNotification({
           sent_by_id: sent_by_id,
           broker_id: sent_to_id,
-          text: `Connection request from broker ${sentByBrokerName?.name} has been accepted.`,
+          text: `${sendToBroker?.name} has accepted your connection request.`,
           type: "Network",
           connectionRequest_id: request_id,
+          token: sendToBroker?.user?.fcm_token || "",
         });
 
         // Create two connection objects to establish mutual connection
