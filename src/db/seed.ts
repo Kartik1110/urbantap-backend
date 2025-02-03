@@ -3,12 +3,17 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clean the database
+  // Clean the database - order matters due to foreign key constraints
+  await prisma.application.deleteMany({});
+  await prisma.job.deleteMany({});
+  await prisma.notification.deleteMany({});
+  await prisma.inquiry.deleteMany({});
+  await prisma.connectionRequest.deleteMany({});
+  await prisma.connections.deleteMany({});
   await prisma.listing.deleteMany({});
-  await prisma.user.deleteMany({});
   await prisma.broker.deleteMany({});
   await prisma.company.deleteMany({});
-  await prisma.job.deleteMany({});
+  await prisma.user.deleteMany({});
   
   // Create multiple users with different roles
   const users = await Promise.all([

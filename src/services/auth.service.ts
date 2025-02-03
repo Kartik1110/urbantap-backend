@@ -258,3 +258,12 @@ export const deleteUserService = async (id: string) => {
     });
   });
 };
+
+export const updateFcmTokenService = async (fcmToken: string, token: string) => {
+  const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET!) as { userId: string };
+  
+  return prisma.user.update({
+    where: { id: decoded.userId },
+    data: { fcm_token: fcmToken }
+  });
+};
