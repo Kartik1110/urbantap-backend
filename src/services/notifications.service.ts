@@ -4,7 +4,7 @@ import logger from "../utils/logger";
 
 const prisma = new PrismaClient();
 
-export const getNotifications = async (
+export const getNotificationsService = async (
   brokerId: string,
   type: NotificationType
 ) => {
@@ -24,7 +24,7 @@ export const getNotifications = async (
   });
 };
 
-export const createNotification = async (data: {
+export const createNotificationService = async (data: {
   token?: string;
   sent_by_id: string;
   broker_id: string;

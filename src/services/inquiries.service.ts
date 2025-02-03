@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { createNotification } from './notifications.service';
+import { createNotificationService } from './notifications.service';
 
 const prisma = new PrismaClient();
 
@@ -33,7 +33,7 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
         });
 
         // Create the notification for the recipient using the notification service
-        await createNotification({
+        await createNotificationService({
             sent_by_id: sent_by_id,
             broker_id: sent_to_id,
             text: `New inquiry received for listing ${listing_id}`,

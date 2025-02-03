@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { createNotification } from './notifications.service';
+import { createNotificationService } from './notifications.service';
 
 const prisma = new PrismaClient();
 
@@ -119,7 +119,7 @@ export const addConnectionRequest = async (
     });
 
     // Step 2: Create a notification for the recipient using the notification service
-    await createNotification({
+    await createNotificationService({
       sent_by_id: broker_id,
       broker_id: sent_to_id,
       message: text || "",
@@ -174,7 +174,7 @@ export const updateConnectionStatus = async (
         });
 
         // notification to the broker who sent the request
-        await createNotification({
+        await createNotificationService({
           sent_by_id: sent_by_id,
           broker_id: sent_to_id,
           text: `${sendToBroker?.name} has accepted your connection request.`,
