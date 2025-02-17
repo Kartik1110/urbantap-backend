@@ -35,9 +35,19 @@ export const createNotificationService = async (data: {
   message?: string;
 }) => {
   try {
+    const notificationData = {
+      sent_by_id: data.sent_by_id,
+      broker_id: data.broker_id,
+      text: data.text,
+      type: data.type,
+      inquiry_id: data.inquiry_id,
+      connectionRequest_id: data.connectionRequest_id,
+      message: data.message,
+    };
+
     // Create notification in database
     const notification = await prisma.notification.create({
-      data,
+      data: notificationData,
       include: {
         broker: {
           include: {

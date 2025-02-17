@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, RequestStatus } from "@prisma/client";
 import { createNotificationService } from './notifications.service';
 
 const prisma = new PrismaClient();
@@ -137,7 +137,7 @@ export const addConnectionRequest = async (
 export const updateConnectionStatus = async (
   request_id: string,
   broker_id: string,
-  status: "Accepted" | "Rejected" | "Pending"
+  status: RequestStatus
 ) => {
   await prisma.$transaction(async (prisma) => {
     // Update the status of the connection request
@@ -146,7 +146,7 @@ export const updateConnectionStatus = async (
       data: { status },
     });
 
-    if (status === "Accepted") {
+    if (status === RequestStatus.Accepted) {
       const { sent_by_id, sent_to_id } = connectionRequest;
 
       // Fetch broker details
@@ -158,13 +158,6 @@ export const updateConnectionStatus = async (
       });
 
       if (brokerSentBy && brokerSentTo) {
-        const sentByBrokerName = await prisma.broker.findUnique({
-          where: { id: sent_by_id },
-          select: {
-            name: true,
-          },
-        });
-
         const sendToBroker = await prisma.broker.findUnique({
           where: { id: sent_to_id },
           select: {
@@ -198,7 +191,7 @@ export const updateConnectionStatus = async (
         });
       }
     }
-    if (status === "Rejected") {
+    if (status === RequestStatus.Rejected) {
       await prisma.connectionRequest.delete({
         where: { id: request_id },
       });
