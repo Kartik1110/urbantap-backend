@@ -12,13 +12,7 @@ add auth middleware to check if the broker id requesting is indeed the logged in
 
 export const getNotifications = async (req: Request, res: Response) => {
   const { type = 'General' } = req.query;
-  const token = req.headers.authorization;
-
-  const decoded = jwt.verify(
-    token?.replace("Bearer ", "") || "",
-    process.env.JWT_SECRET!
-  ) as { userId: string };
-
+  const { broker_id } = req.params;
 
   // Validate notification type
   if (!Object.values(NotificationType).includes(type as NotificationType)) {
@@ -28,7 +22,7 @@ export const getNotifications = async (req: Request, res: Response) => {
   }
 
   try {
-    const notifications = await getNotificationsService(decoded.userId, type as NotificationType);
+    const notifications = await getNotificationsService(broker_id, type as NotificationType);
     res.status(200).json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);
