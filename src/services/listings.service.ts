@@ -77,9 +77,11 @@ export const getListingsService = async (
     payment_plan?: ("Payment_done" | "Payment_Pending")[];
     sale_type?: ("Direct" | "Resale")[];
     amenities?: string[];
+    page?: number;
+    page_size?: number;
   } & ListingFilters
-): Promise<
-  Array<{
+): Promise<{
+  listings: Array<{
     listing: Partial<Listing>;
     broker: {
       id: string;
@@ -91,71 +93,115 @@ export const getListingsService = async (
     company: {
       name: string;
     };
-  }>
-> => {
+  }>;
+  pagination: {
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+  };
+}> => {
   try {
     const {
-      looking_for,
-      category,
-      city,
-      address,
-      min_price,
-      max_price,
-      min_sq_ft,
-      max_sq_ft,
-      no_of_bathrooms,
-      no_of_bedrooms,
-      furnished,
-      type,
-      rental_frequency,
-      project_age,
-      payment_plan,
-      sale_type,
-      amenities,
-      ...otherFilters
+      page = 1,
+      page_size = 10,
+      ...filterParams
     } = filters;
 
-    const listings = await prisma.listing.findMany({
+    // Calculate skip value for pagination
+    const skip = (page - 1) * page_size;
+
+    // Get total count for pagination
+    const total = await prisma.listing.count({
       where: {
         AND: [
           // Base filters as AND conditions
-          ...(Object.keys(otherFilters).length > 0 ? [otherFilters as any] : []),
-          ...(looking_for !== undefined ? [{ looking_for }] : []),
-          ...(category ? [{ category }] : []),
-          ...(city ? [{ city }] : []),
-          ...(address ? [{ address }] : []),
+          ...(Object.keys(filterParams).length > 0 ? [filterParams as any] : []),
+          ...(filterParams.looking_for !== undefined ? [{ looking_for: filterParams.looking_for }] : []),
+          ...(filterParams.category ? [{ category: filterParams.category }] : []),
+          ...(filterParams.city ? [{ city: filterParams.city }] : []),
+          ...(filterParams.address ? [{ address: filterParams.address }] : []),
           
           // Price range condition
-          ...(min_price || max_price
+          ...(filterParams.min_price || filterParams.max_price
             ? [{
                 AND: [
-                  ...(min_price ? [{ min_price: { gte: min_price } }] : []),
-                  ...(max_price ? [{ max_price: { lte: max_price } }] : [])
+                  ...(filterParams.min_price ? [{ min_price: { gte: filterParams.min_price } }] : []),
+                  ...(filterParams.max_price ? [{ max_price: { lte: filterParams.max_price } }] : [])
                 ]
               }]
             : []),
 
           // Square footage condition
-          ...(min_sq_ft || max_sq_ft
+          ...(filterParams.min_sqft || filterParams.max_sqft
             ? [{
                 sq_ft: {
-                  ...(min_sq_ft && { gte: min_sq_ft }),
-                  ...(max_sq_ft && { lte: max_sq_ft })
+                  ...(filterParams.min_sqft && { gte: filterParams.min_sqft }),
+                  ...(filterParams.max_sqft && { lte: filterParams.max_sqft })
                 }
               }]
             : []),
 
           // Array filters as OR conditions within their groups
-          ...(no_of_bathrooms ? [{ no_of_bathrooms: { in: no_of_bathrooms } }] : []),
-          ...(no_of_bedrooms ? [{ no_of_bedrooms: { in: no_of_bedrooms } }] : []),
-          ...(furnished ? [{ furnished: { in: furnished } }] : []),
-          ...(type ? [{ type: { in: type } }] : []),
-          ...(rental_frequency ? [{ rental_frequency: { in: rental_frequency } }] : []),
-          ...(project_age ? [{ project_age: { in: project_age } }] : []),
-          ...(payment_plan ? [{ payment_plan: { in: payment_plan } }] : []),
-          ...(sale_type ? [{ sale_type: { in: sale_type } }] : []),
-          ...(amenities ? [{ amenities: { hasSome: amenities } }] : [])
+          ...(filterParams.no_of_bathrooms ? [{ no_of_bathrooms: { in: filterParams.no_of_bathrooms } }] : []),
+          ...(filterParams.no_of_bedrooms ? [{ no_of_bedrooms: { in: filterParams.no_of_bedrooms } }] : []),
+          ...(filterParams.furnished ? [{ furnished: { in: filterParams.furnished } }] : []),
+          ...(filterParams.type ? [{ type: { in: filterParams.type } }] : []),
+          ...(filterParams.rental_frequency ? [{ rental_frequency: { in: filterParams.rental_frequency } }] : []),
+          ...(filterParams.project_age ? [{ project_age: { in: filterParams.project_age } }] : []),
+          ...(filterParams.payment_plan ? [{ payment_plan: { in: filterParams.payment_plan } }] : []),
+          ...(filterParams.sale_type ? [{ sale_type: { in: filterParams.sale_type } }] : []),
+          ...(filterParams.amenities ? [{ amenities: { hasSome: filterParams.amenities } }] : [])
         ]
+      }
+    });
+
+    const listings = await prisma.listing.findMany({
+      where: {
+        AND: [
+          // Base filters as AND conditions
+          ...(Object.keys(filterParams).length > 0 ? [filterParams as any] : []),
+          ...(filterParams.looking_for !== undefined ? [{ looking_for: filterParams.looking_for }] : []),
+          ...(filterParams.category ? [{ category: filterParams.category }] : []),
+          ...(filterParams.city ? [{ city: filterParams.city }] : []),
+          ...(filterParams.address ? [{ address: filterParams.address }] : []),
+          
+          // Price range condition
+          ...(filterParams.min_price || filterParams.max_price
+            ? [{
+                AND: [
+                  ...(filterParams.min_price ? [{ min_price: { gte: filterParams.min_price } }] : []),
+                  ...(filterParams.max_price ? [{ max_price: { lte: filterParams.max_price } }] : [])
+                ]
+              }]
+            : []),
+
+          // Square footage condition
+          ...(filterParams.min_sqft || filterParams.max_sqft
+            ? [{
+                sq_ft: {
+                  ...(filterParams.min_sqft && { gte: filterParams.min_sqft }),
+                  ...(filterParams.max_sqft && { lte: filterParams.max_sqft })
+                }
+              }]
+            : []),
+
+          // Array filters as OR conditions within their groups
+          ...(filterParams.no_of_bathrooms ? [{ no_of_bathrooms: { in: filterParams.no_of_bathrooms } }] : []),
+          ...(filterParams.no_of_bedrooms ? [{ no_of_bedrooms: { in: filterParams.no_of_bedrooms } }] : []),
+          ...(filterParams.furnished ? [{ furnished: { in: filterParams.furnished } }] : []),
+          ...(filterParams.type ? [{ type: { in: filterParams.type } }] : []),
+          ...(filterParams.rental_frequency ? [{ rental_frequency: { in: filterParams.rental_frequency } }] : []),
+          ...(filterParams.project_age ? [{ project_age: { in: filterParams.project_age } }] : []),
+          ...(filterParams.payment_plan ? [{ payment_plan: { in: filterParams.payment_plan } }] : []),
+          ...(filterParams.sale_type ? [{ sale_type: { in: filterParams.sale_type } }] : []),
+          ...(filterParams.amenities ? [{ amenities: { hasSome: filterParams.amenities } }] : [])
+        ]
+      },
+      skip,
+      take: page_size,
+      orderBy: {
+        created_at: 'desc'
       },
       include: {
         broker: {
@@ -176,15 +222,22 @@ export const getListingsService = async (
     });
 
     if (listings.length === 0) {
-      return [{
+      return {
+        listings: [{
           listing: {},
           broker: { id: "", name: "", profile_pic: "", country_code: "", w_number: "" },
           company: { name: "" },
+        }],
+        pagination: {
+          total: 0,
+          page,
+          page_size,
+          total_pages: 0,
         }
-      ];
+      };
     }
 
-    return listings.map((listing: any) => {
+    const formattedListings = listings.map((listing: any) => {
       const { broker, ...listingWithoutBroker } = listing;
       return {
         listing: listingWithoutBroker,
@@ -200,6 +253,16 @@ export const getListingsService = async (
         },
       };
     });
+
+    return {
+      listings: formattedListings,
+      pagination: {
+        total,
+        page,
+        page_size,
+        total_pages: Math.ceil(total / page_size),
+      }
+    };
   } catch (error) {
     console.error(error);
     logger.error(error);

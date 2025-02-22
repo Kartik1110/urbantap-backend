@@ -6,3 +6,5 @@ dist
 logs
 
 uploads
+
+src/config/urbantap-firebase.json

@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, RequestStatus } from "@prisma/client";
+import { createNotificationService } from "./notifications.service";
 
 const prisma = new PrismaClient();
 
@@ -98,49 +99,45 @@ export const addConnectionRequest = async (
     };
   }
 
-  await prisma
-    .$transaction(async (prisma) => {
+  // TODO: Add transaction
+  // await prisma.$transaction(async (prisma) => {
+  // Step 1: Create the connection request with a Pending status
+  const connectionRequest = await prisma.connectionRequest.create({
+    data: {
+      sent_by_id: broker_id,
+      sent_to_id,
+      status: "Pending",
+      text: text || "",
+    },
+  });
 
-      // Step 1: Create the connection request with a Pending status
-      const connectionRequest = await prisma.connectionRequest.create({
-        data: {
-          sent_by_id: broker_id,
-          sent_to_id,
-          status: "Pending",
-          text: text || "",
-        },
-      });
+  const sentByBrokerName = await prisma.broker.findUnique({
+    where: { id: broker_id },
+    select: {
+      name: true,
+    },
+  });
 
-      const sentByBrokerName = await prisma.broker.findUnique({
-        where: { id: broker_id },
-        select: {
-          name: true,
-        },
-      });
+  // Step 2: Create a notification for the recipient using the notification service
+  await createNotificationService({
+    sent_by_id: broker_id,
+    broker_id: sent_to_id,
+    message: text || "",
+    text: `New connection request received from broker ${sentByBrokerName?.name}`,
+    type: "Network",
+    connectionRequest_id: connectionRequest.id,
+  });
+  // });
 
-      // Step 2: Create a notification for the recipient
-      await prisma.notification.create({
-        data: {
-          sent_by_id: broker_id,
-          broker_id: sent_to_id,
-          message: text || "",
-          text: `New connection request received from broker ${sentByBrokerName?.name}`,
-          type: "Network",
-          connectionRequest_id: connectionRequest.id,
-        },
-      });
-    })
-    .then(() => {
-      return {
-        message: "Connection request created successfully",
-      };
-    });
+  return {
+    message: "Connection request created successfully",
+  };
 };
 
 export const updateConnectionStatus = async (
   request_id: string,
   broker_id: string,
-  status: "Accepted" | "Rejected" | "Pending"
+  status: RequestStatus
 ) => {
   await prisma.$transaction(async (prisma) => {
     // Update the status of the connection request
@@ -149,34 +146,33 @@ export const updateConnectionStatus = async (
       data: { status },
     });
 
-    if (status === "Accepted") {
+    if (status === RequestStatus.Accepted) {
       const { sent_by_id, sent_to_id } = connectionRequest;
 
       // Fetch broker details
-      const brokerSentBy = await prisma.broker.findUnique({
+      const sentByBroker = await prisma.broker.findUnique({
         where: { id: sent_by_id },
+        select: {
+          user: true,
+        },
       });
-      const brokerSentTo = await prisma.broker.findUnique({
+      const sentToBroker = await prisma.broker.findUnique({
         where: { id: sent_to_id },
+        select: {
+          user: true,
+          name: true,
+        },
       });
 
-      if (brokerSentBy && brokerSentTo) {
-        const sentByBrokerName = await prisma.broker.findUnique({
-          where: { id: sent_by_id },
-          select: {
-            name: true,
-          },
-        });
-
-        // Create a notification for the accepted connection
-        await prisma.notification.create({
-          data: {
-            sent_by_id: sent_by_id,
-            broker_id: sent_to_id,
-            text: `Connection request from broker ${sentByBrokerName?.name} has been accepted.`,
-            type: "Network",
-            connectionRequest_id: request_id,
-          },
+      if (sentByBroker && sentToBroker) {
+        // notification to the broker who sent the request
+        await createNotificationService({
+          sent_by_id: sent_by_id,
+          broker_id: sent_to_id,
+          text: `${sentToBroker?.name} has accepted your connection request.`,
+          type: "Network",
+          connectionRequest_id: request_id,
+          token: sentByBroker?.user?.fcm_token || "",
         });
 
         // Create two connection objects to establish mutual connection
@@ -194,7 +190,7 @@ export const updateConnectionStatus = async (
         });
       }
     }
-    if (status === "Rejected") {
+    if (status === RequestStatus.Rejected) {
       await prisma.connectionRequest.delete({
         where: { id: request_id },
       });

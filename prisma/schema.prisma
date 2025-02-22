@@ -25,6 +25,7 @@ model User {
   appleId            String?       @unique
   appleAccessToken   String?
   appleRefreshToken  String?
+  fcm_token          String?
   jobs               Job[]
   applications       Application[]
 }
@@ -228,19 +229,30 @@ model Inquiry {
 }
 
 model Job {
-  id            String        @id @default(uuid())
-  title         String
-  companyId     String
-  company       Company       @relation(fields: [companyId], references: [id])
-  workplaceType WorkplaceType
-  location      String
-  jobType       JobType
-  description   String
-  userId        String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  user          User          @relation(fields: [userId], references: [id])
-  applications  Application[]
+  id             String        @id @default(uuid())
+  title          String
+  companyId      String
+  company        Company       @relation(fields: [companyId], references: [id])
+  workplaceType  WorkplaceType
+  location       String
+  jobType        JobType
+  description    String
+  min_salary     Float?
+  max_salary     Float?
+  currency       Currency
+  min_experience Int?
+  max_experience Int?
+  userId         String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  user           User          @relation(fields: [userId], references: [id])
+  applications   Application[]
+}
+
+enum Currency {
+  USD
+  AED
+  INR
 }
 
 enum WorkplaceType {
@@ -258,11 +270,6 @@ enum JobType {
 
 model Application {
   id          String            @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String
-  phoneNumber String
-  coverLetter String?
   resume      String // File path or URL to the uploaded CV
   jobId       String
   userId      String

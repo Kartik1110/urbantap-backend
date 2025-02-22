@@ -47,11 +47,34 @@ export const getBrokerDetail = async (req: Request, res: Response) => {
 /* Get broker list */
 export const getBrokerList = async (req: Request, res: Response) => {
   try {
-    const brokers = await getBrokerListService();
+    const token = req.headers.authorization;
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+    
+    // Extract pagination parameters from body with defaults
+    const page = parseInt(req.body.page as string) || 1;
+    const page_size = parseInt(req.body.page_size as string) || 10;
+    const search = req.body.search as string;
+
+    const { brokers, pagination } = await getBrokerListService({ page, page_size, token, search });
+
     res.json({
       status: "success",
       message: "Broker list fetched successfully",
-      data: brokers,
+      data: {
+        brokers,
+        pagination: {
+          total: pagination.total,
+          page: pagination.page,
+          page_size: pagination.page_size,
+          total_pages: pagination.total_pages
+        }
+      },
     });
   } catch (error) {
     logger.error(error);
