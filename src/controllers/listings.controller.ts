@@ -5,6 +5,7 @@ import {
   bulkInsertListingsService,
   deleteListingbyId,
   getListingByIdService,
+  reportListingService,
 } from "../services/listings.service";
 import { uploadToS3 } from "../utils/s3Upload";
 import prisma from "../utils/prisma";
@@ -134,6 +135,32 @@ export const deleteListing = async (req: Request, res: Response) => {
     return res.status(500).json({
       status: "error",
       message: "Failed to delete listing",
+      error: error,
+    });
+  }
+};
+
+/* Report a listing */
+export const reportListing = async (req: Request, res: Response) => {
+  const listingId = req.params.id;
+
+  if (!listingId) {
+    return res.status(400).json({
+      status: "error",
+      message: "Missing 'listingId' in request body",
+    });
+  }
+
+  try {
+    await reportListingService(listingId);
+    return res.status(200).json({
+      status: "success",
+      message: "Listing reported successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to report listing",
       error: error,
     });
   }

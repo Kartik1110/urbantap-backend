@@ -101,6 +101,14 @@ model Listing {
   created_at       DateTime          @default(now())
   broker           Broker            @relation(fields: [broker_id], references: [id])
   inquiries        Inquiry[]
+  admin_status     Admin_Status?     @default(Pending)
+}
+
+enum Admin_Status {
+  Approved
+  Rejected
+  Pending
+  Reported
 }
 
 enum Category {
