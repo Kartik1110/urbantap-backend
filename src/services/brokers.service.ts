@@ -1,4 +1,4 @@
-import { Broker, Prisma } from "@prisma/client";
+import { Broker, Prisma, RequestStatus } from "@prisma/client";
 import prisma from "../utils/prisma";
 import jwt from "jsonwebtoken";
 
@@ -6,16 +6,19 @@ import jwt from "jsonwebtoken";
 export const getBrokerDetailService = async (id: string, token: string) => {
   try {
     // Decode token to get userId
-    const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET!) as { userId: string };
-    
+    const decoded = jwt.verify(
+      token.replace("Bearer ", ""),
+      process.env.JWT_SECRET!
+    ) as { userId: string };
+
     // Get user details including role
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, role: true }
+      select: { id: true, role: true },
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Get requesting broker's ID using the user_id
@@ -25,7 +28,7 @@ export const getBrokerDetailService = async (id: string, token: string) => {
     });
 
     if (!requestingBroker) {
-      throw new Error('Requesting broker not found');
+      throw new Error("Requesting broker not found");
     }
 
     const broker = await prisma.broker.findUnique({
@@ -74,31 +77,32 @@ export const getBrokerDetailService = async (id: string, token: string) => {
           where: {
             sent_to_id: requestingBroker.id,
           },
-        }
+        },
       },
     });
 
     if (!broker) return null;
 
-    const { 
-      listings, 
-      company, 
-      broker1Connections, 
-      broker2Connections, 
+    const {
+      listings,
+      company,
+      broker1Connections,
+      broker2Connections,
       sentToConnectionRequests,
       sentByConnectionRequests,
-      ...brokerData 
+      ...brokerData
     } = broker;
 
-    const isConnected = broker1Connections.length > 0 || broker2Connections.length > 0;
+    const isConnected =
+      broker1Connections.length > 0 || broker2Connections.length > 0;
     const pendingRequest = sentToConnectionRequests.some(
-      request => request.status === 'Pending'
+      (request) => request.status === "Pending"
     );
     const pendingRequestSent = sentByConnectionRequests.some(
-      request => request.status === 'Pending'
+      (request) => request.status === "Pending"
     );
     const hasRejectedRequest = sentToConnectionRequests.some(
-      request => request.status === 'Rejected'
+      (request) => request.status === "Rejected"
     );
 
     let request_id = "";
@@ -121,7 +125,6 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       });
 
       request_id = connectionRequest?.id || "";
-
     } else if (hasRejectedRequest) {
       mask = "REQUEST_REJECTED"; // Request rejected
     }
@@ -140,13 +143,13 @@ export const getBrokerDetailService = async (id: string, token: string) => {
 };
 
 /* Get broker list */
-export const getBrokerListService = async ({ 
-  page, 
+export const getBrokerListService = async ({
+  page,
   page_size,
   token,
-  search = ''
-}: { 
-  page: number; 
+  search = "",
+}: {
+  page: number;
   page_size: number;
   token: string;
   search?: string;
@@ -161,26 +164,28 @@ export const getBrokerListService = async ({
 }> => {
   try {
     // Decode token to get userId
-    const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET!) as { userId: string };
-    
+    const decoded = jwt.verify(
+      token.replace("Bearer ", ""),
+      process.env.JWT_SECRET!
+    ) as { userId: string };
+
     // Get current broker's ID
     const currentBroker = await prisma.broker.findFirst({
       where: { user_id: decoded.userId },
       select: { id: true },
     });
 
-    const searchCondition = search ? {
-      OR: [
-        { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
-      ]
-    } : {};
+    const searchCondition = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+          ],
+        }
+      : {};
 
     const brokers = await prisma.broker.findMany({
       where: {
-        AND: [
-          { NOT: { id: currentBroker?.id } },
-          searchCondition
-        ]
+        AND: [{ NOT: { id: currentBroker?.id } }, searchCondition],
       },
       skip: (page - 1) * page_size,
       take: page_size,
@@ -192,11 +197,8 @@ export const getBrokerListService = async ({
     // Update total count to include search condition
     const total = await prisma.broker.count({
       where: {
-        AND: [
-          { NOT: { id: currentBroker?.id } },
-          searchCondition
-        ]
-      }
+        AND: [{ NOT: { id: currentBroker?.id } }, searchCondition],
+      },
     });
 
     if (brokers.length === 0) {
@@ -207,7 +209,7 @@ export const getBrokerListService = async ({
           page,
           page_size,
           total_pages: 0,
-        }
+        },
       };
     }
 
@@ -217,8 +219,8 @@ export const getBrokerListService = async ({
         total,
         page,
         page_size,
-        total_pages: Math.ceil(total / page_size)
-      }
+        total_pages: Math.ceil(total / page_size),
+      },
     };
   } catch (error) {
     console.error(error);
@@ -279,6 +281,61 @@ export const updateBrokerService = async (brokerId: string, data: any) => {
     });
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+};
+
+/* Block a broker */
+export const blockBrokerService = async (
+  brokerId: string,
+  blockBrokerId: string
+) => {
+  try {
+    // Validate input parameters
+    if (!brokerId || !blockBrokerId) {
+      throw new Error("Both broker IDs are required");
+    }
+
+    // Check if brokers exist
+    const [broker1, broker2] = await Promise.all([
+      prisma.broker.findUnique({
+        where: { id: brokerId },
+        select: { id: true },
+      }),
+      prisma.broker.findUnique({
+        where: { id: blockBrokerId },
+        select: { id: true },
+      }),
+    ]);
+
+    if (!broker1 || !broker2) {
+      throw new Error("One or both brokers not found");
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.connections.deleteMany({
+        where: {
+          OR: [
+            { broker1_id: brokerId, broker2_id: blockBrokerId },
+            { broker1_id: blockBrokerId, broker2_id: brokerId },
+          ],
+        },
+      });
+
+      await tx.connectionRequest.updateMany({
+        where: {
+          OR: [
+            { sent_by_id: brokerId, sent_to_id: blockBrokerId },
+            { sent_by_id: blockBrokerId, sent_to_id: brokerId },
+          ],
+        },
+        data: {
+          status: RequestStatus.Rejected,
+        },
+      });
+    });
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };
