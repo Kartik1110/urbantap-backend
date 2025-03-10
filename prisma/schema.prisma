@@ -64,6 +64,7 @@ model Broker {
   sentToInquiries          Inquiry[]           @relation("InquirySentTo")
   broker1Connections       Connections[]       @relation("Broker1")
   broker2Connections       Connections[]       @relation("Broker2")
+  reportedListings         ReportedListing[]
 }
 
 model Company {
@@ -76,32 +77,33 @@ model Company {
 }
 
 model Listing {
-  id               String            @id @default(uuid())
-  title            String
-  description      String
-  image            String
-  min_price        Float?            @default(0)
-  max_price        Float?            @default(0)
-  sq_ft            Float?
-  type             Type
-  category         Category
-  looking_for      Boolean // looking for or renting
-  rental_frequency Rental_frequency?
-  no_of_bedrooms   Bedrooms?
-  no_of_bathrooms  Bathrooms?
-  furnished        Furnished?
-  city             City
-  address          String?           @default("")
-  amenities        String[]
-  image_urls       String[]
-  project_age      Int?
-  payment_plan     Payment_Plan?
-  sale_type        Sale_Type?
-  broker_id        String
-  created_at       DateTime          @default(now())
-  broker           Broker            @relation(fields: [broker_id], references: [id])
-  inquiries        Inquiry[]
-  admin_status     Admin_Status?     @default(Pending)
+  id                String            @id @default(uuid())
+  title             String
+  description       String
+  image             String
+  min_price         Float?            @default(0)
+  max_price         Float?            @default(0)
+  sq_ft             Float?
+  type              Type
+  category          Category
+  looking_for       Boolean // looking for or renting
+  rental_frequency  Rental_frequency?
+  no_of_bedrooms    Bedrooms?
+  no_of_bathrooms   Bathrooms?
+  furnished         Furnished?
+  city              City
+  address           String?           @default("")
+  amenities         String[]
+  image_urls        String[]
+  project_age       Int?
+  payment_plan      Payment_Plan?
+  sale_type         Sale_Type?
+  broker_id         String
+  created_at        DateTime          @default(now())
+  broker            Broker            @relation(fields: [broker_id], references: [id])
+  inquiries         Inquiry[]
+  admin_status      Admin_Status?     @default(Pending)
+  reported_listings ReportedListing[]
 }
 
 enum Admin_Status {
@@ -169,6 +171,17 @@ enum Payment_Plan {
 enum Sale_Type {
   Direct
   Resale
+}
+
+model ReportedListing {
+  id             String   @id @default(uuid())
+  listing_id     String
+  listing        Listing  @relation(fields: [listing_id], references: [id])
+  reported_by_id String
+  reported_by    Broker   @relation(fields: [reported_by_id], references: [id])
+  reason         String
+  description    String
+  created_at     DateTime @default(now())
 }
 
 model Notification {
@@ -277,15 +290,15 @@ enum JobType {
 }
 
 model Application {
-  id          String            @id @default(uuid())
-  resume      String // File path or URL to the uploaded CV
-  jobId       String
-  userId      String
-  status      ApplicationStatus @default(Under_Review)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  job         Job               @relation(fields: [jobId], references: [id])
-  user        User              @relation(fields: [userId], references: [id])
+  id        String            @id @default(uuid())
+  resume    String // File path or URL to the uploaded CV
+  jobId     String
+  userId    String
+  status    ApplicationStatus @default(Under_Review)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  job       Job               @relation(fields: [jobId], references: [id])
+  user      User              @relation(fields: [userId], references: [id])
 }
 
 enum ApplicationStatus {

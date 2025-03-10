@@ -352,12 +352,27 @@ export const deleteListingbyId = async (listingId: string) => {
 };
 
 /* Report Listing */
-export const reportListingService = async (listingId: string) => {
+export const reportListingService = async (
+  listingId: string,
+  reason: string,
+  description: string,
+  brokerId: string
+) => {
   try {
     const reportedListing = await prisma.listing.update({
       where: { id: listingId },
       data: {
         admin_status: Admin_Status.Reported,
+      },
+    });
+
+    /* Create reported listing */
+    await prisma.reportedListing.create({
+      data: {
+        listing_id: listingId,
+        reported_by_id: brokerId,
+        reason: reason,
+        description: description,
       },
     });
 

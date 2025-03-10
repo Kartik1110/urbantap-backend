@@ -144,6 +144,8 @@ export const deleteListing = async (req: Request, res: Response) => {
 export const reportListing = async (req: Request, res: Response) => {
   const listingId = req.params.id;
 
+  const { reason, description, brokerId } = req.body;
+
   if (!listingId) {
     return res.status(400).json({
       status: "error",
@@ -152,7 +154,7 @@ export const reportListing = async (req: Request, res: Response) => {
   }
 
   try {
-    await reportListingService(listingId);
+    await reportListingService(listingId, reason, description, brokerId);
     return res.status(200).json({
       status: "success",
       message: "Listing reported successfully",
