@@ -11,6 +11,7 @@ import {
   Type,
   Rental_frequency,
 } from "@prisma/client";
+import { sendPushNotification } from "./firebase.service";
 
 /* Get listings */
 interface ListingFilters {
@@ -290,6 +291,39 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
 
     const newListings = await prisma.listing.createMany({
       data: listingsWithPendingStatus,
+    });
+
+    /* Send push notification to every one that a new listing has been posted by a broker */
+    const brokers = await prisma.broker.findMany();
+
+    brokers.forEach(async (broker) => {
+      const notification = await prisma.notification.create({
+        data: {
+          broker_id: broker.id,
+          type: NotificationType.General,
+          sent_by_id: "",
+          text: "",
+          message: `A new listing has been posted by a broker`,
+        },
+      });
+
+      if (notification) {
+        if (broker.user_id) {
+          const user = await prisma.user.findUnique({
+            where: {
+              id: broker.user_id,
+            },
+          });
+
+          if (user && user.fcm_token) {
+            await sendPushNotification({
+              title: "New Listing Posted",
+              body: "A new listing has been posted by a broker",
+              token: user.fcm_token,
+            });
+          }
+        }
+      }
     });
 
     return newListings;
