@@ -104,6 +104,7 @@ model Listing {
   inquiries         Inquiry[]
   admin_status      Admin_Status?     @default(Pending)
   reported_listings ReportedListing[]
+  notifications     Notification[]    @relation("ListingNotifications")
 }
 
 enum Admin_Status {
@@ -197,6 +198,8 @@ model Notification {
   inquiry              Inquiry?           @relation(fields: [inquiry_id], references: [id], name: "InquiryNotifications")
   connectionRequest_id String?
   connectionRequest    ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
+  listing_id           String?
+  listing              Listing?           @relation(fields: [listing_id], references: [id], name: "ListingNotifications")
 }
 
 enum NotificationType {

@@ -11,7 +11,7 @@ import {
   Type,
   Rental_frequency,
 } from "@prisma/client";
-import { sendPushNotification } from "./firebase.service";
+import { sendPushNotification, sendPushNotificationToTopic } from "./firebase.service";
 
 /* Get listings */
 interface ListingFilters {
@@ -289,8 +289,8 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
       admin_status: Admin_Status.Pending,
     }));
 
-    const newListings = await prisma.listing.createMany({
-      data: listingsWithPendingStatus,
+    const newListings = await prisma.listing.create({
+      data: listingsWithPendingStatus[0],
     });
 
     /* Send push notification to every one that a new listing has been posted by a broker */
@@ -316,10 +316,10 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
           });
 
           if (user && user.fcm_token) {
-            await sendPushNotification({
+            await sendPushNotificationToTopic({
               title: "New Listing Posted",
               body: "A new listing has been posted by a broker",
-              token: user.fcm_token,
+              topic: "new-listings",
             });
           }
         }
@@ -387,8 +387,9 @@ export const reportListingService = async (
           broker_id: broker.id,
           type: NotificationType.General,
           sent_by_id: "", // kept empty as it is a system generated notification
-          text: "", // kept empty as it is a system generated notification
-          message: `Your listing has been reported for violating our community guidelines and is currently under review.`,
+          text: `Your listing has been reported for violating our community guidelines and is currently under review.`,
+          message: "", // kept empty as it is a system generated notification
+          listing_id: listingId
         },
       });
     }
