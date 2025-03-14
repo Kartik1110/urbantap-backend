@@ -10,8 +10,9 @@ import {
   Furnished,
   Type,
   Rental_frequency,
+  RequestStatus,
 } from "@prisma/client";
-import { sendPushNotification, sendPushNotificationToTopic } from "./firebase.service";
+import { sendPushNotificationToTopic } from "./firebase.service";
 
 /* Get listings */
 interface ListingFilters {
@@ -128,6 +129,16 @@ export const getListingsService = async (
     const whereCondition = {
       AND: [
         { admin_status: Admin_Status.Approved },
+        // Only show listings from brokers who are not blocked
+        {
+          broker: {
+            sentToConnectionRequests: {
+              none: {
+                status: RequestStatus.Blocked
+              }
+            }
+          }
+        },
         // Base filters as AND conditions
         ...(Object.keys(filterParams).length > 0 ? [filterParams as any] : []),
         ...(filterParams.looking_for !== undefined
@@ -294,37 +305,37 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
     });
 
     /* Send push notification to every one that a new listing has been posted by a broker */
-    const brokers = await prisma.broker.findMany();
+    // const brokers = await prisma.broker.findMany();
 
-    brokers.forEach(async (broker) => {
-      const notification = await prisma.notification.create({
-        data: {
-          broker_id: broker.id,
-          type: NotificationType.General,
-          sent_by_id: "",
-          text: "",
-          message: `A new listing has been posted by a broker`,
-        },
-      });
+    // brokers.forEach(async (broker) => {
+    //   const notification = await prisma.notification.create({
+    //     data: {
+    //       broker_id: broker.id,
+    //       type: NotificationType.General,
+    //       sent_by_id: "",
+    //       text: "",
+    //       message: `A new listing has been posted by a broker`,
+    //     },
+    //   });
 
-      if (notification) {
-        if (broker.user_id) {
-          const user = await prisma.user.findUnique({
-            where: {
-              id: broker.user_id,
-            },
-          });
+    //   if (notification) {
+    //     if (broker.user_id) {
+    //       const user = await prisma.user.findUnique({
+    //         where: {
+    //           id: broker.user_id,
+    //         },
+    //       });
 
-          if (user && user.fcm_token) {
-            await sendPushNotificationToTopic({
-              title: "New Listing Posted",
-              body: "A new listing has been posted by a broker",
-              topic: "new-listings",
-            });
-          }
-        }
-      }
-    });
+    //       if (user && user.fcm_token) {
+    //         await sendPushNotificationToTopic({
+    //           title: "New Listing Posted",
+    //           body: "A new listing has been posted by a broker",
+    //           topic: "new-listings",
+    //         });
+    //       }
+    //     }
+    //   }
+    // });
 
     return newListings;
   } catch (error) {

@@ -330,7 +330,7 @@ export const blockBrokerService = async (
           ],
         },
         data: {
-          status: RequestStatus.Rejected,
+          status: RequestStatus.Blocked,
         },
       });
     });

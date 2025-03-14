@@ -224,6 +224,7 @@ enum RequestStatus {
   Accepted
   Rejected
   Pending
+  Blocked
 }
 
 model Connections {
