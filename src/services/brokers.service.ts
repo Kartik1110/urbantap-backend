@@ -96,13 +96,16 @@ export const getBrokerDetailService = async (id: string, token: string) => {
     const isConnected =
       broker1Connections.length > 0 || broker2Connections.length > 0;
     const pendingRequest = sentToConnectionRequests.some(
-      (request) => request.status === "Pending"
+      (request) => request.status === RequestStatus.Pending
     );
     const pendingRequestSent = sentByConnectionRequests.some(
-      (request) => request.status === "Pending"
+      (request) => request.status === RequestStatus.Pending
     );
     const hasRejectedRequest = sentToConnectionRequests.some(
-      (request) => request.status === "Rejected"
+      (request) => request.status === RequestStatus.Rejected
+    );
+    const hasBlockedRequest = sentToConnectionRequests.some(
+      (request) => request.status === RequestStatus.Blocked
     );
 
     let request_id = "";
@@ -127,6 +130,8 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       request_id = connectionRequest?.id || "";
     } else if (hasRejectedRequest) {
       mask = "REQUEST_REJECTED"; // Request rejected
+    } else if (hasBlockedRequest) {
+      mask = "BLOCKED"; // Blocked
     }
 
     return {
