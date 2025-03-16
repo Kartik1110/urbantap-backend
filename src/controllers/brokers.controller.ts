@@ -207,6 +207,7 @@ export const updateBroker = async (req: Request, res: Response) => {
 /* Block a broker */
 export const blockBroker = async (req: Request, res: Response) => {
   const blockBrokerId = req.body.broker_id;
+  const action = req.body.action;
   const brokerId = req.params.id;
 
   if (!blockBrokerId) {
@@ -217,7 +218,7 @@ export const blockBroker = async (req: Request, res: Response) => {
   }
 
   try {
-    await blockBrokerService(brokerId, blockBrokerId);
+    await blockBrokerService(brokerId, blockBrokerId, action);
 
     return res.status(200).json({
       status: "success",

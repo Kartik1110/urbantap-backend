@@ -293,7 +293,8 @@ export const updateBrokerService = async (brokerId: string, data: any) => {
 /* Block a broker */
 export const blockBrokerService = async (
   brokerId: string,
-  blockBrokerId: string
+  blockBrokerId: string,
+  action: "BLOCK" | "UNBLOCK"
 ) => {
   try {
     // Validate input parameters
@@ -317,28 +318,78 @@ export const blockBrokerService = async (
       throw new Error("One or both brokers not found");
     }
 
-    await prisma.$transaction(async (tx) => {
-      await tx.connections.deleteMany({
-        where: {
-          OR: [
-            { broker1_id: brokerId, broker2_id: blockBrokerId },
-            { broker1_id: blockBrokerId, broker2_id: brokerId },
-          ],
-        },
-      });
-
-      await tx.connectionRequest.updateMany({
-        where: {
-          OR: [
-            { sent_by_id: brokerId, sent_to_id: blockBrokerId },
-            { sent_by_id: blockBrokerId, sent_to_id: brokerId },
-          ],
-        },
-        data: {
-          status: RequestStatus.Blocked,
-        },
-      });
+    // check if the brokers are already connected
+    const isConnected = await prisma.connections.findFirst({
+      where: {
+        OR: [
+          { broker1_id: brokerId, broker2_id: blockBrokerId },
+          { broker1_id: blockBrokerId, broker2_id: brokerId },
+        ],
+      },
     });
+
+    // if the brokers are already connected, delete the connection and update the request status to blocked
+    if (isConnected) {
+      if (action === "BLOCK") {
+        await prisma.$transaction(async (tx) => {
+          await tx.connections.deleteMany({
+            where: {
+              OR: [
+                { broker1_id: brokerId, broker2_id: blockBrokerId },
+                { broker1_id: blockBrokerId, broker2_id: brokerId },
+              ],
+            },
+          });
+
+          await tx.connectionRequest.updateMany({
+            where: {
+              OR: [
+                { sent_by_id: brokerId, sent_to_id: blockBrokerId },
+                { sent_by_id: blockBrokerId, sent_to_id: brokerId },
+              ],
+            },
+            data: {
+              status: RequestStatus.Blocked,
+            },
+          });
+        });
+      } else {
+        // if the brokers are already connected and the action is unblock, delete the connection and the mask will be updated to not connected
+        await prisma.connectionRequest.deleteMany({
+          where: {
+            OR: [
+              { sent_by_id: brokerId, sent_to_id: blockBrokerId },
+              { sent_by_id: blockBrokerId, sent_to_id: brokerId },
+            ],
+          },
+        });
+      }
+    } else {
+      // if the brokers are not connected, create a new connection and update the request status to blocked
+      if (action === "BLOCK") {
+        await prisma.connectionRequest.updateMany({
+          where: {
+            OR: [
+              { sent_by_id: brokerId, sent_to_id: blockBrokerId },
+              { sent_by_id: blockBrokerId, sent_to_id: brokerId },
+            ],
+          },
+          data: {
+            status: RequestStatus.Blocked,
+          },
+        });
+      } else {
+        // if the brokers are not connected, delete the request so the mask will be updated to not connected
+        await prisma.connectionRequest.deleteMany({
+          where: {
+            OR: [
+              { sent_by_id: brokerId, sent_to_id: blockBrokerId },
+              { sent_by_id: blockBrokerId, sent_to_id: brokerId },
+            ],
+          },
+        });
+      }
+    }
   } catch (error) {
     console.error(error);
     throw error;
