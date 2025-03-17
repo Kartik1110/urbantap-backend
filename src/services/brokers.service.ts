@@ -104,7 +104,7 @@ export const getBrokerDetailService = async (id: string, token: string) => {
     const hasRejectedRequest = sentToConnectionRequests.some(
       (request) => request.status === RequestStatus.Rejected
     );
-    const hasBlockedRequest = sentToConnectionRequests.some(
+    const hasBlockedRequest = sentByConnectionRequests.some(
       (request) => request.status === RequestStatus.Blocked
     );
 
@@ -364,19 +364,14 @@ export const blockBrokerService = async (
           },
         });
       }
-    } else {
+    } else { 
       // if the brokers are not connected, create a new connection and update the request status to blocked
       if (action === "BLOCK") {
-        await prisma.connectionRequest.updateMany({
-          where: {
-            OR: [
-              { sent_by_id: brokerId, sent_to_id: blockBrokerId },
-              { sent_by_id: blockBrokerId, sent_to_id: brokerId },
-            ],
-          },
-          data: {
-            status: RequestStatus.Blocked,
-          },
+        await prisma.connectionRequest.createMany({
+          data: [
+            { sent_by_id: brokerId, sent_to_id: blockBrokerId, status: RequestStatus.Blocked },
+            { sent_by_id: blockBrokerId, sent_to_id: brokerId, status: RequestStatus.Blocked },
+          ],
         });
       } else {
         // if the brokers are not connected, delete the request so the mask will be updated to not connected

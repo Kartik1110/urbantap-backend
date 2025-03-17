@@ -222,12 +222,12 @@ export const blockBroker = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       status: "success",
-      message: "Broker blocked successfully",
+      message: "Broker connection updated successfully",
     });
   } catch (error) {
-    return res.status(404).json({
+    return res.status(400).json({
       status: "error",
-      message: "Broker not found",
+      message: "Broker connection not updated",
     });
   }
 };
