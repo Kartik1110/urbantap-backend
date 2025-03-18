@@ -64,6 +64,7 @@ model Broker {
   sentToInquiries          Inquiry[]           @relation("InquirySentTo")
   broker1Connections       Connections[]       @relation("Broker1")
   broker2Connections       Connections[]       @relation("Broker2")
+  reportedListings         ReportedListing[]
 }
 
 model Company {
@@ -76,31 +77,41 @@ model Company {
 }
 
 model Listing {
-  id               String            @id @default(uuid())
-  title            String
-  description      String
-  image            String
-  min_price        Float?            @default(0)
-  max_price        Float?            @default(0)
-  sq_ft            Float?
-  type             Type
-  category         Category
-  looking_for      Boolean // looking for or renting
-  rental_frequency Rental_frequency?
-  no_of_bedrooms   Bedrooms?
-  no_of_bathrooms  Bathrooms?
-  furnished        Furnished?
-  city             City
-  address          String?           @default("")
-  amenities        String[]
-  image_urls       String[]
-  project_age      Int?
-  payment_plan     Payment_Plan?
-  sale_type        Sale_Type?
-  broker_id        String
-  created_at       DateTime          @default(now())
-  broker           Broker            @relation(fields: [broker_id], references: [id])
-  inquiries        Inquiry[]
+  id                String            @id @default(uuid())
+  title             String
+  description       String
+  image             String
+  min_price         Float?            @default(0)
+  max_price         Float?            @default(0)
+  sq_ft             Float?
+  type              Type
+  category          Category
+  looking_for       Boolean // looking for or renting
+  rental_frequency  Rental_frequency?
+  no_of_bedrooms    Bedrooms?
+  no_of_bathrooms   Bathrooms?
+  furnished         Furnished?
+  city              City
+  address           String?           @default("")
+  amenities         String[]
+  image_urls        String[]
+  project_age       Int?
+  payment_plan      Payment_Plan?
+  sale_type         Sale_Type?
+  broker_id         String
+  created_at        DateTime          @default(now())
+  broker            Broker            @relation(fields: [broker_id], references: [id])
+  inquiries         Inquiry[]
+  admin_status      Admin_Status?     @default(Pending)
+  reported_listings ReportedListing[]
+  notifications     Notification[]    @relation("ListingNotifications")
+}
+
+enum Admin_Status {
+  Approved
+  Rejected
+  Pending
+  Reported
 }
 
 enum Category {
@@ -163,6 +174,17 @@ enum Sale_Type {
   Resale
 }
 
+model ReportedListing {
+  id             String   @id @default(uuid())
+  listing_id     String
+  listing        Listing  @relation(fields: [listing_id], references: [id])
+  reported_by_id String
+  reported_by    Broker   @relation(fields: [reported_by_id], references: [id])
+  reason         String
+  description    String
+  created_at     DateTime @default(now())
+}
+
 model Notification {
   id                   String             @id @default(uuid())
   broker_id            String
@@ -176,6 +198,8 @@ model Notification {
   inquiry              Inquiry?           @relation(fields: [inquiry_id], references: [id], name: "InquiryNotifications")
   connectionRequest_id String?
   connectionRequest    ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
+  listing_id           String?
+  listing              Listing?           @relation(fields: [listing_id], references: [id], name: "ListingNotifications")
 }
 
 enum NotificationType {
@@ -200,6 +224,7 @@ enum RequestStatus {
   Accepted
   Rejected
   Pending
+  Blocked
 }
 
 model Connections {
@@ -269,15 +294,15 @@ enum JobType {
 }
 
 model Application {
-  id          String            @id @default(uuid())
-  resume      String // File path or URL to the uploaded CV
-  jobId       String
-  userId      String
-  status      ApplicationStatus @default(Under_Review)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  job         Job               @relation(fields: [jobId], references: [id])
-  user        User              @relation(fields: [userId], references: [id])
+  id        String            @id @default(uuid())
+  resume    String // File path or URL to the uploaded CV
+  jobId     String
+  userId    String
+  status    ApplicationStatus @default(Under_Review)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  job       Job               @relation(fields: [jobId], references: [id])
+  user      User              @relation(fields: [userId], references: [id])
 }
 
 enum ApplicationStatus {
