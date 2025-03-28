@@ -105,8 +105,8 @@ async function approveListings(): Promise<void> {
 }
 
 // Schedule the cron job to run every 12 hours
-// Runs at 00:00 and 12:00 every day
-cron.schedule('0 0,12 * * *', async () => {
+// Runs at every 30 minutes
+cron.schedule('*/30 * * * *', async () => {
   logger.info('Running listing approval cron job...');
   await approveListings();
 });
