@@ -122,14 +122,37 @@ export const getListingsService = async (
   try {
     const { page = 1, page_size = 10, ...filterParams } = filters;
 
+    // Remove these properties from filterParams before constructing whereCondition
+    const {
+      type,
+      no_of_bathrooms,
+      no_of_bedrooms,
+      furnished,
+      rental_frequency,
+      project_age,
+      payment_plan,
+      sale_type,
+      amenities,
+      min_price,
+      max_price,
+      min_sqft,
+      max_sqft,
+      looking_for,
+      category,
+      city,
+      address,
+      ...restFilters
+    } = filterParams;
+
     // Calculate skip value for pagination
     const skip = (page - 1) * page_size;
+
+    console.log('filterParams.type', type);
 
     // Base WHERE condition with admin_status
     const whereCondition = {
       AND: [
         { admin_status: Admin_Status.Approved },
-        // Only show listings from brokers who are not blocked
         {
           broker: {
             sentToConnectionRequests: {
@@ -139,72 +162,46 @@ export const getListingsService = async (
             }
           }
         },
-        // Base filters as AND conditions
-        ...(Object.keys(filterParams).length > 0 ? [filterParams as any] : []),
-        ...(filterParams.looking_for !== undefined
-          ? [{ looking_for: filterParams.looking_for }]
-          : []),
-        ...(filterParams.category ? [{ category: filterParams.category }] : []),
-        ...(filterParams.city ? [{ city: filterParams.city }] : []),
-        ...(filterParams.address ? [{ address: filterParams.address }] : []),
+        // Add specific filters one by one
+        ...(looking_for !== undefined ? [{ looking_for }] : []),
+        ...(category ? [{ category }] : []),
+        ...(city ? [{ city }] : []),
+        ...(address ? [{ address }] : []),
 
         // Price range condition
-        ...(filterParams.min_price || filterParams.max_price
-          ? [
-              {
-                AND: [
-                  ...(filterParams.min_price
-                    ? [{ min_price: { gte: filterParams.min_price } }]
-                    : []),
-                  ...(filterParams.max_price
-                    ? [{ max_price: { lte: filterParams.max_price } }]
-                    : []),
-                ],
-              },
-            ]
+        ...(min_price || max_price
+          ? [{
+              AND: [
+                ...(min_price ? [{ min_price: { gte: min_price } }] : []),
+                ...(max_price ? [{ max_price: { lte: max_price } }] : []),
+              ],
+            }]
           : []),
 
         // Square footage condition
-        ...(filterParams.min_sqft || filterParams.max_sqft
-          ? [
-              {
-                sq_ft: {
-                  ...(filterParams.min_sqft && { gte: filterParams.min_sqft }),
-                  ...(filterParams.max_sqft && { lte: filterParams.max_sqft }),
-                },
+        ...(min_sqft || max_sqft
+          ? [{
+              sq_ft: {
+                ...(min_sqft && { gte: min_sqft }),
+                ...(max_sqft && { lte: max_sqft }),
               },
-            ]
+            }]
           : []),
 
-        // Array filters as OR conditions within their groups
-        ...(filterParams.no_of_bathrooms
-          ? [{ no_of_bathrooms: { in: filterParams.no_of_bathrooms } }]
-          : []),
-        ...(filterParams.no_of_bedrooms
-          ? [{ no_of_bedrooms: { in: filterParams.no_of_bedrooms } }]
-          : []),
-        ...(filterParams.furnished
-          ? [{ furnished: { in: filterParams.furnished } }]
-          : []),
-        ...(filterParams.type && filterParams.type.length > 0
-          ? [{ type: { in: filterParams.type } }]
-          : []),
-        ...(filterParams.rental_frequency
-          ? [{ rental_frequency: { in: filterParams.rental_frequency } }]
-          : []),
-        ...(filterParams.project_age
-          ? [{ project_age: { in: filterParams.project_age } }]
-          : []),
-        ...(filterParams.payment_plan
-          ? [{ payment_plan: { in: filterParams.payment_plan } }]
-          : []),
-        ...(filterParams.sale_type
-          ? [{ sale_type: { in: filterParams.sale_type } }]
-          : []),
-        ...(filterParams.amenities
-          ? [{ amenities: { hasSome: filterParams.amenities } }]
-          : []),
-      ].filter(Boolean), // Remove any undefined or null values
+        // Array filters
+        ...(no_of_bathrooms?.length ? [{ no_of_bathrooms: { in: no_of_bathrooms } }] : []),
+        ...(no_of_bedrooms?.length ? [{ no_of_bedrooms: { in: no_of_bedrooms } }] : []),
+        ...(furnished?.length ? [{ furnished: { in: furnished } }] : []),
+        ...(type?.length ? [{ type: { in: type } }] : []),
+        ...(rental_frequency?.length ? [{ rental_frequency: { in: rental_frequency } }] : []),
+        ...(project_age?.length ? [{ project_age: { in: project_age } }] : []),
+        ...(payment_plan?.length ? [{ payment_plan: { in: payment_plan } }] : []),
+        ...(sale_type?.length ? [{ sale_type: { in: sale_type } }] : []),
+        ...(amenities?.length ? [{ amenities: { hasSome: amenities } }] : []),
+
+        // Add any remaining filters
+        ...Object.entries(restFilters).map(([key, value]) => ({ [key]: value })),
+      ].filter(Boolean),
     };
 
     // Remove the filterParams from being spread directly into the AND array
