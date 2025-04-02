@@ -186,7 +186,9 @@ export const getListingsService = async (
         ...(filterParams.furnished
           ? [{ furnished: { in: filterParams.furnished } }]
           : []),
-        ...(filterParams.type ? [{ type: { in: filterParams.type } }] : []),
+        ...(filterParams.type && filterParams.type.length > 0
+          ? [{ type: { in: filterParams.type } }]
+          : []),
         ...(filterParams.rental_frequency
           ? [{ rental_frequency: { in: filterParams.rental_frequency } }]
           : []),
@@ -202,8 +204,12 @@ export const getListingsService = async (
         ...(filterParams.amenities
           ? [{ amenities: { hasSome: filterParams.amenities } }]
           : []),
-      ],
+      ].filter(Boolean), // Remove any undefined or null values
     };
+
+    // Remove the filterParams from being spread directly into the AND array
+    delete filterParams.page;
+    delete filterParams.page_size;
 
     // Get total count for pagination
     const total = await prisma.listing.count({
