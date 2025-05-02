@@ -14,6 +14,7 @@ import notificationsRoutes from './routes/notifications.route';
 import inquiriesRoutes from './routes/inquiries.route';
 import connectionsRoutes from './routes/connections.route';
 import jobRoutes from './routes/job.route';
+import adminRoutes from "./routes/admin.route";
 
 dotenv.config();
 
@@ -39,6 +40,9 @@ app.use("/api/v1", authMiddleware, connectionsRoutes);
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
 app.use("/api/v1", authMiddleware, listingsRoutes(upload));
 app.use("/api/v1", authMiddleware, jobRoutes(upload));
+
+// Admin routes
+app.use("/api/v1", authMiddleware, adminRoutes);
 
 app.get("/health", (req, res) => {
   res.send("OK");

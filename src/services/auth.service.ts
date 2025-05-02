@@ -38,7 +38,11 @@ export const signupService = async (
     },
   });
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+  const token = jwt.sign(
+    { userId: user.id, role: user.role },
+    process.env.JWT_SECRET!
+  );
+  
 
   return { user, token };
 };
@@ -51,7 +55,11 @@ export const loginService = async (email: string, password: string) => {
     throw new Error("Invalid credentials");
   }
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+  const token = jwt.sign(
+    { userId: user.id, role: user.role },
+    process.env.JWT_SECRET!
+  );
+  
 
   return {
     token,
@@ -96,7 +104,11 @@ export const googleSignInService = async (idToken: string) => {
     where: { email: payload.email },
   });
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+  const token = jwt.sign(
+    { userId: user.id, role: user.role },
+    process.env.JWT_SECRET!
+  );
+  
 
   return {
     token,
@@ -153,7 +165,11 @@ export const appleSignInService = async (
     where: { email: email || appleUser.email },
   });
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
+  const token = jwt.sign(
+    { userId: user.id, role: user.role },
+    process.env.JWT_SECRET!
+  );
+  
 
   return {
     token,

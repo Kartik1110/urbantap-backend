@@ -123,6 +123,7 @@ async function main() {
         project_age: 3,
         payment_plan: "Payment_done",
         sale_type: "Direct",
+        admin_status: "Approved"
       },
     }),
     prisma.listing.create({
@@ -147,6 +148,7 @@ async function main() {
         project_age: 5,
         payment_plan: "Payment_Pending",
         sale_type: "Direct",
+        admin_status: "Approved"
       },
     }),
     prisma.listing.create({
@@ -169,6 +171,7 @@ async function main() {
         furnished: "Semi_furnished",
         project_age: 1,
         sale_type: "Resale",
+        admin_status: "Pending"
       },
     }),
   ]);
