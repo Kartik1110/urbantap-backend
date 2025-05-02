@@ -1,7 +1,0 @@
--- AlterTable
-ALTER TABLE "Company" ALTER COLUMN "name" SET DEFAULT '',
-ALTER COLUMN "email" SET DEFAULT '',
-ALTER COLUMN "name_ar" SET DEFAULT '',
-ALTER COLUMN "phone" SET DEFAULT '',
-ALTER COLUMN "type" SET DEFAULT 'Other',
-ALTER COLUMN "website" SET DEFAULT '';
