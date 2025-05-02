@@ -70,6 +70,7 @@ model Broker {
 enum CompanyType {
   Developer
   Brokerage
+  Other
 }
 
 model Company {
