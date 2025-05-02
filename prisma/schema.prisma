@@ -75,14 +75,14 @@ enum CompanyType {
 
 model Company {
   id              String      @id @default(uuid())
-  name            String
-  name_ar         String?     // Arabic name
+  name            String      @default("")
+  name_ar         String?     @default("") // Arabic name
   description     String      @default("")
   logo            String      @default("")
-  type            CompanyType
-  email           String?
-  phone           String?
-  website         String?
+  type            CompanyType @default(Other)
+  email           String?     @default("")
+  phone           String?     @default("")
+  website         String?     @default("")
   brokers         Broker[]
   jobs            Job[]
 }
