@@ -67,19 +67,25 @@ model Broker {
   reportedListings         ReportedListing[]
 }
 
+model Company {
+  id          String      @id @default(uuid())
+  name        String      @default("")
+  name_ar     String?
+  description String      @default("")
+  logo        String      @default("")
+  type        CompanyType @default(Other)
+  website     String?     @default("")
+  email       String?     @default("")
+  phone       String?     @default("")
+  address     String?     @default("")
+  brokers     Broker[]
+  jobs        Job[]
+}
+
 enum CompanyType {
   Developer
   Brokerage
   Other
-}
-
-model Company {
-  id              String      @id @default(uuid())
-  name            String      @default("")
-  description     String      @default("")
-  logo            String      @default("")
-  brokers         Broker[]
-  jobs            Job[]
 }
 
 model Listing {
