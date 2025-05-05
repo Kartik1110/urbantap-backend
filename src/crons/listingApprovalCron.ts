@@ -50,6 +50,12 @@ async function approveListings(): Promise<void> {
         await sendPushNotification(creatorNotification);
       }
 
+      const firstName = listing.broker?.user?.name || 'Someone';
+      const listingType = listing.sale_type?.toLowerCase() || 'property';
+      const location = listing.city || listing.address || 'a location';
+
+      const formattedBody = `${firstName} just listed a ${listingType} space in ${location}! Check it out before someone else grabs it!`;
+
       // Get all other brokers
       const otherBrokers = await prisma.broker.findMany({
         where: {
@@ -70,7 +76,7 @@ async function approveListings(): Promise<void> {
         .map(broker => ({
           token: broker.user.fcm_token,
           title: 'New Listing Alert',
-          body: `${listing.broker?.name || 'A broker'} has posted a new listing`,
+          body: formattedBody,
           data: {
             listingId: listing.id,
             type: 'NEW_LISTING_ALERT'
@@ -88,7 +94,7 @@ async function approveListings(): Promise<void> {
           data: {
             broker_id: broker.id,
             sent_by_id: listing.broker_id,
-            text: `${listing.broker?.name || 'A broker'} has posted a new listing`,
+            text: formattedBody,
             type: NotificationType.General,
             listing_id: listing.id
           }
