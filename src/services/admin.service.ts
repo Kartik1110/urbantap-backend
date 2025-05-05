@@ -308,8 +308,12 @@ export const updateListingStatusService = async (id: string, status: string) => 
 
     console.log("📢 Found other brokers to notify:", otherBrokers.length);
 
+    const firstName = updatedListing.broker?.user?.name || 'Someone';
+    const listingType = updatedListing.sale_type?.toLowerCase() || 'property';
+    const location = updatedListing.city || updatedListing.address || 'a location';
+
+    const multicastBody = `${firstName} just listed a ${listingType} space in ${location}! Check it out before someone else grabs it!`;
     const multicastTitle = "New Listing Alert";
-    const multicastBody = `${updatedListing.broker?.name || "A broker"} has just posted a new property listing. Check it out!`;
     const multicastText = `${multicastTitle}: ${multicastBody}`;
   
     const notifications = otherBrokers
