@@ -308,12 +308,16 @@ export const updateListingStatusService = async (id: string, status: string) => 
 
     console.log("📢 Found other brokers to notify:", otherBrokers.length);
 
+    const multicastTitle = "New Listing Alert";
+    const multicastBody = `${updatedListing.broker?.name || "A broker"} has just posted a new property listing. Check it out!`;
+    const multicastText = `${multicastTitle}: ${multicastBody}`;
+  
     const notifications = otherBrokers
       .filter((broker) => broker.user?.fcm_token)
       .map((broker) => ({
         token: broker.user!.fcm_token!,
-        title: "New Listing Alert",
-        body: `${updatedListing.broker?.name || "A broker"} has posted a new listing`,
+        title: multicastTitle,
+        body: multicastBody,
         data: {
           listingId: updatedListing.id,
           type: "NEW_LISTING_ALERT",
@@ -337,7 +341,7 @@ export const updateListingStatusService = async (id: string, status: string) => 
           data: {
             broker_id: broker.id,
             sent_by_id: updatedListing.broker_id,
-            text: `${updatedListing.broker?.name || "A broker"} has posted a new listing`,
+            text: multicastText,
             type: NotificationType.General,
             listing_id: updatedListing.id,
           },
