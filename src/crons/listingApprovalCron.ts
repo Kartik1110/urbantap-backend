@@ -52,7 +52,7 @@ async function approveListings(): Promise<void> {
 
       const firstName = listing.broker?.user?.name || 'Someone';
       const listingType = listing.sale_type?.toLowerCase() || 'property';
-      const location = listing.city || listing.address || 'a location';
+      const location = listing.address || listing.city || 'a location';
 
       const formattedBody = `${firstName} just listed a ${listingType} space in ${location}! Check it out before someone else grabs it!`;
 
