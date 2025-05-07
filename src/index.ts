@@ -1,20 +1,22 @@
-import express from "express";
-import dotenv from "dotenv";
+// Internal Dependencies
 import cors from "cors";
+import dotenv from "dotenv";
 import multer from "multer";
+import express from "express";
 
 import logger from "./utils/logger";
 import { authMiddleware } from "./middlewares/auth.middleware";
 
-import brokersRoutes from "./routes/brokers.route";
-import listingsRoutes from "./routes/listings.route";
-import companyRoutes from "./routes/company.route";
-import authRoutes from "./routes/auth.route";
-import notificationsRoutes from './routes/notifications.route';
-import inquiriesRoutes from './routes/inquiries.route';
-import connectionsRoutes from './routes/connections.route';
-import jobRoutes from './routes/job.route';
-import adminRoutes from "./routes/admin.route";
+// Routes
+import jobRoutes from './app/jobs/job.route';
+import authRoutes from "./app/auth/auth.route";
+import adminRoutes from "./app/admin/admin.route";
+import brokersRoutes from "./app/brokers/brokers.route";
+import companyRoutes from "./app/company/company.route";
+import listingsRoutes from "./app/listings/listings.route";
+import inquiriesRoutes from './app/inquiries/inquiries.route';
+import connectionsRoutes from './app/connections/connections.route';
+import notificationsRoutes from './app/notifications/notifications.route';
 
 dotenv.config();
 
