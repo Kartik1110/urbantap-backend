@@ -140,7 +140,7 @@ export const handleCustomNotification = async (body: any, senderId: string) => {
     return savedNotification;
 
   } catch (error) {
-    console.error("Error handling custom notification:", error);
+    logger.error("Error handling custom notification:", error);
     throw new Error(`Failed to handle notification: ${(error as Error).message}`);
   }
 };

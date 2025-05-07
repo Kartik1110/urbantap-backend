@@ -58,7 +58,7 @@ async function approveListings(): Promise<void> {
       
       const location = locationRaw
         .split(' ')
-        .slice(0, 4)
+        .slice(0, 5)
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
       
