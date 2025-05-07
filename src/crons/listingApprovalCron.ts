@@ -52,10 +52,18 @@ async function approveListings(): Promise<void> {
 
       const firstName = listing.broker?.user?.name || 'Someone';
       const listingType = listing.sale_type?.toLowerCase() || 'property';
-      const location = listing.address || listing.city || 'a location';
-
-      const formattedBody = `${firstName} just listed a ${listingType} space in ${location}! Check it out before someone else grabs it!`;
-
+      const locationRaw = listing.address || listing.city || 'a location';
+      const priceValue = listing.min_price || listing.max_price || null;
+      const price = priceValue ? `AED ${priceValue.toLocaleString('en-AE', { maximumFractionDigits: 0 })}` : 'a great price';
+      
+      const location = locationRaw
+        .split(' ')
+        .slice(0, 5)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+      
+      const formattedBody = `${firstName} just listed a ${listingType} space in ${location} for ${price} only! Check it out before someone else grabs it!`;
+      
       // Get all other brokers
       const otherBrokers = await prisma.broker.findMany({
         where: {

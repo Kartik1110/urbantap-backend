@@ -1,6 +1,7 @@
 import { PrismaClient, NotificationType, Prisma } from "@prisma/client";
-import { sendPushNotification } from "./firebase.service";
+import { sendPushNotification,sendPushNotificationToTopic } from "./firebase.service";
 import logger from "../utils/logger";
+
 
 const prisma = new PrismaClient();
 
@@ -81,5 +82,65 @@ export const createNotificationService = async (data: {
   } catch (error) {
     logger.error("Error creating notification:", error);
     throw error;
+  }
+};
+
+export const handleCustomNotification = async (body: any, senderId: string) => {
+  const { token, topic, title, description, data } = body;
+
+  // Create the notification data
+  const notificationData = new Map<string, any>();
+  if (data && typeof data === 'object') {
+    Object.keys(data).forEach(key => {
+      notificationData.set(key, data[key]);
+    });
+  }
+
+  const firebaseData = Object.fromEntries(notificationData);
+
+  try {
+    // If no token or topic is provided, return an error
+    if (!token && !topic) {
+      throw new Error('Either token or topic must be provided');
+    }
+
+    // Send notification to individual if token is provided
+    if (token) {
+      await sendPushNotification({
+        token,
+        title,
+        body: description,
+        data: firebaseData,
+      });
+    } 
+    // Send notification to topic if topic is provided
+    else if (topic) {
+      await sendPushNotificationToTopic({
+        topic,
+        title,
+        body: description,
+        data: firebaseData,
+      });
+    }
+
+    // Save the notification to the database
+    const savedNotification = await prisma.notification.create({
+      data: {
+        broker_id: firebaseData.broker_id || "default_broker_id",
+        text: title,
+        type: firebaseData.type || "GENERAL",
+        message: description,
+        sent_by_id: senderId || "system", 
+        listing_id: firebaseData.listing_id || null,
+        inquiry_id: firebaseData.inquiry_id || null,
+        connectionRequest_id: firebaseData.connectionRequest_id || null,
+      },
+    });
+
+    return savedNotification;
+
+  } catch (error) {
+    logger.error("Error handling custom notification:", error);
+    throw new Error(`Failed to handle notification: ${(error as Error).message}`);
   }
 };
