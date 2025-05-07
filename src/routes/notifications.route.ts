@@ -3,9 +3,11 @@ import {
     getNotifications,
     sendCustomNotification,
   } from '../controllers/notifications.controller';  
+  import { adminMiddleware } from '../middlewares/admin.middleware';
 const router = express.Router();
 
+
 router.get('/notifications/:broker_id', getNotifications);
-router.post("/notifications/send", sendCustomNotification);
+router.post("/notifications/send",adminMiddleware, sendCustomNotification);
 
 export default router;
