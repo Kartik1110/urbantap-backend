@@ -13,6 +13,7 @@ const NotificationSchema = z.object({
   data: z.object({
     broker_id: z.string().optional(),
     type: z.nativeEnum(NotificationType).optional(),
+    sent_by_id: z.string().nullable().optional(),
     listing_id: z.string().nullable().optional(),
     inquiry_id: z.string().nullable().optional(),
     connectionRequest_id: z.string().nullable().optional(),
