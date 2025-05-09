@@ -31,6 +31,9 @@ export const getListingByIdService = async (id: string) => {
             profile_pic: true,
             country_code: true,
             w_number: true,
+            email: true,
+            linkedin_link: true,
+            ig_link: true,
             company: {
               select: {
                 name: true,
@@ -64,6 +67,9 @@ export const getListingByIdService = async (id: string) => {
         profile_pic: broker.profile_pic,
         country_code: broker.country_code,
         w_number: broker.w_number,
+        email: broker.email,
+        linkedin_link: broker.linkedin_link,
+        ig_link: broker.ig_link,
       },
       company: {
         name: broker.company?.name || "",
