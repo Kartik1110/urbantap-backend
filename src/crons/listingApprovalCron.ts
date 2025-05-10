@@ -62,7 +62,7 @@ async function approveListings(): Promise<void> {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
       
-      const formattedBody = `${firstName} just listed a ${listingType} space in ${location} for ${price} only! Check it out before someone else grabs it!`;
+      const formattedBody = `${firstName} just listed a ${listingType} in ${location} for ${price} only! Check it out before someone else grabs it!`;
       
       // Get all other brokers
       const otherBrokers = await prisma.broker.findMany({
