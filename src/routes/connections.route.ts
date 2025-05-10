@@ -1,5 +1,10 @@
 import express from 'express';
 import { getConnectionsByBrokerId, createConnectionRequest, updateConnectionRequestStatus, getConnectionRequestsByBrokerId } from '../controllers/connections.controller';
+import validateSchema from "../middlewares/validate.middleware";
+import {
+  createConnectionRequestSchema,
+  updateConnectionRequestStatusSchema,
+} from "../schema/connection.schema";
 
 const router = express.Router();
 
@@ -10,9 +15,9 @@ router.get('/connections/:broker_id', getConnectionsByBrokerId);
 router.get('/connections/my-requests/:broker_id', getConnectionRequestsByBrokerId);
 
 // POST endpoint to create a connection request
-router.post('/connections/:broker_id/crequest', createConnectionRequest);
+router.post("/connections/:broker_id/crequest",validateSchema(createConnectionRequestSchema),createConnectionRequest);
 
 // POST endpoint to update the connection request status
-router.post('/connections/:broker_id/crequest/:request_id', updateConnectionRequestStatus);
+router.post("/connections/:broker_id/crequest/:request_id",validateSchema(updateConnectionRequestStatusSchema),updateConnectionRequestStatus);
 
 export default router;
