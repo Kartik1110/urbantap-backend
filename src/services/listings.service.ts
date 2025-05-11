@@ -165,8 +165,8 @@ export const getListingsService = async (
         // Add specific filters one by one
         ...(looking_for !== undefined ? [{ looking_for }] : []),
         ...(category ? [{ category }] : []),
-        ...(city ? [{ city }] : []),
-        ...(address ? [{ address }] : []),
+        ...(city ? [{ city: { contains: city, mode: "insensitive" } }] : []),
+        ...(address ? [{ address: { contains: address, mode: "insensitive" } }] : []),
 
         // Price range condition
         ...(min_price || max_price

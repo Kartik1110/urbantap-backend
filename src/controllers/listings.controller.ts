@@ -9,10 +9,16 @@ import {
 } from "../services/listings.service";
 import { uploadToS3 } from "../utils/s3Upload";
 import prisma from "../utils/prisma";
+import { City } from "@prisma/client";
 
 /* Get listings */
 export const getListings = async (req: Request, res: Response) => {
-  const filters = req.body || {};
+  const filters = {
+    page: req.query.page ? Number(req.query.page) : 1,
+    page_size: req.query.page_size ? Number(req.query.page_size) : 10,
+    city: req.query.city as City | undefined, 
+    address: req.query.address as string | undefined,
+  };
 
   try {
     const listings = await getListingsService(filters);
