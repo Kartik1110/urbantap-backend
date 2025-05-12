@@ -125,6 +125,8 @@ enum Type {
   Villa
   Townhouse
   Office
+  Shop
+  Plot
 }
 
 enum Rental_frequency {
