@@ -348,6 +348,27 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
   }
 };
 
+export const editListingService = async (listingId: string, updates: Partial<Listing>) => {
+  try {
+    const existing = await prisma.listing.findUnique({ where: { id: listingId } });
+    if (!existing) throw new Error("Listing not found");
+
+    const updatedListing = await prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        ...updates,
+        admin_status: Admin_Status.Pending, // Optional: reset status after edit
+      },
+    });
+
+    return updatedListing;
+  } catch (error) {
+    console.error(error);
+    logger.error(error);
+    throw error;
+  }
+};
+
 /*Delete Listing by Id */
 export const deleteListingbyId = async (listingId: string) => {
   try {
