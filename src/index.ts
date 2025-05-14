@@ -15,6 +15,7 @@ import inquiriesRoutes from './routes/inquiries.route';
 import connectionsRoutes from './routes/connections.route';
 import jobRoutes from './routes/job.route';
 import adminRoutes from "./routes/admin.route";
+import './crons/listingApprovalCron';
 
 dotenv.config();
 
