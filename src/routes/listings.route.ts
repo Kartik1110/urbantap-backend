@@ -5,7 +5,16 @@ import {
   deleteListing,
   getListingById,
   reportListing,
+  editListingController
 } from "../controllers/listings.controller";
+import validateSchema from "../middlewares/validate.middleware";
+import {
+  getListingsSchema,
+  bulkInsertListingsSchema,
+  getListingByIdSchema,
+  reportListingSchema,
+  deleteListingSchema,
+} from "../schema/listing.schema";
 
 const router = Router();
 
@@ -17,6 +26,9 @@ router.get("/listings/:id", getListingById);
 /* Bulk insert listings */
 export default (upload: any) => {
   router.post("/listings/bulk", upload.array("images"), bulkInsertListings);
+
+  router.put("/listings/:id",upload.array("images"),editListingController);
+
   return router;
 };
 
