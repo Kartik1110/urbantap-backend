@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
 import { Listing } from "@prisma/client";
 import {
@@ -64,8 +65,7 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
           const fileExtension = image.originalname.split(".").pop();
           return await uploadToS3(
             image.path,
-            `listings/${Date.now()}.${fileExtension}`
-          );
+            `listings/${Date.now()}-${uuidv4()}.${fileExtension}`          );
         })
       );
     } catch (error) {
