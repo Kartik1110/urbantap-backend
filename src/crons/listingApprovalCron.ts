@@ -50,66 +50,6 @@ async function approveListings(): Promise<void> {
         await sendPushNotification(creatorNotification);
       }
 
-      // const firstName = listing.broker?.user?.name || 'Someone';
-      // const listingType = listing.sale_type?.toLowerCase() || 'property';
-      // const locationRaw = listing.address || listing.city || 'a location';
-      // const priceValue = listing.min_price || listing.max_price || null;
-      // const price = priceValue ? `AED ${priceValue.toLocaleString('en-AE', { maximumFractionDigits: 0 })}` : 'a great price';
-      
-      // const location = locationRaw
-      //   .split(' ')
-      //   .slice(0, 5)
-      //   .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      //   .join(' ');
-      
-      // const formattedBody = `${firstName} just listed a ${listingType} space in ${location} for ${price} only! Check it out before someone else grabs it!`;
-      
-      // // Get all other brokers
-      // const otherBrokers = await prisma.broker.findMany({
-      //   where: {
-      //     NOT: {
-      //       id: listing.broker_id
-      //     }
-      //   },
-      //   include: {
-      //     user: true
-      //   }
-      // }) as BrokerWithUser[];
-
-      // // Prepare notifications for other brokers
-      // const notifications: PushNotificationData[] = otherBrokers
-      //   .filter((broker): broker is BrokerWithUser & { user: User & { fcm_token: string } } => 
-      //     Boolean(broker.user?.fcm_token)
-      //   )
-      //   .map(broker => ({
-      //     token: broker.user.fcm_token,
-      //     title: 'New Listing Alert',
-      //     body: formattedBody,
-      //     data: {
-      //       listingId: listing.id,
-      //       type: 'NEW_LISTING_ALERT'
-      //     }
-      //   }));
-
-      // // Send batch notifications if there are any valid tokens
-      // if (notifications.length > 0) {
-      //   await sendMulticastPushNotification(notifications);
-      // }
-
-      // // Create notification records in database
-      // const notificationPromises = otherBrokers.map(broker =>
-      //   prisma.notification.create({
-      //     data: {
-      //       broker_id: broker.id,
-      //       sent_by_id: listing.broker_id,
-      //       text: formattedBody,
-      //       type: NotificationType.General,
-      //       listing_id: listing.id
-      //     }
-      //   })
-      // );
-
-      // await Promise.all(notificationPromises);
     }
 
     logger.info(`Successfully processed ${pendingListings.length} pending listings`);
