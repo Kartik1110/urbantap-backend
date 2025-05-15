@@ -68,12 +68,24 @@ model Broker {
 }
 
 model Company {
-  id          String   @id @default(uuid())
-  name        String
-  description String   @default("")
-  logo        String   @default("")
+  id          String      @id @default(uuid())
+  name        String      @default("")
+  name_ar     String?
+  description String      @default("")
+  logo        String      @default("")
+  type        CompanyType @default(Other)
+  website     String?     @default("")
+  email       String?     @default("")
+  phone       String?     @default("")
+  address     String?     @default("")
   brokers     Broker[]
   jobs        Job[]
+}
+
+enum CompanyType {
+  Developer
+  Brokerage
+  Other
 }
 
 model Listing {

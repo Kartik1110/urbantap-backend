@@ -1,5 +1,8 @@
-import { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
+import prisma from "../utils/prisma";
 import { Listing } from "@prisma/client";
+import { Request, Response } from "express";
+import { uploadToS3 } from "../utils/s3Upload";
 import {
   getListingsService,
   bulkInsertListingsService,
@@ -8,8 +11,6 @@ import {
   reportListingService,
   editListingService
 } from "../services/listings.service";
-import { uploadToS3 } from "../utils/s3Upload";
-import prisma from "../utils/prisma";
 import { City } from "@prisma/client";
 
 /* Get listings */
@@ -64,7 +65,7 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
           const fileExtension = image.originalname.split(".").pop();
           return await uploadToS3(
             image.path,
-            `listings/${Date.now()}.${fileExtension}`
+            `listings/${Date.now()}-${uuidv4()}.${fileExtension}`
           );
         })
       );
