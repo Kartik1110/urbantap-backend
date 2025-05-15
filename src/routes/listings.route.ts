@@ -7,14 +7,6 @@ import {
   reportListing,
   editListingController
 } from "../controllers/listings.controller";
-import validateSchema from "../middlewares/validate.middleware";
-import {
-  getListingsSchema,
-  bulkInsertListingsSchema,
-  getListingByIdSchema,
-  reportListingSchema,
-  deleteListingSchema,
-} from "../schema/listing.schema";
 
 const router = Router();
 
