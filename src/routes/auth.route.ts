@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { signup, login, googleSignIn, appleSignIn, updateUser, deleteUser, updateFcmTokenHandler } from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
-
+import { forgotPassword } from "../controllers/auth.controller";
 const router = Router();
 
 // Mobile app routes
@@ -17,5 +17,7 @@ router.delete('/user/:id', deleteUser)
 
 // FCM token route (protected)
 router.post('/fcm-token/:id', authMiddleware, updateFcmTokenHandler);
+
+router.post("/forgot-password", forgotPassword);
 
 export default router;

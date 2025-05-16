@@ -28,6 +28,8 @@ model User {
   fcm_token          String?
   jobs               Job[]
   applications       Application[]
+  resetToken         String?       @db.VarChar(255)
+  resetTokenExpiry   DateTime?
 }
 
 enum Role {

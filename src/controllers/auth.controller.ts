@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { signupService, loginService, googleSignInService, appleSignInService, updateUserService, deleteUserService, updateFcmTokenService } from "../services/auth.service";
+import { signupService, loginService, googleSignInService, appleSignInService, updateUserService, deleteUserService, updateFcmTokenService, forgotPasswordService } from "../services/auth.service";
 import logger from "../utils/logger";
 
 // Signup controller
@@ -184,5 +184,21 @@ export const updateFcmTokenHandler = async (req: Request, res: Response) => {
       logger.error(String(error));
     }
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Forgot password controller
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const token = await forgotPasswordService(email);
+    return res.json({
+      status: true,
+      message: "Reset token generated successfully.",
+      data: { resetToken: token }, // In production, do not return the token
+    });
+  } catch (error) {
+    logger.error(error instanceof Error ? error.message : String(error));
+    return res.status(500).json({ status: false, message: "Internal server error" });
   }
 };
