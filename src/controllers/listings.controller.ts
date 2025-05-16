@@ -100,10 +100,20 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
 
 export const editListingController = async (req: Request, res: Response) => {
   const listingId = req.params.id;
-  const updates = req.body;
+  const listingString = req.body.listing; // JSON string of the listing update
   const images = req.files as Express.Multer.File[] | undefined;
 
+  let updates: Partial<Listing>;
   let imageUrls: string[] = [];
+
+  try {
+    updates = JSON.parse(listingString); // Parse listing from JSON string
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid listing data format",
+    });
+  }
 
   if (images && images.length > 0) {
     try {
