@@ -152,9 +152,7 @@ export const getListingsService = async (
 
     // Calculate skip value for pagination
     const skip = (page - 1) * page_size;
-
-    console.log('filterParams.type', type);
-
+    console.log("filterParams.type", type);
     // Base WHERE condition with admin_status
     const whereCondition = {
       AND: [
@@ -163,50 +161,65 @@ export const getListingsService = async (
           broker: {
             sentToConnectionRequests: {
               none: {
-                status: RequestStatus.Blocked
-              }
-            }
-          }
+                status: RequestStatus.Blocked,
+              },
+            },
+          },
         },
         // Add specific filters one by one
         ...(looking_for !== undefined ? [{ looking_for }] : []),
         ...(category ? [{ category }] : []),
-        ...(city ? [{ city: { contains: city, mode: "insensitive" } }] : []),
-        ...(address ? [{ address: { contains: address, mode: "insensitive" } }] : []),
+        ...(city ? [{ city }] : []),
+        ...(address ? [{ address }] : []),
 
         // Price range condition
         ...(min_price || max_price
-          ? [{
-              AND: [
-                ...(min_price ? [{ min_price: { gte: min_price } }] : []),
-                ...(max_price ? [{ max_price: { lte: max_price } }] : []),
-              ],
-            }]
+          ? [
+              {
+                AND: [
+                  ...(min_price ? [{ min_price: { gte: min_price } }] : []),
+                  ...(max_price ? [{ max_price: { lte: max_price } }] : []),
+                ],
+              },
+            ]
           : []),
 
         // Square footage condition
         ...(min_sqft || max_sqft
-          ? [{
-              sq_ft: {
-                ...(min_sqft && { gte: min_sqft }),
-                ...(max_sqft && { lte: max_sqft }),
+          ? [
+              {
+                sq_ft: {
+                  ...(min_sqft && { gte: min_sqft }),
+                  ...(max_sqft && { lte: max_sqft }),
+                },
               },
-            }]
+            ]
           : []),
 
         // Array filters
-        ...(no_of_bathrooms?.length ? [{ no_of_bathrooms: { in: no_of_bathrooms } }] : []),
-        ...(no_of_bedrooms?.length ? [{ no_of_bedrooms: { in: no_of_bedrooms } }] : []),
+        ...(no_of_bathrooms?.length
+          ? [{ no_of_bathrooms: { in: no_of_bathrooms } }]
+          : []),
+
+        ...(no_of_bedrooms?.length
+          ? [{ no_of_bedrooms: { in: no_of_bedrooms } }]
+          : []),
         ...(furnished?.length ? [{ furnished: { in: furnished } }] : []),
         ...(type?.length ? [{ type: { in: type } }] : []),
-        ...(rental_frequency?.length ? [{ rental_frequency: { in: rental_frequency } }] : []),
+        ...(rental_frequency?.length
+          ? [{ rental_frequency: { in: rental_frequency } }]
+          : []),
         ...(project_age?.length ? [{ project_age: { in: project_age } }] : []),
-        ...(payment_plan?.length ? [{ payment_plan: { in: payment_plan } }] : []),
+        ...(payment_plan?.length
+          ? [{ payment_plan: { in: payment_plan } }]
+          : []),
         ...(sale_type?.length ? [{ sale_type: { in: sale_type } }] : []),
         ...(amenities?.length ? [{ amenities: { hasSome: amenities } }] : []),
 
         // Add any remaining filters
-        ...Object.entries(restFilters).map(([key, value]) => ({ [key]: value })),
+        ...Object.entries(restFilters).map(([key, value]) => ({
+          [key]: value,
+        })),
       ].filter(Boolean),
     };
 
@@ -354,9 +367,14 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
   }
 };
 
-export const editListingService = async (listingId: string, updates: Partial<Listing>) => {
+export const editListingService = async (
+  listingId: string,
+  updates: Partial<Listing>
+) => {
   try {
-    const existing = await prisma.listing.findUnique({ where: { id: listingId } });
+    const existing = await prisma.listing.findUnique({
+      where: { id: listingId },
+    });
     if (!existing) throw new Error("Listing not found");
 
     const updatedListing = await prisma.listing.update({
@@ -430,7 +448,7 @@ export const reportListingService = async (
           sent_by_id: "", // kept empty as it is a system generated notification
           text: `Your listing has been reported for violating our community guidelines and is currently under review.`,
           message: "", // kept empty as it is a system generated notification
-          listing_id: listingId
+          listing_id: listingId,
         },
       });
     }
