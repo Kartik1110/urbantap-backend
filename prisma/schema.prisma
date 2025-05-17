@@ -54,6 +54,7 @@ model Broker {
   designation              String?
   company_id               String?
   user_id                  String?
+  type                     BrokerType?
   company                  Company?            @relation(fields: [company_id], references: [id])
   listings                 Listing[]
   user                     User?               @relation(fields: [user_id], references: [id])
@@ -65,6 +66,12 @@ model Broker {
   broker1Connections       Connections[]       @relation("Broker1")
   broker2Connections       Connections[]       @relation("Broker2")
   reportedListings         ReportedListing[]
+}
+
+enum BrokerType {
+  Off_plan
+  Ready_to_move
+  Both
 }
 
 model Company {
@@ -137,6 +144,8 @@ enum Type {
   Villa
   Townhouse
   Office
+  Shop
+  Plot
 }
 
 enum Rental_frequency {
