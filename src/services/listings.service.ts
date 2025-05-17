@@ -31,6 +31,9 @@ export const getListingByIdService = async (id: string) => {
             profile_pic: true,
             country_code: true,
             w_number: true,
+            email: true,
+            linkedin_link: true,
+            ig_link: true,
             company: {
               select: {
                 name: true,
@@ -64,6 +67,9 @@ export const getListingByIdService = async (id: string) => {
         profile_pic: broker.profile_pic,
         country_code: broker.country_code,
         w_number: broker.w_number,
+        email: broker.email,
+        linkedin_link: broker.linkedin_link,
+        ig_link: broker.ig_link,
       },
       company: {
         name: broker.company?.name || "",
@@ -341,6 +347,27 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
     // });
 
     return newListings;
+  } catch (error) {
+    console.error(error);
+    logger.error(error);
+    throw error;
+  }
+};
+
+export const editListingService = async (listingId: string, updates: Partial<Listing>) => {
+  try {
+    const existing = await prisma.listing.findUnique({ where: { id: listingId } });
+    if (!existing) throw new Error("Listing not found");
+
+    const updatedListing = await prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        ...updates,
+        admin_status: Admin_Status.Pending, // Optional: reset status after edit
+      },
+    });
+
+    return updatedListing;
   } catch (error) {
     console.error(error);
     logger.error(error);

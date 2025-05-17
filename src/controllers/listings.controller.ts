@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
 import { Listing } from "@prisma/client";
 import {
@@ -6,6 +7,7 @@ import {
   deleteListingbyId,
   getListingByIdService,
   reportListingService,
+  editListingService
 } from "../services/listings.service";
 import { uploadToS3 } from "../utils/s3Upload";
 import prisma from "../utils/prisma";
@@ -63,8 +65,7 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
           const fileExtension = image.originalname.split(".").pop();
           return await uploadToS3(
             image.path,
-            `listings/${Date.now()}.${fileExtension}`
-          );
+            `listings/${Date.now()}-${uuidv4()}.${fileExtension}`          );
         })
       );
     } catch (error) {
@@ -93,6 +94,64 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
       status: "error",
       message: "Failed to insert listings",
       error: error,
+    });
+  }
+};
+
+export const editListingController = async (req: Request, res: Response) => {
+  const listingId = req.params.id;
+  const listingString = req.body.listing; // JSON string of the listing update
+  const images = req.files as Express.Multer.File[] | undefined;
+
+  let updates: Partial<Listing>;
+  let imageUrls: string[] = [];
+
+  try {
+    updates = JSON.parse(listingString); // Parse listing from JSON string
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid listing data format",
+    });
+  }
+
+  if (images && images.length > 0) {
+    try {
+      imageUrls = await Promise.all(
+        images.map(async (image) => {
+          const fileExtension = image.originalname.split(".").pop();
+          return await uploadToS3(
+            image.path,
+            `listings/${Date.now()}.${fileExtension}`
+          );
+        })
+      );
+    } catch (error) {
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to upload images to S3",
+        error,
+      });
+    }
+  }
+
+  // Merge new images if provided
+  if (imageUrls.length > 0) {
+    updates.image_urls = imageUrls;
+  }
+
+  try {
+    const updatedListing = await editListingService(listingId, updates);
+    return res.json({
+      status: "success",
+      message: "Listing updated successfully",
+      data: updatedListing,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to update listing",
+      error,
     });
   }
 };

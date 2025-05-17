@@ -20,7 +20,8 @@ export const bulkInsertCompanies = async (req: Request, res: Response) => {
 
 export const getCompanies = async (req: Request, res: Response) => {
   try {
-    const companies = await getCompaniesService();
+    const { search = "" } = req.query;
+    const companies = await getCompaniesService({ search: String(search) });
     res.json({
       status: "success",
       message: "Companies fetched successfully",

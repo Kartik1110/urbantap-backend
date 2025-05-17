@@ -25,9 +25,16 @@ export const bulkInsertCompaniesService = async (companies: Company[]) => {
   }
 };
 
-export const getCompaniesService = async () => {
+export const getCompaniesService = async ({ search = "" }: { search: string }) => {
   try {
-    return await prisma.company.findMany();
+    return await prisma.company.findMany({
+      where: search ? {
+        name: {
+          contains: search,
+          mode: "insensitive"
+        }
+      } : {}
+    });
   } catch (error) {
     throw error;
   }

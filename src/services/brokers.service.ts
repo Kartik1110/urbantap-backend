@@ -197,6 +197,11 @@ export const getBrokerListService = async ({
       include: {
         company: true,
       },
+      orderBy: {
+        user: {
+          createdAt: "desc",
+        },
+      },
     });
 
     // Update total count to include search condition
@@ -364,13 +369,21 @@ export const blockBrokerService = async (
           },
         });
       }
-    } else { 
+    } else {
       // if the brokers are not connected, create a new connection and update the request status to blocked
       if (action === "BLOCK") {
         await prisma.connectionRequest.createMany({
           data: [
-            { sent_by_id: brokerId, sent_to_id: blockBrokerId, status: RequestStatus.Blocked },
-            { sent_by_id: blockBrokerId, sent_to_id: brokerId, status: RequestStatus.Blocked },
+            {
+              sent_by_id: brokerId,
+              sent_to_id: blockBrokerId,
+              status: RequestStatus.Blocked,
+            },
+            {
+              sent_by_id: blockBrokerId,
+              sent_to_id: brokerId,
+              status: RequestStatus.Blocked,
+            },
           ],
         });
       } else {
