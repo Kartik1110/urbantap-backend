@@ -170,7 +170,7 @@ export const getListingsService = async (
         ...(looking_for !== undefined ? [{ looking_for }] : []),
         ...(category ? [{ category }] : []),
         ...(city ? [{ city }] : []),
-        ...(address ? [{ address }] : []),
+        ...(address ? [{ address: { contains: address, mode: "insensitive" } }] : []),
 
         // Price range condition
         ...(min_price || max_price
