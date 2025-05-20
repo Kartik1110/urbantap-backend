@@ -97,19 +97,15 @@ async function approveListings(): Promise<void> {
       }
 
       // Create notification records in database
-      const notificationPromises = otherBrokers.map(broker =>
-        prisma.notification.create({
-          data: {
-            broker_id: broker.id,
-            sent_by_id: listing.broker_id,
-            text: formattedBody,
-            type: NotificationType.General,
-            listing_id: listing.id
-          }
-        })
-      );
-
-      await Promise.all(notificationPromises);
+      await prisma.notification.create({
+        data: {
+          sent_by_id: listing.broker_id,
+          text: formattedBody,
+          type: NotificationType.General,
+          listing_id: listing.id,
+          broker_id: listing.broker_id
+        }
+      });
     }
 
     logger.info(`Successfully processed ${pendingListings.length} pending listings`);
