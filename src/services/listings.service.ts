@@ -21,6 +21,16 @@ interface ListingFilters {
 
 export const getListingByIdService = async (id: string) => {
   try {
+
+    await prisma.listing.update({
+      where: { id },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+
     const listing = await prisma.listing.findUnique({
       where: { id },
       include: {
@@ -70,6 +80,7 @@ export const getListingByIdService = async (id: string) => {
         email: broker.email,
         linkedin_link: broker.linkedin_link,
         ig_link: broker.ig_link,
+        views: listing.views
       },
       company: {
         name: broker.company?.name || "",
