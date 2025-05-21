@@ -21,6 +21,7 @@ export const bulkInsertCompaniesService = async (companies: Company[]) => {
     
     return createdCompanies.map(company => company.id);
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
