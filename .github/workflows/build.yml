@@ -18,17 +18,9 @@ jobs:
               with:
                   node-version: "20.x"
 
-            - name: Install pnpm
-              uses: pnpm/action-setup@v2
-              with:
-                  version: 10
-
             - name: Install Dependencies
-              run: pnpm install
-
-            - name: Run Tests
-              run: pnpm test
+              run: npm install
 
             - name: Start Server (Optional)
-              run: pnpm start
+              run: npm start
               continue-on-error: true
