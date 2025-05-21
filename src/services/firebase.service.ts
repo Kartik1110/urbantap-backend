@@ -67,24 +67,38 @@ export const sendPushNotificationToTopic = async (notification: PushNotification
 export const sendMulticastPushNotification = async (notifications: PushNotificationData[]): Promise<void> => {
     try {
         const validTokens = notifications.map(n => n.token).filter((token): token is string => !!token);
-        
+
         if (validTokens.length === 0) {
             throw new Error('At least one valid token is required');
         }
 
-        const message = {
-            notification: {
-                title: notifications[0].title,
-                body: notifications[0].body,
-            },
-            data: notifications[0].data || {},
-            tokens: validTokens,
-        };
+        const BATCH_SIZE = 400;
+        for (let i = 0; i < validTokens.length; i += BATCH_SIZE) {
+            const batchTokens = validTokens.slice(i, i + BATCH_SIZE);
 
-        const response = await admin.messaging().sendEachForMulticast(message);
-        logger.info(`${response.successCount} messages were sent successfully`);
+            const message = {
+                notification: {
+                    title: notifications[0].title,
+                    body: notifications[0].body,
+                },
+                data: notifications[0].data || {},
+                tokens: batchTokens,
+            };
+
+            const response = await admin.messaging().sendEachForMulticast(message);
+
+            logger.info(
+                `Multicast batch ${Math.floor(i / BATCH_SIZE) + 1}: ${response.successCount} succeeded, ${response.failureCount} failed`
+            );
+
+            response.responses.forEach((resp, idx) => {
+                if (!resp.success) {
+                    logger.error(`Failed to send to token: ${batchTokens[idx]} - ${resp.error?.message}`);
+                }
+            });
+        }
     } catch (error) {
         logger.error('Error sending multicast push notifications:', error);
         throw error;
     }
-}; 
+};
