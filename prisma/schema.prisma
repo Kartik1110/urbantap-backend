@@ -112,6 +112,8 @@ model Listing {
   furnished         Furnished?
   city              City
   address           String?           @default("")
+  latitude          Float?
+  longitude         Float?
   amenities         String[]
   image_urls        String[]
   project_age       Int?
