@@ -144,3 +144,18 @@ export const handleCustomNotification = async (body: any, senderId: string) => {
     throw new Error(`Failed to handle notification: ${(error as Error).message}`);
   }
 };
+
+export const deleteAllNotificationsService = async (broker_id: string) => {
+  try {
+    const result = await prisma.notification.deleteMany({
+      where: {
+        broker_id,
+      },
+    });
+
+    return result.count;
+  } catch (error) {
+    logger.error("Error in deleteAllNotificationsService:", error);
+    throw error;
+  }
+};
