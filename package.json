@@ -11,7 +11,8 @@
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node src/db/seed.ts",
-    "copy-files": "cp -r src/config dist/"
+    "copy-files": "cp -r src/config dist/",
+    "backup": "node src/scripts/backup.js"
   },
   "keywords": [],
   "author": "",
