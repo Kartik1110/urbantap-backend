@@ -1,10 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError, ZodSchema } from "zod";
+import { ZodError, ZodTypeAny } from "zod";
 
-const validateSchema = (schema: ZodSchema) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+const validateSchema = (schema: ZodTypeAny) => {
+  return async(req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parse(req.body);
+      schema.parse({
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      });
       next();
     } catch (error) {
       if (error instanceof ZodError) {
