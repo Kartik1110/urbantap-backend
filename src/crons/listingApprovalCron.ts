@@ -101,7 +101,7 @@ async function approveListings(): Promise<void> {
         data: {
           sent_by_id: listing.broker_id,
           text: formattedBody,
-          type: NotificationType.General,
+          type: NotificationType.Broadcast,
           listing_id: listing.id,
           broker_id: listing.broker_id
         }
