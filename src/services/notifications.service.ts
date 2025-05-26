@@ -16,6 +16,8 @@ export const getNotificationsService = async (
     whereClause.type = NotificationType.Network;
   } else if (type === NotificationType.Inquiries) {
     whereClause.type = NotificationType.Inquiries;
+  } else if (type === NotificationType.Broadcast){
+    whereClause.type = NotificationType.Broadcast;
   }
 
   // Fetch notifications based on the broker ID and type

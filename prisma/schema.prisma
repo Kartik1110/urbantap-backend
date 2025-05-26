@@ -229,6 +229,7 @@ enum NotificationType {
   General
   Inquiries
   Network
+  Broadcast
 }
 
 model ConnectionRequest {
