@@ -90,7 +90,12 @@ async function approveListings(): Promise<void> {
 
   const firstName = listing.broker?.user?.name || 'Someone';
   const listingType = listing.sale_type?.toLowerCase() || 'property';
-  const location = listing.address || listing.city || 'a location';
+  const rawAddress = listing.address || listing.city || 'a location';
+  const cleanedAddress = rawAddress
+    .replace(/\s*-\s*United Arab Emirates\s*$/i, '')
+    .trim();
+  const location = cleanedAddress;
+
   const priceValue = listing.min_price || listing.max_price || null;
   const price = priceValue ? `AED ${priceValue.toLocaleString('en-AE', { maximumFractionDigits: 0 })}` : 'a great price';
 
