@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getAdminListingsService } from "../services/admin.service";
-import { updateListingStatusService } from "../services/admin.service";
-
+import { updateListingStatusService,getUserListService } from "../services/admin.service";
+import logger from "../utils/logger";
 
 
 export const getAdminListings = async (req: Request, res: Response) => {
@@ -43,4 +43,56 @@ export const updateListingStatus = async (req: Request, res: Response) => {
     }
   };
   
-  
+export const getUserList = async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const page_size = parseInt(req.query.page_size as string) || 10000;
+
+    const search = (req.query.search as string) || "";
+    const searchType = (req.query.searchType as string) || ""; // new
+
+    const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+    const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
+    const { users, pagination } = await getUserListService({
+      page,
+      page_size,
+      token,
+      search,
+      searchType,
+      startDate,
+      endDate,
+    });
+
+    res.json({
+      status: "success",
+      message: "User list fetched successfully",
+      data: {
+        users,
+        pagination: {
+          total: pagination.total,
+          page: pagination.page,
+          page_size: pagination.page_size,
+          total_pages: pagination.total_pages,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to fetch user list",
+      error: error,
+    });
+  }
+};
+
