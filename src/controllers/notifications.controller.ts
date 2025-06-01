@@ -30,7 +30,7 @@ add auth middleware to check if the broker id requesting is indeed the logged in
 */
 
 export const getNotifications = async (req: Request, res: Response) => {
-  const { type = 'General' } = req.query;
+  const { type = NotificationType.General } = req.query;
   const { broker_id } = req.params;
 
   // Validate notification type
