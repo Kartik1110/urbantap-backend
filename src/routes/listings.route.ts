@@ -5,7 +5,8 @@ import {
   deleteListing,
   getListingById,
   reportListing,
-  editListingController
+  editListingController,
+  generateListingFromText
 } from "../controllers/listings.controller";
 
 const router = Router();
@@ -20,6 +21,9 @@ export default (upload: any) => {
   router.post("/listings/bulk", upload.array("images"), bulkInsertListings);
 
   router.put("/listings/:id",upload.array("images"),editListingController);
+
+  /* Generate Listing from text */ 
+  router.post("/listings/generate", generateListingFromText);
 
   return router;
 };
