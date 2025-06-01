@@ -13,6 +13,7 @@ import {
   RequestStatus,
 } from "@prisma/client";
 import { sendPushNotificationToTopic } from "./firebase.service";
+import generateListingFromText from "../scripts/generate-listings";
 
 /* Get listings */
 interface ListingFilters {
@@ -170,7 +171,9 @@ export const getListingsService = async (
         ...(looking_for !== undefined ? [{ looking_for }] : []),
         ...(category ? [{ category }] : []),
         ...(city ? [{ city }] : []),
-        ...(address ? [{ address: { contains: address, mode: "insensitive" } }] : []),
+        ...(address
+          ? [{ address: { contains: address, mode: "insensitive" } }]
+          : []),
 
         // Price range condition
         ...(min_price || max_price
@@ -454,6 +457,16 @@ export const reportListingService = async (
     }
 
     return reportedListing;
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+};
+
+// Generate Listing from Text Service
+export const generateListingFromTextService = async (text: string) => {
+  try {
+    return await generateListingFromText(text);
   } catch (error) {
     logger.error(error);
     throw error;

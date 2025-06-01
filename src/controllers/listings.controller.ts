@@ -8,6 +8,7 @@ import {
   getListingByIdService,
   reportListingService,
   editListingService,
+  generateListingFromTextService,
 } from "../services/listings.service";
 import { uploadToS3 } from "../utils/s3Upload";
 import prisma from "../utils/prisma";
@@ -225,6 +226,33 @@ export const reportListing = async (req: Request, res: Response) => {
       status: "error",
       message: "Failed to report listing",
       error: error,
+    });
+  }
+};
+
+// Generate Listing from Text
+export const generateListingFromText = async (req: Request, res: Response) => {
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({
+      status: "error",
+      message: "Missing 'text' in request body",
+    });
+  }
+
+  try {
+    const listing = await generateListingFromTextService(text);
+    return res.status(200).json({
+      status: "success",
+      message: "Listing generated successfully",
+      data: listing,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to generate listing",
+      error,
     });
   }
 };
