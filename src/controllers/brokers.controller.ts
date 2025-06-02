@@ -58,9 +58,9 @@ export const getBrokerList = async (req: Request, res: Response) => {
     }
     
     // Extract pagination parameters from body with defaults
-    const page = parseInt(req.query.page as string) || 1;
-    const page_size = parseInt(req.query.page_size as string) || 10;
-    const search = req.query.search as string;
+    const page = parseInt(req.body.page as string) || 1;
+    const page_size = parseInt(req.body.page_size as string) || 10;
+    const search = req.body.search as string;
 
     const { brokers, pagination } = await getBrokerListService({ page, page_size, token, search });
 
