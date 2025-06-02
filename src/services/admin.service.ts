@@ -358,3 +358,90 @@ export const updateListingStatusService = async (id: string, status: string) => 
   return updatedListing;
 };
 
+export const getUserListService = async ({
+  page,
+  page_size,
+  token,
+  search,
+  searchType,
+  startDate,
+  endDate
+}: {
+  page: number;
+  page_size: number;
+  token: string;
+  search?: string;
+  searchType?: string;
+  startDate?: Date;
+  endDate?: Date;
+}) => {
+  const offset = (page - 1) * page_size;
+
+  const whereClause: any = {};
+
+  // --- Search logic ---
+  if (search && searchType) {
+    switch (searchType) {
+      case "id":
+        whereClause.id = search;
+        break;
+      case "email":
+        whereClause.email = {
+          contains: search,
+          mode: "insensitive",
+        };
+        break;
+      case "name":
+        whereClause.name = {
+          contains: search,
+          mode: "insensitive",
+        };
+        break;
+      case "w_number":
+        whereClause.w_number = {
+          contains: search,
+          mode: "insensitive",
+        };
+        break;
+    }
+  }
+
+  // --- Date filtering logic ---
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    whereClause.createdAt = {
+      gte: new Date(start.setHours(0, 0, 0, 0)),
+      lte: new Date(end.setHours(23, 59, 59, 999)),
+    };
+  } else if (startDate) {
+    const start = new Date(startDate);
+    whereClause.createdAt = {
+      gte: new Date(start.setHours(0, 0, 0, 0)),
+      lte: new Date(start.setHours(23, 59, 59, 999)),
+    };
+  }
+
+  const users = await prisma.user.findMany({
+    where: whereClause,
+    skip: offset,
+    take: page_size,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const total = await prisma.user.count({
+    where: whereClause,
+  });
+
+  return {
+    users,
+    pagination: {
+      total,
+      page,
+      page_size,
+      total_pages: Math.ceil(total / page_size),
+    },
+  };
+};
