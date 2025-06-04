@@ -195,11 +195,7 @@ export const getBrokerListService = async ({
       skip: (page - 1) * page_size,
       take: page_size,
       include: {
-        company: {
-          select: {
-            name: true,
-          },
-        },
+        company: true,
         listings: {
           where: {
             admin_status: "Approved", // Optional: only show approved listings
