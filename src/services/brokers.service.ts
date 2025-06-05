@@ -217,6 +217,7 @@ export const getBrokerListService = async ({
             city: true,
             address:true,
             image_urls:true,
+            description:true,
           },
         },
       },
