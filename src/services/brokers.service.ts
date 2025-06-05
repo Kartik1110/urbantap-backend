@@ -215,6 +215,8 @@ export const getBrokerListService = async ({
             no_of_bathrooms: true,
             furnished: true,
             city: true,
+            address:true,
+            image_urls:true,
           },
         },
       },
