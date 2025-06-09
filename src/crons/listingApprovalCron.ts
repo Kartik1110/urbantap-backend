@@ -159,8 +159,8 @@ async function approveListings(): Promise<void> {
     '0 11-21 * * *',
     async () => {
       logger.info('Running hourly listing summary cron job...');
-      logger.info(`Running on instance ${process.pid}`);
       await sendHourlyListingNotifications();
+      logger.info(`Running on instance ${process.pid}`);
     },
     {
       timezone: 'Asia/Dubai' 
