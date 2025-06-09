@@ -196,6 +196,30 @@ export const getBrokerListService = async ({
       take: page_size,
       include: {
         company: true,
+        listings: {
+          where: {
+            admin_status: "Approved", // Optional: only show approved listings
+          },
+          select: {
+            id: true,
+            title: true,
+            image: true,
+            min_price: true,
+            max_price: true,
+            sq_ft: true,
+            type: true,
+            category: true,
+            looking_for: true,
+            rental_frequency: true,
+            no_of_bedrooms: true,
+            no_of_bathrooms: true,
+            furnished: true,
+            city: true,
+            address:true,
+            image_urls:true,
+            description:true,
+          },
+        },
       },
       orderBy: {
         user: {

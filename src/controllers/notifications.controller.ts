@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import { getNotificationsService,handleCustomNotification } from '../services/notifications.service';
+import { getNotificationsService,handleCustomNotification,deleteAllNotificationsService} from '../services/notifications.service';
 import { NotificationType } from '@prisma/client';
 import { z } from "zod";
 import logger from '../utils/logger';
+import prisma from '../utils/prisma';
 
 const NotificationSchema = z.object({
   token: z.string().optional(),
@@ -30,7 +31,7 @@ add auth middleware to check if the broker id requesting is indeed the logged in
 */
 
 export const getNotifications = async (req: Request, res: Response) => {
-  const { type = 'General' } = req.query;
+  const { type = NotificationType.General } = req.query;
   const { broker_id } = req.params;
 
   // Validate notification type
@@ -62,6 +63,28 @@ export const sendCustomNotification = async (req: Request, res: Response) => {
     logger.error("Error sending notification:", error);
     return res.status(500).json({
       message: "Failed to send or save notification",
+      error: (error as Error).message,
+    });
+  }
+};
+
+export const deleteAllNotificationsForBroker = async (req: Request, res: Response) => {
+  try {
+    const broker_id = req.params.broker_id;
+
+    if (!broker_id) {
+      return res.status(400).json({ message: "Broker ID is required" });
+    }
+
+    const deletedCount = await deleteAllNotificationsService(broker_id);
+
+    return res.status(200).json({
+      message: `Deleted ${deletedCount} notifications for broker ${broker_id}`,
+    });
+  } catch (error) {
+    logger.error("Error deleting notifications:", error);
+    return res.status(500).json({
+      message: "Failed to delete notifications",
       error: (error as Error).message,
     });
   }

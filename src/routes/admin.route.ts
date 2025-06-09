@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getAdminListings } from "../controllers/admin.controller";
+import { getAdminListings, getBrokerListforAdmins } from "../controllers/admin.controller";
 import { adminMiddleware } from "../middlewares/admin.middleware";
-import { updateListingStatus } from "../controllers/admin.controller";
+import { updateListingStatus,getUserList } from "../controllers/admin.controller";
 
 const router = Router();
 
@@ -13,4 +13,9 @@ router.get("/admin/listings", getAdminListings);
 // Update listing status
 router.put("/admin/listings/:id/status", updateListingStatus);
 
+// Fetch Users
+router.get("/admin/users", getUserList);
+
+// Fetch Brokers List
+router.get("/admin/brokers", getBrokerListforAdmins);
 export default router;
