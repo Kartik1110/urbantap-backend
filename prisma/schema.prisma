@@ -66,7 +66,10 @@ model Broker {
   broker1Connections       Connections[]       @relation("Broker1")
   broker2Connections       Connections[]       @relation("Broker2")
   reportedListings         ReportedListing[]
-  developers               Developer[]         @relation("DeveloperBrokers")
+  Brokerage                Brokerage?          @relation(fields: [brokerageId], references: [id])
+  brokerageId              String?
+  Developer                Developer?          @relation(fields: [developerId], references: [id])
+  developerId              String?
 }
 
 enum BrokerType {
@@ -88,6 +91,7 @@ model Company {
   address     String?     @default("")
   brokers     Broker[]
   jobs        Job[]
+  Brokerage   Brokerage[]
 }
 
 enum CompanyType {
@@ -138,9 +142,9 @@ model Developer {
   email       String?
   phone       String?
   projects    Project[]
-  brokers     Broker[]  @relation("DeveloperBrokers")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  Broker      Broker[]
 }
 
 model Project {
@@ -168,6 +172,23 @@ model Project {
   developer     Developer    @relation(fields: [developerId], references: [id])
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+}
+
+model Brokerage {
+  id            String   @id @default(uuid())
+  name          String
+  logo          String
+  description   String
+  ded           String?
+  rera          String?
+  contact_email String?
+  contact_phone String?
+  service_areas String[]
+  brokers       Broker[]
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 enum Admin_Status {
