@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
-import { getDevelopersService,createDeveloperService } from '../services/developer.service';
+import { getDevelopersService,createDeveloperService,getDeveloperDetailsService } from '../services/developer.service';
 
 export const getDevelopers = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 10;
+    const search = req.query.search as string | undefined;
 
-    const { developers, pagination } = await getDevelopersService({ page, pageSize });
+    const { developers, pagination } = await getDevelopersService({ page, pageSize, search });
 
     res.json({
       status: 'success',
@@ -22,6 +23,7 @@ export const getDevelopers = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 export const createDeveloper = async (req: Request, res: Response) => {
     try {
@@ -39,3 +41,22 @@ export const createDeveloper = async (req: Request, res: Response) => {
       });
     }
 };
+
+export const getDeveloperDetails = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const developerDetails = await getDeveloperDetailsService(id);
+      res.json({
+        status: "success",
+        message: "Developer details fetched successfully",
+        data: developerDetails,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Failed to fetch developer details",
+        error,
+      });
+    }
+  };
+

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDevelopers,createDeveloper } from '../controllers/developer.controller';
+import { getDevelopers,createDeveloper,getDeveloperDetails } from '../controllers/developer.controller';
 
 const router = Router();
 
@@ -8,5 +8,8 @@ router.get('/developers', getDevelopers);
 
 /* Create a new developer */
 router.post("/developers", createDeveloper);
+
+/* Get developer details by ID */
+router.get("/developers/:id", getDeveloperDetails);
 
 export default router;

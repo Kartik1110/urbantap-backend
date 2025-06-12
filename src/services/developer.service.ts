@@ -1,17 +1,30 @@
 import prisma from '../utils/prisma';
+import { Category,Prisma } from '@prisma/client';
 
 export const getDevelopersService = async ({
   page,
   pageSize,
+  search,
 }: {
   page: number;
   pageSize: number;
+  search?: string; // <- Add this line
 }) => {
   try {
     const skip = (page - 1) * pageSize;
 
+    const whereClause = search
+      ? {
+          name: {
+            contains: search,
+        mode: 'insensitive' as Prisma.QueryMode,
+          },
+        }
+      : {};
+
     const [developersRaw, totalCount] = await Promise.all([
       prisma.developer.findMany({
+        where: whereClause,
         skip,
         take: pageSize,
         select: {
@@ -22,7 +35,9 @@ export const getDevelopersService = async ({
           },
         },
       }),
-      prisma.developer.count(),
+      prisma.developer.count({
+        where: whereClause,
+      }),
     ]);
 
     const developers = developersRaw.map(dev => ({
@@ -61,3 +76,59 @@ export const createDeveloperService = async (data: {
     }
   };
 
+
+export const getDeveloperDetailsService = async (developerId: string) => {
+  try {
+    const developer = await prisma.developer.findUnique({
+      where: { id: developerId },
+      include: {
+        projects: true,
+        Broker: {
+          include: {
+            company: true, // include company data for each broker
+          },
+        },
+      },
+    });
+
+    if (!developer) throw new Error("Developer not found");
+
+    const projectCount = developer.projects.length;
+
+    const groupedProjects = {
+      all: developer.projects,
+      off_plan: developer.projects.filter(p => p.type === Category.Off_plan),
+      ready: developer.projects.filter(p => p.type === Category.Ready_to_move),
+    };
+
+    const brokers = developer.Broker.map((broker) => ({
+      id: broker.id,
+      name: broker.name,
+      profile_pic: broker.profile_pic,
+      company: broker.company
+        ? {
+            name: broker.company.name,
+            logo: broker.company.logo,
+            address: broker.company.address,
+          }
+        : null,
+    }));
+
+    return {
+      id: developer.id,
+      name: developer.name,
+      logo: developer.logo,
+      coverImage: developer.coverImage,
+      description: developer.description,
+      project_count: projectCount,
+      contact: {
+        email: developer.email,
+        phone: developer.phone,
+      },
+      projects: groupedProjects,
+      brokers, // ✅ added detailed broker info
+    };
+  } catch (error) {
+    throw error;
+  }
+};
