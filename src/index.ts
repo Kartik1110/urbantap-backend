@@ -16,6 +16,8 @@ import connectionsRoutes from './routes/connections.route';
 import jobRoutes from './routes/job.route';
 import adminRoutes from "./routes/admin.route";
 import developerRoutes from "./routes/developer.route"
+import projectRoutes from "./routes/project.route"
+import brokerageRoutes from"./routes/brokerage.route"
 import './crons/listingApprovalCron';
 
 dotenv.config();
@@ -37,7 +39,10 @@ app.use("/api/v1", authRoutes);
 app.use("/api/v1", authMiddleware, notificationsRoutes);
 app.use("/api/v1", authMiddleware, inquiriesRoutes);
 app.use("/api/v1", authMiddleware, connectionsRoutes);
-app.use("/api/v1",  authMiddleware, developerRoutes )
+app.use("/api/v1", authMiddleware, developerRoutes );
+app.use("/api/v1", authMiddleware, projectRoutes);
+app.use("/api/v1",authMiddleware, brokerageRoutes);
+
 
 // File upload routes (also protected)
 app.use("/api/v1", authMiddleware, brokersRoutes(upload));
