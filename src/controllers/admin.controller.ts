@@ -5,25 +5,81 @@ import logger from "../utils/logger";
 import { getBrokerListService } from "../services/brokers.service";
 
 
-export const getAdminListings = async (req: Request, res: Response) => {
-  const filters = req.body || {};
+import { Bathrooms, Bedrooms, Furnished, Type, Rental_frequency, Payment_Plan, Sale_Type, Admin_Status } from '@prisma/client'; // or from wherever you defined them
 
+
+function convertToEnumArray<T>(input: any[], enumObj: any): T[] {
+  return (input || []).filter((item) => Object.values(enumObj).includes(item));
+}
+
+
+export const getAdminListings = async (req: Request, res: Response) => {
   try {
+    const {
+      page,
+      page_size,
+      no_of_bathrooms,
+      no_of_bedrooms,
+      furnished,
+      type,
+      rental_frequency,
+      project_age,
+      payment_plan,
+      sale_type,
+      admin_status,
+      ...rest
+    } = req.query;
+
+    const filters = {
+      ...rest,
+      page: Number(page) || 1,
+      page_size: Number(page_size) || 10,
+      no_of_bathrooms: convertToEnumArray<Bathrooms>(
+        typeof no_of_bathrooms === 'string' ? no_of_bathrooms.split(',') : [],
+        Bathrooms
+      ),
+      no_of_bedrooms: convertToEnumArray<Bedrooms>(
+        typeof no_of_bedrooms === 'string' ? no_of_bedrooms.split(',') : [],
+        Bedrooms
+      ),
+      furnished: convertToEnumArray<Furnished>(
+        typeof furnished === 'string' ? furnished.split(',') : [],
+        Furnished
+      ),
+      type: convertToEnumArray<Type>(
+        typeof type === 'string' ? type.split(',') : [],
+        Type
+      ),
+      rental_frequency: convertToEnumArray<Rental_frequency>(
+        typeof rental_frequency === 'string' ? rental_frequency.split(',') : [],
+        Rental_frequency
+      ),
+      project_age: typeof project_age === 'string' ? project_age.split(',') as ("Less_than_5_years" | "More_than_5_years")[] : [],
+      payment_plan: typeof payment_plan === 'string' ? payment_plan.split(',') as ("Payment_done" | "Payment_Pending")[] : [],
+      sale_type: typeof sale_type === 'string' ? sale_type.split(',') as ("Direct" | "Resale")[] : [],
+      admin_status: convertToEnumArray<Admin_Status>(
+        typeof admin_status === 'string' ? admin_status.split(',') : [],
+        Admin_Status
+      ),
+    };
+
     const listings = await getAdminListingsService(filters);
 
     res.json({
-      status: "success",
-      message: "Listings fetched successfully",
+      status: 'success',
+      message: 'Listings fetched successfully',
       data: listings,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
-      status: "error",
-      message: "Failed to fetch listings",
-      error: error,
+      status: 'error',
+      message: 'Failed to fetch listings',
+      error,
     });
   }
 };
+
 
 export const updateListingStatus = async (req: Request, res: Response) => {
     const { id } = req.params;
