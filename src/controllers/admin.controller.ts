@@ -27,11 +27,13 @@ export const getAdminListings = async (req: Request, res: Response) => {
       payment_plan,
       sale_type,
       admin_status,
+      search,
       ...rest
     } = req.query;
 
     const filters = {
       ...rest,
+      search: typeof search === "string" ? search : undefined, 
       page: Number(page) || 1,
       page_size: Number(page_size) || 10,
       no_of_bathrooms: convertToEnumArray<Bathrooms>(

@@ -2,6 +2,7 @@ import logger from "../utils/logger";
 import prisma from "../utils/prisma";
 import {  NotificationType } from "@prisma/client";
 import { sendPushNotification, sendMulticastPushNotification } from "./firebase.service";
+import { Prisma } from "@prisma/client";
 import {
   Listing,
   Admin_Status,
@@ -42,6 +43,7 @@ export const getAdminListingsService = async (
     admin_status?: ("Approved" | "Rejected" | "Pending" | "Reported")[];
     page?: number;
     page_size?: number;
+    search?:string,
   }
 ): Promise<{
   listings: Array<{
@@ -86,6 +88,7 @@ export const getAdminListingsService = async (
       category,
       city,
       address,
+      search,
       ...restFilters
     } = filters;
 
@@ -142,6 +145,37 @@ export const getAdminListingsService = async (
 
         // Dynamic filters from query
         ...Object.entries(restFilters).map(([key, value]) => ({ [key]: value })),
+...(search
+          ? [
+              {
+                OR: [
+                  {
+                    broker: {
+                      name: {
+                        contains: search,
+                        mode: 'insensitive' as Prisma.QueryMode,
+                      },
+                    },
+                  },
+                  {
+                    broker: {
+                      email: {
+                        contains: search,
+                        mode: 'insensitive' as Prisma.QueryMode,
+                      },
+                    },
+                  },
+                  {
+                    admin_status: {
+                      contains: search,
+                      mode: 'insensitive' as Prisma.QueryMode,
+                    } as any,
+                  },
+                ],
+              },
+            ]
+          : []),
+
       ],
     };
 
