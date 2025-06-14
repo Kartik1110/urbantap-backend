@@ -2,7 +2,6 @@ import logger from "../utils/logger";
 import prisma from "../utils/prisma";
 import {  NotificationType } from "@prisma/client";
 import { sendPushNotification, sendMulticastPushNotification } from "./firebase.service";
-import { Prisma } from "@prisma/client";
 import {
   Listing,
   Admin_Status,
@@ -23,6 +22,7 @@ interface ListingFilters {
 
 export const getAdminListingsService = async (
   filters: {
+    search?: string; 
     looking_for?: boolean;
     category?: "Ready_to_move" | "Off_plan" | "Rent";
     min_price?: number;
@@ -42,9 +42,12 @@ export const getAdminListingsService = async (
     amenities?: string[];
     admin_status?: ("Approved" | "Rejected" | "Pending" | "Reported")[];
     page?: number;
-    page_size?: number;
-    search?:string,
-  }
+    page_size?: number;  
+    broker_name?: string;
+    broker_email?:string;
+    broker_w_number?:string }
+    
+
 ): Promise<{
   listings: Array<{
     listing: Partial<Listing>;
@@ -89,6 +92,9 @@ export const getAdminListingsService = async (
       city,
       address,
       search,
+      broker_name,
+      broker_email,
+      broker_w_number,
       ...restFilters
     } = filters;
 
@@ -143,39 +149,60 @@ export const getAdminListingsService = async (
         ...(sale_type?.length ? [{ sale_type: { in: sale_type } }] : []),
         ...(amenities?.length ? [{ amenities: { hasSome: amenities } }] : []),
 
+      ...(search
+        ? [
+            {
+              OR: [
+                // Broker name
+                {
+                  broker: {
+                    name: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                // Broker email
+                {
+                  broker: {
+                    email: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                // Broker WhatsApp number
+                {
+                  broker: {
+                    w_number: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                // Listing description
+                {
+                  description: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+                // Listing address
+                {
+                  address: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ]
+        : []),
+
+
+
         // Dynamic filters from query
         ...Object.entries(restFilters).map(([key, value]) => ({ [key]: value })),
-...(search
-          ? [
-              {
-                OR: [
-                  {
-                    broker: {
-                      name: {
-                        contains: search,
-                        mode: 'insensitive' as Prisma.QueryMode,
-                      },
-                    },
-                  },
-                  {
-                    broker: {
-                      email: {
-                        contains: search,
-                        mode: 'insensitive' as Prisma.QueryMode,
-                      },
-                    },
-                  },
-                  {
-                    admin_status: {
-                      contains: search,
-                      mode: 'insensitive' as Prisma.QueryMode,
-                    } as any,
-                  },
-                ],
-              },
-            ]
-          : []),
-
       ],
     };
 
@@ -191,6 +218,7 @@ export const getAdminListingsService = async (
           select: {
             id: true,
             name: true,
+            email:true,
             profile_pic: true,
             country_code: true,
             w_number: true,
@@ -209,6 +237,7 @@ export const getAdminListingsService = async (
         broker: {
           id: broker.id,
           name: broker.name,
+          email:broker.email,
           profile_pic: broker.profile_pic,
           country_code: broker.country_code,
           w_number: broker.w_number,
