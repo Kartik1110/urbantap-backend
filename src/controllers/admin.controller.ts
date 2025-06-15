@@ -18,6 +18,7 @@ export const getAdminListings = async (req: Request, res: Response) => {
     const {
       page,
       page_size,
+      search,
       no_of_bathrooms,
       no_of_bedrooms,
       furnished,
@@ -32,6 +33,7 @@ export const getAdminListings = async (req: Request, res: Response) => {
 
     const filters = {
       ...rest,
+      search: typeof search === 'string' ? search : undefined, // ✅ Normalize search
       page: Number(page) || 1,
       page_size: Number(page_size) || 10,
       no_of_bathrooms: convertToEnumArray<Bathrooms>(
@@ -63,7 +65,7 @@ export const getAdminListings = async (req: Request, res: Response) => {
       ),
     };
 
-    const listings = await getAdminListingsService(filters);
+    const listings = await getAdminListingsService(filters,);
 
     res.json({
       status: 'success',
