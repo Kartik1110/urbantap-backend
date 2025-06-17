@@ -9,8 +9,24 @@ const prisma = new PrismaClient();
 
 export const getNotificationsService = async (
   brokerId: string,
-  type: NotificationType
+  type: NotificationType | null | undefined
 ) => {
+
+  if(type === null || type === undefined) {
+    // If type is null or undefined, return all notifications for the broker
+    return await prisma.notification.findMany({
+      where: {
+        OR: [
+          { type: NotificationType.General },
+          { type: NotificationType.Broadcast },
+        ]
+        },
+      orderBy: {
+        timestamp: "desc",
+      },
+    });
+  }
+
   if(type === NotificationType.Inquiries || type === NotificationType.Network){
     return await prisma.notification.findMany({
       where: {

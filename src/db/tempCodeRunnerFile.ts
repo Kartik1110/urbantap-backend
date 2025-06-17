@@ -1,1 +1,0 @@
-"@faker-js/faker"
