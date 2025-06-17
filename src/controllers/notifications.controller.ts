@@ -41,6 +41,20 @@ export const getNotifications = async (req: Request, res: Response) => {
     });
   }
 
+  // Validating Broker ID
+  if (!broker_id) {
+    return res.status(400).json({ message: "Broker ID is required" });
+  }
+
+  // Check if broker exists
+  const broker = await prisma.broker.findUnique({
+    where: { id: broker_id },
+  });
+
+  if (!broker) {
+    return res.status(404).json({ message: "Broker not found" });
+  }
+
   try {
     const notifications = await getNotificationsService(broker_id, type as NotificationType);
     res.status(200).json(notifications);

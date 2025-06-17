@@ -11,24 +11,31 @@ export const getNotificationsService = async (
   brokerId: string,
   type: NotificationType
 ) => {
-  let whereClause: Prisma.NotificationWhereInput = { broker_id: brokerId };
-
-  // Determine the type filter
-  if (type === NotificationType.Network) {
-    whereClause.type = NotificationType.Network;
-  } else if (type === NotificationType.Inquiries) {
-    whereClause.type = NotificationType.Inquiries;
-  } else if (type === NotificationType.General) {
-    whereClause.type = {
-      in: [NotificationType.General, NotificationType.Broadcast],
-    };
+  if(type === NotificationType.Inquiries || type === NotificationType.Network){
+    return await prisma.notification.findMany({
+      where: {
+        broker_id: brokerId,
+        type: type,
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+    });
   }
-  // Fetch notifications based on the broker ID and type
+  // For other types, we can use a more generic query
   return await prisma.notification.findMany({
-    where: whereClause,
-    orderBy: { timestamp: "desc" },
+    where: {
+      type: {
+        equals: type,
+        notIn: [NotificationType.Inquiries, NotificationType.Network],
+      },
+    },
+    orderBy: {
+      timestamp: "desc",
+    },
   });
 };
+
 
 export const createNotificationService = async (data: {
   token?: string;
