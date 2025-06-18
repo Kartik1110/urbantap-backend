@@ -11,23 +11,26 @@ export const getNotificationsService = async (
   brokerId: string,
   type: NotificationType | null | undefined
 ) => {
-
-  if(type === null || type === undefined) {
+  if (type === null || type === undefined) {
     // If type is null or undefined, return all notifications for the broker
     return await prisma.notification.findMany({
       where: {
         OR: [
           { type: NotificationType.General },
           { type: NotificationType.Broadcast },
-        ]
-        },
+        ],
+      },
       orderBy: {
         timestamp: "desc",
       },
+      take: 50,
     });
   }
 
-  if(type === NotificationType.Inquiries || type === NotificationType.Network){
+  if (
+    type === NotificationType.Inquiries ||
+    type === NotificationType.Network
+  ) {
     return await prisma.notification.findMany({
       where: {
         broker_id: brokerId,
@@ -36,6 +39,7 @@ export const getNotificationsService = async (
       orderBy: {
         timestamp: "desc",
       },
+      take: 50,
     });
   }
   // For other types, we can use a more generic query
@@ -49,9 +53,9 @@ export const getNotificationsService = async (
     orderBy: {
       timestamp: "desc",
     },
+    take: 50,
   });
 };
-
 
 export const createNotificationService = async (data: {
   token?: string;
