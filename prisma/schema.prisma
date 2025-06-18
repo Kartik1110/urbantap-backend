@@ -66,6 +66,10 @@ model Broker {
   broker1Connections       Connections[]       @relation("Broker1")
   broker2Connections       Connections[]       @relation("Broker2")
   reportedListings         ReportedListing[]
+  Brokerage                Brokerage?          @relation(fields: [brokerageId], references: [id])
+  brokerageId              String?
+  Developer                Developer?          @relation(fields: [developerId], references: [id])
+  developerId              String?
 }
 
 enum BrokerType {
@@ -87,6 +91,7 @@ model Company {
   address     String?     @default("")
   brokers     Broker[]
   jobs        Job[]
+  Brokerage   Brokerage[]
 }
 
 enum CompanyType {
@@ -126,6 +131,64 @@ model Listing {
   admin_status      Admin_Status?     @default(Pending)
   reported_listings ReportedListing[]
   notifications     Notification[]    @relation("ListingNotifications")
+}
+
+model Developer {
+  id          String    @id @default(uuid())
+  name        String
+  logo        String
+  coverImage  String?
+  description String
+  email       String?
+  phone       String?
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Broker      Broker[]
+}
+
+model Project {
+  id            String       @id @default(uuid())
+  title         String
+  description   String
+  image         String
+  images        String[] // gallery images
+  floorPlans    String[] // floor plan images
+  price         Float
+  address       String
+  city          City
+  file_url      String? // optional downloadable file
+  type          Category
+  projectName   String
+  projectAge    String
+  noOfBedrooms  Bedrooms
+  noOfBathrooms Bathrooms
+  furnishing    Furnished
+  propertySize  Float
+  paymentPlan   Payment_Plan
+  unitTypes     String[] // dynamic list like: [“1BHK”, “2BHK Villa”, etc.]
+  amenities     String[]
+  developerId   String
+  developer     Developer    @relation(fields: [developerId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Brokerage {
+  id            String   @id @default(uuid())
+  name          String
+  logo          String
+  description   String
+  ded           String?
+  rera          String?
+  contact_email String?
+  contact_phone String?
+  service_areas String[]
+  brokers       Broker[]
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 enum Admin_Status {
