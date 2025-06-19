@@ -101,36 +101,90 @@ enum CompanyType {
 }
 
 model Listing {
-  id                String            @id @default(uuid())
-  title             String
-  description       String
-  image             String
-  min_price         Float?            @default(0)
-  max_price         Float?            @default(0)
-  sq_ft             Float?
-  type              Type
-  category          Category
-  looking_for       Boolean // looking for or renting
-  rental_frequency  Rental_frequency?
-  no_of_bedrooms    Bedrooms?
-  no_of_bathrooms   Bathrooms?
-  furnished         Furnished?
-  city              City
-  address           String?           @default("")
-  latitude          Float?
-  longitude         Float?
-  amenities         String[]
-  image_urls        String[]
-  project_age       Int?
-  payment_plan      Payment_Plan?
-  sale_type         Sale_Type?
-  broker_id         String
-  created_at        DateTime          @default(now())
-  broker            Broker            @relation(fields: [broker_id], references: [id])
-  inquiries         Inquiry[]
-  admin_status      Admin_Status?     @default(Pending)
-  reported_listings ReportedListing[]
-  notifications     Notification[]    @relation("ListingNotifications")
+  id                    String            @id @default(uuid())
+  title                 String
+  description           String
+  image                 String
+  min_price             Float?            @default(0)
+  max_price             Float?            @default(0)
+  sq_ft                 Float?
+  type                  Type
+  category              Category
+  looking_for           Boolean // looking for or renting
+  rental_frequency      Rental_frequency?
+  no_of_bedrooms        Bedrooms?
+  no_of_bathrooms       Bathrooms?
+  furnished             Furnished?
+  cheques               Int?
+  city                  City
+  address               String?           @default("")
+  handoverYear          Int? // e.g., 2025
+  handoverQuarter       Quarter?
+  Type_of_use           Type_of_use?
+  DealType              DealType?
+  CurrentStatus         CurrentStatus?
+  Views                 Views?
+  Market                Market?
+  parking_space         Boolean           @default(false)
+  service_charge        Int?
+  construction_progress Int?
+  gfa_bua               Int?
+  floor_area_ratio      Float?
+  latitude              Float?
+  longitude             Float?
+  amenities             String[]
+  image_urls            String[]
+  project_age           Int?
+  payment_plan          Payment_Plan?
+  sale_type             Sale_Type?
+  broker_id             String
+  created_at            DateTime          @default(now())
+  broker                Broker            @relation(fields: [broker_id], references: [id])
+  inquiries             Inquiry[]
+  admin_status          Admin_Status?     @default(Pending)
+  reported_listings     ReportedListing[]
+  notifications         Notification[]    @relation("ListingNotifications")
+}
+
+enum Type_of_use {
+  Commercial
+  Residential
+  Mixed
+}
+
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  Q4
+}
+
+enum DealType {
+  Rental
+  Selling
+}
+
+enum CurrentStatus {
+  Occupied
+  Vacant
+}
+
+enum Views {
+  Classic
+  City
+  Community
+  Water
+  Sea
+  Canal
+  Park
+  Lagoon
+  Golf_Course
+  Others
+}
+
+enum Market {
+  Primary
+  Secondary
 }
 
 model Developer {
@@ -211,6 +265,8 @@ enum Type {
   Office
   Shop
   Plot
+  Retail
+  Warehouse
 }
 
 enum Rental_frequency {
@@ -224,6 +280,7 @@ enum Furnished {
   Furnished
   Semi_furnished
   Unfurnished
+  Kitchen_Appliances_only
 }
 
 enum City {

@@ -22,6 +22,7 @@ interface ListingFilters {
 
 export const getAdminListingsService = async (
   filters: {
+    search?: string; 
     looking_for?: boolean;
     category?: "Ready_to_move" | "Off_plan" | "Rent";
     min_price?: number;
@@ -39,9 +40,14 @@ export const getAdminListingsService = async (
     payment_plan?: ("Payment_done" | "Payment_Pending")[];
     sale_type?: ("Direct" | "Resale")[];
     amenities?: string[];
+    admin_status?: ("Approved" | "Rejected" | "Pending" | "Reported")[];
     page?: number;
-    page_size?: number;
-  } & ListingFilters
+    page_size?: number;  
+    broker_name?: string;
+    broker_email?:string;
+    broker_w_number?:string }
+    
+
 ): Promise<{
   listings: Array<{
     listing: Partial<Listing>;
@@ -64,10 +70,10 @@ export const getAdminListingsService = async (
   };
 }> => {
   try {
-    const { page = 1, page_size = 10, ...filterParams } = filters;
-
-    // Remove these properties from filterParams before constructing whereCondition
     const {
+      page = 1,
+      page_size = 10,
+      admin_status,
       type,
       no_of_bathrooms,
       no_of_bedrooms,
@@ -85,34 +91,36 @@ export const getAdminListingsService = async (
       category,
       city,
       address,
+      search,
+      broker_name,
+      broker_email,
+      broker_w_number,
       ...restFilters
-    } = filterParams;
+    } = filters;
 
-    // Calculate skip value for pagination
     const skip = (page - 1) * page_size;
 
-    console.log('filterParams.type', type);
-
-    // Base WHERE condition with admin_status
     const whereCondition = {
       AND: [
-        { admin_status: Admin_Status.Pending },
+        // Optional: Admin status filter
+        ...(admin_status?.length ? [{ admin_status: { in: admin_status } }] : []),
+
+        // Blocked broker filtering
         {
           broker: {
             sentToConnectionRequests: {
               none: {
-                status: RequestStatus.Blocked
-              }
-            }
-          }
+                status: RequestStatus.Blocked,
+              },
+            },
+          },
         },
-        // Add specific filters one by one
+
         ...(looking_for !== undefined ? [{ looking_for }] : []),
         ...(category ? [{ category }] : []),
         ...(city ? [{ city }] : []),
         ...(address ? [{ address }] : []),
 
-        // Price range condition
         ...(min_price || max_price
           ? [{
               AND: [
@@ -122,7 +130,6 @@ export const getAdminListingsService = async (
             }]
           : []),
 
-        // Square footage condition
         ...(min_sqft || max_sqft
           ? [{
               sq_ft: {
@@ -132,7 +139,6 @@ export const getAdminListingsService = async (
             }]
           : []),
 
-        // Array filters
         ...(no_of_bathrooms?.length ? [{ no_of_bathrooms: { in: no_of_bathrooms } }] : []),
         ...(no_of_bedrooms?.length ? [{ no_of_bedrooms: { in: no_of_bedrooms } }] : []),
         ...(furnished?.length ? [{ furnished: { in: furnished } }] : []),
@@ -143,68 +149,86 @@ export const getAdminListingsService = async (
         ...(sale_type?.length ? [{ sale_type: { in: sale_type } }] : []),
         ...(amenities?.length ? [{ amenities: { hasSome: amenities } }] : []),
 
-        // Add any remaining filters
+      ...(search
+        ? [
+            {
+              OR: [
+                // Broker name
+                {
+                  broker: {
+                    name: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                // Broker email
+                {
+                  broker: {
+                    email: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                // Broker WhatsApp number
+                {
+                  broker: {
+                    w_number: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+                // Listing description
+                {
+                  description: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+                // Listing address
+                {
+                  address: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ]
+        : []),
+
+
+
+        // Dynamic filters from query
         ...Object.entries(restFilters).map(([key, value]) => ({ [key]: value })),
-      ].filter(Boolean),
+      ],
     };
 
-    // Remove the filterParams from being spread directly into the AND array
-    delete filterParams.page;
-    delete filterParams.page_size;
-
-    // Get total count for pagination
-    const total = await prisma.listing.count({
-      where: whereCondition,
-    });
+    const total = await prisma.listing.count({ where: whereCondition });
 
     const listings = await prisma.listing.findMany({
       where: whereCondition,
       skip,
       take: page_size,
-      orderBy: {
-        created_at: "desc",
-      },
+      orderBy: { created_at: "desc" },
       include: {
         broker: {
           select: {
             id: true,
             name: true,
+            email:true,
             profile_pic: true,
             country_code: true,
             w_number: true,
             company: {
-              select: {
-                name: true,
-              },
+              select: { name: true },
             },
           },
         },
       },
     });
-
-    if (listings.length === 0) {
-      return {
-        listings: [
-          {
-            listing: {},
-            broker: {
-              id: "",
-              name: "",
-              profile_pic: "",
-              country_code: "",
-              w_number: "",
-            },
-            company: { name: "" },
-          },
-        ],
-        pagination: {
-          total: 0,
-          page,
-          page_size,
-          total_pages: 0,
-        },
-      };
-    }
 
     const formattedListings = listings.map((listing: any) => {
       const { broker, ...listingWithoutBroker } = listing;
@@ -213,6 +237,7 @@ export const getAdminListingsService = async (
         broker: {
           id: broker.id,
           name: broker.name,
+          email:broker.email,
           profile_pic: broker.profile_pic,
           country_code: broker.country_code,
           w_number: broker.w_number,
@@ -224,7 +249,17 @@ export const getAdminListingsService = async (
     });
 
     return {
-      listings: formattedListings,
+      listings: formattedListings.length ? formattedListings : [{
+        listing: {},
+        broker: {
+          id: "",
+          name: "",
+          profile_pic: "",
+          country_code: "",
+          w_number: "",
+        },
+        company: { name: "" },
+      }],
       pagination: {
         total,
         page,

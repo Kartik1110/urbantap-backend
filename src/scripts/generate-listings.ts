@@ -10,6 +10,12 @@ import {
   City,
   Payment_Plan,
   Sale_Type,
+  Quarter,
+  Type_of_use,
+  DealType,
+  CurrentStatus,
+  Views,
+  Market,
 } from "@prisma/client";
 
 
@@ -29,12 +35,25 @@ interface ExtractedListingFields {
   no_of_bedrooms?: Bedrooms | null;
   no_of_bathrooms?: Bathrooms | null;
   furnished?: Furnished | null;
+  cheques?: number | null;
   city?: City;
   address?: string | null;
+  handoverYear?: number | null;
+  handoverQuarter?: Quarter | null;
+  Type_of_use?: Type_of_use | null;
+  DealType?: DealType | null;
+  CurrentStatus?: CurrentStatus | null;
+  Views?: Views | null;
+  Market?: Market | null;
+  parking_space?: boolean | null;
+  service_charge?: number | null;
+  construction_progress?: number | null;
+  gfa_bua?: number | null;
+  floor_area_ratio?: number | null;
   latitude?: number | null;
   longitude?: number | null;
-  amenities?: string[];
-  image_urls?: string[];
+  amenities?: string[] | null;
+  image_urls?: string[] | null;
   project_age?: number | null;
   payment_plan?: Payment_Plan | null;
   sale_type?: Sale_Type | null;
@@ -49,7 +68,7 @@ function cleanText(text: string): string {
 
 function normalizeExtractedFields(raw: any): ExtractedListingFields {
   return {
-    title: raw.title ?? null,
+   title: raw.title ?? null,
     description: raw.description ?? null,
     image: raw.image ?? null,
     min_price: typeof raw.min_price === "number" ? raw.min_price : null,
@@ -62,8 +81,21 @@ function normalizeExtractedFields(raw: any): ExtractedListingFields {
     no_of_bedrooms: raw.no_of_bedrooms ?? null,
     no_of_bathrooms: raw.no_of_bathrooms ?? null,
     furnished: raw.furnished ?? null,
+    cheques: typeof raw.cheques === "number" ? raw.cheques : null,
     city: raw.city ?? null,
     address: raw.address ?? null,
+    handoverYear: typeof raw.handoverYear === "number" ? raw.handoverYear : null,
+    handoverQuarter: raw.handoverQuarter ?? null,
+    Type_of_use: raw.Type_of_use ?? null,
+    DealType: raw.DealType ?? null,
+    CurrentStatus: raw.CurrentStatus ?? null,
+    Views: raw.Views ?? null,
+    Market: raw.Market ?? null,
+    parking_space: typeof raw.parking_space === "boolean" ? raw.parking_space : null,
+    service_charge: typeof raw.service_charge === "number" ? raw.service_charge : null,
+    construction_progress: typeof raw.construction_progress === "number" ? raw.construction_progress : null,
+    gfa_bua: typeof raw.gfa_bua === "number" ? raw.gfa_bua : null,
+    floor_area_ratio: typeof raw.floor_area_ratio === "number" ? raw.floor_area_ratio : null,
     latitude: typeof raw.latitude === "number" ? raw.latitude : null,
     longitude: typeof raw.longitude === "number" ? raw.longitude : null,
     amenities: Array.isArray(raw.amenities) ? raw.amenities : null,
@@ -96,6 +128,19 @@ Return a JSON object with ALL these fields (even if null):
 - furnished (one of: Furnished, Semi_furnished, Unfurnished, or null)
 - city (one of: Dubai, Abu_Dhabi, Sharjah, Ajman, Ras_Al_Khaimah, Fujairah, Umm_Al_Quwain, or null)
 - address (string or null)
+- address (string or null)
+- handoverYear (number or null)
+- handoverQuarter (Q1, Q2, Q3, Q4, or null)
+- Type_of_use (Commercial, Residential, Mixed, or null)
+- DealType (Rental, Selling, or null)
+- CurrentStatus (Occupied, Vacant, or null)
+- Views (Classic, City, Community, Water, Sea, Canal, Park, Lagoon, Golf_Course, Others, or null)
+- Market (Primary, Secondary, or null)
+- parking_space (boolean or null)
+- service_charge (number or null)
+- construction_progress (number or null)
+- gfa_bua (number or null)
+- floor_area_ratio (number or null)
 - latitude (number or null)
 - longitude (number or null)
 - amenities (array of strings or null)
