@@ -93,7 +93,7 @@ function normalizeExtractedFields(raw: any): ExtractedListingFields {
     Market: raw.Market ?? null,
     parking_space: typeof raw.parking_space === "boolean" ? raw.parking_space : null,
     service_charge: typeof raw.service_charge === "number" ? raw.service_charge : null,
-    construction_progress: typeof raw.construction_progress === "number" ? raw.construction_progress : null,
+    construction_progress: typeof raw.construction_progress === "number" && !isNaN(raw.construction_progress)? Math.min(raw.construction_progress, 100): null,
     gfa_bua: typeof raw.gfa_bua === "number" ? raw.gfa_bua : null,
     floor_area_ratio: typeof raw.floor_area_ratio === "number" ? raw.floor_area_ratio : null,
     latitude: typeof raw.latitude === "number" ? raw.latitude : null,
@@ -128,11 +128,10 @@ Return a JSON object with ALL these fields (even if null):
 - furnished (one of: Furnished, Semi_furnished, Unfurnished, or null)
 - city (one of: Dubai, Abu_Dhabi, Sharjah, Ajman, Ras_Al_Khaimah, Fujairah, Umm_Al_Quwain, or null)
 - address (string or null)
-- address (string or null)
 - handoverYear (number or null)
 - handoverQuarter (Q1, Q2, Q3, Q4, or null)
 - Type_of_use (Commercial, Residential, Mixed, or null)
-- DealType (Rental, Selling, or null)
+- DealType (Rental, Sale, or null)
 - CurrentStatus (Occupied, Vacant, or null)
 - Views (Classic, City, Community, Water, Sea, Canal, Park, Lagoon, Golf_Course, Others, or null)
 - Market (Primary, Secondary, or null)
