@@ -83,7 +83,7 @@ function normalizeExtractedFields(raw: any): ExtractedListingFields {
     furnished: raw.furnished ?? null,
     cheques: typeof raw.cheques === "number" ? raw.cheques : null,
     city: raw.city ?? null,
-    address: raw.address ?? null,
+    address: raw.location ?? null,
     handoverYear: typeof raw.handoverYear === "number" ? raw.handoverYear : null,
     handoverQuarter: raw.handoverQuarter ?? null,
     Type_of_use: raw.Type_of_use ?? null,
@@ -127,7 +127,7 @@ Return a JSON object with ALL these fields (even if null):
 - no_of_bathrooms (one of: One, Two, Three_Plus, or null)
 - furnished (one of: Furnished, Semi_furnished, Unfurnished, or null)
 - city (one of: Dubai, Abu_Dhabi, Sharjah, Ajman, Ras_Al_Khaimah, Fujairah, Umm_Al_Quwain, or null)
-- address (string or null)
+- location (string or null)
 - handoverYear (number or null)
 - handoverQuarter (Q1, Q2, Q3, Q4, or null)
 - Type_of_use (Commercial, Residential, Mixed, or null)
