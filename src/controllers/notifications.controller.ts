@@ -31,18 +31,32 @@ add auth middleware to check if the broker id requesting is indeed the logged in
 */
 
 export const getNotifications = async (req: Request, res: Response) => {
-  const { type = NotificationType.General } = req.query;
+  const { type } = req.query;
   const { broker_id } = req.params;
 
   // Validate notification type
-  if (!Object.values(NotificationType).includes(type as NotificationType)) {
+  if (!Object.values(NotificationType).includes(type as NotificationType) && type !== undefined) {
     return res.status(400).json({ 
-      message: `Invalid notification type. Must be one of: ${Object.values(NotificationType).join(', ')}`
+      message: `Invalid notification type. Must be one of: ${Object.values(NotificationType).join(', ')} or undefined`
     });
   }
 
+  // Validating Broker ID
+  if (!broker_id) {
+    return res.status(400).json({ message: "Broker ID is required" });
+  }
+
+  // Check if broker exists
+  const broker = await prisma.broker.findUnique({
+    where: { id: broker_id },
+  });
+
+  if (!broker) {
+    return res.status(404).json({ message: "Broker not found" });
+  }
+
   try {
-    const notifications = await getNotificationsService(broker_id, type as NotificationType);
+    const notifications = await getNotificationsService(broker_id, type as NotificationType | undefined);
     res.status(200).json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);

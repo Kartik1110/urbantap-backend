@@ -11,6 +11,12 @@ import {
   Type,
   Rental_frequency,
   RequestStatus,
+  Quarter,
+  Type_of_use,
+  DealType,
+  CurrentStatus,
+  Views,
+  Market
 } from "@prisma/client";
 import { sendPushNotificationToTopic } from "./firebase.service";
 import generateListingFromText from "../scripts/generate-listings";
@@ -93,6 +99,18 @@ export const getListingsService = async (
     max_sqft?: number;
     city?: City;
     address?: string;
+    handoverYear?: number[];
+    handoverQuarter?: Quarter[];
+    Type_of_use?: Type_of_use[];
+    DealType?: DealType[];
+    CurrentStatus?: CurrentStatus[];
+    Views?: Views[];
+    Market?: Market[];
+    parking_space?: boolean;
+    service_charge?: number;
+    construction_progress?: number;
+    gfa_bua?: number;
+    floor_area_ratio?: number;
     no_of_bathrooms?: Bathrooms[];
     no_of_bedrooms?: Bedrooms[];
     furnished?: Furnished[];
@@ -148,6 +166,13 @@ export const getListingsService = async (
       category,
       city,
       address,
+      handoverYear,
+      handoverQuarter,
+      Type_of_use,
+      DealType,
+      CurrentStatus,
+      Views,
+      Market,
       ...restFilters
     } = filterParams;
 
@@ -174,6 +199,18 @@ export const getListingsService = async (
         ...(address
           ? [{ address: { contains: address, mode: "insensitive" } }]
           : []),
+        ...(handoverYear?.length ? [{ handoverYear: { in: handoverYear } }] : []),
+        ...(handoverQuarter?.length ? [{ handoverQuarter: { in: handoverQuarter } }] : []),
+        ...(Type_of_use?.length ? [{ Type_of_use: { in: Type_of_use } }] : []),
+        ...(DealType?.length ? [{ DealType: { in: DealType } }] : []),
+        ...(CurrentStatus?.length ? [{ CurrentStatus: { in: CurrentStatus } }] : []),
+        ...(Views?.length ? [{ Views: { in: Views } }] : []),
+        ...(Market?.length ? [{ Market: { in: Market } }] : []),
+        ...(filters.parking_space !== undefined ? [{ parking_space: filters.parking_space }] : []),
+        ...(filters.service_charge !== undefined ? [{ service_charge: filters.service_charge }] : []),
+        ...(filters.construction_progress !== undefined ? [{ construction_progress: filters.construction_progress }] : []),
+        ...(filters.gfa_bua !== undefined ? [{ gfa_bua: filters.gfa_bua }] : []),
+        ...(filters.floor_area_ratio !== undefined ? [{ floor_area_ratio: filters.floor_area_ratio }] : []),
 
         // Price range condition
         ...(min_price || max_price
