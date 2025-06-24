@@ -98,7 +98,7 @@ function normalizeExtractedFields(raw: any): ExtractedListingFields {
     floor_area_ratio: typeof raw.floor_area_ratio === "number" ? raw.floor_area_ratio : null,
     latitude: typeof raw.latitude === "number" ? raw.latitude : null,
     longitude: typeof raw.longitude === "number" ? raw.longitude : null,
-    amenities: Array.isArray(raw.amenities) ? raw.amenities : null,
+    amenities: Array.isArray(raw.amenities)? raw.amenities: typeof raw.amenities === "string"? raw.amenities.split(",").map((a: string) => a.trim()): null,
     image_urls: Array.isArray(raw.image_urls) ? raw.image_urls : null,
     project_age: typeof raw.project_age === "number" ? raw.project_age : null,
     payment_plan: raw.payment_plan ?? null,
@@ -142,7 +142,7 @@ Return a JSON object with ALL these fields (even if null):
 - floor_area_ratio (number or null)
 - latitude (number or null)
 - longitude (number or null)
-- amenities (array of strings or null)
+- amenities (list of strings, e.g., ["Pool", "Gym", "Parking"], or null)
 - image_urls (array of strings or null)
 - project_age (number or null)
 - payment_plan (one of: Payment_done, Payment_Pending, or null)
