@@ -125,7 +125,7 @@ model Listing {
   CurrentStatus         CurrentStatus?
   Views                 Views?
   Market                Market?
-  parking_space         Boolean?          @default(false)
+  parking_space         Boolean?
   service_charge        Int?
   construction_progress Int?
   gfa_bua               Int?
