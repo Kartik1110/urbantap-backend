@@ -69,7 +69,7 @@ export const createBrokerageService = async (data: {
   contact_email?: string;
   contact_phone?: string;
   service_areas: string[];
-  companyId: string;
+  company_id: string;
 }) => {
   try {
     return await prisma.brokerage.create({

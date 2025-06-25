@@ -1,5 +1,5 @@
-import prisma from '../utils/prisma';
-import { Category,Prisma } from '@prisma/client';
+import prisma from "../utils/prisma";
+import { Category, Prisma } from "@prisma/client";
 
 export const getDevelopersService = async ({
   page,
@@ -17,7 +17,7 @@ export const getDevelopersService = async ({
       ? {
           name: {
             contains: search,
-        mode: 'insensitive' as Prisma.QueryMode,
+            mode: "insensitive" as Prisma.QueryMode,
           },
         }
       : {};
@@ -40,7 +40,7 @@ export const getDevelopersService = async ({
       }),
     ]);
 
-    const developers = developersRaw.map(dev => ({
+    const developers = developersRaw.map((dev) => ({
       name: dev.name,
       logo: dev.logo,
       project_count: dev.projects.length,
@@ -60,22 +60,21 @@ export const getDevelopersService = async ({
 };
 
 export const createDeveloperService = async (data: {
-    name: string;
-    logo: string;
-    coverImage?: string;
-    description: string;
-    email?: string;
-    phone?: string;
-  }) => {
-    try {
-      return await prisma.developer.create({
-        data,
-      });
-    } catch (error) {
-      throw error;
-    }
-  };
-
+  name: string;
+  logo: string;
+  coverImage?: string;
+  description: string;
+  email?: string;
+  phone?: string;
+}) => {
+  try {
+    return await prisma.developer.create({
+      data,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const getDeveloperDetailsService = async (developerId: string) => {
   try {
@@ -97,8 +96,10 @@ export const getDeveloperDetailsService = async (developerId: string) => {
 
     const groupedProjects = {
       all: developer.projects,
-      off_plan: developer.projects.filter(p => p.type === Category.Off_plan),
-      ready: developer.projects.filter(p => p.type === Category.Ready_to_move),
+      off_plan: developer.projects.filter((p) => p.type === Category.Off_plan),
+      ready: developer.projects.filter(
+        (p) => p.type === Category.Ready_to_move
+      ),
     };
 
     const brokers = developer.Broker.map((broker) => ({
@@ -118,7 +119,7 @@ export const getDeveloperDetailsService = async (developerId: string) => {
       id: developer.id,
       name: developer.name,
       logo: developer.logo,
-      coverImage: developer.coverImage,
+      cover_image: developer.cover_image,
       description: developer.description,
       project_count: projectCount,
       contact: {

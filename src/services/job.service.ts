@@ -39,9 +39,9 @@ export const createJobService = async (job: Job) => {
     }
   }
 
-  if (job.companyId) {
+  if (job.company_id) {
     const company = await prisma.company.findUnique({
-      where: { id: job.companyId },
+      where: { id: job.company_id },
     });
 
     if (!company) {

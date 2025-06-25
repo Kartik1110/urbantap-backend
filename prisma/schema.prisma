@@ -118,13 +118,13 @@ model Listing {
   cheques               Int?
   city                  City
   address               String?           @default("")
-  handoverYear          Int? // e.g., 2025
-  handoverQuarter       Quarter?
-  Type_of_use           Type_of_use?
-  DealType              DealType?
-  CurrentStatus         CurrentStatus?
-  Views                 Views?
-  Market                Market?
+  handover_year         Int? // e.g., 2025
+  handover_quarter      Quarter?
+  type_of_use           Type_of_use?
+  deal_type             DealType?
+  current_status        CurrentStatus?
+  views                 Views?
+  market                Market?
   parking_space         Boolean?
   service_charge        Int?
   construction_progress Int?
@@ -191,7 +191,7 @@ model Developer {
   id          String    @id @default(uuid())
   name        String
   logo        String
-  coverImage  String?
+  cover_image String?
   description String
   email       String?
   phone       String?
@@ -202,30 +202,30 @@ model Developer {
 }
 
 model Project {
-  id            String       @id @default(uuid())
-  title         String
-  description   String
-  image         String
-  images        String[] // gallery images
-  floorPlans    String[] // floor plan images
-  price         Float
-  address       String
-  city          City
-  file_url      String? // optional downloadable file
-  type          Category
-  projectName   String
-  projectAge    String
-  noOfBedrooms  Bedrooms
-  noOfBathrooms Bathrooms
-  furnishing    Furnished
-  propertySize  Float
-  paymentPlan   Payment_Plan
-  unitTypes     String[] // dynamic list like: [“1BHK”, “2BHK Villa”, etc.]
-  amenities     String[]
-  developerId   String
-  developer     Developer    @relation(fields: [developerId], references: [id])
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id              String       @id @default(uuid())
+  title           String
+  description     String
+  image           String
+  images          String[] // gallery images
+  floor_plans     String[] // floor plan images
+  price           Float
+  address         String
+  city            City
+  file_url        String? // optional downloadable file
+  type            Category
+  project_name    String
+  project_age     String
+  no_of_bedrooms  Bedrooms
+  no_of_bathrooms Bathrooms
+  furnished       Furnished
+  property_size   Float
+  payment_plan    Payment_Plan
+  unit_types      String[] // dynamic list like: [“1BHK”, “2BHK Villa”, etc.]
+  amenities       String[]
+  developer_id    String
+  developer       Developer    @relation(fields: [developer_id], references: [id])
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
 }
 
 model Brokerage {
@@ -239,10 +239,10 @@ model Brokerage {
   contact_phone String?
   service_areas String[]
   brokers       Broker[]
-  companyId     String
-  company       Company  @relation(fields: [companyId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  company_id    String
+  company       Company  @relation(fields: [company_id], references: [id])
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 }
 
 enum Admin_Status {
@@ -391,20 +391,20 @@ model Inquiry {
   country_code  String
   listing       Listing        @relation(fields: [listing_id], references: [id], onDelete: Cascade)
   text          String
-  email         String // New field
-  name          String // New field
-  phone_no      String // New field
+  email         String
+  name          String
+  phone_no      String
   notifications Notification[] @relation("InquiryNotifications")
 }
 
 model Job {
   id             String        @id @default(uuid())
   title          String
-  companyId      String
-  company        Company       @relation(fields: [companyId], references: [id])
-  workplaceType  WorkplaceType
+  company_id     String
+  company        Company       @relation(fields: [company_id], references: [id])
+  workplace_type WorkplaceType
   location       String
-  jobType        JobType
+  job_type       JobType
   description    String
   min_salary     Float?
   max_salary     Float?
