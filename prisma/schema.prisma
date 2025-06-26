@@ -9,25 +9,26 @@ generator client {
 }
 
 model User {
-  id                 String        @id @default(uuid())
-  email              String        @unique
+  id                 String         @id @default(uuid())
+  email              String         @unique
   password           String
   name               String?
   role               Role
   country_code       String?
   w_number           String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
   brokers            Broker[]
-  googleId           String?       @unique
+  googleId           String?        @unique
   googleAccessToken  String?
   googleRefreshToken String?
-  appleId            String?       @unique
+  appleId            String?        @unique
   appleAccessToken   String?
   appleRefreshToken  String?
   fcm_token          String?
   jobs               Job[]
   applications       Application[]
+  RecentSearch       RecentSearch[]
 }
 
 enum Role {
@@ -243,6 +244,16 @@ model Brokerage {
   company       Company  @relation(fields: [company_id], references: [id])
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+}
+
+model RecentSearch {
+  id        String   @id @default(uuid())
+  term      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 enum Admin_Status {
