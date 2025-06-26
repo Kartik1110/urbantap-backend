@@ -62,7 +62,7 @@ export const getDevelopersService = async ({
 export const createDeveloperService = async (data: {
   name: string;
   logo: string;
-  coverImage?: string;
+  cover_image?: string;
   description: string;
   email?: string;
   phone?: string;
