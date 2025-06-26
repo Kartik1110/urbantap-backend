@@ -99,13 +99,13 @@ export const getListingsService = async (
     max_sqft?: number;
     city?: City;
     address?: string;
-    handoverYear?: number[];
-    handoverQuarter?: Quarter[];
-    Type_of_use?: Type_of_use[];
-    DealType?: DealType[];
-    CurrentStatus?: CurrentStatus[];
-    Views?: Views[];
-    Market?: Market[];
+    handover_year?: number[];
+    handover_quarter?: Quarter[];
+    type_of_use?: Type_of_use[];
+    deal_type?: DealType[];
+    current_status?: CurrentStatus[];
+    views?: Views[];
+    market?: Market[];
     parking_space?: boolean;
     service_charge?: number;
     construction_progress?: number;
@@ -166,13 +166,13 @@ export const getListingsService = async (
       category,
       city,
       address,
-      handoverYear,
-      handoverQuarter,
-      Type_of_use,
-      DealType,
-      CurrentStatus,
-      Views,
-      Market,
+      handover_year,
+      handover_quarter,
+      type_of_use,
+      deal_type,
+      current_status,
+      views,
+      market,
       ...restFilters
     } = filterParams;
 
@@ -199,13 +199,13 @@ export const getListingsService = async (
         ...(address
           ? [{ address: { contains: address, mode: "insensitive" } }]
           : []),
-        ...(handoverYear?.length ? [{ handoverYear: { in: handoverYear } }] : []),
-        ...(handoverQuarter?.length ? [{ handoverQuarter: { in: handoverQuarter } }] : []),
-        ...(Type_of_use?.length ? [{ Type_of_use: { in: Type_of_use } }] : []),
-        ...(DealType?.length ? [{ DealType: { in: DealType } }] : []),
-        ...(CurrentStatus?.length ? [{ CurrentStatus: { in: CurrentStatus } }] : []),
-        ...(Views?.length ? [{ Views: { in: Views } }] : []),
-        ...(Market?.length ? [{ Market: { in: Market } }] : []),
+        ...(handover_year?.length ? [{ handover_year: { in: handover_year } }] : []),
+        ...(handover_quarter?.length ? [{ handover_quarter: { in: handover_quarter } }] : []),
+        ...(type_of_use?.length ? [{ type_of_use: { in: type_of_use } }] : []),
+        ...(deal_type?.length ? [{ deal_type: { in: deal_type } }] : []),
+        ...(current_status?.length ? [{ current_status: { in: current_status } }] : []),
+        ...(views?.length ? [{ views: { in: views } }] : []),
+        ...(market?.length ? [{ market: { in: market } }] : []),
         ...(filters.parking_space !== undefined ? [{ parking_space: filters.parking_space }] : []),
         ...(filters.service_charge !== undefined ? [{ service_charge: filters.service_charge }] : []),
         ...(filters.construction_progress !== undefined ? [{ construction_progress: filters.construction_progress }] : []),
