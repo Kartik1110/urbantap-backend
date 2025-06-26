@@ -54,7 +54,7 @@ export const getProjectsService = async ({
               id: true,
               name: true,
               logo: true,
-              coverImage: true,
+              cover_image: true,
               description: true,
               email: true,
               phone: true,
