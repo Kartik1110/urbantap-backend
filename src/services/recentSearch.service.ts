@@ -1,10 +1,10 @@
 import prisma from "../utils/prisma";
 
-export const addSearchTerm = async (userId: string, term: string) => {
+export const addSearchTerm = async (user_id: string, term: string) => {
   // Remove if it already exists
   await prisma.recentSearch.deleteMany({
     where: {
-      userId,
+      user_id,
       term: { equals: term, mode: "insensitive" },
     },
   });
@@ -12,15 +12,15 @@ export const addSearchTerm = async (userId: string, term: string) => {
   // Insert new
   await prisma.recentSearch.create({
     data: {
-      userId,
+      user_id,
       term,
     },
   });
 
   // Limit to 5 recent only
   const recent = await prisma.recentSearch.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
+    where: { user_id },
+    orderBy: { created_at: "desc" },
   });
 
   if (recent.length > 5) {
@@ -31,20 +31,20 @@ export const addSearchTerm = async (userId: string, term: string) => {
   }
 };
 
-export const fetchSearchTerms = async (userId: string) => {
+export const fetchSearchTerms = async (user_id: string) => {
   const terms = await prisma.recentSearch.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
+    where: { user_id },
+    orderBy: { created_at: "desc" },
     take: 5,
   });
 
   return terms.map((r) => r.term);
 };
 
-export const removeSearchTerm = async (userId: string, term: string) => {
+export const removeSearchTerm = async (user_id: string, term: string) => {
   await prisma.recentSearch.deleteMany({
     where: {
-      userId,
+      user_id,
       term: { equals: term, mode: "insensitive" },
     },
   });
