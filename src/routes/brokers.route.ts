@@ -6,20 +6,22 @@ import {
   updateBroker,
   blockBroker,
 } from "../controllers/brokers.controller";
+import validateSchema from "../middlewares/validate.middleware";
+import {
+  bulkInsertBrokersSchema,
+  updateBrokerDataSchema,
+} from "../schema/broker.schema";
 
 const router = express.Router();
 
-/* Get all brokers */
 router.get("/brokers", getBrokerList);
 
-/* Get a broker by id */
 router.get("/brokers/:id", getBrokerDetail);
 
-/* Block a broker */
 router.post("/brokers/:id/block", blockBroker);
 
 export default (upload: any) => {
-  router.put("/brokers/:id", upload.single('file'), updateBroker);
-  router.post('/brokers/bulk', upload.single('file'), bulkInsertBrokers);
+  router.put("/brokers/:id", upload.single("file"),validateSchema(updateBrokerDataSchema), updateBroker);
+  router.post("/brokers/bulk", upload.single("file"),validateSchema(bulkInsertBrokersSchema),  bulkInsertBrokers);
   return router;
 };

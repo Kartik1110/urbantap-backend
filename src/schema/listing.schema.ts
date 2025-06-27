@@ -1,0 +1,110 @@
+// src/schemas/listing.schema.ts
+import { z } from "zod";
+import {
+  Category,
+  City,
+  Type,
+  Bedrooms,
+  Bathrooms,
+  Furnished,
+  Rental_frequency,
+  Quarter,
+  Type_of_use,
+  DealType,
+  CurrentStatus,
+  Views,
+  Market,
+  Payment_Plan,
+  Sale_Type,
+} from "@prisma/client"; 
+
+// Get Listings Filters Schema (for filters in body)
+export const getListingsSchema = z.object({
+  body: z.object({
+    looking_for: z.boolean().optional(),
+    category: z.nativeEnum(Category).optional(),
+    min_price: z.number().optional(),
+    max_price: z.number().optional(),
+    sq_ft: z.number().optional(),
+    city: z.nativeEnum(City).optional(),
+    address: z.string().optional(),
+    no_of_bathrooms: z.array(z.nativeEnum(Bathrooms)).optional(), 
+    no_of_bedrooms: z.array(z.nativeEnum(Bedrooms)).optional(), 
+    furnished: z.array(z.nativeEnum(Furnished)).optional(), 
+    type: z.array(z.nativeEnum(Type)).optional(), 
+    rental_frequency: z.array(z.nativeEnum(Rental_frequency)).optional(),
+    views: z.array(z.nativeEnum(Views)).optional(), 
+    deal_type: z.array(z.nativeEnum(DealType)).optional(), 
+    current_status: z.array(z.nativeEnum(CurrentStatus)).optional(), 
+    parking_space: z.boolean().optional(),
+    market: z.array(z.nativeEnum(Market)).optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    floor_area_ratio: z.number().optional(),
+    gfa_bua: z.number().optional(),
+    construction_progress: z.number().optional(),
+    handover_year: z.number().optional(), 
+    handover_quarter: z.array(z.nativeEnum(Quarter)).optional(),
+    type_of_use: z.array(z.nativeEnum(Type_of_use)).optional(),
+    payment_plan: z.array(z.nativeEnum(Payment_Plan)).optional(),
+    sale_type: z.array(z.nativeEnum(Sale_Type)).optional(),
+    amenities: z.array(z.string()).optional(),
+    page: z.number().optional(),
+    page_size: z.number().optional(),
+  }).strict(),
+});
+
+// Bulk Insert Listings (images will come separately via multer, but listings are JSON stringified)
+export const postListingSchema = z.object({
+  body: z.object({
+    title: z.string().min(3),
+    description: z.string().min(10),
+    image: z.string().optional(), 
+    min_price: z.number().min(100, { message: "Minimum price must be at least 3 digits" }).optional(),
+    max_price: z.number().min(100, { message: "Maximum price must be at least 3 digits" }).optional(),
+    sq_ft: z.number().nonnegative().optional(),
+    type: z.nativeEnum(Type),
+    category: z.nativeEnum(Category),
+    looking_for: z.boolean(),
+    rental_frequency: z.nativeEnum(Rental_frequency).optional(),
+    no_of_bedrooms: z.nativeEnum(Bedrooms).optional(),
+    no_of_bathrooms: z.nativeEnum(Bathrooms).optional(),
+    furnished: z.nativeEnum(Furnished).optional(),
+    cheques: z.number().int().optional(),
+    city: z.nativeEnum(City),
+    address: z.string().optional(),
+    handover_year: z.number().optional(),
+    handover_quarter: z.nativeEnum(Quarter).optional(),
+    type_of_use: z.nativeEnum(Type_of_use).optional(),
+    deal_type: z.nativeEnum(DealType).optional(),
+    current_status: z.nativeEnum(CurrentStatus).optional(),
+    views: z.nativeEnum(Views).optional(),
+    market: z.nativeEnum(Market).optional(),
+    parking_space: z.boolean().optional(),
+    service_charge: z.number().int().optional(),
+    construction_progress: z.number().min(0).max(100).optional(),
+    gfa_bua: z.number().optional(),
+    floor_area_ratio: z.number().optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    amenities: z.array(z.string()).optional(),
+    image_urls: z.array(z.string()).optional(),
+    project_age: z.number().optional(),
+    payment_plan: z.nativeEnum(Payment_Plan).optional(),
+    sale_type: z.nativeEnum(Sale_Type).optional(),
+    broker_id: z.string(),
+  }).strict(),
+});
+
+// Report Listing
+export const reportListingSchema = z.object({
+  params: z.object({
+    id: z.string(),
+  }),
+  body: z.object({
+    reason: z.string(),
+    description: z.string(),
+    brokerId: z.string(),
+  }).strict(),
+});
+

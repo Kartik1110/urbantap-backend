@@ -38,13 +38,13 @@ interface ExtractedListingFields {
   cheques?: number | null;
   city?: City;
   address?: string | null;
-  handoverYear?: number | null;
-  handoverQuarter?: Quarter | null;
-  Type_of_use?: Type_of_use | null;
-  DealType?: DealType | null;
-  CurrentStatus?: CurrentStatus | null;
-  Views?: Views | null;
-  Market?: Market | null;
+  handover_year?: number | null;
+  handover_quarter?: Quarter | null;
+  type_of_use?: Type_of_use | null;
+  deal_type?: DealType | null;
+  current_status?: CurrentStatus | null;
+  views?: Views | null;
+  market?: Market | null;
   parking_space?: boolean | null;
   service_charge?: number | null;
   construction_progress?: number | null;
@@ -68,7 +68,7 @@ function cleanText(text: string): string {
 
 function normalizeExtractedFields(raw: any): ExtractedListingFields {
   return {
-   title: raw.title ?? null,
+    title: raw.title ?? null,
     description: raw.description ?? null,
     image: raw.image ?? null,
     min_price: typeof raw.min_price === "number" ? raw.min_price : null,
@@ -84,13 +84,13 @@ function normalizeExtractedFields(raw: any): ExtractedListingFields {
     cheques: typeof raw.cheques === "number" ? raw.cheques : null,
     city: raw.city ?? null,
     address: raw.location ?? null,
-    handoverYear: typeof raw.handoverYear === "number" ? raw.handoverYear : null,
-    handoverQuarter: raw.handoverQuarter ?? null,
-    Type_of_use: raw.Type_of_use ?? null,
-    DealType: raw.DealType ?? null,
-    CurrentStatus: raw.CurrentStatus ?? null,
-    Views: raw.Views ?? null,
-    Market: raw.Market ?? null,
+    handover_year: typeof raw.handover_year === "number" ? raw.handover_year : null,
+    handover_quarter: raw.handover_quarter ?? null,
+    type_of_use: raw.type_of_use ?? null,
+    deal_type: raw.deal_type ?? null,
+    current_status: raw.current_status ?? null,
+    views: raw.views ?? null,
+    market: raw.market ?? null,
     parking_space: typeof raw.parking_space === "boolean" ? raw.parking_space : null,
     service_charge: typeof raw.service_charge === "number" ? raw.service_charge : null,
     construction_progress: typeof raw.construction_progress === "number" && !isNaN(raw.construction_progress)? Math.min(raw.construction_progress, 100): null,
@@ -128,13 +128,13 @@ Return a JSON object with ALL these fields (even if null):
 - furnished (one of: Furnished, Semi_furnished, Unfurnished, or null)
 - city (one of: Dubai, Abu_Dhabi, Sharjah, Ajman, Ras_Al_Khaimah, Fujairah, Umm_Al_Quwain, or null)
 - location (string or null)
-- handoverYear (number or null)
-- handoverQuarter (Q1, Q2, Q3, Q4, or null)
-- Type_of_use (Commercial, Residential, Mixed, or null)
-- DealType (Rental, Sale, or null)
-- CurrentStatus (Occupied, Vacant, or null)
-- Views (Classic, City, Community, Water, Sea, Canal, Park, Lagoon, Golf_Course, Others, or null)
-- Market (Primary, Secondary, or null)
+- handover_year (number or null)
+- handover_quarter (Q1, Q2, Q3, Q4, or null)
+- type_of_use (Commercial, Residential, Mixed, or null)
+- deal_type (Rental, Sale, or null)
+- current_status (Occupied, Vacant, or null)
+- views (Classic, City, Community, Water, Sea, Canal, Park, Lagoon, Golf_Course, Others, or null)
+- market (Primary, Secondary, or null)
 - parking_space (boolean or null)
 - service_charge (number or null)
 - construction_progress (number or null)

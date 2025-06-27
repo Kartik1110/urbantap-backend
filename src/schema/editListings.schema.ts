@@ -36,13 +36,13 @@ export const editListingSchema = z
     cheques: z.number().optional(),
     city: z.nativeEnum(City).optional(),
     address: z.string().optional(),
-    handoverYear: z.number().optional(),
-    handoverQuarter: z.nativeEnum(Quarter).optional(),
-    Type_of_use: z.nativeEnum(Type_of_use).optional(),
-    DealType: z.nativeEnum(DealType).optional(),
-    CurrentStatus: z.nativeEnum(CurrentStatus).optional(),
-    Views: z.nativeEnum(Views).optional(),
-    Market: z.nativeEnum(Market).optional(),
+    handover_year: z.number().optional(),
+    handover_quarter: z.nativeEnum(Quarter).optional(),
+    type_of_use: z.nativeEnum(Type_of_use).optional(),
+    deal_type: z.nativeEnum(DealType).optional(),
+    current_status: z.nativeEnum(CurrentStatus).optional(),
+    views: z.nativeEnum(Views).optional(),
+    market: z.nativeEnum(Market).optional(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
     amenities: z.array(z.string()).optional(),
@@ -56,6 +56,5 @@ export const editListingSchema = z
     construction_progress: z.number().optional(),
     gfa_bua: z.number().optional(),
     floor_area_ratio: z.number().optional(),
-
   })
   .strict();
