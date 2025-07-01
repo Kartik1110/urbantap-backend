@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { bulkInsertCompanies, getCompanies, getBrokersByCompanyId,updateCompany,getListingsByCompanyId,} from '../controllers/company.controller';
+import { bulkInsertCompanies, getCompanies, getBrokersByCompanyId,updateCompany,getListingsByCompanyId,getCompaniesByUserId} from '../controllers/company.controller';
 
 const router = Router();
 
@@ -17,6 +17,9 @@ router.put("/companies/:id", updateCompany);
 
 /* Get all listings of brokers under a company */
 router.get("/companies/:companyId/listings", getListingsByCompanyId);
+
+router.get("/companies/user/:userId", getCompaniesByUserId);
+
 
 
 export default router;

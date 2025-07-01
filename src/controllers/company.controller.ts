@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { bulkInsertCompaniesService, getCompaniesService, getBrokersByCompanyIdService,updateCompanyService,  getListingsByCompanyIdService} from "../services/company.service";
+import { bulkInsertCompaniesService, getCompaniesService, getBrokersByCompanyIdService,updateCompanyService,  getListingsByCompanyIdService, getCompaniesByUserIdService } from "../services/company.service";
 
 export const bulkInsertCompanies = async (req: Request, res: Response) => {
   try {
@@ -102,6 +102,26 @@ export const getListingsByCompanyId = async (req: Request, res: Response) => {
     res.status(500).json({
       status: "error",
       message: "Failed to fetch listings",
+      error,
+    });
+  }
+};
+
+export const getCompaniesByUserId = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    const companies = await getCompaniesByUserIdService(userId);
+
+    res.json({
+      status: "success",
+      message: "Companies fetched successfully for user",
+      data: companies,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Failed to fetch companies by user ID",
       error,
     });
   }
