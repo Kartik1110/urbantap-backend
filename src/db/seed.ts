@@ -49,12 +49,18 @@ async function main() {
       data: {
         name: "Real Estate Pro",
         description: "Leading real estate company in Dubai",
+        user: {
+          connect: { id: users[0].id }
+        }
       },
     }),
     prisma.company.create({
       data: {
         name: "Premium Properties",
         description: "Luxury real estate solutions",
+        user: {
+          connect: { id: users[1].id }
+        }
       },
     }),
   ]);
