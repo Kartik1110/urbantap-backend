@@ -3,9 +3,8 @@ import jwt from "jsonwebtoken";
 import appleSignin from "apple-signin-auth";
 import { OAuth2Client } from "google-auth-library";
 import { PrismaClient, Role } from "@prisma/client";
-
+import crypto from "crypto";
 import logger from "../utils/logger";
-
 const prisma = new PrismaClient();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -282,4 +281,25 @@ export const updateFcmTokenService = async (fcmToken: string, token: string) => 
     where: { id: decoded.userId },
     data: { fcm_token: fcmToken }
   });
+};
+
+export const forgotPasswordService = async (email: string) => {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const tokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+
+  await prisma.user.update({
+    where: { email },
+    data: {
+      resetToken,
+      resetTokenExpiry: tokenExpiry,
+    },
+  });
+
+  return resetToken;
 };
