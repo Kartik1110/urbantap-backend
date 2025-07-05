@@ -28,6 +28,14 @@ interface ListingFilters {
 
 export const getListingByIdService = async (id: string) => {
   try {
+
+    await prisma.listingView.create({
+      data: {
+        listingId: id,
+        // ipAddress: req.ip (optional if passed via controller)
+      },
+    });
+
     const listing = await prisma.listing.findUnique({
       where: { id },
       include: {
@@ -91,6 +99,7 @@ export const getListingByIdService = async (id: string) => {
 
 export const getListingsService = async (
   filters: {
+    viewsFeature?: boolean;
     looking_for?: boolean;
     category?: "Ready_to_move" | "Off_plan" | "Rent";
     min_price?: number;
@@ -125,7 +134,7 @@ export const getListingsService = async (
   } & ListingFilters
 ): Promise<{
   listings: Array<{
-    listing: Partial<Listing>;
+    listing: Partial<Listing> & { recentViews?: number };
     broker: {
       id: string;
       name: string;
@@ -145,9 +154,83 @@ export const getListingsService = async (
   };
 }> => {
   try {
-    const { page = 1, page_size = 10, ...filterParams } = filters;
+    const { page = 1, page_size = 10, viewsFeature, ...filterParams } = filters;
 
-    // Remove these properties from filterParams before constructing whereCondition
+    const skip = (page - 1) * page_size;
+
+    if (viewsFeature) {
+      // Trending listings in the last 48 hours
+      const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+      const trendingListings = await prisma.listing.findMany({
+        where: {
+          admin_status: Admin_Status.Approved,
+          listingViews: {
+            some: {
+              viewedAt: { gte: since },
+            },
+          },
+        },
+        include: {
+          listingViews: {
+            where: {
+              viewedAt: {
+                gte: since,
+              },
+            },
+          },
+          broker: {
+            select: {
+              id: true,
+              name: true,
+              profile_pic: true,
+              country_code: true,
+              w_number: true,
+              company: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const sorted = trendingListings
+        .map((listing) => ({
+          ...listing,
+          recentViews: listing.listingViews.length,
+        }))
+        .sort((a, b) => b.recentViews - a.recentViews)
+        .slice(skip, skip + page_size); // paginate manually
+
+      return {
+        listings: sorted.map((listing: any) => {
+          const { broker, listingViews, ...rest } = listing;
+          return {
+            listing: rest,
+            broker: {
+              id: broker.id,
+              name: broker.name,
+              profile_pic: broker.profile_pic,
+              country_code: broker.country_code,
+              w_number: broker.w_number,
+            },
+            company: {
+              name: broker.company?.name || "",
+            },
+          };
+        }),
+        pagination: {
+          total: trendingListings.length,
+          page,
+          page_size,
+          total_pages: Math.ceil(trendingListings.length / page_size),
+        },
+      };
+    }
+
+    // ---------- Non-trending (default) logic ----------
     const {
       type,
       no_of_bathrooms,
@@ -177,7 +260,6 @@ export const getListingsService = async (
     } = filterParams;
 
     // Calculate skip value for pagination
-    const skip = (page - 1) * page_size;
     console.log("filterParams.type", type);
     // Base WHERE condition with admin_status
     const whereCondition = {
@@ -186,9 +268,7 @@ export const getListingsService = async (
         {
           broker: {
             sentToConnectionRequests: {
-              none: {
-                status: RequestStatus.Blocked,
-              },
+              none: { status: RequestStatus.Blocked },
             },
           },
         },
