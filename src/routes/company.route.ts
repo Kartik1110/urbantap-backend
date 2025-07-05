@@ -7,7 +7,10 @@ const router = Router();
 router.get("/companies", getCompanies);
 
 /* Bulk insert companies */
-router.post("/companies/bulk", bulkInsertCompanies);
+export const companyRoutes = (upload: any) => {
+  router.post("/companies/bulk", upload.array("logos"), bulkInsertCompanies);
+  return router;
+};
 
 /* Get all brokers by company ID */
 router.get("/companies/:id/brokers", getBrokersByCompanyId);
