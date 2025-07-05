@@ -28,7 +28,6 @@ model User {
   fcm_token          String?
   jobs               Job[]
   applications       Application[]
-  Company            Company[]
 }
 
 enum Role {
@@ -90,8 +89,6 @@ model Company {
   email       String?     @default("")
   phone       String?     @default("")
   address     String?     @default("")
-  user_id     String
-  user        User        @relation(fields: [user_id], references: [id])
   brokers     Broker[]
   jobs        Job[]
   Brokerage   Brokerage[]

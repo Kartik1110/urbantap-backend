@@ -132,9 +132,9 @@ export const getListingsByCompanyIdService = async (
 export const getCompaniesByUserIdService = async (userId: string) => {
   try {
     const companies = await prisma.company.findMany({
-      where: {
-        user_id: userId,
-      }
+      // where: {
+      //   user_id: userId,
+      // }
       // orderBy: {
       //   createdAt: 'desc', // optional
       // },
