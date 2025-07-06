@@ -14,8 +14,19 @@ interface InquiryData {
     country_code: string;
 }
 
-export const createInquiryAndNotify = async (data: InquiryData): Promise<void> => {
-    const { listing_id, text, sent_by_id, sent_to_id, email, name, phone_no, country_code } = data;
+export const createInquiryAndNotify = async (
+    data: InquiryData
+): Promise<void> => {
+    const {
+        listing_id,
+        text,
+        sent_by_id,
+        sent_to_id,
+        email,
+        name,
+        phone_no,
+        country_code,
+    } = data;
 
     await prisma.$transaction(async (prisma) => {
         // Create the inquiry
@@ -28,8 +39,8 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
                 email,
                 name,
                 phone_no,
-                country_code
-            }
+                country_code,
+            },
         });
 
         // Create the notification for the recipient using the notification service
@@ -38,7 +49,7 @@ export const createInquiryAndNotify = async (data: InquiryData): Promise<void> =
             broker_id: sent_to_id,
             text: `New inquiry received for listing ${listing_id}`,
             type: 'Inquiries',
-            inquiry_id: inquiry.id
+            inquiry_id: inquiry.id,
         });
     });
 };
@@ -55,11 +66,11 @@ export const getInquiryById = async (inquiry_id: string) => {
                     profile_pic: true,
                     company: {
                         select: {
-                            name: true
-                        }
-                    }
-                }
-            }, 
+                            name: true,
+                        },
+                    },
+                },
+            },
             sent_to_id: true,
             timestamp: true,
             listing_id: true,
@@ -67,7 +78,7 @@ export const getInquiryById = async (inquiry_id: string) => {
             email: true,
             name: true,
             phone_no: true,
-            country_code: true
-        }
+            country_code: true,
+        },
     });
 };

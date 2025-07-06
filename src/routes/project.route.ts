@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
-  getProjects,
-  getProjectById,
-  createProject
+    getProjects,
+    getProjectById,
+    createProject,
 } from '../controllers/project.controller';
 
 const router = Router();
