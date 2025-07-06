@@ -51,6 +51,7 @@ export const getBrokerDetailService = async (id: string, token: string) => {
             no_of_bathrooms: true,
             furnished: true,
             city: true,
+            locality: true,
             address: true,
             amenities: true,
             image_urls: true,
@@ -83,7 +84,7 @@ export const getBrokerDetailService = async (id: string, token: string) => {
 
     if (!broker) return null;
 
-    const {
+      const {
       listings,
       company,
       broker1Connections,
@@ -92,6 +93,31 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       sentByConnectionRequests,
       ...brokerData
     } = broker;
+
+    // Group listings by locality
+    const groupedLocalities = listings.reduce((acc, listing) => {
+      const loc = listing.locality || "Unknown";
+      if (!acc[loc]) {
+        acc[loc] = {
+          locality: loc,
+          count: 0,
+          listings: [],
+          cover_image: listing.image, // take the first listing’s image
+        };
+      }
+      acc[loc].count += 1;
+      acc[loc].listings.push(listing);
+      return acc;
+    }, {} as Record<string, {
+      locality: string;
+      count: number;
+      listings: typeof listings;
+      cover_image: string;
+    }>);
+
+    // Convert groupedLocalities object to array
+    const localities = Object.values(groupedLocalities);
+
 
     const isConnected =
       broker1Connections.length > 0 || broker2Connections.length > 0;
@@ -134,13 +160,28 @@ export const getBrokerDetailService = async (id: string, token: string) => {
       mask = "BLOCKED"; // Blocked
     }
 
-    return {
-      listings: listings || [],
-      broker: brokerData,
-      company: company || {},
-      mask,
-      request_id,
-    };
+    const listingsGroupedByLocality = await prisma.listing.groupBy({
+    by: ['locality'],
+    where: {
+      broker_id: id,
+      locality: {
+        not: null,
+      },
+    },
+    _count: {
+      id: true,
+    },
+    });
+
+   return {
+  localities, // 👈 grouped listings by locality
+  broker: brokerData,
+  company: company || {},
+  mask,
+  request_id,
+};
+
+
   } catch (error) {
     console.error(error);
     throw error;

@@ -21,6 +21,7 @@ import {
 import { sendPushNotificationToTopic } from "./firebase.service";
 import generateListingFromText from "../scripts/generate-listings";
 
+
 /* Get listings */
 interface ListingFilters {
   [key: string]: any; // TODO: Define the type of filters
@@ -509,3 +510,36 @@ export const generateListingFromTextService = async (text: string) => {
     throw error;
   }
 };
+
+// Fetch popular localities service
+
+export const getTopLocalitiesWithCounts = async () => {
+  const result = await prisma.listing.groupBy({
+    by: ['locality'],
+    _count: {
+      locality: true,
+    },
+    orderBy: {
+      _count: {
+        locality: 'desc',
+      },
+    },
+    where: {
+      locality: {
+        not: null,
+      },
+      admin_status: Admin_Status.Approved,
+    },
+    take: 7, // get top 7 localities
+  });
+
+  const response = result.map(item => ({
+    locality: item.locality ?? 'Unknown',
+    count: item._count?.locality ?? 0,
+  }));
+
+  return response;
+};
+
+
+

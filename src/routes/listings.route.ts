@@ -6,7 +6,8 @@ import {
   getListingById,
   reportListing,
   editListingController,
-  generateListingFromText
+  generateListingFromText,
+  getPopularLocalities
 } from "../controllers/listings.controller";
 
 const router = Router();
@@ -27,6 +28,9 @@ export default (upload: any) => {
 
   return router;
 };
+
+//  Get popular localities
+router.get("/listings/locality/popular", getPopularLocalities);
 
 /* Report a listing */
 router.post("/listings/report/:id", reportListing);
