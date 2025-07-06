@@ -30,7 +30,7 @@ export default (upload: any) => {
 };
 
 //  Get popular localities
-router.get("/listings/locality/popularlocation", getPopularLocalities);
+router.get("/listings/locality/popular", getPopularLocalities);
 
 /* Report a listing */
 router.post("/listings/report/:id", reportListing);
