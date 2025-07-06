@@ -123,9 +123,7 @@ export const getListingsByCompanyId = async (req: Request, res: Response) => {
 
 export const getCompaniesByUserId = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
-
-        const companies = await getCompaniesByUserIdService(userId);
+        const companies = await getCompaniesByUserIdService();
 
         res.json({
             status: 'success',
