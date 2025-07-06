@@ -12,7 +12,8 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node src/db/seed.ts",
     "copy-files": "cp -r src/config dist/",
-    "backup": "node dist/scripts/backup.js"
+    "backup": "node dist/scripts/backup.js",
+    "update-locality": "ts-node src/scripts/update-locality.ts"
   },
   "keywords": [],
   "author": "",
