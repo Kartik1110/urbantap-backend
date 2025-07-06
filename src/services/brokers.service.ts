@@ -51,6 +51,7 @@ export const getBrokerDetailService = async (id: string, token: string) => {
             no_of_bathrooms: true,
             furnished: true,
             city: true,
+            locality: true,
             address: true,
             amenities: true,
             image_urls: true,
