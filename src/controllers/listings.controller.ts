@@ -9,6 +9,7 @@ import {
   reportListingService,
   editListingService,
   generateListingFromTextService,
+  getTopLocalitiesWithCounts
 } from "../services/listings.service";
 import { uploadToS3 } from "../utils/s3Upload";
 import prisma from "../utils/prisma";
@@ -252,6 +253,26 @@ export const generateListingFromText = async (req: Request, res: Response) => {
     return res.status(500).json({
       status: "error",
       message: "Failed to generate listing",
+      error,
+    });
+  }
+};
+
+// Fetch popular localities
+export const getPopularLocalities = async (req: Request, res: Response) => {
+  try {
+    const popularLocalities = await getTopLocalitiesWithCounts();
+
+    return res.status(200).json({
+      status: "success",
+      message: "Top 7 popular localities fetched successfully",
+      data: popularLocalities,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to fetch popular localities",
       error,
     });
   }
