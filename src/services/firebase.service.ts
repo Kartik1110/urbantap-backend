@@ -18,7 +18,9 @@ export interface PushNotificationData {
     topic?: string;
 }
 
-export const sendPushNotification = async (notification: PushNotificationData): Promise<void> => {
+export const sendPushNotification = async (
+    notification: PushNotificationData
+): Promise<void> => {
     try {
         if (!notification.token) {
             throw new Error('Token is required');
@@ -34,14 +36,18 @@ export const sendPushNotification = async (notification: PushNotificationData): 
         };
 
         await admin.messaging().send(message);
-        logger.info(`Push notification sent successfully to token: ${notification.token}`);
+        logger.info(
+            `Push notification sent successfully to token: ${notification.token}`
+        );
     } catch (error) {
         logger.error('Error sending push notification:', error);
         throw error;
     }
 };
 
-export const sendPushNotificationToTopic = async (notification: PushNotificationData): Promise<void> => {
+export const sendPushNotificationToTopic = async (
+    notification: PushNotificationData
+): Promise<void> => {
     try {
         if (!notification.topic) {
             throw new Error('Topic is required');
@@ -57,16 +63,22 @@ export const sendPushNotificationToTopic = async (notification: PushNotification
         };
 
         await admin.messaging().send(message);
-        logger.info(`Push notification sent successfully to topic: ${notification.topic}`);
+        logger.info(
+            `Push notification sent successfully to topic: ${notification.topic}`
+        );
     } catch (error) {
         logger.error('Error sending push notification:', error);
         throw error;
     }
 };
 
-export const sendMulticastPushNotification = async (notifications: PushNotificationData[]): Promise<void> => {
+export const sendMulticastPushNotification = async (
+    notifications: PushNotificationData[]
+): Promise<void> => {
     try {
-        const validTokens = notifications.map(n => n.token).filter((token): token is string => !!token);
+        const validTokens = notifications
+            .map((n) => n.token)
+            .filter((token): token is string => !!token);
 
         if (validTokens.length === 0) {
             throw new Error('At least one valid token is required');
@@ -85,7 +97,9 @@ export const sendMulticastPushNotification = async (notifications: PushNotificat
                 tokens: batchTokens,
             };
 
-            const response = await admin.messaging().sendEachForMulticast(message);
+            const response = await admin
+                .messaging()
+                .sendEachForMulticast(message);
 
             logger.info(
                 `Multicast batch ${Math.floor(i / BATCH_SIZE) + 1}: ${response.successCount} succeeded, ${response.failureCount} failed`
@@ -93,7 +107,9 @@ export const sendMulticastPushNotification = async (notifications: PushNotificat
 
             response.responses.forEach((resp, idx) => {
                 if (!resp.success) {
-                    logger.error(`Failed to send to token: ${batchTokens[idx]} - ${resp.error?.message}`);
+                    logger.error(
+                        `Failed to send to token: ${batchTokens[idx]} - ${resp.error?.message}`
+                    );
                 }
             });
         }
