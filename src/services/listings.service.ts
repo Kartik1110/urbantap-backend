@@ -31,7 +31,7 @@ export const getListingByIdService = async (id: string) => {
 
     await prisma.listingView.create({
       data: {
-        listingId: id,
+        listing_id: id,
         // ipAddress: req.ip (optional if passed via controller)
       },
     });
@@ -99,7 +99,7 @@ export const getListingByIdService = async (id: string) => {
 
 export const getListingsService = async (
   filters: {
-    viewsFeature?: boolean;
+    views_feature?: boolean;
     looking_for?: boolean;
     category?: "Ready_to_move" | "Off_plan" | "Rent";
     min_price?: number;
@@ -154,81 +154,85 @@ export const getListingsService = async (
   };
 }> => {
   try {
-    const { page = 1, page_size = 10, viewsFeature, ...filterParams } = filters;
+    const { page = 1, page_size = 10, views_feature, ...filterParams } = filters;
 
     const skip = (page - 1) * page_size;
 
-    if (viewsFeature) {
-      // Trending listings in the last 48 hours
-      const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+  if (views_feature) {
+  const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
-      const trendingListings = await prisma.listing.findMany({
-        where: {
-          admin_status: Admin_Status.Approved,
-          listingViews: {
-            some: {
-              viewedAt: { gte: since },
-            },
+  const trendingListings = await prisma.listing.findMany({
+    where: {
+      admin_status: Admin_Status.Approved,
+      listing_views: {
+        some: {
+          viewed_at: {
+            gte: since,
           },
         },
-        include: {
-          listingViews: {
-            where: {
-              viewedAt: {
-                gte: since,
-              },
-            },
-          },
-          broker: {
+      },
+    },
+    orderBy: [
+      {
+        listing_views: {
+          _count: "desc",
+        },
+      },
+    ],
+    skip,
+    take: page_size,
+    include: {
+      _count: {
+        select: {
+          listing_views: true,
+        },
+      },
+      broker: {
+        select: {
+          id: true,
+          name: true,
+          profile_pic: true,
+          country_code: true,
+          w_number: true,
+          company: {
             select: {
-              id: true,
               name: true,
-              profile_pic: true,
-              country_code: true,
-              w_number: true,
-              company: {
-                select: {
-                  name: true,
-                },
-              },
             },
           },
         },
-      });
+      },
+    },
+  });
 
-      const sorted = trendingListings
-        .map((listing) => ({
-          ...listing,
-          recentViews: listing.listingViews.length,
-        }))
-        .sort((a, b) => b.recentViews - a.recentViews)
-        .slice(skip, skip + page_size); // paginate manually
-
+  return {
+    listings: trendingListings.map((listing: any) => {
+      const { broker, _count, ...rest } = listing;
       return {
-        listings: sorted.map((listing: any) => {
-          const { broker, listingViews, ...rest } = listing;
-          return {
-            listing: rest,
-            broker: {
-              id: broker.id,
-              name: broker.name,
-              profile_pic: broker.profile_pic,
-              country_code: broker.country_code,
-              w_number: broker.w_number,
-            },
-            company: {
-              name: broker.company?.name || "",
-            },
-          };
-        }),
-        pagination: {
-          total: trendingListings.length,
-          page,
-          page_size,
-          total_pages: Math.ceil(trendingListings.length / page_size),
+        listing: {
+          ...rest,
+          recent_views: _count?.listing_views || 0,
+        },
+        broker: {
+          id: broker.id,
+          name: broker.name,
+          profile_pic: broker.profile_pic,
+          country_code: broker.country_code,
+          w_number: broker.w_number,
+        },
+        company: {
+          name: broker.company?.name || "",
         },
       };
-    }
+    }),
+    pagination: {
+      total: trendingListings.length + skip, // estimate
+      page,
+      page_size,
+      total_pages: Math.ceil((trendingListings.length + skip) / page_size),
+    },
+  };
+}
+
 
     // ---------- Non-trending (default) logic ----------
     const {
