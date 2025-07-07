@@ -3,7 +3,7 @@ import prisma from "../utils/prisma";
 import jwt from "jsonwebtoken";
 
 /* Get broker detail by id */
-export const getBrokerDetailService = async (id: string, token: string) => {
+export const getBrokerDetailService = async (id: string, token: string, groupByLocality: boolean = false) => {
   try {
     // Decode token to get userId
     const decoded = jwt.verify(
@@ -173,13 +173,33 @@ export const getBrokerDetailService = async (id: string, token: string) => {
     },
     });
 
-   return {
-  localities, // 👈 grouped listings by locality
-  broker: brokerData,
-  company: company || {},
-  mask,
-  request_id,
-};
+//    return {
+//   localities, // 👈 grouped listings by locality
+//   broker: brokerData,
+//   company: company || {},
+//   mask,
+//   request_id,
+// };
+
+if (groupByLocality) {
+  // Return the new response format
+  return {
+    localities,
+    broker: brokerData,
+    company: company || {},
+    mask,
+    request_id,
+  };
+} else {
+  // Return the old response format
+  return {
+    listings: listings || [],
+    broker: brokerData,
+    company: company || {},
+    mask,
+    request_id,
+  };
+}
 
 
   } catch (error) {

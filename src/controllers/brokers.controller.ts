@@ -15,6 +15,7 @@ export const getBrokerDetail = async (req: Request, res: Response) => {
   try {
     const brokerId = req.params.id;
     const token = req.headers.authorization;
+    const groupByLocality = req.query.groupByLocality === 'true';
 
     if (!brokerId) {
       return res.status(400).json({
@@ -23,7 +24,7 @@ export const getBrokerDetail = async (req: Request, res: Response) => {
       });
     }
 
-    const broker = await getBrokerDetailService(brokerId, token as string);
+    const broker = await getBrokerDetailService(brokerId, token as string,groupByLocality);
     if (!broker) {
       return res.status(404).json({
         success: false,
