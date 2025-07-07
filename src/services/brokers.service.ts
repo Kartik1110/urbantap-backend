@@ -173,13 +173,6 @@ export const getBrokerDetailService = async (id: string, token: string, groupByL
     },
     });
 
-//    return {
-//   localities, // 👈 grouped listings by locality
-//   broker: brokerData,
-//   company: company || {},
-//   mask,
-//   request_id,
-// };
 
 if (groupByLocality) {
   // Return the new response format
