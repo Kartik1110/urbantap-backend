@@ -12,9 +12,10 @@ import logger from '../utils/logger';
 
 /* Get broker detail by id */
 export const getBrokerDetail = async (req: Request, res: Response) => {
-    try {
-        const brokerId = req.params.id;
-        const token = req.headers.authorization;
+  try {
+    const brokerId = req.params.id;
+    const token = req.headers.authorization;
+    const groupByLocality = req.query.groupByLocality === 'true';
 
         if (!brokerId) {
             return res.status(400).json({
@@ -23,13 +24,13 @@ export const getBrokerDetail = async (req: Request, res: Response) => {
             });
         }
 
-        const broker = await getBrokerDetailService(brokerId, token as string);
-        if (!broker) {
-            return res.status(404).json({
-                success: false,
-                message: 'Broker not found',
-            });
-        }
+    const broker = await getBrokerDetailService(brokerId, token as string,groupByLocality);
+    if (!broker) {
+      return res.status(404).json({
+        success: false,
+        message: 'Broker not found'
+      });
+    }
 
         return res.status(200).json({
             success: true,
