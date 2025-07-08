@@ -22,29 +22,21 @@ export const getDevelopersService = async ({
               }
             : {};
 
-        const [developersRaw, totalCount] = await Promise.all([
+        const [developers, totalCount] = await Promise.all([
             prisma.developer.findMany({
                 where: whereClause,
                 skip,
                 take: pageSize,
-                select: {
-                    name: true,
-                    logo: true,
-                    projects: {
-                        select: { id: true },
+                include: {
+                        projects: {
+                            select: { id: true },
+                        },
                     },
-                },
             }),
             prisma.developer.count({
                 where: whereClause,
             }),
         ]);
-
-        const developers = developersRaw.map((dev) => ({
-            name: dev.name,
-            logo: dev.logo,
-            project_count: dev.projects.length,
-        }));
 
         const pagination = {
             page,
