@@ -6,10 +6,10 @@ import multer from 'multer';
 import logger from './utils/logger';
 import { authMiddleware } from './middlewares/auth.middleware';
 
-import brokersRoutes from './routes/brokers.route';
-import listingsRoutes from './routes/listings.route';
-import companyRoutes from './routes/company.route';
-import authRoutes from './routes/auth.route';
+import brokersRoutes from "./routes/brokers.route";
+import listingsRoutes from "./routes/listings.route";
+import { companyRoutes } from "./routes/company.route";
+import authRoutes from "./routes/auth.route";
 import notificationsRoutes from './routes/notifications.route';
 import inquiriesRoutes from './routes/inquiries.route';
 import connectionsRoutes from './routes/connections.route';
@@ -32,8 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Unprotected routes
-app.use('/api/v1', companyRoutes);
-app.use('/api/v1', authRoutes);
+app.use("/api/v1", authRoutes);
 
 // Protected routes
 app.use('/api/v1', authMiddleware, notificationsRoutes);
@@ -44,9 +43,10 @@ app.use('/api/v1', authMiddleware, projectRoutes);
 app.use('/api/v1', authMiddleware, brokerageRoutes);
 
 // File upload routes (also protected)
-app.use('/api/v1', authMiddleware, brokersRoutes(upload));
-app.use('/api/v1', authMiddleware, listingsRoutes(upload));
-app.use('/api/v1', authMiddleware, jobRoutes(upload));
+app.use("/api/v1", authMiddleware, brokersRoutes(upload));
+app.use("/api/v1", authMiddleware, listingsRoutes(upload));
+app.use("/api/v1", authMiddleware, jobRoutes(upload));
+app.use("/api/v1", authMiddleware, companyRoutes(upload)); 
 
 // Admin routes
 app.use('/api/v1', authMiddleware, adminRoutes);
