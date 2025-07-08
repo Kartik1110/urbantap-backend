@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
-  getBrokerages,
-  createBrokerage,
-  getBrokerageDetails
+    getBrokerages,
+    createBrokerage,
+    getBrokerageDetails,
 } from '../controllers/brokerage.controller';
 
 const router = Router();

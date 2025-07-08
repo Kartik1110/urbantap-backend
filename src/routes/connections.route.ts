@@ -1,5 +1,10 @@
 import express from 'express';
-import { getConnectionsByBrokerId, createConnectionRequest, updateConnectionRequestStatus, getConnectionRequestsByBrokerId } from '../controllers/connections.controller';
+import {
+    getConnectionsByBrokerId,
+    createConnectionRequest,
+    updateConnectionRequestStatus,
+    getConnectionRequestsByBrokerId,
+} from '../controllers/connections.controller';
 
 const router = express.Router();
 
@@ -7,12 +12,18 @@ const router = express.Router();
 router.get('/connections/:broker_id', getConnectionsByBrokerId);
 
 // GET endpoint to retrieve all connection requests for a specific broker
-router.get('/connections/my-requests/:broker_id', getConnectionRequestsByBrokerId);
+router.get(
+    '/connections/my-requests/:broker_id',
+    getConnectionRequestsByBrokerId
+);
 
 // POST endpoint to create a connection request
 router.post('/connections/:broker_id/crequest', createConnectionRequest);
 
 // POST endpoint to update the connection request status
-router.post('/connections/:broker_id/crequest/:request_id', updateConnectionRequestStatus);
+router.post(
+    '/connections/:broker_id/crequest/:request_id',
+    updateConnectionRequestStatus
+);
 
 export default router;
