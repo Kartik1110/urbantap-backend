@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+*.config.js
+prisma/migrations/
+docs/
+.env
+*.log
+package-lock.json 

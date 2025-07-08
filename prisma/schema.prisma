@@ -132,6 +132,7 @@ model Listing {
   floor_area_ratio      Float?
   latitude              Float?
   longitude             Float?
+  locality              String?
   amenities             String[]
   image_urls            String[]
   project_age           Int?

@@ -1,9 +1,20 @@
 import { Request, Response } from 'express';
-import { createInquiryAndNotify, getInquiryById } from '../services/inquiries.service';
+import {
+    createInquiryAndNotify,
+    getInquiryById,
+} from '../services/inquiries.service';
 
 export const createInquiry = async (req: Request, res: Response) => {
     const { listing_id } = req.params;
-    const { text, sent_by_id, sent_to_id, email, name, phone_no, country_code} = req.body;
+    const {
+        text,
+        sent_by_id,
+        sent_to_id,
+        email,
+        name,
+        phone_no,
+        country_code,
+    } = req.body;
 
     try {
         await createInquiryAndNotify({
@@ -14,7 +25,7 @@ export const createInquiry = async (req: Request, res: Response) => {
             email,
             name,
             phone_no,
-            country_code
+            country_code,
         });
 
         res.status(200).json({
@@ -22,7 +33,9 @@ export const createInquiry = async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error('Error creating inquiry and notification:', error);
-        res.status(500).json({ message: 'Failed to create inquiry and notification.' });
+        res.status(500).json({
+            message: 'Failed to create inquiry and notification.',
+        });
     }
 };
 
