@@ -3,15 +3,13 @@ import prisma from '../utils/prisma';
 import jwt from 'jsonwebtoken';
 
 /* Get broker detail by id */
-export const getBrokerDetailService = async (id: string, token: string) => {
-    try {
-        // Decode token to get userId
-        const decoded = jwt.verify(
-            token.replace('Bearer ', ''),
-            process.env.JWT_SECRET!
-        ) as {
-            userId: string;
-        };
+export const getBrokerDetailService = async (id: string, token: string, groupByLocality: boolean = false) => {
+  try {
+    // Decode token to get userId
+    const decoded = jwt.verify(
+      token.replace("Bearer ", ""),
+      process.env.JWT_SECRET!
+    ) as { userId: string };
 
         // Get user details including role
         const user = await prisma.user.findUnique({
@@ -180,17 +178,32 @@ export const getBrokerDetailService = async (id: string, token: string) => {
             },
         });
 
-        return {
-            localities, // 👈 grouped listings by locality
-            broker: brokerData,
-            company: company || {},
-            mask,
-            request_id,
-        };
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+
+if (groupByLocality) {
+  // Return the new response format
+  return {
+    localities,
+    broker: brokerData,
+    company: company || {},
+    mask,
+    request_id,
+  };
+} else {
+  // Return the old response format
+  return {
+    listings: listings || [],
+    broker: brokerData,
+    company: company || {},
+    mask,
+    request_id,
+  };
+}
+
+
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 /* Get broker list */
