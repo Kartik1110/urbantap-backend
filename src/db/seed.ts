@@ -1,295 +1,263 @@
-import { PrismaClient } from "@prisma/client";
-import { faker } from "@faker-js/faker";
-import {
-  Admin_Status,
-  NotificationType,
-  City,
-  Bathrooms,
-  Bedrooms,
-  Furnished,
-  Type,
-  Rental_frequency,
-  Payment_Plan,
-  Sale_Type,
-  Category,
-  BrokerType,
-  Quarter,
-  Type_of_use,
-  DealType,
-  CurrentStatus,
-  Views,
-  Market,
-} from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Clearing existing data...");
+    // Clean the database - order matters due to foreign key constraints
+    await prisma.application.deleteMany({});
+    await prisma.job.deleteMany({});
+    await prisma.notification.deleteMany({});
+    await prisma.inquiry.deleteMany({});
+    await prisma.connectionRequest.deleteMany({});
+    await prisma.connections.deleteMany({});
+    await prisma.listing.deleteMany({});
+    await prisma.broker.deleteMany({});
+    await prisma.company.deleteMany({});
+    await prisma.user.deleteMany({});
 
-  // Handle dependent deletions first
-  await prisma.notification.deleteMany({});
-  await prisma.inquiry.deleteMany({});
-  await prisma.connectionRequest.deleteMany({});
-  await prisma.connections.deleteMany({});
-  await prisma.application.deleteMany({});
-  await prisma.job.deleteMany({});
+    // Create multiple users with different roles
+    const users = await Promise.all([
+        prisma.user.create({
+            data: {
+                name: 'John Doe',
+                email: 'john@realestatepro.com',
+                password: 'password123',
+                role: 'BROKER',
+            },
+        }),
+        prisma.user.create({
+            data: {
+                name: 'Sarah Admin',
+                email: 'sarah@realestatepro.com',
+                password: 'password123',
+                role: 'ADMIN',
+            },
+        }),
+        prisma.user.create({
+            data: {
+                name: 'Mike HR',
+                email: 'mike@realestatepro.com',
+                password: 'password123',
+                role: 'HR',
+            },
+        }),
+    ]);
 
-  // Handle custom table with FK constraint (e.g. ListingView)
-  try {
-    await prisma.$executeRawUnsafe(`DELETE FROM "ListingView";`);
-  } catch (e) {
-    console.log("Warning: Could not delete from ListingView (may not exist)");
-  }
+    // Create multiple companies
+    const companies = await Promise.all([
+        prisma.company.create({
+            data: {
+                name: 'Real Estate Pro',
+                description: 'Leading real estate company in Dubai',
+            },
+        }),
+        prisma.company.create({
+            data: {
+                name: 'Premium Properties',
+                description: 'Luxury real estate solutions',
+            },
+        }),
+    ]);
 
-  await prisma.listing.deleteMany({});
-  await prisma.broker.deleteMany({});
-  await prisma.brokerage.deleteMany({});
-  await prisma.project.deleteMany({});
-  await prisma.developer.deleteMany({});
-  await prisma.company.deleteMany({});
-  await prisma.user.deleteMany({});
+    // Create multiple brokers
+    const brokers = await Promise.all([
+        prisma.broker.create({
+            data: {
+                name: 'John Doe',
+                email: 'john@realestatepro.com',
+                info: 'Experienced real estate broker specializing in residential properties.',
+                y_o_e: 15,
+                languages: ['English', 'Arabic'],
+                is_certified: true,
+                country_code: '+971',
+                w_number: '585605980',
+                ig_link: 'johndoe_realtor',
+                linkedin_link: 'https://linkedin.com/in/johndoe',
+                profile_pic: 'https://randomuser.me/api/portraits/men/1.jpg',
+                designation: 'Senior Broker',
+                company_id: companies[0].id,
+                user_id: users[0].id,
+            },
+        }),
+        prisma.broker.create({
+            data: {
+                name: 'Alice Smith',
+                email: 'alice@premiumprop.com',
+                info: 'Luxury property specialist with focus on villa communities',
+                y_o_e: 8,
+                languages: ['English', 'French', 'Hindi'],
+                is_certified: true,
+                country_code: '+971',
+                w_number: '585605981',
+                profile_pic: 'https://randomuser.me/api/portraits/women/1.jpg',
+                designation: 'Property Consultant',
+                company_id: companies[1].id,
+            },
+        }),
+    ]);
 
-  console.log("Creating admin and HR users...");
+    // Create multiple listings with different conditions
+    const listings = await Promise.all([
+        prisma.listing.create({
+            data: {
+                title: 'Luxury Downtown Apartment',
+                description:
+                    'Stunning 2-bedroom apartment with Burj Khalifa view',
+                min_price: 2500000,
+                max_price: 3000000,
+                sq_ft: 1800,
+                address: 'Downtown Dubai',
+                city: 'Dubai',
+                image: 'https://example.com/apt1.jpg',
+                image_urls: [
+                    'https://example.com/apt1-1.jpg',
+                    'https://example.com/apt1-2.jpg',
+                ],
+                type: 'Apartment',
+                category: 'Ready_to_move',
+                no_of_bedrooms: 'Two',
+                no_of_bathrooms: 'Two',
+                broker_id: brokers[0].id,
+                amenities: ['Pool', 'Gym', 'Spa', 'Parking'],
+                looking_for: false,
+                rental_frequency: 'Yearly',
+                furnished: 'Furnished',
+                project_age: 3,
+                payment_plan: 'Payment_done',
+                sale_type: 'Direct',
+                admin_status: 'Approved',
+            },
+        }),
+        prisma.listing.create({
+            data: {
+                title: 'Off-Plan Villa Project',
+                description: 'Exclusive villa project in premium location',
+                min_price: 5000000,
+                max_price: 7000000,
+                sq_ft: 4500,
+                address: 'Palm Jumeirah',
+                city: 'Dubai',
+                image: 'https://example.com/villa1.jpg',
+                image_urls: [
+                    'https://example.com/villa1-1.jpg',
+                    'https://example.com/villa1-2.jpg',
+                ],
+                type: 'Villa',
+                category: 'Off_plan',
+                no_of_bedrooms: 'Four_Plus',
+                no_of_bathrooms: 'Three_Plus',
+                broker_id: brokers[1].id,
+                amenities: [
+                    'Private Pool',
+                    'Garden',
+                    'Smart Home',
+                    "Maid's Room",
+                ],
+                looking_for: true,
+                furnished: 'Unfurnished',
+                project_age: 5,
+                payment_plan: 'Payment_Pending',
+                sale_type: 'Direct',
+                admin_status: 'Approved',
+            },
+        }),
+        prisma.listing.create({
+            data: {
+                title: 'Commercial Office Space',
+                description: 'Modern office space in Business Bay',
+                min_price: 80000,
+                max_price: 100000,
+                sq_ft: 2500,
+                address: 'Business Bay',
+                city: 'Dubai',
+                image: 'https://example.com/office1.jpg',
+                image_urls: [
+                    'https://example.com/office1-1.jpg',
+                    'https://example.com/office1-2.jpg',
+                ],
+                type: 'Office',
+                category: 'Rent',
+                broker_id: brokers[0].id,
+                amenities: [
+                    'Reception',
+                    'Meeting Rooms',
+                    'Parking',
+                    '24/7 Security',
+                ],
+                looking_for: false,
+                rental_frequency: 'Yearly',
+                furnished: 'Semi_furnished',
+                project_age: 1,
+                sale_type: 'Resale',
+                admin_status: 'Pending',
+            },
+        }),
+    ]);
 
-  const adminUser = await prisma.user.create({
-    data: {
-      name: "Sarah Admin",
-      email: "sarah@realestatepro.com",
-      password: "password123",
-      role: "ADMIN",
-    },
-  });
+    // Create multiple job listings
+    const jobs = await Promise.all([
+        prisma.job.create({
+            data: {
+                title: 'Senior Real Estate Broker',
+                description:
+                    'Looking for experienced real estate broker with proven track record in luxury property sales. Must have strong network and excellent negotiation skills.',
+                workplace_type: 'On_site',
+                location: 'Dubai',
+                job_type: 'Full_time',
+                min_salary: 20000,
+                max_salary: 30000,
+                currency: 'AED',
+                min_experience: 5,
+                max_experience: 10,
+                company_id: companies[0].id,
+                userId: users[2].id, // Mike HR
+            },
+        }),
+        prisma.job.create({
+            data: {
+                title: 'Property Consultant',
+                description:
+                    'Join our luxury property division as a property consultant. Looking for dynamic individuals with strong sales background.',
+                workplace_type: 'Hybrid',
+                location: 'Dubai',
+                job_type: 'Full_time',
+                min_salary: 15000,
+                max_salary: 25000,
+                currency: 'AED',
+                min_experience: 3,
+                max_experience: 7,
+                company_id: companies[1].id,
+                userId: users[2].id, // Mike HR
+            },
+        }),
+        prisma.job.create({
+            data: {
+                title: 'Listing Coordinator',
+                description:
+                    'Support our brokers with property listings and documentation. Perfect opportunity for detail-oriented professionals.',
+                workplace_type: 'On_site',
+                location: 'Dubai',
+                job_type: 'Part_time',
+                min_salary: 8000,
+                max_salary: 12000,
+                currency: 'AED',
+                min_experience: 1,
+                max_experience: 3,
+                company_id: companies[0].id,
+                userId: users[2].id, // Mike HR
+            },
+        }),
+    ]);
 
-  const hrUser = await prisma.user.create({
-    data: {
-      name: "Mike HR",
-      email: "mike@realestatepro.com",
-      password: "password123",
-      role: "HR",
-    },
-  });
-
-  console.log("Creating core companies...");
-
-  const companies = await Promise.all([
-    prisma.company.create({
-      data: {
-        name: "Real Estate Pro",
-        description: "Leading real estate company in Dubai",
-      },
-    }),
-    prisma.company.create({
-      data: {
-        name: "Premium Properties",
-        description: "Luxury real estate solutions",
-      },
-    }),
-  ]);
-
-  const companyIds = companies.map((c) => c.id);
-
-  console.log("Creating brokers and listings...");
-
-  for (let i = 0; i < 100; i++) {
-    const user = await prisma.user.create({
-      data: {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: "password123",
-        role: "BROKER",
-      },
-    });
-
-    const broker = await prisma.broker.create({
-      data: {
-        name: user.name!,
-        email: user.email,
-        info: faker.lorem.sentence(),
-        y_o_e: faker.number.int({ min: 1, max: 20 }),
-        languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
-        is_certified: faker.datatype.boolean(),
-        profile_pic: faker.image.avatar(),
-        country_code: "+971",
-        w_number: `5${faker.string.numeric(8)}`,
-        ig_link: faker.internet.userName(),
-        linkedin_link: faker.internet.url(),
-        designation: "Broker",
-        company_id: companyIds[i % companyIds.length],
-        user_id: user.id,
-        type: faker.helpers.arrayElement([BrokerType.Off_plan, BrokerType.Ready_to_move, BrokerType.Both]),
-      },
-    });
-
-    for (let j = 0; j < 2; j++) {
-      const listing = await prisma.listing.create({
-        data: {
-          title: faker.company.catchPhrase(),
-          description: faker.lorem.paragraph(),
-          min_price: faker.number.int({ min: 100000, max: 5000000 }),
-          max_price: faker.number.int({ min: 5000000, max: 10000000 }),
-          sq_ft: faker.number.int({ min: 500, max: 6000 }),
-          address: faker.location.streetAddress(),
-          city: City.Dubai,
-          image: faker.image.urlPicsumPhotos(),
-          image_urls: [faker.image.urlPicsumPhotos(), faker.image.urlPicsumPhotos()],
-          type: faker.helpers.arrayElement(Object.values(Type)),
-          category: faker.helpers.arrayElement(Object.values(Category)),
-          no_of_bedrooms: faker.helpers.arrayElement(Object.values(Bedrooms)),
-          no_of_bathrooms: faker.helpers.arrayElement(Object.values(Bathrooms)),
-          broker_id: broker.id,
-          amenities: faker.helpers.arrayElements(["Pool", "Gym", "Parking", "Garden", "Smart Home"], 3),
-          looking_for: faker.datatype.boolean(),
-          rental_frequency: Rental_frequency.Yearly,
-          furnished: faker.helpers.arrayElement(Object.values(Furnished)),
-          project_age: faker.number.int({ min: 1, max: 10 }),
-          payment_plan: faker.helpers.arrayElement(Object.values(Payment_Plan)),
-          sale_type: faker.helpers.arrayElement(Object.values(Sale_Type)),
-          admin_status: faker.helpers.arrayElement(Object.values(Admin_Status)),
-          handover_year: faker.number.int({ min: 2024, max: 2030 }),
-          handover_quarter: faker.helpers.arrayElement(Object.values(Quarter)),
-          type_of_use: faker.helpers.arrayElement(Object.values(Type_of_use)),
-          deal_type: faker.helpers.arrayElement(Object.values(DealType)),
-          current_status: faker.helpers.arrayElement(Object.values(CurrentStatus)),
-          views: faker.helpers.arrayElement(Object.values(Views)),
-          market: faker.helpers.arrayElement(Object.values(Market)),
-        },
-      });
-
-      for (const type of Object.values(NotificationType)) {
-        await prisma.notification.create({
-          data: {
-            broker_id: broker.id,
-            sent_by_id: adminUser.id,
-            text: `New ${type} alert for listing.`,
-            message: faker.lorem.sentence(),
-            type,
-            listing_id: listing.id,
-          },
-        });
-      }
-    }
-  }
-
-  console.log("Creating developers...");
-
-  const developers = await Promise.all(
-    Array.from({ length: 100 }).map(() =>
-      prisma.developer.create({
-        data: {
-          name: faker.company.name(),
-          logo: faker.image.urlPicsumPhotos(),
-          cover_image: faker.image.urlPicsumPhotos(),
-          description: faker.company.catchPhrase(),
-          email: faker.internet.email(),
-          phone: faker.phone.number(),
-        },
-      })
-    )
-  );
-
-  console.log("Creating projects...");
-
-  await Promise.all(
-    Array.from({ length: 100 }).map(() =>
-      prisma.project.create({
-        data: {
-          title: faker.company.catchPhrase(),
-          description: faker.lorem.paragraph(),
-          image: faker.image.urlPicsumPhotos(),
-          images: [faker.image.urlPicsumPhotos(), faker.image.urlPicsumPhotos()],
-          floor_plans: [faker.image.urlPicsumPhotos()],
-          price: faker.number.float({ min: 100000, max: 5000000, fractionDigits: 2 }),
-          address: faker.location.streetAddress(),
-          city: City.Dubai,
-          file_url: faker.internet.url(),
-          type: Category.Off_plan,
-          project_name: faker.company.name(),
-          project_age: String(faker.number.int({ min: 1, max: 10 })),
-          no_of_bedrooms: Bedrooms.Two,
-          no_of_bathrooms: Bathrooms.Two,
-          furnished: Furnished.Semi_furnished,
-          property_size: faker.number.float({ min: 500, max: 5000, fractionDigits: 1 }),
-          payment_plan: Payment_Plan.Payment_Pending,
-          unit_types: ["1BHK", "2BHK"],
-          amenities: ["Pool", "Gym", "Parking"],
-          developer_id: developers[Math.floor(Math.random() * developers.length)].id,
-        },
-      })
-    )
-  );
-
-  console.log("Creating brokerages...");
-
-  await Promise.all(
-    Array.from({ length: 100 }).map(async () => {
-      const company = await prisma.company.create({
-        data: {
-          name: faker.company.name(),
-          type: "Brokerage",
-          description: faker.company.catchPhrase(),
-          logo: faker.image.avatar(),
-        },
-      });
-
-      await prisma.brokerage.create({
-        data: {
-          name: company.name,
-          logo: faker.image.avatar(),
-          description: faker.lorem.sentence(),
-          ded: faker.string.numeric(6),
-          rera: faker.string.numeric(4),
-          contact_email: faker.internet.email(),
-          contact_phone: faker.phone.number(),
-          service_areas: [faker.location.city(), faker.location.city()],
-          company_id: company.id,
-        },
-      });
-    })
-  );
-
-  console.log("Creating job listings...");
-
-  await prisma.job.createMany({
-    data: [
-      {
-        title: "Senior Broker",
-        description: faker.lorem.paragraph(),
-        workplace_type: "On_site",
-        location: "Dubai",
-        job_type: "Full_time",
-        min_salary: 20000,
-        max_salary: 30000,
-        currency: "AED",
-        min_experience: 5,
-        max_experience: 10,
-        company_id: companyIds[0],
-        userId: hrUser.id,
-      },
-      {
-        title: "Property Consultant",
-        description: faker.lorem.paragraph(),
-        workplace_type: "Hybrid",
-        location: "Dubai",
-        job_type: "Full_time",
-        min_salary: 15000,
-        max_salary: 25000,
-        currency: "AED",
-        min_experience: 3,
-        max_experience: 7,
-        company_id: companyIds[1],
-        userId: hrUser.id,
-      },
-    ],
-  });
-
-  console.log("✅ Seed data created successfully!");
+    console.log('Seed data created successfully');
+    
 }
 
 main()
-  .catch((e) => {
-    console.error("❌ Error seeding data:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
