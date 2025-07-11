@@ -145,6 +145,15 @@ model Listing {
   admin_status          Admin_Status?     @default(Pending)
   reported_listings     ReportedListing[]
   notifications         Notification[]    @relation("ListingNotifications")
+  listing_views         ListingView[]
+}
+
+model ListingView {
+  id         String   @id @default(uuid())
+  listing    Listing  @relation(fields: [listing_id], references: [id])
+  listing_id String   @unique
+  viewed_at  DateTime @default(now())
+  count      Int      @default(1)
 }
 
 enum Type_of_use {
