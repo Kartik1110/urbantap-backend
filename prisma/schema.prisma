@@ -123,7 +123,7 @@ model Listing {
   type_of_use           Type_of_use?
   deal_type             DealType?
   current_status        CurrentStatus?
-  views                 Views?
+  views                 Views[]           @default([])
   market                Market?
   parking_space         Boolean?
   service_charge        Int?

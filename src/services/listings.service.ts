@@ -213,7 +213,7 @@ export const getListingsService = async (
                 ...(current_status?.length
                     ? [{ current_status: { in: current_status } }]
                     : []),
-                ...(views?.length ? [{ views: { in: views } }] : []),
+                ...(views?.length ? [{ views: { hasSome: views } }] : []),
                 ...(market?.length ? [{ market: { in: market } }] : []),
                 ...(filters.parking_space !== undefined
                     ? [{ parking_space: filters.parking_space }]
