@@ -35,12 +35,12 @@ export const getListingByIdService = async (id: string) => {
     });
 
     if (view) {
-    //   const hoursPassed =
-    //     (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60 * 60);
+      const hoursPassed =
+        (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60 * 60);
 
-    //   if (hoursPassed > 48) {
-    const minutesPassed = (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60);
-    if (minutesPassed > 1) {
+      if (hoursPassed > 48) {
+    // const minutesPassed = (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60);
+    // if (minutesPassed > 1) {
         await prisma.listingView.update({
           where: { listing_id: id },
           data: {
