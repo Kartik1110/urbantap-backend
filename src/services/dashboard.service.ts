@@ -1,6 +1,5 @@
 import { Broker, User } from '@prisma/client';
 import prisma from '../utils/prisma';
-import jwt from 'jsonwebtoken';
 
 interface DashboardStats {
     profile_completion_percentage: number;
@@ -59,6 +58,8 @@ const calculateProfileCompletionPercentage = async (
         'w_number',
         'designation',
         'company_id',
+        'linkedin_url',
+        'ig_link',
     ];
 
     let totalFields = 0;
@@ -106,16 +107,4 @@ const calculateProfileCompletionPercentage = async (
     const percentage =
         totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
     return percentage;
-};
-
-export const getUserIdFromToken = (token: string): string => {
-    try {
-        const decoded = jwt.verify(
-            token.replace('Bearer ', ''),
-            process.env.JWT_SECRET!
-        ) as any;
-        return decoded.id;
-    } catch {
-        throw new Error('Invalid token');
-    }
 };

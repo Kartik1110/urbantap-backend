@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import {
-    getDashboardStatsService,
-    getUserIdFromToken,
-} from '../services/dashboard.service';
+import { getDashboardStatsService } from '../services/dashboard.service';
 import logger from '../utils/logger';
+import jwt from 'jsonwebtoken';
 
 export const getDashboardStats = async (req: Request, res: Response) => {
     try {
@@ -16,11 +14,13 @@ export const getDashboardStats = async (req: Request, res: Response) => {
             });
         }
 
-        // Extract user ID from token
-        const userId = getUserIdFromToken(token);
+        const decoded = jwt.verify(
+            token.replace('Bearer ', ''),
+            process.env.JWT_SECRET!
+        ) as { userId: string };
 
         // Get dashboard stats
-        const stats = await getDashboardStatsService(userId);
+        const stats = await getDashboardStatsService(decoded.userId);
 
         res.json({
             status: 'success',
