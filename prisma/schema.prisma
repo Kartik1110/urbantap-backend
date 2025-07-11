@@ -151,8 +151,9 @@ model Listing {
 model ListingView {
   id         String   @id @default(uuid())
   listing    Listing  @relation(fields: [listing_id], references: [id])
-  listing_id String
+  listing_id String   @unique
   viewed_at  DateTime @default(now())
+  count      Int      @default(1)
 }
 
 enum Type_of_use {

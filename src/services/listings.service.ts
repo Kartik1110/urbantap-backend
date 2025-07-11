@@ -26,15 +26,64 @@ interface ListingFilters {
 }
 
 export const getListingByIdService = async (id: string) => {
-    try {
+   try {
+    const now = new Date();
 
-    await prisma.listingView.create({
-      data: {
-        listing_id: id,
-        // ipAddress: req.ip (optional if passed via controller)
-      },
+    // Try to upsert the view row safely
+    const view = await prisma.listingView.findUnique({
+      where: { listing_id: id },
     });
 
+    if (view) {
+    //   const hoursPassed =
+    //     (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60 * 60);
+
+    //   if (hoursPassed > 48) {
+    const minutesPassed = (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60);
+    if (minutesPassed > 1) {
+        await prisma.listingView.update({
+          where: { listing_id: id },
+          data: {
+            count: 1,
+            viewed_at: now,
+          },
+        });
+      } else {
+        await prisma.listingView.update({
+          where: { listing_id: id },
+          data: {
+            count: { increment: 1 },
+          },
+        });
+      }
+    } else {
+      try {
+        await prisma.listingView.create({
+          data: {
+            listing_id: id,
+            viewed_at: now,
+            count: 1,
+          },
+        });
+      } catch (error) {
+        // If create fails due to race condition, fallback to update
+        if (
+          typeof error === 'object' &&
+          error !== null &&
+          'code' in error &&
+          (error as { code?: string }).code === 'P2002'
+        ) {
+          await prisma.listingView.update({
+            where: { listing_id: id },
+            data: {
+              count: { increment: 1 },
+            },
+          });
+        } else {
+          throw error;
+        }
+      }
+    }
         const listing = await prisma.listing.findUnique({
             where: { id },
             include: {
@@ -55,6 +104,7 @@ export const getListingByIdService = async (id: string) => {
                         },
                     },
                 },
+                listing_views: true,
             },
         });
 
@@ -71,10 +121,11 @@ export const getListingByIdService = async (id: string) => {
                 company: { name: '' },
             };
         }
-
+        const recentViews = listing.listing_views?.[0]?.count || 0;
         const { broker, ...listingWithoutBroker } = listing;
         return {
             listing: listingWithoutBroker,
+            recentViews,
             broker: {
                 id: broker.id,
                 name: broker.name,
@@ -158,7 +209,22 @@ export const getListingsService = async (
     const skip = (page - 1) * page_size;
 
   if (views_feature) {
-  const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+  const now = new Date();
+    const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+//   const since = new Date(now.getTime() - 1 * 60 * 1000); // 1 minute window
+
+  // 👇 Clean up old views
+  await prisma.listingView.updateMany({
+    where: {
+      viewed_at: {
+        lt: since,
+      },
+    },
+    data: {
+      count: 0,
+      viewed_at: now,
+    },
+  });
 
   const trendingListings = await prisma.listing.findMany({
     where: {
@@ -171,19 +237,19 @@ export const getListingsService = async (
         },
       },
     },
-    orderBy: [
-      {
-        listing_views: {
-          _count: "desc",
-        },
-      },
-    ],
+    
     skip,
     take: page_size,
     include: {
-      _count: {
+      listing_views: {
+        where: {
+          viewed_at: {
+            gte: since,
+          },
+        },
         select: {
-          listing_views: true,
+          id: true,
+          count: true,
         },
       },
       broker: {
@@ -203,13 +269,19 @@ export const getListingsService = async (
     },
   });
 
+    trendingListings.sort(
+    (a, b) => b.listing_views.length - a.listing_views.length
+  );
+
+
   return {
     listings: trendingListings.map((listing: any) => {
+        const recentViews = listing.listing_views?.[0]?.count || 0;
       const { broker, _count, ...rest } = listing;
       return {
         listing: {
           ...rest,
-          recent_views: _count?.listing_views || 0,
+          recent_views: recentViews
         },
         broker: {
           id: broker.id,
@@ -389,6 +461,11 @@ export const getListingsService = async (
                         },
                     },
                 },
+                  listing_views: {
+                    select: {
+                    count: true,
+                    },
+                },
             },
         });
 
@@ -418,8 +495,11 @@ export const getListingsService = async (
 
         const formattedListings = listings.map((listing: any) => {
             const { broker, ...listingWithoutBroker } = listing;
+            const recentViews = listing.listing_views?.[0]?.count || 0;
+
             return {
                 listing: listingWithoutBroker,
+                recentViews,
                 broker: {
                     id: broker.id,
                     name: broker.name,
