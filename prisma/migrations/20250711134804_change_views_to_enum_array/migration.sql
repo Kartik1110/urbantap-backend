@@ -5,4 +5,6 @@
 
 */
 -- AlterTable
-ALTER TABLE "Listing" ALTER COLUMN "views" SET DATA TYPE "Views"[];
+-- ALTER TABLE "Listing" ALTER COLUMN "views" SET DATA TYPE "Views"[];
+ALTER TABLE "Listing" ALTER COLUMN "views" SET DATA TYPE "Views"[] USING ARRAY[views];
+
