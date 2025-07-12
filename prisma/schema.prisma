@@ -78,6 +78,20 @@ enum BrokerType {
   Both
 }
 
+model AdminUser {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  password    String
+  companyId   String
+  developerId String?
+  brokerageId String?
+  company     Company    @relation(fields: [companyId], references: [id])
+  developer   Developer? @relation(fields: [developerId], references: [id])
+  brokerage   Brokerage? @relation(fields: [brokerageId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
 model Company {
   id          String      @id @default(uuid())
   name        String      @default("")
@@ -91,7 +105,11 @@ model Company {
   address     String?     @default("")
   brokers     Broker[]
   jobs        Job[]
-  Brokerage   Brokerage[]
+  developerId String?     @unique
+  brokerageId String?     @unique
+  developer   Developer?  @relation("CompanyToDeveloper", fields: [developerId], references: [id])
+  brokerage   Brokerage?  @relation("CompanyToBrokerage", fields: [brokerageId], references: [id])
+  AdminUser   AdminUser[]
 }
 
 enum CompanyType {
@@ -198,7 +216,7 @@ enum Market {
 }
 
 model Developer {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   name        String
   logo        String
   cover_image String?
@@ -206,9 +224,12 @@ model Developer {
   email       String?
   phone       String?
   projects    Project[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   Broker      Broker[]
+  company_id  String
+  company     Company?    @relation("CompanyToDeveloper")
+  AdminUser   AdminUser[]
 }
 
 model Project {
@@ -239,7 +260,7 @@ model Project {
 }
 
 model Brokerage {
-  id            String   @id @default(uuid())
+  id            String      @id @default(uuid())
   name          String
   logo          String
   description   String
@@ -250,9 +271,10 @@ model Brokerage {
   service_areas String[]
   brokers       Broker[]
   company_id    String
-  company       Company  @relation(fields: [company_id], references: [id])
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  company       Company?    @relation("CompanyToBrokerage")
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  AdminUser     AdminUser[]
 }
 
 enum Admin_Status {

@@ -6,6 +6,7 @@ import {
     updateCompany,
     getListingsByCompanyId,
     getCompaniesByUserId,
+    getCompanyLinkInfo
 } from '../controllers/company.controller';
 
 const router = Router();
@@ -26,5 +27,8 @@ router.put('/companies/:id', updateCompany);
 router.get('/companies/:companyId/listings', getListingsByCompanyId);
 
 router.get('/companies/user/:userId', getCompaniesByUserId);
+
+router.get('/companies/:id/link-info', getCompanyLinkInfo);
+
 
 export default router;

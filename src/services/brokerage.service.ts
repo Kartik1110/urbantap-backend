@@ -129,11 +129,13 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
             broker_count: brokerage.brokers.length,
             brokers: brokerage.brokers,
             listings: listings,
-            company: {
-                id: brokerage.company.id,
-                name: brokerage.company.name,
-                type: brokerage.company.type,
-            },
+            company: brokerage.company
+                ? {
+                      id: brokerage.company.id,
+                      name: brokerage.company.name,
+                      type: brokerage.company.type,
+                  }
+                : null, // fallback if company is null
         };
     } catch (error) {
         throw error;

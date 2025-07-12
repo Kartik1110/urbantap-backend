@@ -170,24 +170,44 @@ async function main() {
     }
   }
 
-  console.log("Creating developers...");
+  console.log("Creating developers and companies...");
 
-  const developers = await Promise.all(
-    Array.from({ length: 100 }).map(() =>
-      prisma.developer.create({
-        data: {
-          name: faker.company.name(),
-          logo: faker.image.urlPicsumPhotos(),
-          cover_image: faker.image.urlPicsumPhotos(),
-          description: faker.company.catchPhrase(),
-          email: faker.internet.email(),
-          phone: faker.phone.number(),
-        },
-      })
-    )
-  );
+  for (let i = 0; i < 100; i++) {
+    const developerCompany = await prisma.company.create({
+      data: {
+        name: faker.company.name(),
+        description: faker.company.catchPhrase(),
+        logo: faker.image.avatar(),
+        type: "Developer",
+      },
+    });
+
+    const developer = await prisma.developer.create({
+      data: {
+        name: developerCompany.name,
+        logo: faker.image.urlPicsumPhotos(),
+        cover_image: faker.image.urlPicsumPhotos(),
+        description: developerCompany.description,
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        company_id: developerCompany.id,
+      },
+    });
+
+    await prisma.company.create({
+      data: {
+        name: faker.company.name(),
+        type: "Developer",
+        description: faker.company.catchPhrase(),
+        logo: faker.image.avatar(),
+        developerId: developer.id,
+      },
+    });
+  }
 
   console.log("Creating projects...");
+
+  const allDevelopers = await prisma.developer.findMany();
 
   await Promise.all(
     Array.from({ length: 100 }).map(() =>
@@ -212,40 +232,49 @@ async function main() {
           payment_plan: Payment_Plan.Payment_Pending,
           unit_types: ["1BHK", "2BHK"],
           amenities: ["Pool", "Gym", "Parking"],
-          developer_id: developers[Math.floor(Math.random() * developers.length)].id,
+          developer_id: allDevelopers[Math.floor(Math.random() * allDevelopers.length)].id,
         },
       })
     )
   );
 
-  console.log("Creating brokerages...");
+  console.log("Creating brokerages and companies...");
 
-  await Promise.all(
-    Array.from({ length: 100 }).map(async () => {
-      const company = await prisma.company.create({
-        data: {
-          name: faker.company.name(),
-          type: "Brokerage",
-          description: faker.company.catchPhrase(),
-          logo: faker.image.avatar(),
-        },
-      });
+  for (let i = 0; i < 100; i++) {
+    // First, create a company for the brokerage to get its id
+    const brokerageCompany = await prisma.company.create({
+      data: {
+        name: faker.company.name(),
+        type: "Brokerage",
+        description: faker.lorem.sentence(),
+        logo: faker.image.avatar(),
+      },
+    });
 
-      await prisma.brokerage.create({
-        data: {
-          name: company.name,
-          logo: faker.image.avatar(),
-          description: faker.lorem.sentence(),
-          ded: faker.string.numeric(6),
-          rera: faker.string.numeric(4),
-          contact_email: faker.internet.email(),
-          contact_phone: faker.phone.number(),
-          service_areas: [faker.location.city(), faker.location.city()],
-          company_id: company.id,
-        },
-      });
-    })
-  );
+    const brokerage = await prisma.brokerage.create({
+      data: {
+        name: brokerageCompany.name,
+        logo: brokerageCompany.logo,
+        description: brokerageCompany.description,
+        ded: faker.string.numeric(6),
+        rera: faker.string.numeric(4),
+        contact_email: faker.internet.email(),
+        contact_phone: faker.phone.number(),
+        service_areas: [faker.location.city(), faker.location.city()],
+        company_id: brokerageCompany.id,
+      },
+    });
+
+    await prisma.company.create({
+      data: {
+        name: brokerage.name,
+        type: "Brokerage",
+        description: brokerage.description,
+        logo: brokerage.logo,
+        brokerageId: brokerage.id,
+      },
+    });
+  }
 
   console.log("Creating job listings...");
 
