@@ -39,3 +39,52 @@ export const loginAdmin = async (email: string, password: string) => {
 
   return token;
 };
+
+
+export const changeAdminPassword = async (adminUserId: string, oldPassword: string, newPassword: string) => {
+  const user = await prisma.adminUser.findUnique({
+    where: { id: adminUserId },
+  });
+
+  if (!user) throw new Error("Admin user not found");
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isMatch) throw new Error("Old password is incorrect");
+
+  const hashedNew = await bcrypt.hash(newPassword, 10);
+
+  await prisma.adminUser.update({
+    where: { id: adminUserId },
+    data: { password: hashedNew },
+  });
+};
+
+export const editLinkedDeveloper = async (adminUserId: string, updateData: any) => {
+  // Find the admin user
+  const adminUser = await prisma.adminUser.findUnique({
+    where: { id: adminUserId },
+    select: { developerId: true },
+  });
+
+  if (!adminUser) {
+    throw new Error("Admin user not found");
+  }
+
+  if (!adminUser.developerId) {
+    throw new Error("This admin is not linked to any developer");
+  }
+
+  // Update developer
+    const updatedDeveloper = await prisma.developer.update({
+    where: { id: adminUser.developerId },
+    data: {
+      name: updateData.name,
+      description: updateData.description,
+      email: updateData.email,
+      phone: updateData.phone,
+      logo: updateData.logo,
+      cover_image: updateData.cover_image,
+    },
+  });
+  return updatedDeveloper;
+};
