@@ -19,7 +19,7 @@ import developerRoutes from './routes/developer.route';
 import projectRoutes from './routes/project.route';
 import brokerageRoutes from './routes/brokerage.route';
 import dashboardRoutes from './routes/dashboard.route';
-import adminuserRoutes from './routes/adminuser.routes'
+import adminuserRoutes from './routes/admin-user.routes'
 import './crons/listingApprovalCron';
 
 dotenv.config();
@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 // Unprotected routes
 app.use('/api/v1', companyRoutes);
 app.use('/api/v1', authRoutes);
-app.use('/api/v1', adminuserRoutes)
+app.use('/api/v1', adminuserRoutes(upload));
 
 // Protected routes
 app.use('/api/v1', authMiddleware, notificationsRoutes);

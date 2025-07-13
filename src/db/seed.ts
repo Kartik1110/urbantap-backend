@@ -152,6 +152,7 @@ async function main() {
           current_status: faker.helpers.arrayElement(Object.values(CurrentStatus)),
           views: faker.helpers.arrayElement(Object.values(Views)),
           market: faker.helpers.arrayElement(Object.values(Market)),
+          locality: faker.location.city(),
         },
       });
 
