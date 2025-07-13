@@ -18,6 +18,14 @@ router.get('/adminuser/developers',verifyToken, getDevelopers);
 
 router.get('/adminuser/developers/:id',verifyToken, getDeveloperDetails);
 
-router.post('/adminuser/projects',verifyToken, createProject);
+export default (upload: any) => {
+  router.post('/adminuser/projects', verifyToken, upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+    { name: 'floor_plans', maxCount: 10 },
+    { name: 'file_url', maxCount: 1 },
+  ]), createProject);
 
-export default router;
+  return router;
+};
+

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { signupAdmin, loginAdmin, changeAdminPassword,editLinkedDeveloper , getDevelopersService, getDeveloperDetailsService, createProjectService} from "../services/adminuser.service";
-
+import { uploadToS3 } from "../utils/s3Upload";
 
 
 interface AuthenticatedRequest extends Request {
@@ -134,16 +134,121 @@ export const getDeveloperDetails = async (req: Request, res: Response) => {
     }
 };
 
+// export const createProject = async (req: AuthenticatedRequest, res: Response) => {
+//   try {
+//     if (!req.user?.developerId) {
+//       return res.status(403).json({ status: "error", message: "Unauthorized: No developer linked." });
+//     }
+
+//     // Override the developer_id from token
+//     const projectData = {
+//       ...req.body,
+//       developer_id: req.user.developerId,
+//     };
+
+//     const project = await createProjectService(projectData);
+
+//     res.json({
+//       status: 'success',
+//       message: 'Project created successfully',
+//       data: project,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       status: 'error',
+//       message: 'Failed to create project',
+//       error,
+//     });
+//   }
+// }
+
 export const createProject = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user?.developerId) {
       return res.status(403).json({ status: "error", message: "Unauthorized: No developer linked." });
     }
 
-    // Override the developer_id from token
+    const files = req.files as {
+      image?: Express.Multer.File[];
+      images?: Express.Multer.File[];
+      floor_plans?: Express.Multer.File[];
+      file_url?: Express.Multer.File[];
+    };
+
+    // Upload main image
+    let mainImageUrl = '';
+    if (files?.image?.[0]) {
+      const ext = files.image[0].originalname.split('.').pop();
+      mainImageUrl = await uploadToS3(files.image[0].path, `projects/image_${Date.now()}.${ext}`);
+    }
+
+    // Upload gallery images
+    let galleryImageUrls: string[] = [];
+    if (files?.images) {
+      for (const file of files.images) {
+        const ext = file.originalname.split('.').pop();
+        const url = await uploadToS3(file.path, `projects/gallery_${Date.now()}_${file.originalname}`);
+        galleryImageUrls.push(url);
+      }
+    }
+
+    // Upload floor plan images
+    let floorPlanUrls: string[] = [];
+    if (files?.floor_plans) {
+      for (const file of files.floor_plans) {
+        const ext = file.originalname.split('.').pop();
+        const url = await uploadToS3(file.path, `projects/floorplan_${Date.now()}_${file.originalname}`);
+        floorPlanUrls.push(url);
+      }
+    }
+
+    // Upload optional downloadable file
+    let fileUrl = '';
+    if (files?.file_url?.[0]) {
+      const ext = files.file_url[0].originalname.split('.').pop();
+      fileUrl = await uploadToS3(files.file_url[0].path, `projects/file_${Date.now()}.${ext}`);
+    }
+
+    // Parse body fields
+    const {
+      title,
+      description,
+      price,
+      address,
+      city,
+      type,
+      project_name,
+      project_age,
+      no_of_bedrooms,
+      no_of_bathrooms,
+      furnished,
+      property_size,
+      payment_plan,
+      unit_types,
+      amenities
+    } = req.body;
+
     const projectData = {
-      ...req.body,
-      developer_id: req.user.developerId,
+      title,
+      description,
+      price: parseFloat(price),
+      address,
+      city,
+      type,
+      project_name,
+      project_age,
+      no_of_bedrooms,
+      no_of_bathrooms,
+      furnished,
+      property_size: parseFloat(property_size),
+      payment_plan,
+      unit_types: JSON.parse(unit_types), // expects JSON string
+      amenities: JSON.parse(amenities),   // expects JSON string
+      image: mainImageUrl,
+      images: galleryImageUrls,
+      floor_plans: floorPlanUrls,
+      file_url: fileUrl,
+      developer_id: req.user.developerId
     };
 
     const project = await createProjectService(projectData);
@@ -154,10 +259,12 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
       data: project,
     });
   } catch (error) {
+    console.error('Create project error:', error);
     res.status(500).json({
       status: 'error',
       message: 'Failed to create project',
       error,
     });
   }
-}
+};
+

@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 // Unprotected routes
 app.use('/api/v1', companyRoutes);
 app.use('/api/v1', authRoutes);
-app.use('/api/v1', adminuserRoutes)
+app.use('/api/v1', adminuserRoutes(upload));
 
 // Protected routes
 app.use('/api/v1', authMiddleware, notificationsRoutes);
