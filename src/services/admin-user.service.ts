@@ -200,3 +200,18 @@ export const createProjectService = async (data: any) => {
         data,
     });
 };
+
+export const getCompanyByIdService = async (companyId: string) => {
+  return await prisma.company.findUnique({
+    where: { id: companyId },
+    include: {
+      brokers: {
+        include: {
+          listings: true, 
+        },
+      },
+      developer: true,
+      brokerage: true,
+    },
+  });
+};

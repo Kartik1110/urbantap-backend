@@ -1,5 +1,13 @@
 import { Request, Response } from "express";
-import { signupAdmin, loginAdmin, changeAdminPassword,editLinkedDeveloper , getDevelopersService, getDeveloperDetailsService, createProjectService} from "../services/admin-user.service";
+import {signupAdmin,
+        loginAdmin,
+        changeAdminPassword,
+        editLinkedDeveloper,
+        getDevelopersService,
+        getDeveloperDetailsService,
+        createProjectService,
+        getCompanyByIdService
+      } from "../services/admin-user.service";
 import { uploadToS3 } from "../utils/s3Upload";
 
 
@@ -280,3 +288,29 @@ export const createProject = async (req: AuthenticatedRequest, res: Response) =>
   }
 };
 
+export const getCompanyById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const company = await getCompanyByIdService(id);
+
+    if (!company) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Company not found',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Company fetched successfully',
+      data: company,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch company',
+      error: error.message || error,
+    });
+  }
+};
