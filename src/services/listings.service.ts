@@ -359,7 +359,7 @@ export const getListingsService = async (
         ...(type_of_use?.length ? [{ type_of_use: { in: type_of_use } }] : []),
         ...(deal_type?.length ? [{ deal_type: { in: deal_type } }] : []),
         ...(current_status?.length ? [{ current_status: { in: current_status } }] : []),
-        ...(views?.length ? [{ views: { in: views } }] : []),
+        ...(views?.length ? [{ views: { hasSome: views } }] : []),
         ...(market?.length ? [{ market: { in: market } }] : []),
         ...(filters.parking_space !== undefined ? [{ parking_space: filters.parking_space }] : []),
         ...(filters.service_charge !== undefined ? [{ service_charge: filters.service_charge }] : []),

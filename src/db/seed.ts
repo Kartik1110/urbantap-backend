@@ -49,6 +49,9 @@ async function main() {
   await prisma.company.deleteMany({});
   await prisma.user.deleteMany({});
 
+  const viewsOptions = Object.values(Views);
+
+
   console.log("Creating admin and HR users...");
 
   const adminUser = await prisma.user.create({
@@ -150,7 +153,7 @@ async function main() {
           type_of_use: faker.helpers.arrayElement(Object.values(Type_of_use)),
           deal_type: faker.helpers.arrayElement(Object.values(DealType)),
           current_status: faker.helpers.arrayElement(Object.values(CurrentStatus)),
-          views: faker.helpers.arrayElement(Object.values(Views)),
+          views: viewsOptions.sort(() => 0.5 - Math.random()).slice(0, 2), // ✅ Now valid
           market: faker.helpers.arrayElement(Object.values(Market)),
         },
       });
