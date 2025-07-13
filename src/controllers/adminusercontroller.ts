@@ -73,10 +73,49 @@ export const changePassword = async (req: Request, res: Response) => {
 
 export const editDeveloper = async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user; // or create a custom type if you want strong typing
-    if (!user?.id) return res.status(401).json({ message: "Unauthorized" });
+    const user = (req as any).user;
+    if (!user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    const updateData = req.body;
+    const files = req.files as {
+      [fieldname: string]: Express.Multer.File[];
+    };
+
+    let logoUrl = '';
+    let coverImageUrl = '';
+
+    // Handle logo upload
+    if (files?.logo?.[0]) {
+      const file = files.logo[0];
+      const ext = file.originalname.split('.').pop();
+      logoUrl = await uploadToS3(
+        file.path,
+        `developers/logo_${Date.now()}.${ext}`
+      );
+    }
+
+    // Handle cover_image upload
+    if (files?.cover_image?.[0]) {
+      const file = files.cover_image[0];
+      const ext = file.originalname.split('.').pop();
+      coverImageUrl = await uploadToS3(
+        file.path,
+        `developers/cover_${Date.now()}.${ext}`
+      );
+    }
+
+    // Merge body data
+    const updateData: any = {
+      name: req.body.name,
+      description: req.body.description,
+      email: req.body.email,
+      phone: req.body.phone,
+    };
+
+    if (logoUrl) updateData.logo = logoUrl;
+    if (coverImageUrl) updateData.cover_image = coverImageUrl;
+
     const updatedDeveloper = await editLinkedDeveloper(user.id, updateData);
 
     res.status(200).json({
@@ -85,6 +124,7 @@ export const editDeveloper = async (req: Request, res: Response) => {
       data: updatedDeveloper,
     });
   } catch (error: any) {
+    console.error("editDeveloper error:", error);
     res.status(400).json({ status: "error", message: error.message });
   }
 };
@@ -133,34 +173,6 @@ export const getDeveloperDetails = async (req: Request, res: Response) => {
         });
     }
 };
-
-// export const createProject = async (req: AuthenticatedRequest, res: Response) => {
-//   try {
-//     if (!req.user?.developerId) {
-//       return res.status(403).json({ status: "error", message: "Unauthorized: No developer linked." });
-//     }
-
-//     // Override the developer_id from token
-//     const projectData = {
-//       ...req.body,
-//       developer_id: req.user.developerId,
-//     };
-
-//     const project = await createProjectService(projectData);
-
-//     res.json({
-//       status: 'success',
-//       message: 'Project created successfully',
-//       data: project,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       status: 'error',
-//       message: 'Failed to create project',
-//       error,
-//     });
-//   }
-// }
 
 export const createProject = async (req: AuthenticatedRequest, res: Response) => {
   try {
