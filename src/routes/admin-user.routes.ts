@@ -1,5 +1,5 @@
 import express from "express";
-import { signup, login, logout, changePassword,editDeveloper, getDevelopers, getDeveloperDetails, createProject } from "../controllers/admin-user.controller";
+import { signup, login, logout, changePassword,editDeveloper, getDevelopers, getDeveloperDetails, createProject , getCompanyById} from "../controllers/admin-user.controller";
 import { verifyToken } from "../middlewares/verfiyToken";
 
 const router = express.Router();
@@ -37,4 +37,6 @@ export default (upload: any) => {
 
   return router;
 };
+
+router.get("/admin-user/company/:id", verifyToken, getCompanyById);
 
