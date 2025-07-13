@@ -4,17 +4,17 @@ import { verifyToken } from "../middlewares/verfiyToken";
 
 const router = express.Router();
 
-router.post("/adminuser/signup", signup);
+router.post("/admin-user/signup", signup);
 
-router.post("/adminuser/login", login);
+router.post("/admin-user/login", login);
 
-router.post("/adminuser/logout",verifyToken, logout); 
+router.post("/admin-user/logout",verifyToken, logout); 
 
-router.post("/adminuser/change-password",verifyToken, changePassword);
+router.post("/admin-user/change-password",verifyToken, changePassword);
 
-router.get('/adminuser/developers',verifyToken, getDevelopers);
+router.get('/admin-user/developers',verifyToken, getDevelopers);
 
-router.get('/adminuser/developers/:id',verifyToken, getDeveloperDetails);
+router.get('/admin-user/developers/:id',verifyToken, getDeveloperDetails);
 
 export default (upload: any) => {
     router.post(
