@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { signupAdmin, loginAdmin, changeAdminPassword,editLinkedDeveloper , getDevelopersService, getDeveloperDetailsService, createProjectService} from "../services/adminuser.service";
+import { signupAdmin, loginAdmin, changeAdminPassword,editLinkedDeveloper , getDevelopersService, getDeveloperDetailsService, createProjectService} from "../services/admin-user.service";
 import { uploadToS3 } from "../utils/s3Upload";
 
 
