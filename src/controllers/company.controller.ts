@@ -5,7 +5,8 @@ import {
     getBrokersByCompanyIdService,
     updateCompanyService,
     getListingsByCompanyIdService,
-    getCompaniesByUserIdService,
+     getCompaniesByUserIdService,
+    getCompanyByIdService
 } from '../services/company.service';
 import prisma from '../utils/prisma';
 
@@ -159,3 +160,31 @@ export const getCompanyLinkInfo = async (req: Request, res: Response) => {
     brokerageId: company.brokerageId
   });
 };
+
+export const getCompanyById = async (req: Request, res: Response) => {
+    try {
+        const companyId = req.params.id;
+
+        const company = await getCompanyByIdService(companyId);
+
+        if (!company) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Company not found',
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Company fetched successfully',
+            data: company,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company by ID',
+            error,
+        });
+    }
+};
+

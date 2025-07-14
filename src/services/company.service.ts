@@ -129,3 +129,36 @@ export const getCompaniesByUserIdService = async () => {
 
     return companies;
 };
+
+export const getCompanyByIdService = async (companyId: string) => {
+    return await prisma.company.findUnique({
+        where: {
+            id: companyId,
+        },
+        include: {
+            brokers: {
+                select: {
+                    id: true,
+                    name: true,
+                    profile_pic: true,
+                    Developer: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                    Brokerage: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+            jobs: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
+};
+

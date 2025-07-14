@@ -17,7 +17,7 @@ export const getBrokeragesService = async ({
             ? {
                   name: {
                       contains: search,
-                      mode: 'insensitive' as Prisma.QueryMode, // consistent with Developer service
+                      mode: 'insensitive' as Prisma.QueryMode,
                   },
               }
             : {};
@@ -32,19 +32,49 @@ export const getBrokeragesService = async ({
                     name: true,
                     logo: true,
                     brokers: {
-                        select: { id: true },
+                        select: {
+                            id: true,
+                        },
                     },
                 },
             }),
             prisma.brokerage.count({ where: whereClause }),
         ]);
 
-        const brokerages = brokeragesRaw.map((brokerage) => ({
-            id: brokerage.id,
-            name: brokerage.name,
-            logo: brokerage.logo,
-            broker_count: brokerage.brokers.length,
-        }));
+        // Get listing counts for all brokers in one query
+        const allBrokerIds = brokeragesRaw.flatMap((b) => b.brokers.map((br) => br.id));
+
+        const listingsByBroker = await prisma.listing.groupBy({
+            by: ['broker_id'],
+            where: {
+                broker_id: {
+                    in: allBrokerIds,
+                },
+            },
+            _count: {
+                broker_id: true,
+            },
+        });
+
+        // Convert to map for fast lookup
+        const listingCountMap = new Map(
+            listingsByBroker.map((item) => [item.broker_id, item._count.broker_id])
+        );
+
+        const brokerages = brokeragesRaw.map((brokerage) => {
+            const brokerCount = brokerage.brokers.length;
+            const listingCount = brokerage.brokers.reduce((sum, broker) => {
+                return sum + (listingCountMap.get(broker.id) || 0);
+            }, 0);
+
+            return {
+                id: brokerage.id,
+                name: brokerage.name,
+                logo: brokerage.logo,
+                broker_count: brokerCount,
+                listing_count: listingCount,
+            };
+        });
 
         const pagination = {
             page,
