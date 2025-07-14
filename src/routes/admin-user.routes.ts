@@ -1,6 +1,10 @@
 import express from "express";
 import { signup, login, logout, changePassword,editDeveloper, getDevelopers, getDeveloperDetails, createProject , getCompanyById} from "../controllers/admin-user.controller";
 import { verifyToken } from "../middlewares/verfiyToken";
+import { createProjectSchema } from "../schema/createProjectschema";
+import { editDeveloperSchema } from "../schema/editDeveloperSchema";
+import validateSchema from "../middlewares/validate.middleware";
+
 
 const router = express.Router();
 
@@ -23,7 +27,10 @@ export default (upload: any) => {
     { name: 'images', maxCount: 10 },
     { name: 'floor_plans', maxCount: 10 },
     { name: 'file_url', maxCount: 1 },
-  ]), createProject);
+  ]),
+    validateSchema(createProjectSchema),
+    createProject
+  );
 
     router.put(
     "/admin-user/developer",
@@ -32,6 +39,7 @@ export default (upload: any) => {
         { name: "logo", maxCount: 1 },
         { name: "cover_image", maxCount: 1 },
     ]),
+    validateSchema(editDeveloperSchema),
     editDeveloper
   );
 
