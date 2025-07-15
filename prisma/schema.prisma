@@ -164,6 +164,8 @@ model Listing {
   reported_listings     ReportedListing[]
   notifications         Notification[]    @relation("ListingNotifications")
   listing_views         ListingView[]
+  brokerage_id          String?
+  brokerage             Brokerage?        @relation("BrokerageListings", fields: [brokerage_id], references: [id])
 }
 
 model ListingView {
@@ -264,6 +266,7 @@ model Brokerage {
   name          String
   logo          String
   description   String
+  about         String?
   ded           String?
   rera          String?
   contact_email String?
@@ -275,6 +278,7 @@ model Brokerage {
   created_at    DateTime    @default(now())
   updated_at    DateTime    @updatedAt
   AdminUser     AdminUser[]
+  listings      Listing[]   @relation("BrokerageListings")
 }
 
 enum Admin_Status {
