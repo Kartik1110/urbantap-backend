@@ -122,16 +122,24 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
                         w_number: true,
                     },
                 },
+                listings: {   // Include new direct listings
+                    select: {
+                        id: true,
+                        title: true,
+                        min_price: true,
+                        max_price: true,
+                        image: true,
+                    },
+                },
                 company: true,
             },
         });
 
         if (!brokerage) throw new Error('Brokerage not found');
 
-        // You can derive listings through brokers if needed
         const brokerIds = brokerage.brokers.map((b) => b.id);
 
-        const listings = await prisma.listing.findMany({
+        const brokerListings = await prisma.listing.findMany({
             where: {
                 broker_id: { in: brokerIds },
             },
@@ -144,11 +152,14 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
             },
         });
 
+        const totalListingsCount = brokerListings.length + brokerage.listings.length;
+
         return {
             id: brokerage.id,
             name: brokerage.name,
             logo: brokerage.logo,
             description: brokerage.description,
+            about: brokerage.about ?? "",
             ded: brokerage.ded,
             rera: brokerage.rera,
             contact: {
@@ -158,14 +169,15 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
             service_areas: brokerage.service_areas,
             broker_count: brokerage.brokers.length,
             brokers: brokerage.brokers,
-            listings: listings,
+            listings: [...brokerage.listings, ...brokerListings],
+            properties_count: totalListingsCount,
             company: brokerage.company
                 ? {
                       id: brokerage.company.id,
                       name: brokerage.company.name,
                       type: brokerage.company.type,
                   }
-                : null, // fallback if company is null
+                : null,
         };
     } catch (error) {
         throw error;
