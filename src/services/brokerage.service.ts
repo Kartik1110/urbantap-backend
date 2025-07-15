@@ -183,3 +183,153 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
         throw error;
     }
 };
+
+export const getAboutService = async (id: string) => {
+  const brokerage = await prisma.brokerage.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      logo: true,
+      description: true,
+      about: true,
+      ded: true,
+      rera: true,
+      contact_email: true,
+      contact_phone: true,
+      service_areas: true,
+    },
+  });
+
+  if (!brokerage) throw new Error('Brokerage not found');
+
+  return {
+    ...brokerage,
+    contact: {
+      email: brokerage.contact_email,
+      phone: brokerage.contact_phone,
+    },
+  };
+};
+
+export const getListingsService = async (brokerageId: string) => {
+  try {
+    const brokers = await prisma.broker.findMany({
+      where: { brokerageId },
+      select: { id: true },
+    });
+
+    const brokerIds = brokers.map((b) => b.id);
+
+    const listings = await prisma.listing.findMany({
+      where: {
+        admin_status: 'Approved',
+        OR: [
+          { brokerage_id: brokerageId },         // Direct listings
+          { broker_id: { in: brokerIds } },      // Listings by brokerage's brokers
+        ],
+      },
+      orderBy: { created_at: 'desc' },
+      include: {
+        broker: {
+          select: {
+            id: true,
+            name: true,
+            profile_pic: true,
+            country_code: true,
+            w_number: true,
+            company: {
+              select: { name: true },
+            },
+          },
+        },
+        listing_views: {
+          select: {
+            count: true,
+          },
+        },
+      },
+    });
+
+    const formattedListings = listings.map((listing: any) => {
+      const recentViews = listing.listing_views?.[0]?.count || 0;
+
+      return {
+        listing: {
+          ...listing,
+        },
+        recentViews,
+        broker: listing.broker
+          ? {
+              id: listing.broker.id,
+              name: listing.broker.name,
+              profile_pic: listing.broker.profile_pic,
+              country_code: listing.broker.country_code,
+              w_number: listing.broker.w_number,
+            }
+          : {
+              id: '',
+              name: '',
+              profile_pic: '',
+              country_code: '',
+              w_number: '',
+            },
+        company: {
+          name: listing.broker?.company?.name || '',
+        },
+      };
+    });
+
+    return {
+      listings: formattedListings,
+      pagination: {
+        total: formattedListings.length,
+        page: 1,
+        page_size: 10,
+        total_pages: 1,
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getBrokersService = async (id: string) => {
+  const brokerage = await prisma.brokerage.findUnique({
+    where: { id },
+    include: {
+      brokers: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          w_number: true,
+          profile_pic: true,
+        },
+      },
+    },
+  });
+
+  if (!brokerage) throw new Error('Brokerage not found');
+
+  return brokerage.brokers;
+};
+
+export const getJobsService = async (id: string) => {
+  const jobs = await prisma.job.findMany({
+    where: { brokerage_id: id },
+    select: {
+      id: true,
+      title: true,
+      location: true,
+      min_salary: true,
+      max_salary: true,
+      job_type: true,    
+      min_experience: true,
+      max_experience: true,
+      createdAt: true,
+    },
+  });
+
+  return jobs;
+};
