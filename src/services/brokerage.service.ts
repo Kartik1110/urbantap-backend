@@ -198,17 +198,41 @@ export const getAboutService = async (id: string) => {
       contact_email: true,
       contact_phone: true,
       service_areas: true,
+      listings: {
+        select: { id: true },
+      },
+      brokers: {
+        select: { id: true },
+      },
     },
   });
 
   if (!brokerage) throw new Error('Brokerage not found');
 
+  const brokerIds = brokerage.brokers.map((b) => b.id);
+
+  const brokerListingsCount = await prisma.listing.count({
+    where: {
+      broker_id: { in: brokerIds },
+    },
+  });
+
+  const totalListingsCount = brokerListingsCount + brokerage.listings.length;
+
   return {
-    ...brokerage,
+    id: brokerage.id,
+    name: brokerage.name,
+    logo: brokerage.logo,
+    description: brokerage.description,
+    about: brokerage.about,
+    ded: brokerage.ded,
+    rera: brokerage.rera,
+    service_areas: brokerage.service_areas,
     contact: {
       email: brokerage.contact_email,
       phone: brokerage.contact_phone,
     },
+    totalListingsCount,
   };
 };
 
