@@ -73,6 +73,8 @@ export const getBrokerageDetails = async (req: Request, res: Response) => {
 
 export const getBrokerageAbout = async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
+    // const brokerageDetails = await getBrokerageDetailsService(id);
     const data = await getAboutService(req.params.id);
     res.json({ status: 'success', data });
   } catch (error) {
