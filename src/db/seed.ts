@@ -1,3 +1,4 @@
+
 import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import {
@@ -22,6 +23,10 @@ import {
 } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+// Import the real data
+import { realDevelopers } from "./realData";
+import { realBrokerages } from "./realData";
 
 async function main() {
   console.log("Clearing existing data...");
@@ -88,131 +93,191 @@ async function main() {
 
   const companyIds = companies.map((c) => c.id);
 
-  console.log("Creating brokers and listings...");
-
-  for (let i = 0; i < 100; i++) {
-    const user = await prisma.user.create({
-      data: {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: "password123",
-        role: "BROKER",
-      },
-    });
-
-    const broker = await prisma.broker.create({
-      data: {
-        name: user.name!,
-        email: user.email,
-        info: faker.lorem.sentence(),
-        y_o_e: faker.number.int({ min: 1, max: 20 }),
-        languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
-        is_certified: faker.datatype.boolean(),
-        profile_pic: faker.image.avatar(),
-        country_code: "+971",
-        w_number: `5${faker.string.numeric(8)}`,
-        ig_link: faker.internet.userName(),
-        linkedin_link: faker.internet.url(),
-        designation: "Broker",
-        company_id: companyIds[i % companyIds.length],
-        user_id: user.id,
-        type: faker.helpers.arrayElement([BrokerType.Off_plan, BrokerType.Ready_to_move, BrokerType.Both]),
-      },
-    });
-
-    for (let j = 0; j < 2; j++) {
-      const listing = await prisma.listing.create({
+  console.log("Creating real developers and companies...");
+  
+  // Create real developers
+  const createdDevelopers = await Promise.all(
+    realDevelopers.map(async (developer) => {
+      // First create the company for the developer
+      const developerCompany = await prisma.company.create({
         data: {
-          title: faker.company.catchPhrase(),
-          description: faker.lorem.paragraph(),
-          min_price: faker.number.int({ min: 100000, max: 5000000 }),
-          max_price: faker.number.int({ min: 5000000, max: 10000000 }),
-          sq_ft: faker.number.int({ min: 500, max: 6000 }),
-          address: faker.location.streetAddress(),
-          city: City.Dubai,
-          image: faker.image.urlPicsumPhotos(),
-          image_urls: [faker.image.urlPicsumPhotos(), faker.image.urlPicsumPhotos()],
-          type: faker.helpers.arrayElement(Object.values(Type)),
-          category: faker.helpers.arrayElement(Object.values(Category)),
-          no_of_bedrooms: faker.helpers.arrayElement(Object.values(Bedrooms)),
-          no_of_bathrooms: faker.helpers.arrayElement(Object.values(Bathrooms)),
-          broker_id: broker.id,
-          amenities: faker.helpers.arrayElements(["Pool", "Gym", "Parking", "Garden", "Smart Home"], 3),
-          looking_for: faker.datatype.boolean(),
-          rental_frequency: Rental_frequency.Yearly,
-          furnished: faker.helpers.arrayElement(Object.values(Furnished)),
-          project_age: faker.number.int({ min: 1, max: 10 }),
-          payment_plan: faker.helpers.arrayElement(Object.values(Payment_Plan)),
-          sale_type: faker.helpers.arrayElement(Object.values(Sale_Type)),
-          admin_status: faker.helpers.arrayElement(Object.values(Admin_Status)),
-          handover_year: faker.number.int({ min: 2024, max: 2030 }),
-          handover_quarter: faker.helpers.arrayElement(Object.values(Quarter)),
-          type_of_use: faker.helpers.arrayElement(Object.values(Type_of_use)),
-          deal_type: faker.helpers.arrayElement(Object.values(DealType)),
-          current_status: faker.helpers.arrayElement(Object.values(CurrentStatus)),
-          views: faker.helpers.arrayElement(Object.values(Views)),
-          market: faker.helpers.arrayElement(Object.values(Market)),
-          locality: faker.location.city(),
+          name: developer.name,
+          description: developer.description,
+          logo: developer.logo,
+          type: "Developer",
         },
       });
 
-      for (const type of Object.values(NotificationType)) {
-        await prisma.notification.create({
+      // Then create the developer linked to the company
+      const dev = await prisma.developer.create({
+        data: {
+          name: developer.name,
+          logo: developer.logo,
+          cover_image: developer.cover_image,
+          description: developer.description,
+          email: developer.email,
+          phone: developer.phone,
+          company_id: developerCompany.id,
+        },
+      });
+
+      // Create another company linked to this developer
+      await prisma.company.create({
+        data: {
+          name: developerCompany.name,
+          type: "Developer",
+          description: developerCompany.description,
+          logo: developerCompany.logo,
+          developerId: dev.id,
+        },
+      });
+
+      return dev;
+    })
+  );
+
+  console.log("Creating real brokerages and companies...");
+
+  // Create real brokerages
+  const createdBrokerages = await Promise.all(
+    realBrokerages.map(async (brokerage) => {
+      // First create the company for the brokerage
+      const brokerageCompany = await prisma.company.create({
+        data: {
+          name: brokerage.name,
+          type: "Brokerage",
+          description: brokerage.description,
+          logo: brokerage.logo,
+        },
+      });
+
+      // Then create the brokerage linked to the company
+      const bro = await prisma.brokerage.create({
+        data: {
+          name: brokerage.name,
+          logo: brokerage.logo,
+          description: brokerage.description,
+          ded: faker.string.numeric(6),
+          rera: faker.string.numeric(4),
+          contact_email: faker.internet.email(),
+          contact_phone: faker.phone.number(),
+          service_areas: [faker.location.city(), faker.location.city()],
+          company_id: brokerageCompany.id,
+        },
+      });
+
+      // Create another company linked to this brokerage
+      await prisma.company.create({
+        data: {
+          name: brokerage.name,
+          type: "Brokerage",
+          description: brokerage.description,
+          logo: brokerage.logo,
+          brokerageId: bro.id,
+        },
+      });
+
+      return bro;
+    })
+  );
+
+  console.log("Creating brokers and listings...");
+
+  // Create brokers for each brokerage
+  const allBrokers = [];
+  for (const brokerage of createdBrokerages) {
+    for (let i = 0; i < 5; i++) { // Create 5 brokers per brokerage
+      const user = await prisma.user.create({
+        data: {
+          name: faker.person.fullName(),
+          email: faker.internet.email(),
+          password: "password123",
+          role: "BROKER",
+        },
+      });
+
+      const broker = await prisma.broker.create({
+        data: {
+          name: user.name!,
+          email: user.email,
+          info: faker.lorem.sentence(),
+          y_o_e: faker.number.int({ min: 1, max: 20 }),
+          languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
+          is_certified: faker.datatype.boolean(),
+          profile_pic: faker.image.avatar(),
+          country_code: "+971",
+          w_number: `5${faker.string.numeric(8)}`,
+          ig_link: faker.internet.userName(),
+          linkedin_link: faker.internet.url(),
+          designation: "Broker",
+          company_id: companyIds[i % companyIds.length],
+          user_id: user.id,
+          type: faker.helpers.arrayElement([BrokerType.Off_plan, BrokerType.Ready_to_move, BrokerType.Both]),
+          brokerageId: brokerage.id, // Link broker to brokerage
+        },
+      });
+
+      allBrokers.push(broker);
+
+      // Create 2 listings for each broker
+      for (let j = 0; j < 2; j++) {
+        const listing = await prisma.listing.create({
           data: {
+            title: faker.company.catchPhrase(),
+            description: faker.lorem.paragraph(),
+            min_price: faker.number.int({ min: 100000, max: 5000000 }),
+            max_price: faker.number.int({ min: 5000000, max: 10000000 }),
+            sq_ft: faker.number.int({ min: 500, max: 6000 }),
+            address: faker.location.streetAddress(),
+            city: City.Dubai,
+            image: faker.image.urlPicsumPhotos(),
+            image_urls: [faker.image.urlPicsumPhotos(), faker.image.urlPicsumPhotos()],
+            type: faker.helpers.arrayElement(Object.values(Type)),
+            category: faker.helpers.arrayElement(Object.values(Category)),
+            no_of_bedrooms: faker.helpers.arrayElement(Object.values(Bedrooms)),
+            no_of_bathrooms: faker.helpers.arrayElement(Object.values(Bathrooms)),
             broker_id: broker.id,
-            sent_by_id: adminUser.id,
-            text: `New ${type} alert for listing.`,
-            message: faker.lorem.sentence(),
-            type,
-            listing_id: listing.id,
+            amenities: faker.helpers.arrayElements(["Pool", "Gym", "Parking", "Garden", "Smart Home"], 3),
+            looking_for: faker.datatype.boolean(),
+            rental_frequency: Rental_frequency.Yearly,
+            furnished: faker.helpers.arrayElement(Object.values(Furnished)),
+            project_age: faker.number.int({ min: 1, max: 10 }),
+            payment_plan: faker.helpers.arrayElement(Object.values(Payment_Plan)),
+            sale_type: faker.helpers.arrayElement(Object.values(Sale_Type)),
+            admin_status: faker.helpers.arrayElement(Object.values(Admin_Status)),
+            handover_year: faker.number.int({ min: 2024, max: 2030 }),
+            handover_quarter: faker.helpers.arrayElement(Object.values(Quarter)),
+            type_of_use: faker.helpers.arrayElement(Object.values(Type_of_use)),
+            deal_type: faker.helpers.arrayElement(Object.values(DealType)),
+            current_status: faker.helpers.arrayElement(Object.values(CurrentStatus)),
+            views: faker.helpers.arrayElement(Object.values(Views)),
+            market: faker.helpers.arrayElement(Object.values(Market)),
+            locality: faker.location.city(),
           },
         });
+
+        for (const type of Object.values(NotificationType)) {
+          await prisma.notification.create({
+            data: {
+              broker_id: broker.id,
+              sent_by_id: adminUser.id,
+              text: `New ${type} alert for listing.`,
+              message: faker.lorem.sentence(),
+              type,
+              listing_id: listing.id,
+            },
+          });
+        }
       }
     }
   }
 
-  console.log("Creating developers and companies...");
+  console.log("Creating projects for developers...");
 
-  for (let i = 0; i < 100; i++) {
-    const developerCompany = await prisma.company.create({
-      data: {
-        name: faker.company.name(),
-        description: faker.company.catchPhrase(),
-        logo: faker.image.avatar(),
-        type: "Developer",
-      },
-    });
-
-    const developer = await prisma.developer.create({
-      data: {
-        name: developerCompany.name,
-        logo: faker.image.urlPicsumPhotos(),
-        cover_image: faker.image.urlPicsumPhotos(),
-        description: developerCompany.description,
-        email: faker.internet.email(),
-        phone: faker.phone.number(),
-        company_id: developerCompany.id,
-      },
-    });
-
-    await prisma.company.create({
-      data: {
-        name: faker.company.name(),
-        type: "Developer",
-        description: faker.company.catchPhrase(),
-        logo: faker.image.avatar(),
-        developerId: developer.id,
-      },
-    });
-  }
-
-  console.log("Creating projects...");
-
-  const allDevelopers = await prisma.developer.findMany();
-
+  // Create projects for each developer
   await Promise.all(
-    Array.from({ length: 100 }).map(() =>
-      prisma.project.create({
+    createdDevelopers.map(async (developer) => {
+      return prisma.project.create({
         data: {
           title: faker.company.catchPhrase(),
           description: faker.lorem.paragraph(),
@@ -233,49 +298,11 @@ async function main() {
           payment_plan: Payment_Plan.Payment_Pending,
           unit_types: ["1BHK", "2BHK"],
           amenities: ["Pool", "Gym", "Parking"],
-          developer_id: allDevelopers[Math.floor(Math.random() * allDevelopers.length)].id,
+          developer_id: developer.id,
         },
-      })
-    )
+      });
+    })
   );
-
-  console.log("Creating brokerages and companies...");
-
-  for (let i = 0; i < 100; i++) {
-    // First, create a company for the brokerage to get its id
-    const brokerageCompany = await prisma.company.create({
-      data: {
-        name: faker.company.name(),
-        type: "Brokerage",
-        description: faker.lorem.sentence(),
-        logo: faker.image.avatar(),
-      },
-    });
-
-    const brokerage = await prisma.brokerage.create({
-      data: {
-        name: brokerageCompany.name,
-        logo: brokerageCompany.logo,
-        description: brokerageCompany.description,
-        ded: faker.string.numeric(6),
-        rera: faker.string.numeric(4),
-        contact_email: faker.internet.email(),
-        contact_phone: faker.phone.number(),
-        service_areas: [faker.location.city(), faker.location.city()],
-        company_id: brokerageCompany.id,
-      },
-    });
-
-    await prisma.company.create({
-      data: {
-        name: brokerage.name,
-        type: "Brokerage",
-        description: brokerage.description,
-        logo: brokerage.logo,
-        brokerageId: brokerage.id,
-      },
-    });
-  }
 
   console.log("Creating job listings...");
 
