@@ -3,6 +3,10 @@ import {
     getBrokeragesService,
     createBrokerageService,
     getBrokerageDetailsService,
+    getAboutService,
+    getListingsService,
+    getBrokersService,
+    getJobsService
 } from '../services/brokerage.service';
 
 export const getBrokerages = async (req: Request, res: Response) => {
@@ -65,4 +69,50 @@ export const getBrokerageDetails = async (req: Request, res: Response) => {
             error,
         });
     }
+};
+
+export const getBrokerageAbout = async (req: Request, res: Response) => {
+  try {
+    const data = await getAboutService(req.params.id);
+    res.json({ status: 'success', data });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Failed to fetch about', error });
+  }
+};
+
+export const getBrokerageListings = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const listingsData = await getListingsService(id);
+
+    res.json({
+      status: 'success',
+      message: 'Listings fetched successfully',
+      data: listingsData.listings,
+      pagination: listingsData.pagination,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to fetch brokerage listings',
+      error,
+    });
+  }
+};
+export const getBrokerageBrokers = async (req: Request, res: Response) => {
+  try {
+    const data = await getBrokersService(req.params.id);
+    res.json({ status: 'success', data });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Failed to fetch brokers', error });
+  }
+};
+
+export const getBrokerageJobs = async (req: Request, res: Response) => {
+  try {
+    const data = await getJobsService(req.params.id);
+    res.json({ status: 'success', data });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Failed to fetch jobs', error });
+  }
 };

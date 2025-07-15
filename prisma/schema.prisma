@@ -279,6 +279,7 @@ model Brokerage {
   updated_at    DateTime    @updatedAt
   AdminUser     AdminUser[]
   listings      Listing[]   @relation("BrokerageListings")
+  jobs          Job[]
 }
 
 enum Admin_Status {
@@ -438,6 +439,8 @@ model Job {
   title          String
   company_id     String
   company        Company       @relation(fields: [company_id], references: [id])
+  brokerage_id   String?
+  brokerage      Brokerage?    @relation(fields: [brokerage_id], references: [id])
   workplace_type WorkplaceType
   location       String
   job_type       JobType
