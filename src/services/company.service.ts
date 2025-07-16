@@ -161,4 +161,3 @@ export const getCompanyByIdService = async (companyId: string) => {
         },
     });
 };
-

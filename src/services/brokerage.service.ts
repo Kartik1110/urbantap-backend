@@ -42,7 +42,9 @@ export const getBrokeragesService = async ({
         ]);
 
         // Get listing counts for all brokers in one query
-        const allBrokerIds = brokeragesRaw.flatMap((b) => b.brokers.map((br) => br.id));
+        const allBrokerIds = brokeragesRaw.flatMap((b) =>
+            b.brokers.map((br) => br.id)
+        );
 
         const listingsByBroker = await prisma.listing.groupBy({
             by: ['broker_id'],
@@ -58,7 +60,10 @@ export const getBrokeragesService = async ({
 
         // Convert to map for fast lookup
         const listingCountMap = new Map(
-            listingsByBroker.map((item) => [item.broker_id, item._count.broker_id])
+            listingsByBroker.map((item) => [
+                item.broker_id,
+                item._count.broker_id,
+            ])
         );
 
         const brokerages = brokeragesRaw.map((brokerage) => {
@@ -122,7 +127,8 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
                         w_number: true,
                     },
                 },
-                listings: {   // Include new direct listings
+                listings: {
+                    // Include new direct listings
                     select: {
                         id: true,
                         title: true,
@@ -152,14 +158,15 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
             },
         });
 
-        const totalListingsCount = brokerListings.length + brokerage.listings.length;
+        const totalListingsCount =
+            brokerListings.length + brokerage.listings.length;
 
         return {
             id: brokerage.id,
             name: brokerage.name,
             logo: brokerage.logo,
             description: brokerage.description,
-            about: brokerage.about ?? "",
+            about: brokerage.about ?? '',
             ded: brokerage.ded,
             rera: brokerage.rera,
             contact: {
@@ -185,175 +192,175 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
 };
 
 export const getAboutService = async (id: string) => {
-  const brokerage = await prisma.brokerage.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      logo: true,
-      description: true,
-      about: true,
-      ded: true,
-      rera: true,
-      contact_email: true,
-      contact_phone: true,
-      service_areas: true,
-      listings: {
-        select: { id: true },
-      },
-      brokers: {
-        select: { id: true },
-      },
-    },
-  });
+    const brokerage = await prisma.brokerage.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            logo: true,
+            description: true,
+            about: true,
+            ded: true,
+            rera: true,
+            contact_email: true,
+            contact_phone: true,
+            service_areas: true,
+            listings: {
+                select: { id: true },
+            },
+            brokers: {
+                select: { id: true },
+            },
+        },
+    });
 
-  if (!brokerage) throw new Error('Brokerage not found');
+    if (!brokerage) throw new Error('Brokerage not found');
 
-  const brokerIds = brokerage.brokers.map((b) => b.id);
+    const brokerIds = brokerage.brokers.map((b) => b.id);
 
-  const brokerListingsCount = await prisma.listing.count({
-    where: {
-      broker_id: { in: brokerIds },
-    },
-  });
+    const brokerListingsCount = await prisma.listing.count({
+        where: {
+            broker_id: { in: brokerIds },
+        },
+    });
 
-  const totalListingsCount = brokerListingsCount + brokerage.listings.length;
+    const totalListingsCount = brokerListingsCount + brokerage.listings.length;
 
-  return {
-    id: brokerage.id,
-    name: brokerage.name,
-    logo: brokerage.logo,
-    description: brokerage.description,
-    about: brokerage.about,
-    ded: brokerage.ded,
-    rera: brokerage.rera,
-    service_areas: brokerage.service_areas,
-    contact: {
-      email: brokerage.contact_email,
-      phone: brokerage.contact_phone,
-    },
-    totalListingsCount,
-  };
+    return {
+        id: brokerage.id,
+        name: brokerage.name,
+        logo: brokerage.logo,
+        description: brokerage.description,
+        about: brokerage.about,
+        ded: brokerage.ded,
+        rera: brokerage.rera,
+        service_areas: brokerage.service_areas,
+        contact: {
+            email: brokerage.contact_email,
+            phone: brokerage.contact_phone,
+        },
+        totalListingsCount,
+    };
 };
 
 export const getListingsService = async (brokerageId: string) => {
-  try {
-    const brokers = await prisma.broker.findMany({
-      where: { brokerageId },
-      select: { id: true },
-    });
+    try {
+        const brokers = await prisma.broker.findMany({
+            where: { brokerageId },
+            select: { id: true },
+        });
 
-    const brokerIds = brokers.map((b) => b.id);
+        const brokerIds = brokers.map((b) => b.id);
 
-    const listings = await prisma.listing.findMany({
-      where: {
-        admin_status: 'Approved',
-        OR: [
-          { brokerage_id: brokerageId },         // Direct listings
-          { broker_id: { in: brokerIds } },      // Listings by brokerage's brokers
-        ],
-      },
-      orderBy: { created_at: 'desc' },
-      include: {
-        broker: {
-          select: {
-            id: true,
-            name: true,
-            profile_pic: true,
-            country_code: true,
-            w_number: true,
-            company: {
-              select: { name: true },
+        const listings = await prisma.listing.findMany({
+            where: {
+                admin_status: 'Approved',
+                OR: [
+                    { brokerage_id: brokerageId }, // Direct listings
+                    { broker_id: { in: brokerIds } }, // Listings by brokerage's brokers
+                ],
             },
-          },
-        },
-        listing_views: {
-          select: {
-            count: true,
-          },
-        },
-      },
-    });
-
-    const formattedListings = listings.map((listing: any) => {
-      const recentViews = listing.listing_views?.[0]?.count || 0;
-
-      return {
-        listing: {
-          ...listing,
-        },
-        recentViews,
-        broker: listing.broker
-          ? {
-              id: listing.broker.id,
-              name: listing.broker.name,
-              profile_pic: listing.broker.profile_pic,
-              country_code: listing.broker.country_code,
-              w_number: listing.broker.w_number,
-            }
-          : {
-              id: '',
-              name: '',
-              profile_pic: '',
-              country_code: '',
-              w_number: '',
+            orderBy: { created_at: 'desc' },
+            include: {
+                broker: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile_pic: true,
+                        country_code: true,
+                        w_number: true,
+                        company: {
+                            select: { name: true },
+                        },
+                    },
+                },
+                listing_views: {
+                    select: {
+                        count: true,
+                    },
+                },
             },
-        company: {
-          name: listing.broker?.company?.name || '',
-        },
-      };
-    });
+        });
 
-    return {
-      listings: formattedListings,
-      pagination: {
-        total: formattedListings.length,
-        page: 1,
-        page_size: 10,
-        total_pages: 1,
-      },
-    };
-  } catch (error) {
-    throw error;
-  }
+        const formattedListings = listings.map((listing: any) => {
+            const recentViews = listing.listing_views?.[0]?.count || 0;
+
+            return {
+                listing: {
+                    ...listing,
+                },
+                recentViews,
+                broker: listing.broker
+                    ? {
+                          id: listing.broker.id,
+                          name: listing.broker.name,
+                          profile_pic: listing.broker.profile_pic,
+                          country_code: listing.broker.country_code,
+                          w_number: listing.broker.w_number,
+                      }
+                    : {
+                          id: '',
+                          name: '',
+                          profile_pic: '',
+                          country_code: '',
+                          w_number: '',
+                      },
+                company: {
+                    name: listing.broker?.company?.name || '',
+                },
+            };
+        });
+
+        return {
+            listings: formattedListings,
+            pagination: {
+                total: formattedListings.length,
+                page: 1,
+                page_size: 10,
+                total_pages: 1,
+            },
+        };
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const getBrokersService = async (id: string) => {
-  const brokerage = await prisma.brokerage.findUnique({
-    where: { id },
-    include: {
-      brokers: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          w_number: true,
-          profile_pic: true,
+    const brokerage = await prisma.brokerage.findUnique({
+        where: { id },
+        include: {
+            brokers: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    w_number: true,
+                    profile_pic: true,
+                },
+            },
         },
-      },
-    },
-  });
+    });
 
-  if (!brokerage) throw new Error('Brokerage not found');
+    if (!brokerage) throw new Error('Brokerage not found');
 
-  return brokerage.brokers;
+    return brokerage.brokers;
 };
 
 export const getJobsService = async (id: string) => {
-  const jobs = await prisma.job.findMany({
-    where: { brokerage_id: id },
-    select: {
-      id: true,
-      title: true,
-      location: true,
-      min_salary: true,
-      max_salary: true,
-      job_type: true,    
-      min_experience: true,
-      max_experience: true,
-      createdAt: true,
-    },
-  });
+    const jobs = await prisma.job.findMany({
+        where: { brokerage_id: id },
+        select: {
+            id: true,
+            title: true,
+            location: true,
+            min_salary: true,
+            max_salary: true,
+            job_type: true,
+            min_experience: true,
+            max_experience: true,
+            createdAt: true,
+        },
+    });
 
-  return jobs;
+    return jobs;
 };

@@ -5,8 +5,8 @@ import {
     getBrokersByCompanyIdService,
     updateCompanyService,
     getListingsByCompanyIdService,
-     getCompaniesByUserIdService,
-    getCompanyByIdService
+    getCompaniesByUserIdService,
+    getCompanyByIdService,
 } from '../services/company.service';
 import prisma from '../utils/prisma';
 
@@ -142,23 +142,23 @@ export const getCompaniesByUserId = async (req: Request, res: Response) => {
 };
 
 export const getCompanyLinkInfo = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const company = await prisma.company.findUnique({
-    where: { id },
-    select: {
-      developerId: true,
-      brokerageId: true
+    const { id } = req.params;
+    const company = await prisma.company.findUnique({
+        where: { id },
+        select: {
+            developerId: true,
+            brokerageId: true,
+        },
+    });
+
+    if (!company) {
+        return res.status(404).json({ message: 'Company not found' });
     }
-  });
 
-  if (!company) {
-    return res.status(404).json({ message: 'Company not found' });
-  }
-
-  res.json({
-    developerId: company.developerId,
-    brokerageId: company.brokerageId
-  });
+    res.json({
+        developerId: company.developerId,
+        brokerageId: company.brokerageId,
+    });
 };
 
 export const getCompanyById = async (req: Request, res: Response) => {
@@ -187,4 +187,3 @@ export const getCompanyById = async (req: Request, res: Response) => {
         });
     }
 };
-
