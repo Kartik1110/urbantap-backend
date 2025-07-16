@@ -1,6 +1,6 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import prisma from '../utils/prisma';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import prisma from "../utils/prisma";
 import { Category, Prisma } from '@prisma/client';
 
 export const signupAdmin = async (
