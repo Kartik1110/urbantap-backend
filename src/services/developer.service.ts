@@ -54,7 +54,7 @@ export const createDeveloperService = async (data: {
     description: string;
     email?: string;
     phone?: string;
-    company_id: string; 
+    company_id: string;
 }) => {
     return await prisma.developer.create({
         data,

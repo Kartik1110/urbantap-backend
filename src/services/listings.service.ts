@@ -26,64 +26,65 @@ interface ListingFilters {
 }
 
 export const getListingByIdService = async (id: string) => {
-   try {
-    const now = new Date();
+    try {
+        const now = new Date();
 
-    // Try to upsert the view row safely
-    const view = await prisma.listingView.findUnique({
-      where: { listing_id: id },
-    });
-
-    if (view) {
-      const hoursPassed =
-        (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60 * 60);
-
-      if (hoursPassed > 48) {
-    // const minutesPassed = (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60);
-    // if (minutesPassed > 1) {
-        await prisma.listingView.update({
-          where: { listing_id: id },
-          data: {
-            count: 1,
-            viewed_at: now,
-          },
-        });
-      } else {
-        await prisma.listingView.update({
-          where: { listing_id: id },
-          data: {
-            count: { increment: 1 },
-          },
-        });
-      }
-    } else {
-      try {
-        await prisma.listingView.create({
-          data: {
-            listing_id: id,
-            viewed_at: now,
-            count: 1,
-          },
-        });
-      } catch (error) {
-        // If create fails due to race condition, fallback to update
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          'code' in error &&
-          (error as { code?: string }).code === 'P2002'
-        ) {
-          await prisma.listingView.update({
+        // Try to upsert the view row safely
+        const view = await prisma.listingView.findUnique({
             where: { listing_id: id },
-            data: {
-              count: { increment: 1 },
-            },
-          });
+        });
+
+        if (view) {
+            const hoursPassed =
+                (now.getTime() - new Date(view.viewed_at).getTime()) /
+                (1000 * 60 * 60);
+
+            if (hoursPassed > 48) {
+                // const minutesPassed = (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60);
+                // if (minutesPassed > 1) {
+                await prisma.listingView.update({
+                    where: { listing_id: id },
+                    data: {
+                        count: 1,
+                        viewed_at: now,
+                    },
+                });
+            } else {
+                await prisma.listingView.update({
+                    where: { listing_id: id },
+                    data: {
+                        count: { increment: 1 },
+                    },
+                });
+            }
         } else {
-          throw error;
+            try {
+                await prisma.listingView.create({
+                    data: {
+                        listing_id: id,
+                        viewed_at: now,
+                        count: 1,
+                    },
+                });
+            } catch (error) {
+                // If create fails due to race condition, fallback to update
+                if (
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'code' in error &&
+                    (error as { code?: string }).code === 'P2002'
+                ) {
+                    await prisma.listingView.update({
+                        where: { listing_id: id },
+                        data: {
+                            count: { increment: 1 },
+                        },
+                    });
+                } else {
+                    throw error;
+                }
+            }
         }
-      }
-    }
         const listing = await prisma.listing.findUnique({
             where: { id },
             include: {
@@ -149,7 +150,7 @@ export const getListingByIdService = async (id: string) => {
 
 export const getListingsService = async (
     filters: {
-    views_feature?: boolean;
+        views_feature?: boolean;
         looking_for?: boolean;
         category?: 'Ready_to_move' | 'Off_plan' | 'Rent';
         min_price?: number;
@@ -183,189 +184,214 @@ export const getListingsService = async (
         page_size?: number;
     } & ListingFilters
 ): Promise<{
-  listings: Array<{
-    listing: Partial<Listing> & { recentViews?: number };
-    broker: {
-      id: string;
-      name: string;
-      profile_pic: string;
-      country_code: string;
-      w_number: string;
-    };
-    company: {
-      name: string;
-    };
-  }>;
-  pagination: {
-    total: number;
-    page: number;
-    page_size: number;
-    total_pages: number;
-  };
-}> => {
-  try {
-    const { page = 1, page_size = 10, views_feature, ...filterParams } = filters;
-
-    const skip = (page - 1) * page_size;
-
-  if (views_feature) {
-  const now = new Date();
-    const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
-//   const since = new Date(now.getTime() - 1 * 60 * 1000); // 1 minute window
-
-  // 👇 Clean up old views
-  await prisma.listingView.updateMany({
-    where: {
-      viewed_at: {
-        lt: since,
-      },
-    },
-    data: {
-      count: 0,
-      viewed_at: now,
-    },
-  });
-
-  const trendingListings = await prisma.listing.findMany({
-    where: {
-      admin_status: Admin_Status.Approved,
-      listing_views: {
-        some: {
-          viewed_at: {
-            gte: since,
-          },
-        },
-      },
-    },
-    
-    skip,
-    take: page_size,
-    include: {
-      listing_views: {
-        where: {
-          viewed_at: {
-            gte: since,
-          },
-        },
-        select: {
-          id: true,
-          count: true,
-        },
-      },
-      broker: {
-        select: {
-          id: true,
-          name: true,
-          profile_pic: true,
-          country_code: true,
-          w_number: true,
-          company: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-    trendingListings.sort(
-    (a, b) => b.listing_views.length - a.listing_views.length
-  );
-
-
-  return {
-    listings: trendingListings.map((listing: any) => {
-        const recentViews = listing.listing_views?.[0]?.count || 0;
-      const { broker, _count, ...rest } = listing;
-      return {
-        listing: {
-          ...rest,
-          recent_views: recentViews
-        },
+    listings: Array<{
+        listing: Partial<Listing> & { recentViews?: number };
         broker: {
-          id: broker.id,
-          name: broker.name,
-          profile_pic: broker.profile_pic,
-          country_code: broker.country_code,
-          w_number: broker.w_number,
-        },
+            id: string;
+            name: string;
+            profile_pic: string;
+            country_code: string;
+            w_number: string;
+        };
         company: {
-          name: broker.company?.name || "",
-        },
-      };
-    }),
+            name: string;
+        };
+    }>;
     pagination: {
-      total: trendingListings.length + skip, // estimate
-      page,
-      page_size,
-      total_pages: Math.ceil((trendingListings.length + skip) / page_size),
-    },
-  };
-}
+        total: number;
+        page: number;
+        page_size: number;
+        total_pages: number;
+    };
+}> => {
+    try {
+        const {
+            page = 1,
+            page_size = 10,
+            views_feature,
+            ...filterParams
+        } = filters;
 
+        const skip = (page - 1) * page_size;
 
-    // ---------- Non-trending (default) logic ----------
-    const {
-      type,
-      no_of_bathrooms,
-      no_of_bedrooms,
-      furnished,
-      rental_frequency,
-      project_age,
-      payment_plan,
-      sale_type,
-      amenities,
-      min_price,
-      max_price,
-      min_sqft,
-      max_sqft,
-      looking_for,
-      category,
-      city,
-      address,
-      handover_year,
-      handover_quarter,
-      type_of_use,
-      deal_type,
-      current_status,
-      views,
-      market,
-      ...restFilters
-    } = filterParams;
+        if (views_feature) {
+            const now = new Date();
+            const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+            //   const since = new Date(now.getTime() - 1 * 60 * 1000); // 1 minute window
 
-    // Calculate skip value for pagination
-    console.log("filterParams.type", type);
-    // Base WHERE condition with admin_status
-    const whereCondition = {
-      AND: [
-        { admin_status: Admin_Status.Approved },
-        {
-          broker: {
-            sentToConnectionRequests: {
-              none: { status: RequestStatus.Blocked },
-            },
-          },
-        },
-        // Add specific filters one by one
-        ...(looking_for !== undefined ? [{ looking_for }] : []),
-        ...(category ? [{ category }] : []),
-        ...(city ? [{ city }] : []),
-        ...(address
-          ? [{ address: { contains: address, mode: "insensitive" } }]
-          : []),
-        ...(handover_year?.length ? [{ handover_year: { in: handover_year } }] : []),
-        ...(handover_quarter?.length ? [{ handover_quarter: { in: handover_quarter } }] : []),
-        ...(type_of_use?.length ? [{ type_of_use: { in: type_of_use } }] : []),
-        ...(deal_type?.length ? [{ deal_type: { in: deal_type } }] : []),
-        ...(current_status?.length ? [{ current_status: { in: current_status } }] : []),
-        ...(views?.length ? [{ views: { in: views } }] : []),
-        ...(market?.length ? [{ market: { in: market } }] : []),
-        ...(filters.parking_space !== undefined ? [{ parking_space: filters.parking_space }] : []),
-        ...(filters.service_charge !== undefined ? [{ service_charge: filters.service_charge }] : []),
-        ...(filters.construction_progress !== undefined ? [{ construction_progress: filters.construction_progress }] : []),
-        ...(filters.gfa_bua !== undefined ? [{ gfa_bua: filters.gfa_bua }] : []),
-        ...(filters.floor_area_ratio !== undefined ? [{ floor_area_ratio: filters.floor_area_ratio }] : []),
+            // 👇 Clean up old views
+            await prisma.listingView.updateMany({
+                where: {
+                    viewed_at: {
+                        lt: since,
+                    },
+                },
+                data: {
+                    count: 0,
+                    viewed_at: now,
+                },
+            });
+
+            const trendingListings = await prisma.listing.findMany({
+                where: {
+                    admin_status: Admin_Status.Approved,
+                    listing_views: {
+                        some: {
+                            viewed_at: {
+                                gte: since,
+                            },
+                        },
+                    },
+                },
+
+                skip,
+                take: page_size,
+                include: {
+                    listing_views: {
+                        where: {
+                            viewed_at: {
+                                gte: since,
+                            },
+                        },
+                        select: {
+                            id: true,
+                            count: true,
+                        },
+                    },
+                    broker: {
+                        select: {
+                            id: true,
+                            name: true,
+                            profile_pic: true,
+                            country_code: true,
+                            w_number: true,
+                            company: {
+                                select: {
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            trendingListings.sort(
+                (a, b) => b.listing_views.length - a.listing_views.length
+            );
+
+            return {
+                listings: trendingListings.map((listing: any) => {
+                    const recentViews = listing.listing_views?.[0]?.count || 0;
+                    const { broker, _count, ...rest } = listing;
+                    return {
+                        listing: {
+                            ...rest,
+                            recent_views: recentViews,
+                        },
+                        broker: {
+                            id: broker.id,
+                            name: broker.name,
+                            profile_pic: broker.profile_pic,
+                            country_code: broker.country_code,
+                            w_number: broker.w_number,
+                        },
+                        company: {
+                            name: broker.company?.name || '',
+                        },
+                    };
+                }),
+                pagination: {
+                    total: trendingListings.length + skip, // estimate
+                    page,
+                    page_size,
+                    total_pages: Math.ceil(
+                        (trendingListings.length + skip) / page_size
+                    ),
+                },
+            };
+        }
+
+        // ---------- Non-trending (default) logic ----------
+        const {
+            type,
+            no_of_bathrooms,
+            no_of_bedrooms,
+            furnished,
+            rental_frequency,
+            project_age,
+            payment_plan,
+            sale_type,
+            amenities,
+            min_price,
+            max_price,
+            min_sqft,
+            max_sqft,
+            looking_for,
+            category,
+            city,
+            address,
+            handover_year,
+            handover_quarter,
+            type_of_use,
+            deal_type,
+            current_status,
+            views,
+            market,
+            ...restFilters
+        } = filterParams;
+
+        // Calculate skip value for pagination
+        console.log('filterParams.type', type);
+        // Base WHERE condition with admin_status
+        const whereCondition = {
+            AND: [
+                { admin_status: Admin_Status.Approved },
+                {
+                    broker: {
+                        sentToConnectionRequests: {
+                            none: { status: RequestStatus.Blocked },
+                        },
+                    },
+                },
+                // Add specific filters one by one
+                ...(looking_for !== undefined ? [{ looking_for }] : []),
+                ...(category ? [{ category }] : []),
+                ...(city ? [{ city }] : []),
+                ...(address
+                    ? [{ address: { contains: address, mode: 'insensitive' } }]
+                    : []),
+                ...(handover_year?.length
+                    ? [{ handover_year: { in: handover_year } }]
+                    : []),
+                ...(handover_quarter?.length
+                    ? [{ handover_quarter: { in: handover_quarter } }]
+                    : []),
+                ...(type_of_use?.length
+                    ? [{ type_of_use: { in: type_of_use } }]
+                    : []),
+                ...(deal_type?.length
+                    ? [{ deal_type: { in: deal_type } }]
+                    : []),
+                ...(current_status?.length
+                    ? [{ current_status: { in: current_status } }]
+                    : []),
+                ...(views?.length ? [{ views: { in: views } }] : []),
+                ...(market?.length ? [{ market: { in: market } }] : []),
+                ...(filters.parking_space !== undefined
+                    ? [{ parking_space: filters.parking_space }]
+                    : []),
+                ...(filters.service_charge !== undefined
+                    ? [{ service_charge: filters.service_charge }]
+                    : []),
+                ...(filters.construction_progress !== undefined
+                    ? [{ construction_progress: filters.construction_progress }]
+                    : []),
+                ...(filters.gfa_bua !== undefined
+                    ? [{ gfa_bua: filters.gfa_bua }]
+                    : []),
+                ...(filters.floor_area_ratio !== undefined
+                    ? [{ floor_area_ratio: filters.floor_area_ratio }]
+                    : []),
 
                 // Price range condition
                 ...(min_price || max_price
@@ -461,9 +487,9 @@ export const getListingsService = async (
                         },
                     },
                 },
-                  listing_views: {
+                listing_views: {
                     select: {
-                    count: true,
+                        count: true,
                     },
                 },
             },
