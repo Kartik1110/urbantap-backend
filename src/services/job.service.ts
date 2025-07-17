@@ -88,6 +88,7 @@ export const getJobsService = async (
                     id: true,
                     name: true,
                     logo: true,
+                    description: true,
                 },
             },
             brokerage: {
@@ -95,6 +96,7 @@ export const getJobsService = async (
                     id: true,
                     name: true,
                     logo: true,
+                    description: true,
                 },
             },
         },
