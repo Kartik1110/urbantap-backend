@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Job" ALTER COLUMN "skills" DROP NOT NULL;
