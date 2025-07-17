@@ -444,9 +444,10 @@ model Job {
   workplace_type WorkplaceType
   location       String
   job_type       JobType
-  description    String
+  description    String[]
   min_salary     Float?
   max_salary     Float?
+  skills         String[]
   currency       Currency
   min_experience Int?
   max_experience Int?

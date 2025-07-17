@@ -372,7 +372,11 @@ async function main() {
         data: [
             {
                 title: 'Senior Broker',
-                description: faker.lorem.paragraph(),
+                description: [
+                faker.lorem.sentence(),
+                faker.lorem.sentence(),
+                faker.lorem.sentence(),
+            ],
                 workplace_type: 'On_site',
                 location: 'Dubai',
                 job_type: 'Full_time',
@@ -386,7 +390,11 @@ async function main() {
             },
             {
                 title: 'Property Consultant',
-                description: faker.lorem.paragraph(),
+                description: [
+                faker.lorem.sentence(),
+                faker.lorem.sentence(),
+                faker.lorem.sentence(),
+            ],
                 workplace_type: 'Hybrid',
                 location: 'Dubai',
                 job_type: 'Full_time',

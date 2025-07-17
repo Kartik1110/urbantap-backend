@@ -5,6 +5,7 @@ import {
     applyJobService,
     createJobService,
     getJobsService,
+    getJobByIdService
 } from '../services/job.service';
 
 export const applyJob = async (req: Request, res: Response) => {
@@ -90,6 +91,25 @@ export const getJobs = async (req: Request, res: Response) => {
             status: 'error',
             message: 'Internal server error',
             error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+export const getJobById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const job = await getJobByIdService(id);
+        res.status(200).json({
+            status: 'success',
+            message: 'Job fetched successfully',
+            data: job,
+        });
+    } catch (error) {
+        logger.error(error);
+        res.status(404).json({
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };
