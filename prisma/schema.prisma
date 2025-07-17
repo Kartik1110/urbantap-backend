@@ -447,6 +447,7 @@ model Job {
   description    String
   min_salary     Float?
   max_salary     Float?
+  skills         String
   currency       Currency
   min_experience Int?
   max_experience Int?

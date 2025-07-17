@@ -1,4 +1,4 @@
-import { PrismaClient, Job, Role } from '@prisma/client';
+import { PrismaClient, Job, Role, Prisma } from '@prisma/client';
 import { ApplyJobInput } from '../schema/job.schema';
 import { uploadToS3 } from '../utils/s3Upload';
 
@@ -60,28 +60,49 @@ export const createJobService = async (job: Job) => {
 };
 
 export const getJobsService = async (
-    body: { page?: number; page_size?: number } = {}
+    body: { page?: number; page_size?: number, search?: string } = {}
 ) => {
-    const { page = 1, page_size = 10 } = body;
+    const { page = 1, page_size = 10,search = ''  } = body;
     const skip = (page - 1) * page_size;
     const take = page_size;
+
+  const whereClause = search
+        ? {
+              title: {
+                  contains: search,
+                  mode: Prisma.QueryMode.insensitive,
+              },
+          }
+        : {};
+
+
 
     const jobs = await prisma.job.findMany({
         skip,
         take,
         orderBy: { createdAt: 'desc' },
+        where: whereClause,
         include: {
             company: {
                 select: {
                     id: true,
                     name: true,
                     logo: true,
+                    description: true,
+                },
+            },
+            brokerage: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                    description: true,
                 },
             },
         },
     });
 
-    const totalJobs = await prisma.job.count();
+    const totalJobs = await prisma.job.count({ where: whereClause });
     const totalPages = Math.ceil(totalJobs / page_size);
 
     const pagination = {
@@ -93,3 +114,39 @@ export const getJobsService = async (
 
     return { jobs, pagination };
 };
+
+export const getJobByIdService = async (id: string) => {
+    const job = await prisma.job.findUnique({
+        where: { id },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+            brokerage: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            },
+        },
+    });
+
+    if (!job) {
+        throw new Error('Job not found');
+    }
+
+    return job;
+};
+
