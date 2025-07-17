@@ -369,48 +369,47 @@ async function main() {
     console.log('Creating job listings...');
 
     await prisma.job.createMany({
-  data: [
-    {
-      title: 'Senior Broker',
-      description: [
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-      ].join('\n'), // ✅ Join array into string
-      workplace_type: 'On_site',
-      location: 'Dubai',
-      job_type: 'Full_time',
-      min_salary: 20000,
-      max_salary: 30000,
-      currency: 'AED',
-      skills:"Sales Person",
-      min_experience: 5,
-      max_experience: 10,
-      company_id: companyIds[0],
-      userId: hrUser.id,
-    },
-    {
-      title: 'Property Consultant',
-      description: [
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-      ].join('\n'), // ✅ Join array into string
-      workplace_type: 'Hybrid',
-      location: 'Dubai',
-      job_type: 'Full_time',
-      min_salary: 15000,
-      max_salary: 25000,
-      currency: 'AED',
-      skills:"Real estate Knowledge",
-      min_experience: 3,
-      max_experience: 7,
-      company_id: companyIds[1],
-      userId: hrUser.id,
-    },
-  ],
-});
-
+        data: [
+            {
+                title: 'Senior Broker',
+                description: [
+                    faker.lorem.sentence(),
+                    faker.lorem.sentence(),
+                    faker.lorem.sentence(),
+                ].join('\n'), // ✅ Join array into string
+                workplace_type: 'On_site',
+                location: 'Dubai',
+                job_type: 'Full_time',
+                min_salary: 20000,
+                max_salary: 30000,
+                currency: 'AED',
+                skills: 'Sales Person',
+                min_experience: 5,
+                max_experience: 10,
+                company_id: companyIds[0],
+                userId: hrUser.id,
+            },
+            {
+                title: 'Property Consultant',
+                description: [
+                    faker.lorem.sentence(),
+                    faker.lorem.sentence(),
+                    faker.lorem.sentence(),
+                ].join('\n'), // ✅ Join array into string
+                workplace_type: 'Hybrid',
+                location: 'Dubai',
+                job_type: 'Full_time',
+                min_salary: 15000,
+                max_salary: 25000,
+                currency: 'AED',
+                skills: 'Real estate Knowledge',
+                min_experience: 3,
+                max_experience: 7,
+                company_id: companyIds[1],
+                userId: hrUser.id,
+            },
+        ],
+    });
 
     console.log('✅ Seed data created successfully!');
 }
