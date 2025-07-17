@@ -19,6 +19,7 @@ import {
     Market,
 } from '@prisma/client';
 import generateListingFromText from '../scripts/generate-listings';
+import { Prisma } from '@prisma/client';
 
 /* Get listings */
 interface ListingFilters {
@@ -337,6 +338,7 @@ export const getListingsService = async (
             current_status,
             views,
             market,
+            search,
             ...restFilters
         } = filterParams;
 
@@ -460,13 +462,46 @@ export const getListingsService = async (
         delete filterParams.page;
         delete filterParams.page_size;
 
+        const normalizedSearch = filters.search?.trim().toLowerCase();
+
+        const searchConditions: Prisma.ListingWhereInput = normalizedSearch
+        ? {
+            OR: [
+                {
+                address: {
+                    contains: normalizedSearch,
+                    mode: 'insensitive' as Prisma.QueryMode, // Cast to enum
+                },
+                },
+                {
+                locality: {
+                    contains: normalizedSearch,
+                    mode: 'insensitive' as Prisma.QueryMode,
+                },
+                },
+                {
+                city: {
+                    equals: Object.values(City).find(
+                    (c) => c.toLowerCase() === normalizedSearch
+                    ) as City | undefined, // Safely cast to enum
+                },
+                },
+            ],
+            }
+        : {};
+
+
+
         // Get total count for pagination
         const total = await prisma.listing.count({
             where: whereCondition,
         });
 
         const listings = await prisma.listing.findMany({
-            where: whereCondition,
+            where:{
+                ...whereCondition,
+                ...searchConditions,
+            },
             skip,
             take: page_size,
             orderBy: {
