@@ -228,3 +228,22 @@ export const getCompanyByIdService = async (companyId: string) => {
         },
     });
 };
+
+export const createCompanyPostService = async (data: {
+    title: string;
+    caption: string;
+    image: string;
+    company_id: string;
+}) => {
+    return await prisma.companyPost.create({ data });
+};
+
+export const editCompanyPostService = async (
+    id: string,
+    updateData: { title?: string; caption?: string; image?: string }
+) => {
+    return await prisma.companyPost.update({
+        where: { id },
+        data: updateData,
+    });
+};

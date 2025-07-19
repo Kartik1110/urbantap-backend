@@ -93,23 +93,24 @@ model AdminUser {
 }
 
 model Company {
-  id          String      @id @default(uuid())
-  name        String      @default("")
+  id          String        @id @default(uuid())
+  name        String        @default("")
   name_ar     String?
-  description String      @default("")
-  logo        String      @default("")
-  type        CompanyType @default(Other)
-  website     String?     @default("")
-  email       String?     @default("")
-  phone       String?     @default("")
-  address     String?     @default("")
+  description String        @default("")
+  logo        String        @default("")
+  type        CompanyType   @default(Other)
+  website     String?       @default("")
+  email       String?       @default("")
+  phone       String?       @default("")
+  address     String?       @default("")
   brokers     Broker[]
   jobs        Job[]
-  developerId String?     @unique
-  brokerageId String?     @unique
-  developer   Developer?  @relation("CompanyToDeveloper", fields: [developerId], references: [id])
-  brokerage   Brokerage?  @relation("CompanyToBrokerage", fields: [brokerageId], references: [id])
+  developerId String?       @unique
+  brokerageId String?       @unique
+  developer   Developer?    @relation("CompanyToDeveloper", fields: [developerId], references: [id])
+  brokerage   Brokerage?    @relation("CompanyToBrokerage", fields: [brokerageId], references: [id])
   AdminUser   AdminUser[]
+  CompanyPost CompanyPost[]
 }
 
 enum CompanyType {
@@ -280,6 +281,17 @@ model Brokerage {
   AdminUser     AdminUser[]
   listings      Listing[]   @relation("BrokerageListings")
   jobs          Job[]
+}
+
+model CompanyPost {
+  id         String   @id @default(uuid())
+  title      String
+  caption    String
+  image      String
+  company_id String
+  company    Company  @relation(fields: [company_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 enum Admin_Status {

@@ -8,6 +8,8 @@ import {
     getCompaniesByUserId,
     getCompanyLinkInfo,
     getCompanyById,
+    getAllCompanyPosts,
+    getCompanyPostById
 } from '../controllers/company.controller';
 
 const router = Router();
@@ -32,5 +34,9 @@ router.get('/companies/user/:userId', getCompaniesByUserId);
 router.get('/companies/:id/link-info', getCompanyLinkInfo);
 
 router.get('/companies/detail/:id', getCompanyById);
+
+router.get('/company-posts', getAllCompanyPosts);
+
+router.get('/company-posts/:id', getCompanyPostById);
 
 export default router;

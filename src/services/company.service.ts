@@ -41,11 +41,11 @@ export const getCompaniesService = async ({
     return await prisma.company.findMany({
         where: search
             ? {
-                  name: {
-                      contains: search,
-                      mode: 'insensitive',
-                  },
-              }
+                name: {
+                    contains: search,
+                    mode: 'insensitive',
+                },
+            }
             : {},
     });
 };
@@ -156,6 +156,40 @@ export const getCompanyByIdService = async (companyId: string) => {
             jobs: {
                 select: {
                     id: true,
+                },
+            },
+        },
+    });
+};
+
+export const getAllCompanyPostsService = async () => {
+    return await prisma.companyPost.findMany({
+        orderBy: {
+            created_at: 'desc',
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+        },
+    });
+};
+
+export const getCompanyPostByIdService = async (postId: string) => {
+    return await prisma.companyPost.findUnique({
+        where: {
+            id: postId,
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
                 },
             },
         },
