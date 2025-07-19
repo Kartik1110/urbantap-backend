@@ -9,7 +9,9 @@ import {
     createProjectService,
     getCompanyByIdService,
     createCompanyPostService,
-    editCompanyPostService
+    editCompanyPostService,
+    getAllCompanyPostsService,
+    getCompanyPostByIdService
 } from '../services/admin-user.service';
 import { uploadToS3 } from '../utils/s3Upload';
 
@@ -419,5 +421,49 @@ export const editCompanyPost = async (
     } catch (error: any) {
         console.error('Edit CompanyPost error:', error);
         res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+
+export const getAllCompanyPosts = async (req: Request, res: Response) => {
+    try {
+        const posts = await getAllCompanyPostsService();
+        res.json({
+            status: 'success',
+            message: 'Company posts fetched successfully',
+            data: posts,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company posts',
+            error,
+        });
+    }
+};
+
+export const getCompanyPostById = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.id;
+        const post = await getCompanyPostByIdService(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Company post not found',
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Company post fetched successfully',
+            data: post,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company post',
+            error,
+        });
     }
 };
