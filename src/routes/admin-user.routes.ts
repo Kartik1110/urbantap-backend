@@ -10,7 +10,9 @@ import {
     createProject,
     getCompanyById,
     createCompanyPost,
-    editCompanyPost
+    editCompanyPost,
+    getAllCompanyPosts,
+    getCompanyPostById
 } from '../controllers/admin-user.controller';
 import { verifyToken } from '../middlewares/verfiyToken';
 import { createProjectSchema } from '../schema/createProjectschema';
@@ -74,3 +76,7 @@ export default (upload: any) => {
 };
 
 router.get('/admin-user/company/:id', verifyToken, getCompanyById);
+
+router.get('/admin-user/company-posts', getAllCompanyPosts);
+
+router.get('/admin-user/company-posts/:id', getCompanyPostById);

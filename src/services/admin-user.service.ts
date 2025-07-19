@@ -119,11 +119,11 @@ export const getDevelopersService = async ({
 
     const whereClause = search
         ? {
-              name: {
-                  contains: search,
-                  mode: 'insensitive' as Prisma.QueryMode,
-              },
-          }
+            name: {
+                contains: search,
+                mode: 'insensitive' as Prisma.QueryMode,
+            },
+        }
         : {};
 
     const [developers, totalCount] = await Promise.all([
@@ -185,10 +185,10 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         profile_pic: broker.profile_pic,
         company: broker.company
             ? {
-                  name: broker.company.name,
-                  logo: broker.company.logo,
-                  address: broker.company.address,
-              }
+                name: broker.company.name,
+                logo: broker.company.logo,
+                address: broker.company.address,
+            }
             : null,
     }));
 
@@ -245,5 +245,40 @@ export const editCompanyPostService = async (
     return await prisma.companyPost.update({
         where: { id },
         data: updateData,
+    });
+};
+
+
+export const getAllCompanyPostsService = async () => {
+    return await prisma.companyPost.findMany({
+        orderBy: {
+            created_at: 'desc',
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+        },
+    });
+};
+
+export const getCompanyPostByIdService = async (postId: string) => {
+    return await prisma.companyPost.findUnique({
+        where: {
+            id: postId,
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+        },
     });
 };
