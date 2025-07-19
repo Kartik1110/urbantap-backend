@@ -9,6 +9,8 @@ import {
     getDeveloperDetails,
     createProject,
     getCompanyById,
+    createCompanyPost,
+    editCompanyPost
 } from '../controllers/admin-user.controller';
 import { verifyToken } from '../middlewares/verfiyToken';
 import { createProjectSchema } from '../schema/createProjectschema';
@@ -52,6 +54,20 @@ export default (upload: any) => {
         ]),
         validateSchema(editDeveloperSchema),
         editDeveloper
+    );
+
+    router.post(
+        '/admin-user/company-post',
+        verifyToken,
+        upload.fields([{ name: 'image', maxCount: 1 }]),
+        createCompanyPost
+    );
+
+    router.put(
+        '/admin-user/company-post',
+        verifyToken,
+        upload.fields([{ name: 'image', maxCount: 1 }]),
+        editCompanyPost
     );
 
     return router;

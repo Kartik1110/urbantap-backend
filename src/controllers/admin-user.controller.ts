@@ -8,6 +8,8 @@ import {
     getDeveloperDetailsService,
     createProjectService,
     getCompanyByIdService,
+    createCompanyPostService,
+    editCompanyPostService
 } from '../services/admin-user.service';
 import { uploadToS3 } from '../utils/s3Upload';
 
@@ -330,5 +332,92 @@ export const getCompanyById = async (req: Request, res: Response) => {
             message: 'Failed to fetch company',
             error: error.message || error,
         });
+    }
+};
+
+export const createCompanyPost = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const user = req.user;
+        if (!user?.companyId) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Unauthorized: No company linked.',
+            });
+        }
+
+        const { title, caption } = req.body;
+        const files = req.files as {
+            [fieldname: string]: Express.Multer.File[];
+        };
+        const file = files?.image?.[0];
+
+        if (!file) {
+            return res
+                .status(400)
+                .json({ status: 'error', message: 'Image is required' });
+        }
+
+        const ext = file.originalname.split('.').pop();
+        const fileName = `company_posts/image_${Date.now()}.${ext}`;
+
+        // Use file.path since multer saved the file to disk
+        const imageUrl = await uploadToS3(file.path, fileName);
+
+        const post = await createCompanyPostService({
+            title,
+            caption,
+            image: imageUrl,
+            company_id: user.companyId,
+        });
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Post created',
+            data: post,
+        });
+    } catch (error: any) {
+        console.error('Create CompanyPost error:', error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const editCompanyPost = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const { id, title, caption } = req.body;
+
+        const files = req.files as {
+            [fieldname: string]: Express.Multer.File[];
+        };
+        let imageUrl: string | undefined = undefined;
+
+        if (files?.image?.[0]) {
+            const file = files.image[0];
+            const ext = file.originalname.split('.').pop();
+            imageUrl = await uploadToS3(
+                file.path,
+                `company_posts/image_${Date.now()}.${ext}`
+            );
+        }
+
+        const updated = await editCompanyPostService(id, {
+            title,
+            caption,
+            ...(imageUrl && { image: imageUrl }),
+        });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Post updated',
+            data: updated,
+        });
+    } catch (error: any) {
+        console.error('Edit CompanyPost error:', error);
+        res.status(500).json({ status: 'error', message: error.message });
     }
 };

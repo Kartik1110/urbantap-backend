@@ -7,6 +7,8 @@ import {
     getListingsByCompanyIdService,
     getCompaniesByUserIdService,
     getCompanyByIdService,
+    getAllCompanyPostsService,
+    getCompanyPostByIdService
 } from '../services/company.service';
 import prisma from '../utils/prisma';
 
@@ -183,6 +185,50 @@ export const getCompanyById = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch company by ID',
+            error,
+        });
+    }
+};
+
+
+export const getAllCompanyPosts = async (req: Request, res: Response) => {
+    try {
+        const posts = await getAllCompanyPostsService();
+        res.json({
+            status: 'success',
+            message: 'Company posts fetched successfully',
+            data: posts,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company posts',
+            error,
+        });
+    }
+};
+
+export const getCompanyPostById = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.id;
+        const post = await getCompanyPostByIdService(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Company post not found',
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Company post fetched successfully',
+            data: post,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company post',
             error,
         });
     }
