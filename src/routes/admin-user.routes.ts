@@ -61,14 +61,14 @@ export default (upload: any) => {
     router.post(
         '/admin-user/company-post',
         verifyToken,
-        upload.fields([{ name: 'image', maxCount: 1 }]),
+        upload.array('images'),
         createCompanyPost
     );
 
     router.put(
         '/admin-user/company-post',
         verifyToken,
-        upload.fields([{ name: 'image', maxCount: 1 }]),
+        upload.array('images'),
         editCompanyPost
     );
 

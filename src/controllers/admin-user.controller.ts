@@ -14,6 +14,7 @@ import {
     getCompanyPostByIdService
 } from '../services/admin-user.service';
 import { uploadToS3 } from '../utils/s3Upload';
+import prisma from '../utils/prisma';
 
 interface AuthenticatedRequest extends Request {
     user?: {
@@ -350,29 +351,36 @@ export const createCompanyPost = async (
             });
         }
 
-        const { title, caption } = req.body;
-        const files = req.files as {
-            [fieldname: string]: Express.Multer.File[];
-        };
-        const file = files?.image?.[0];
+        const { title, caption, position } = req.body;
 
-        if (!file) {
+        const files = req.files as Express.Multer.File[];
+        if (!files || files.length === 0) {
             return res
                 .status(400)
-                .json({ status: 'error', message: 'Image is required' });
+                .json({ status: 'error', message: 'At least one image is required.' });
         }
 
-        const ext = file.originalname.split('.').pop();
-        const fileName = `company_posts/image_${Date.now()}.${ext}`;
+        const imageUrls: string[] = await Promise.all(
+            files.map(async (file) => {
+                const ext = file.originalname.split('.').pop();
+                const fileName = `company_posts/image_${Date.now()}_${Math.random()
+                    .toString(36)
+                    .substring(2)}.${ext}`;
+                return await uploadToS3(file.path, fileName);
+            })
+        );
 
-        // Use file.path since multer saved the file to disk
-        const imageUrl = await uploadToS3(file.path, fileName);
+        // Get current count of posts to assign rank
+        const currentCount = await prisma.companyPost.count();
+        const rank = currentCount + 1;
 
         const post = await createCompanyPostService({
             title,
             caption,
-            image: imageUrl,
+            images: imageUrls,
             company_id: user.companyId,
+            rank,
+            position,
         });
 
         res.status(201).json({
@@ -391,26 +399,28 @@ export const editCompanyPost = async (
     res: Response
 ) => {
     try {
-        const { id, title, caption } = req.body;
+        const { id, title, caption, position } = req.body;
+        const files = req.files as Express.Multer.File[];
 
-        const files = req.files as {
-            [fieldname: string]: Express.Multer.File[];
-        };
-        let imageUrl: string | undefined = undefined;
+        let imageUrls: string[] | undefined = undefined;
 
-        if (files?.image?.[0]) {
-            const file = files.image[0];
-            const ext = file.originalname.split('.').pop();
-            imageUrl = await uploadToS3(
-                file.path,
-                `company_posts/image_${Date.now()}.${ext}`
+        if (files && files.length > 0) {
+            imageUrls = await Promise.all(
+                files.map(async (file) => {
+                    const ext = file.originalname.split('.').pop();
+                    const fileName = `company_posts/image_${Date.now()}_${Math.random()
+                        .toString(36)
+                        .substring(2)}.${ext}`;
+                    return await uploadToS3(file.path, fileName);
+                })
             );
         }
 
         const updated = await editCompanyPostService(id, {
             title,
             caption,
-            ...(imageUrl && { image: imageUrl }),
+            position,
+            ...(imageUrls && { images: imageUrls }),
         });
 
         res.status(200).json({
