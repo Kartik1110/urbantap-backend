@@ -284,14 +284,22 @@ model Brokerage {
 }
 
 model CompanyPost {
-  id         String   @id @default(uuid())
-  title      String
-  caption    String
-  image      String
+  id         String       @id @default(uuid())
+  title      String?
+  caption    String?
+  images     String[]     @default([])
+  position   PostPosition @default(Home)
+  rank       Int          @default(1)
   company_id String
-  company    Company  @relation(fields: [company_id], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  company    Company      @relation(fields: [company_id], references: [id])
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+}
+
+enum PostPosition {
+  Home
+  Listings
+  Jobs
 }
 
 enum Admin_Status {

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "CompanyPost" ALTER COLUMN "title" DROP NOT NULL,
+ALTER COLUMN "caption" DROP NOT NULL,
+ALTER COLUMN "images" SET DEFAULT ARRAY[]::TEXT[];

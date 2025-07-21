@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../utils/prisma";
-import { Category, Prisma } from '@prisma/client';
+import { Category, Prisma, PostPosition } from '@prisma/client';
 
 export const signupAdmin = async (
     email: string,
@@ -232,15 +232,22 @@ export const getCompanyByIdService = async (companyId: string) => {
 export const createCompanyPostService = async (data: {
     title: string;
     caption: string;
-    image: string;
+    images: string[];
+    position: PostPosition;
     company_id: string;
+    rank: number;
 }) => {
     return await prisma.companyPost.create({ data });
 };
 
 export const editCompanyPostService = async (
     id: string,
-    updateData: { title?: string; caption?: string; image?: string }
+    updateData: {
+        title?: string;
+        caption?: string;
+        images?: string[];
+        position?: PostPosition;
+    }
 ) => {
     return await prisma.companyPost.update({
         where: { id },
@@ -252,7 +259,7 @@ export const editCompanyPostService = async (
 export const getAllCompanyPostsService = async () => {
     return await prisma.companyPost.findMany({
         orderBy: {
-            created_at: 'desc',
+            rank: 'asc',
         },
         include: {
             company: {
@@ -260,6 +267,8 @@ export const getAllCompanyPostsService = async () => {
                     id: true,
                     name: true,
                     logo: true,
+                    developerId: true,
+                    brokerageId: true,
                 },
             },
         },
@@ -277,6 +286,8 @@ export const getCompanyPostByIdService = async (postId: string) => {
                     id: true,
                     name: true,
                     logo: true,
+                    developerId: true,
+                    brokerageId: true,
                 },
             },
         },
