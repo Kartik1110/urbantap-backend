@@ -285,9 +285,9 @@ model Brokerage {
 
 model CompanyPost {
   id         String       @id @default(uuid())
-  title      String
-  caption    String
-  images     String[]
+  title      String?
+  caption    String?
+  images     String[]     @default([])
   position   PostPosition @default(Home)
   rank       Int          @default(1)
   company_id String
