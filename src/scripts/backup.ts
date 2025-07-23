@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
 import { exec } from 'child_process';
+import logger from '../utils/logger';
 import { uploadToS3 } from '../utils/s3Upload';
 
 dotenv.config();
@@ -23,13 +24,13 @@ function getBackupFileName(): string {
 
 async function performBackup(): Promise<void> {
     if (!DB_NAME || !DB_USER || !DB_PASSWORD) {
-        console.error(
+        logger.error(
             'Database credentials are not set in environment variables.'
         );
         return;
     }
     if (!process.env.S3_BUCKET_NAME) {
-        console.error('S3_BUCKET_NAME is not set in environment variables.');
+        logger.error('S3_BUCKET_NAME is not set in environment variables.');
         return;
     }
 
@@ -40,51 +41,102 @@ async function performBackup(): Promise<void> {
     const backupFileName = getBackupFileName();
     const backupFilePath = path.join(BACKUP_DIR, backupFileName);
 
-    // Construct pg_dump command
-    const dumpCmd = `PGPASSWORD=\"${DB_PASSWORD}\" pg_dump -U ${DB_USER} -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME} | gzip > ${backupFilePath}`;
-
-    console.log('Starting PostgreSQL backup...');
-    exec(
-        dumpCmd,
-        { env: process.env, shell: '/bin/bash' },
-        async (error: Error | null, stdout: string, stderr: string) => {
-            if (error) {
-                console.error('Database backup failed:', error.message);
-                return;
-            }
-            if (stderr) {
-                console.error('pg_dump stderr:', stderr);
-            }
-            console.log('Database backup completed:', backupFilePath);
-
-            // Upload to S3
-            try {
-                const s3Key = `${S3_FOLDER}/${backupFileName}`;
-                await uploadToS3(backupFilePath, s3Key);
-                console.log(`Backup successfully uploaded to S3: ${s3Key}`);
-            } catch (err) {
-                console.error('Failed to upload backup to S3:', err);
-                return;
-            }
-
-            // Cleanup local backup file
-            try {
-                fs.unlinkSync(backupFilePath);
-                console.log('Local backup file cleaned up.');
-            } catch (err) {
-                console.error('Failed to delete local backup file:', err);
-            }
-        }
+    logger.info('Starting PostgreSQL backup...');
+    logger.info(
+        `Database: ${DB_NAME}, Host: ${DB_HOST}, Port: ${DB_PORT}, User: ${DB_USER}`
     );
+
+    // Create environment with PGPASSWORD
+    const env = { ...process.env, PGPASSWORD: DB_PASSWORD };
+
+    // Construct pg_dump command without shell escaping issues
+    const dumpCmd = `pg_dump -U "${DB_USER}" -h "${DB_HOST}" -p "${DB_PORT}" "${DB_NAME}" | gzip > "${backupFilePath}"`;
+
+    logger.info('Executing backup command...');
+
+    return new Promise((resolve, reject) => {
+        exec(
+            dumpCmd,
+            { env, shell: '/bin/bash' },
+            async (error: Error | null, stdout: string, stderr: string) => {
+                if (error) {
+                    logger.error('Database backup failed:', error.message);
+                    reject(error);
+                    return;
+                }
+
+                if (stderr && !stderr.includes('WARNING')) {
+                    logger.error('pg_dump stderr:', stderr);
+                }
+
+                // Check if backup file was created and has content
+                try {
+                    if (!fs.existsSync(backupFilePath)) {
+                        const error = new Error('Backup file was not created');
+                        logger.error('Backup file was not created');
+                        reject(error);
+                        return;
+                    }
+
+                    const stats = fs.statSync(backupFilePath);
+                    if (stats.size === 0) {
+                        const error = new Error('Backup file is empty');
+                        logger.error('Backup file is empty - backup failed');
+                        reject(error);
+                        return;
+                    }
+
+                    logger.info(
+                        `Database backup completed: ${backupFilePath} (${stats.size} bytes)`
+                    );
+
+                    // Upload to S3
+                    try {
+                        const s3Key = `${S3_FOLDER}/${backupFileName}`;
+                        await uploadToS3(backupFilePath, s3Key);
+                        logger.info(
+                            `Backup successfully uploaded to S3: ${s3Key}`
+                        );
+                    } catch (err) {
+                        logger.error('Failed to upload backup to S3:', err);
+                        reject(err);
+                        return;
+                    }
+
+                    // Cleanup local backup file
+                    try {
+                        fs.unlinkSync(backupFilePath);
+                        logger.info('Local backup file cleaned up.');
+                    } catch (err) {
+                        logger.error(
+                            'Failed to delete local backup file:',
+                            err
+                        );
+                        // Don't reject here as the backup was successful
+                    }
+
+                    resolve();
+                } catch (err) {
+                    logger.error('Error checking backup file:', err);
+                    reject(err);
+                }
+            }
+        );
+    });
 }
 
 // Schedule the backup to run daily at 12am
 cron.schedule('0 0 * * *', () => {
-    console.log('Running scheduled database backup...');
-    performBackup();
+    logger.info('Running scheduled database backup...');
+    performBackup().catch((err) => {
+        logger.error('Scheduled backup failed:', err);
+    });
 });
 
 // If run directly, perform backup immediately
 if (require.main === module) {
-    performBackup();
+    performBackup().catch((err) => {
+        logger.error('Backup failed:', err);
+        process.exit(1);
+    });
 }

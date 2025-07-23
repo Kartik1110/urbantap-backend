@@ -8,12 +8,18 @@ import {
     editListingController,
     generateListingFromText,
     getPopularLocalities,
+    getFeaturedListings,
+    getRecentListings,
 } from '../controllers/listings.controller';
 
 const router = Router();
 
 /* Get all listings */
 router.get('/listings', getListings);
+
+router.get('/listings/featured', getFeaturedListings);
+
+router.get('/listings/recent', getRecentListings);
 
 router.get('/listings/:id', getListingById);
 
