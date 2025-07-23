@@ -77,7 +77,7 @@ export const getJobsService = async (
 
 
 
-    const jobs = await prisma.job.findMany({
+    const jobsRaw = await prisma.job.findMany({
         skip,
         take,
         orderBy: { createdAt: 'desc' },
@@ -105,17 +105,32 @@ export const getJobsService = async (
         },
     });
 
+    const jobs = jobsRaw.map((job) => {
+        if (job.brokerage) {
+            const { _count, ...brokerageData } = job.brokerage;
+            return {
+                ...job,
+                brokerage: {
+                    ...brokerageData,
+                    listings_count: _count.listings,
+                },
+            };
+        }
+        return job;
+    });
+
     const totalJobs = await prisma.job.count({ where: whereClause });
     const totalPages = Math.ceil(totalJobs / page_size);
 
-    const pagination = {
-        total: totalJobs,
-        totalPages,
-        page,
-        page_size,
+    return {
+        jobs,
+        pagination: {
+            total: totalJobs,
+            totalPages,
+            page,
+            page_size,
+        },
     };
-
-    return { jobs, pagination };
 };
 
 export const getJobByIdService = async (id: string) => {
@@ -134,6 +149,7 @@ export const getJobByIdService = async (id: string) => {
                     id: true,
                     name: true,
                     logo: true,
+                    description: true,
                     _count: {
                         select: { listings: true },
                     }
@@ -149,10 +165,25 @@ export const getJobByIdService = async (id: string) => {
         },
     });
 
+
     if (!job) {
         throw new Error('Job not found');
     }
 
-    return job;
-};
+    const cleanedBrokerage = job.brokerage
+        ? {
+            id: job.brokerage.id,
+            name: job.brokerage.name,
+            logo: job.brokerage.logo,
+            description: job.brokerage.description,
+            listings_count: job.brokerage._count?.listings ?? 0,
+        }
+        : null;
 
+    const returnedJob = {
+        ...job,
+        brokerage: cleanedBrokerage,
+    };
+
+    return returnedJob;
+};
