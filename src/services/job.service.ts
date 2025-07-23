@@ -62,17 +62,17 @@ export const createJobService = async (job: Job) => {
 export const getJobsService = async (
     body: { page?: number; page_size?: number, search?: string } = {}
 ) => {
-    const { page = 1, page_size = 10,search = ''  } = body;
+    const { page = 1, page_size = 10, search = '' } = body;
     const skip = (page - 1) * page_size;
     const take = page_size;
 
-  const whereClause = search
+    const whereClause = search
         ? {
-              title: {
-                  contains: search,
-                  mode: Prisma.QueryMode.insensitive,
-              },
-          }
+            title: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+            },
+        }
         : {};
 
 
@@ -97,6 +97,9 @@ export const getJobsService = async (
                     name: true,
                     logo: true,
                     description: true,
+                    _count: {
+                        select: { listings: true },
+                    },
                 },
             },
         },
@@ -131,6 +134,9 @@ export const getJobByIdService = async (id: string) => {
                     id: true,
                     name: true,
                     logo: true,
+                    _count: {
+                        select: { listings: true },
+                    }
                 },
             },
             user: {
