@@ -36,15 +36,15 @@ export const applyJobService = async (
 };
 
 export const createJobService = async (job: Job) => {
-    if (job.userId) {
-        const user = await prisma.user.findUnique({
-            where: { id: job.userId, role: Role.HR },
-        });
+    // if (job.userId) {
+    //     const user = await prisma.user.findUnique({
+    //         where: { id: job.userId, role: Role.HR },
+    //     });
 
-        if (!user) {
-            throw new Error('User not found or is not an HR');
-        }
-    }
+    //     if (!user) {
+    //         throw new Error('User not found or is not an HR');
+    //     }
+    // }
 
     if (job.company_id) {
         const company = await prisma.company.findUnique({

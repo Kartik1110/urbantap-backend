@@ -11,7 +11,10 @@ import {
     createCompanyPostService,
     editCompanyPostService,
     getAllCompanyPostsService,
-    getCompanyPostByIdService
+    getCompanyPostByIdService,
+    createJobService,
+    getJobsByBrokerageIdService,
+    getJobByIdService
 } from '../services/admin-user.service';
 import { uploadToS3 } from '../utils/s3Upload';
 import prisma from '../utils/prisma';
@@ -475,5 +478,100 @@ export const getCompanyPostById = async (req: Request, res: Response) => {
             message: 'Failed to fetch company post',
             error,
         });
+    }
+};
+
+// export const createJobController = async (req: AuthenticatedRequest, res: Response) => {
+//     try {
+//         const user = req.user;
+//         if (!user?.companyId) {
+//             return res.status(403).json({ message: 'Unauthorized: No company linked.' });
+//         }
+
+//         const data = {
+//             ...req.body,
+//             company_id: user.companyId,
+//             brokerage_id: user.brokerageId || null,
+//             userId: user.id,
+//         };
+
+//         const job = await createJobService(data);
+
+//         res.status(201).json({
+//             status: 'success',
+//             message: 'Job created successfully',
+//             data: job,
+//         });
+//     } catch (error: any) {
+//         res.status(500).json({ status: 'error', message: error.message });
+//     }
+// };
+
+export const createJobController = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized",
+            });
+        }
+
+        const { id: userId, companyId, brokerageId } = req.user;
+
+        const jobData = {
+            ...req.body,
+            adminUserId: userId,
+            company_id: companyId,
+            brokerage_id: brokerageId,
+        };
+
+        const job = await createJobService(jobData);
+
+        return res.status(201).json({
+            status: "success",
+            data: job,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            status: "error",
+            message: "Server Error",
+        });
+    }
+};
+
+export const getJobsByBrokerageIdController = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const brokerageId = req.user?.brokerageId;
+        if (!brokerageId) {
+            return res.status(400).json({ message: 'Brokerage ID not found for user' });
+        }
+
+        const jobs = await getJobsByBrokerageIdService(brokerageId);
+
+        res.status(200).json({
+            status: 'success',
+            data: jobs,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const getJobByIdController = async (req: Request, res: Response) => {
+    try {
+        const jobId = req.params.id;
+        const job = await getJobByIdService(jobId);
+
+        if (!job) {
+            return res.status(404).json({ status: 'error', message: 'Job not found' });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: job,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
     }
 };

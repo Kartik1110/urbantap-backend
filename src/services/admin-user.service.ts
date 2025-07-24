@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../utils/prisma";
 import { Category, Prisma, PostPosition } from '@prisma/client';
+import { JobInput } from '../schema/job.schema';
 
 export const signupAdmin = async (
     email: string,
@@ -290,6 +291,55 @@ export const getCompanyPostByIdService = async (postId: string) => {
                     brokerageId: true,
                 },
             },
+        },
+    });
+};
+
+export const createJobService = async (
+    data: JobInput & {
+        adminUserId: string;
+        company_id: string;
+        brokerage_id?: string;
+    }
+) => {
+    return await prisma.job.create({
+        data: {
+            title: data.title,
+            company_id: data.company_id,
+            brokerage_id: data.brokerage_id, // optional
+            workplace_type: data.workplace_type,
+            location: data.location,
+            job_type: data.job_type,
+            description: data.description,
+            currency: data.currency,
+            min_salary: data.min_salary ?? null,
+            max_salary: data.max_salary ?? null,
+            skills: data.skills ?? null,
+            min_experience: data.min_experience ?? null,
+            max_experience: data.max_experience ?? null,
+            adminUserId: data.adminUserId,
+            userId: null,
+        },
+    });
+};
+
+
+
+export const getJobsByBrokerageIdService = async (brokerageId: string) => {
+    return await prisma.job.findMany({
+        where: {
+            brokerage_id: brokerageId,
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
+};
+
+export const getJobByIdService = async (jobId: string) => {
+    return await prisma.job.findUnique({
+        where: {
+            id: jobId,
         },
     });
 };
