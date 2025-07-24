@@ -55,7 +55,7 @@ model Broker {
   company_id               String?
   user_id                  String?
   type                     BrokerType?
-  speciality               Speciality[]        @default([])
+  specialities             Speciality[]        @default([])
   company                  Company?            @relation(fields: [company_id], references: [id])
   listings                 Listing[]
   user                     User?               @relation(fields: [user_id], references: [id])
