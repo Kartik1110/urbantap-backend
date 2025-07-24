@@ -239,6 +239,8 @@ export const getListingsService = async (
             current_status,
             views,
             market,
+            // eslint-disable-next-line
+            search,
             ...restFilters
         } = filterParams;
 
@@ -390,7 +392,10 @@ export const getListingsService = async (
 
         // Get total count for pagination
         const total = await prisma.listing.count({
-            where: whereCondition,
+            where: {
+                ...whereCondition,
+                ...searchConditions,
+            },
         });
 
         const listings = await prisma.listing.findMany({
