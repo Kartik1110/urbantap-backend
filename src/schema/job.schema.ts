@@ -12,9 +12,9 @@ export const jobSchema = z.object({
         .min(1, 'Description is required')
         .max(2000, 'Description must be less than 2000 characters'),
 
-    company_id: z
-        .string()
-        .min(1, 'Company ID is required'),
+    // company_id: z
+    //     .string()
+    //     .min(1, 'Company ID is required'),
 
     brokerage_id: z
         .string()

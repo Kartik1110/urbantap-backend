@@ -12,12 +12,16 @@ import {
     createCompanyPost,
     editCompanyPost,
     getAllCompanyPosts,
-    getCompanyPostById
+    getCompanyPostById,
+    createJobController,
+    getJobByIdController,
+    getJobsByBrokerageIdController
 } from '../controllers/admin-user.controller';
 import { verifyToken } from '../middlewares/verfiyToken';
 import { createProjectSchema } from '../schema/createProjectschema';
 import { editDeveloperSchema } from '../schema/editDeveloperSchema';
 import validateSchema from '../middlewares/validate.middleware';
+import { jobSchema } from '../schema/job.schema';
 
 const router = express.Router();
 
@@ -80,3 +84,9 @@ router.get('/admin-user/company/:id', verifyToken, getCompanyById);
 router.get('/admin-user/company-posts', getAllCompanyPosts);
 
 router.get('/admin-user/company-posts/:id', getCompanyPostById);
+
+router.post('/admin-user/jobs', verifyToken, validateSchema(jobSchema), createJobController);
+
+router.get('/admin-user/jobs/brokerage', verifyToken, getJobsByBrokerageIdController);
+
+router.get('/admin-user/jobs/:id', verifyToken, getJobByIdController);
