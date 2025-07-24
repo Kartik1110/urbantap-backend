@@ -55,6 +55,7 @@ model Broker {
   company_id               String?
   user_id                  String?
   type                     BrokerType?
+  speciality               Speciality[]        @default([])
   company                  Company?            @relation(fields: [company_id], references: [id])
   listings                 Listing[]
   user                     User?               @relation(fields: [user_id], references: [id])
@@ -70,6 +71,14 @@ model Broker {
   brokerageId              String?
   Developer                Developer?          @relation(fields: [developerId], references: [id])
   developerId              String?
+}
+
+enum Speciality {
+  Villa
+  Apartment
+  Townhouse
+  Office
+  Shop
 }
 
 enum BrokerType {
