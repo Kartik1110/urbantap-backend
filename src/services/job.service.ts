@@ -1,4 +1,4 @@
-import { PrismaClient, Job, Role, Prisma } from '@prisma/client';
+import { PrismaClient, Job, Prisma } from '@prisma/client';
 import { ApplyJobInput } from '../schema/job.schema';
 import { uploadToS3 } from '../utils/s3Upload';
 
@@ -60,7 +60,7 @@ export const createJobService = async (job: Job) => {
 };
 
 export const getJobsService = async (
-    body: { page?: number; page_size?: number, search?: string } = {}
+    body: { page?: number; page_size?: number; search?: string } = {}
 ) => {
     const { page = 1, page_size = 10, search = '' } = body;
     const skip = (page - 1) * page_size;
@@ -68,21 +68,36 @@ export const getJobsService = async (
 
     const whereClause = search
         ? {
-            title: {
-                contains: search,
-                mode: Prisma.QueryMode.insensitive,
-            },
-        }
+              title: {
+                  contains: search,
+                  mode: Prisma.QueryMode.insensitive,
+              },
+          }
         : {};
-
-
 
     const jobsRaw = await prisma.job.findMany({
         skip,
         take,
         orderBy: { createdAt: 'desc' },
         where: whereClause,
-        include: {
+        select: {
+            id: true,
+            title: true,
+            company_id: true,
+            brokerage_id: true,
+            workplace_type: true,
+            location: true,
+            job_type: true,
+            description: true,
+            min_salary: true,
+            max_salary: true,
+            skills: true,
+            currency: true,
+            min_experience: true,
+            max_experience: true,
+            userId: true,
+            createdAt: true,
+            updatedAt: true,
             company: {
                 select: {
                     id: true,
@@ -136,7 +151,24 @@ export const getJobsService = async (
 export const getJobByIdService = async (id: string) => {
     const job = await prisma.job.findUnique({
         where: { id },
-        include: {
+        select: {
+            id: true,
+            title: true,
+            company_id: true,
+            brokerage_id: true,
+            workplace_type: true,
+            location: true,
+            job_type: true,
+            description: true,
+            min_salary: true,
+            max_salary: true,
+            skills: true,
+            currency: true,
+            min_experience: true,
+            max_experience: true,
+            userId: true,
+            createdAt: true,
+            updatedAt: true,
             company: {
                 select: {
                     id: true,
@@ -152,7 +184,7 @@ export const getJobByIdService = async (id: string) => {
                     description: true,
                     _count: {
                         select: { listings: true },
-                    }
+                    },
                 },
             },
             user: {
@@ -165,19 +197,18 @@ export const getJobByIdService = async (id: string) => {
         },
     });
 
-
     if (!job) {
         throw new Error('Job not found');
     }
 
     const cleanedBrokerage = job.brokerage
         ? {
-            id: job.brokerage.id,
-            name: job.brokerage.name,
-            logo: job.brokerage.logo,
-            description: job.brokerage.description,
-            listings_count: job.brokerage._count?.listings ?? 0,
-        }
+              id: job.brokerage.id,
+              name: job.brokerage.name,
+              logo: job.brokerage.logo,
+              description: job.brokerage.description,
+              listings_count: job.brokerage._count?.listings ?? 0,
+          }
         : null;
 
     const returnedJob = {

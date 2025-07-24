@@ -3,7 +3,12 @@ import { Router } from 'express';
 
 import validateSchema from '../middlewares/validate.middleware';
 import { jobSchema } from '../schema/job.schema';
-import { applyJob, createJob, getJobs, getJobById } from '../controllers/job.controller';
+import {
+    applyJob,
+    createJob,
+    getJobs,
+    getJobById,
+} from '../controllers/job.controller';
 
 const router = Router();
 

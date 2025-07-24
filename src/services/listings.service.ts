@@ -182,6 +182,7 @@ export const getListingsService = async (
         payment_plan?: ('Payment_done' | 'Payment_Pending')[];
         sale_type?: ('Direct' | 'Resale')[];
         amenities?: string[];
+        search?: string;
         page?: number;
         page_size?: number;
     } & ListingFilters
