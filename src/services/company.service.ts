@@ -14,21 +14,58 @@ interface CompanyUpdateInput {
 }
 
 export const bulkInsertCompaniesService = async (companies: Company[]) => {
-    await prisma.company.createMany({
-        data: companies,
-    });
+    // 1. Create all companies
+    const createdCompanies = await Promise.all(
+        companies.map(async (company) => {
+            const createdCompany = await prisma.company.create({
+                data: company,
+            });
 
-    // Get the IDs of the newly created companies
-    const createdCompanies = await prisma.company.findMany({
-        where: {
-            name: {
-                in: companies.map((company) => company.name),
-            },
-        },
-        select: {
-            id: true,
-        },
-    });
+            // 2. Automatically create Developer or Brokerage based on type
+            if (company.type === CompanyType.Developer) {
+                const developer = await prisma.developer.create({
+                    data: {
+                        name: createdCompany.name,
+                        logo: createdCompany.logo,
+                        description: createdCompany.description,
+                        email: createdCompany.email,
+                        phone: createdCompany.phone,
+                        company_id: createdCompany.id,
+                    },
+                });
+
+                // 3. Update company with developerId
+                await prisma.company.update({
+                    where: { id: createdCompany.id },
+                    data: {
+                        developerId: developer.id,
+                    },
+                });
+            } else if (company.type === CompanyType.Brokerage) {
+                const brokerage = await prisma.brokerage.create({
+                    data: {
+                        name: createdCompany.name,
+                        logo: createdCompany.logo,
+                        description: createdCompany.description,
+                        contact_email: createdCompany.email,
+                        contact_phone: createdCompany.phone,
+                        company_id: createdCompany.id,
+                        service_areas: [],
+                    },
+                });
+
+                // 4. Update company with brokerageId
+                await prisma.company.update({
+                    where: { id: createdCompany.id },
+                    data: {
+                        brokerageId: brokerage.id,
+                    },
+                });
+            }
+
+            return createdCompany;
+        })
+    );
 
     return createdCompanies.map((company) => company.id);
 };
