@@ -3,33 +3,33 @@ import path from 'path';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
 import { exec } from 'child_process';
+import logger from '../utils/logger';
 import { uploadToS3 } from '../utils/s3Upload';
 
 dotenv.config();
 
-// Configuration from environment variables
+// **Environment vars**
 const DB_NAME = process.env.DB_NAME;
 const DB_USER = process.env.DB_USER;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const DB_HOST = process.env.PGHOST || 'localhost';
-const DB_PORT = process.env.PGPORT || '5432';
+const S3_BUCKET = process.env.S3_BUCKET_NAME;
 const BACKUP_DIR = process.env.BACKUP_DIR || '/tmp/backup';
 const S3_FOLDER = process.env.S3_FOLDER || 'backups';
+
+// Docker container name (as seen in `docker ps`)
+const PG_CONTAINER = process.env.PG_CONTAINER || 'postgres-dev';
 
 function getBackupFileName(): string {
     const date = new Date().toISOString().replace(/[:.]/g, '-');
     return `${DB_NAME}_backup_${date}.sql.gz`;
 }
 
-async function performBackup(): Promise<void> {
-    if (!DB_NAME || !DB_USER || !DB_PASSWORD) {
-        console.error(
-            'Database credentials are not set in environment variables.'
-        );
+export async function performBackup(): Promise<void> {
+    if (!DB_NAME || !DB_USER) {
+        logger.error('DB_NAME and DB_USER must be set');
         return;
     }
-    if (!process.env.S3_BUCKET_NAME) {
-        console.error('S3_BUCKET_NAME is not set in environment variables.');
+    if (!S3_BUCKET) {
+        logger.error('S3_BUCKET_NAME must be set');
         return;
     }
 
@@ -40,51 +40,84 @@ async function performBackup(): Promise<void> {
     const backupFileName = getBackupFileName();
     const backupFilePath = path.join(BACKUP_DIR, backupFileName);
 
-    // Construct pg_dump command
-    const dumpCmd = `PGPASSWORD=\"${DB_PASSWORD}\" pg_dump -U ${DB_USER} -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME} | gzip > ${backupFilePath}`;
+    logger.info('Starting PostgreSQL backup via docker exec...');
+    logger.info(`Container: ${PG_CONTAINER}, DB: ${DB_NAME}, User: ${DB_USER}`);
 
-    console.log('Starting PostgreSQL backup...');
-    exec(
-        dumpCmd,
-        { env: process.env, shell: '/bin/bash' },
-        async (error: Error | null, stdout: string, stderr: string) => {
-            if (error) {
-                console.error('Database backup failed:', error.message);
-                return;
-            }
-            if (stderr) {
-                console.error('pg_dump stderr:', stderr);
-            }
-            console.log('Database backup completed:', backupFilePath);
+    // use the container's pg_dump to avoid version mismatches
+    const dumpCmd = `
+    docker exec -i ${PG_CONTAINER} \
+      pg_dump -U "${DB_USER}" "${DB_NAME}" \
+    | gzip > "${backupFilePath}"
+  `.trim();
 
-            // Upload to S3
-            try {
-                const s3Key = `${S3_FOLDER}/${backupFileName}`;
-                await uploadToS3(backupFilePath, s3Key);
-                console.log(`Backup successfully uploaded to S3: ${s3Key}`);
-            } catch (err) {
-                console.error('Failed to upload backup to S3:', err);
-                return;
-            }
+    return new Promise<void>((resolve, reject) => {
+        exec(
+            dumpCmd,
+            { shell: '/bin/bash' },
+            async (error, _stdout, stderr) => {
+                if (error) {
+                    logger.error('Database backup failed:', error.message);
+                    return reject(error);
+                }
+                if (stderr) {
+                    logger.error('pg_dump stderr:', stderr.trim());
+                }
 
-            // Cleanup local backup file
-            try {
-                fs.unlinkSync(backupFilePath);
-                console.log('Local backup file cleaned up.');
-            } catch (err) {
-                console.error('Failed to delete local backup file:', err);
+                // verify file
+                if (!fs.existsSync(backupFilePath)) {
+                    const err = new Error('Backup file not created');
+                    logger.error(err.message);
+                    return reject(err);
+                }
+                const stats = fs.statSync(backupFilePath);
+                if (stats.size === 0) {
+                    const err = new Error('Backup file is empty');
+                    logger.error(err.message);
+                    return reject(err);
+                }
+
+                logger.info(
+                    `Backup completed: ${backupFilePath} (${stats.size} bytes)`
+                );
+
+                // upload
+                try {
+                    const s3Key = `${S3_FOLDER}/${backupFileName}`;
+                    await uploadToS3(backupFilePath, s3Key);
+                    logger.info(`Uploaded to S3: ${s3Key}`);
+                } catch (uploadErr) {
+                    logger.error('Upload failed:', uploadErr);
+                    return reject(uploadErr);
+                }
+
+                // cleanup
+                try {
+                    fs.unlinkSync(backupFilePath);
+                    logger.info('Local backup file deleted.');
+                } catch (cleanupErr) {
+                    logger.error('Cleanup failed:', cleanupErr);
+                }
+
+                resolve();
             }
-        }
-    );
+        );
+    });
 }
 
-// Schedule the backup to run daily at 12am
+// schedule daily at midnight
 cron.schedule('0 0 * * *', () => {
-    console.log('Running scheduled database backup...');
-    performBackup();
+    logger.info('Scheduled backup triggered');
+    performBackup().catch((err) => {
+        logger.error('Scheduled backup error:', err);
+    });
 });
 
-// If run directly, perform backup immediately
+// allow `node backup.js` to run one-off
 if (require.main === module) {
-    performBackup();
+    performBackup()
+        .then(() => process.exit(0))
+        .catch((err) => {
+            logger.error('Immediate backup failed:', err);
+            process.exit(1);
+        });
 }
