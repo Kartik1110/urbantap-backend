@@ -5,8 +5,16 @@ import {
     applyJobService,
     createJobService,
     getJobsService,
-    getJobByIdService
+    getJobByIdService,
+    getJobsAppliedByBrokerService
 } from '../services/job.service';
+
+interface AuthenticatedRequest extends Request {
+    user?: {
+        userId: string;
+        [key: string]: any;
+    };
+}
 
 export const applyJob = async (req: Request, res: Response) => {
     console.log('req.body', req.body);
@@ -77,13 +85,16 @@ export const createJob = async (req: Request, res: Response) => {
     }
 };
 
-export const getJobs = async (req: Request, res: Response) => {
+export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId || undefined;
+
     try {
-        const jobs = await getJobsService(req.body);
+        const { jobs, pagination } = await getJobsService(req.body, userId);
+
         res.status(200).json({
             status: 'success',
             message: 'Jobs fetched successfully',
-            data: jobs,
+            data: { jobs, pagination },
         });
     } catch (error) {
         logger.error(error);
@@ -95,6 +106,7 @@ export const getJobs = async (req: Request, res: Response) => {
     }
 };
 
+
 export const getJobById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -104,6 +116,25 @@ export const getJobById = async (req: Request, res: Response) => {
             status: 'success',
             message: 'Job fetched successfully',
             data: job,
+        });
+    } catch (error) {
+        logger.error(error);
+        res.status(404).json({
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+export const getJobsAppliedByBroker = async (req: Request, res: Response) => {
+    const { brokerId } = req.params;
+
+    try {
+        const result = await getJobsAppliedByBrokerService(brokerId);
+        res.status(200).json({
+            status: 'success',
+            message: 'Jobs applied by broker fetched successfully',
+            data: result,
         });
     } catch (error) {
         logger.error(error);
