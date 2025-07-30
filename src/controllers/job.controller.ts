@@ -9,6 +9,13 @@ import {
     getJobsAppliedByBrokerService
 } from '../services/job.service';
 
+interface AuthenticatedRequest extends Request {
+    user?: {
+        userId: string;
+        [key: string]: any;
+    };
+}
+
 export const applyJob = async (req: Request, res: Response) => {
     console.log('req.body', req.body);
 
@@ -78,25 +85,11 @@ export const createJob = async (req: Request, res: Response) => {
     }
 };
 
-export const getJobs = async (req: Request, res: Response) => {
-    const token = req.headers.authorization;
-
-    let userId: string | null = null;
-
-    if (token) {
-        try {
-            const decoded = jwt.verify(
-                token.replace('Bearer ', ''),
-                process.env.JWT_SECRET!
-            ) as { userId: string };
-            userId = decoded.userId;
-        } catch (error) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
-    }
+export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId || undefined;
 
     try {
-        const { jobs, pagination } = await getJobsService(req.body, userId ?? undefined);
+        const { jobs, pagination } = await getJobsService(req.body, userId);
 
         res.status(200).json({
             status: 'success',
