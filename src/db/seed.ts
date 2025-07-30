@@ -1,203 +1,414 @@
-import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker';
-import {
-    Admin_Status,
-    NotificationType,
-    City,
-    Bathrooms,
-    Bedrooms,
-    Furnished,
-    Type,
-    Rental_frequency,
-    Payment_Plan,
-    Sale_Type,
-    Category,
-    BrokerType,
-    Quarter,
-    Type_of_use,
-    DealType,
-    CurrentStatus,
-    Views,
-    Market,
-} from '@prisma/client';
+
+// import { PrismaClient } from "@prisma/client";
+// import { faker } from "@faker-js/faker";
+// import fs from "fs";
+// import path from "path";
+
+// const prisma = new PrismaClient();
+
+// // Load images and logos from files
+// const listingsImages = JSON.parse(fs.readFileSync(path.join(__dirname, "listings_images.json"), "utf-8")).records;
+// const brokeragesData = JSON.parse(fs.readFileSync(path.join(__dirname, "brokerages-logos.json"), "utf-8"));
+// const developersData = JSON.parse(fs.readFileSync(path.join(__dirname, "developer-logos.json"), "utf-8"));
+// const allUsers: any[] = [];
+// const allJobs: any[] = [];
+
+// async function main() {
+//     console.log("Clearing existing data...");
+
+//     await prisma.notification.deleteMany({});
+//     await prisma.reportedListing.deleteMany({});
+//     await prisma.listingView.deleteMany({});
+//     await prisma.inquiry.deleteMany({});
+//     await prisma.connectionRequest.deleteMany({});
+//     await prisma.connections.deleteMany({});
+//     await prisma.application.deleteMany({});
+//     await prisma.job.deleteMany({});
+//     await prisma.listing.deleteMany({});
+//     await prisma.brokerage.deleteMany({});
+//     await prisma.developer.deleteMany({});
+//     await prisma.project.deleteMany({});
+//     await prisma.broker.deleteMany({});
+//     await prisma.company.deleteMany({});
+//     await prisma.user.deleteMany({});
+
+//     console.log("Creating admin and HR users...");
+//     const adminUser = await prisma.user.create({
+//         data: {
+//             name: "Admin",
+//             email: "admin@example.com",
+//             password: "password123",
+//             role: "ADMIN",
+//         },
+//     });
+
+//     const hrUser = await prisma.user.create({
+//         data: {
+//             name: "HR Manager",
+//             email: "hr@example.com",
+//             password: "password123",
+//             role: "HR",
+//         },
+//     });
+
+//     const allBrokers: { id: string, brokerageId?: string, developerId?: string }[] = [];
+
+//     let listingImageIndex = 0;
+
+//     for (let i = 0; i < 60; i++) {
+//         const isDeveloper = i < 30;
+
+//         const companyData = isDeveloper
+//             ? developersData[i % developersData.length]
+//             : brokeragesData[i % brokeragesData.length];
+
+//         const company = await prisma.company.create({
+//             data: {
+//                 name: companyData.name,
+//                 type: isDeveloper ? "Developer" : "Brokerage",
+//                 logo: companyData.logo,
+//                 description: "No description provided",
+//             },
+//         });
+
+//         const user = await prisma.user.create({
+//             data: {
+//                 name: faker.person.fullName(),
+//                 email: faker.internet.email(),
+//                 password: "password123",
+//                 role: "BROKER",
+//             },
+//         });
+
+//         allUsers.push(user);
+
+
+//         if (isDeveloper) {
+//             const developer = await prisma.developer.create({
+//                 data: {
+//                     name: company.name,
+//                     logo: company.logo,
+//                     description: faker.lorem.paragraph(),
+//                     email: faker.internet.email(),
+//                     phone: faker.phone.number(),
+//                     company_id: company.id,
+//                     cover_image: listingsImages[listingImageIndex % listingsImages.length].images[0],
+//                 },
+//             });
+
+//             const broker = await prisma.broker.create({
+//                 data: {
+//                     name: user.name!,
+//                     email: user.email,
+//                     info: faker.lorem.sentence(),
+//                     y_o_e: faker.number.int({ min: 1, max: 20 }),
+//                     languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
+//                     is_certified: faker.datatype.boolean(),
+//                     profile_pic: faker.image.avatar(),
+//                     country_code: "+971",
+//                     w_number: `5${faker.string.numeric(8)}`,
+//                     ig_link: faker.internet.userName(),
+//                     linkedin_link: faker.internet.url(),
+//                     designation: "Broker",
+//                     user_id: user.id,
+//                     company_id: company.id,
+//                     developerId: developer.id,
+//                     brokerageId: null,
+//                     type: faker.helpers.arrayElement(["Off_plan", "Ready_to_move", "Both"]),
+//                 },
+//             });
+
+//             allBrokers.push({ id: broker.id, developerId: developer.id });
+
+//             const numProjects = faker.number.int({ min: 5, max: 10 });
+//             for (let j = 0; j < numProjects; j++) {
+//                 const projectImages = listingsImages[listingImageIndex % listingsImages.length].images;
+//                 listingImageIndex++;
+
+//                 await prisma.project.create({
+//                     data: {
+//                         title: faker.company.catchPhrase(),
+//                         description: faker.lorem.paragraph(),
+//                         image: projectImages[0],
+//                         images: projectImages,
+//                         floor_plans: projectImages,
+//                         price: faker.number.float({ min: 100000, max: 5000000 }),
+//                         address: faker.location.streetAddress(),
+//                         city: "Dubai",
+//                         file_url: faker.internet.url(),
+//                         type: "Off_plan",
+//                         project_name: faker.company.name(),
+//                         project_age: String(faker.number.int({ min: 1, max: 10 })),
+//                         no_of_bedrooms: "Two",
+//                         no_of_bathrooms: "Two",
+//                         furnished: "Semi_furnished",
+//                         property_size: faker.number.float({ min: 500, max: 5000 }),
+//                         payment_plan: "Payment_Pending",
+//                         unit_types: ["1BHK", "2BHK"],
+//                         amenities: ["Pool", "Gym", "Parking"],
+//                         developer_id: developer.id,
+//                     },
+//                 });
+//             }
+//         } else {
+//             const brokerage = await prisma.brokerage.create({
+//                 data: {
+//                     name: company.name,
+//                     logo: company.logo,
+//                     description: faker.lorem.paragraph(),
+//                     ded: faker.string.numeric(6),
+//                     rera: faker.string.numeric(4),
+//                     contact_email: faker.internet.email(),
+//                     contact_phone: faker.phone.number(),
+//                     service_areas: [faker.location.city(), faker.location.city()],
+//                     company_id: company.id,
+//                 },
+//             });
+
+//             const broker = await prisma.broker.create({
+//                 data: {
+//                     name: user.name!,
+//                     email: user.email,
+//                     info: faker.lorem.sentence(),
+//                     y_o_e: faker.number.int({ min: 1, max: 20 }),
+//                     languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
+//                     is_certified: faker.datatype.boolean(),
+//                     profile_pic: faker.image.avatar(),
+//                     country_code: "+971",
+//                     w_number: `5${faker.string.numeric(8)}`,
+//                     ig_link: faker.internet.userName(),
+//                     linkedin_link: faker.internet.url(),
+//                     designation: "Broker",
+//                     user_id: user.id,
+//                     company_id: company.id,
+//                     brokerageId: brokerage.id,
+//                     developerId: null,
+//                     type: faker.helpers.arrayElement(["Off_plan", "Ready_to_move", "Both"]),
+//                 },
+//             });
+
+//             allBrokers.push({ id: broker.id, brokerageId: brokerage.id });
+
+//             // await prisma.job.create({
+//             //   data: {
+//             //     title: faker.person.jobTitle(),
+//             //     description: faker.lorem.paragraph(),
+//             //     workplace_type: "On_site",
+//             //     location: "Dubai",
+//             //     job_type: "Full_time",
+//             //     min_salary: 15000,
+//             //     max_salary: 30000,
+//             //     currency: "AED",
+//             //     min_experience: 2,
+//             //     max_experience: 10,
+//             //     company_id: company.id,
+//             //     brokerage_id: brokerage.id,
+//             //     userId: hrUser.id,
+//             //   },
+//             // });
+
+//             await prisma.job.create({
+//                 data: {
+//                     title: faker.person.jobTitle(),
+//                     description: ` ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}`,
+//                     workplace_type: "On_site",
+//                     location: "Dubai",
+//                     job_type: "Full_time",
+//                     min_salary: 15000,
+//                     max_salary: 30000,
+//                     currency: "AED",
+//                     min_experience: 2,
+//                     max_experience: 10,
+//                     company_id: company.id,
+//                     brokerage_id: brokerage.id,
+//                     userId: hrUser.id,
+//                     skills: ` ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}`,
+//                 },
+
+//             }
+//             );
+
+
+
+//         }
+//     }
+
+//     console.log("Creating 200 listings...");
+
+//     for (let i = 0; i < 200; i++) {
+//         const broker = faker.helpers.arrayElement(allBrokers);
+//         const images = listingsImages[listingImageIndex % listingsImages.length].images;
+//         listingImageIndex++;
+
+//         const listing = await prisma.listing.create({
+//             data: {
+//                 title: faker.company.catchPhrase(),
+//                 description: faker.lorem.paragraph(),
+//                 image: images[0],
+//                 image_urls: images,
+//                 min_price: faker.number.float({ min: 100000, max: 5000000 }),
+//                 max_price: faker.number.float({ min: 5000000, max: 10000000 }),
+//                 sq_ft: faker.number.float({ min: 500, max: 6000 }),
+//                 address: faker.location.streetAddress(),
+//                 city: "Dubai",
+//                 type: faker.helpers.arrayElement(["Apartment", "Villa", "Office"]),
+//                 category: faker.helpers.arrayElement(["Ready_to_move", "Off_plan", "Rent"]),
+//                 no_of_bedrooms: faker.helpers.arrayElement(["Studio", "One", "Two"]),
+//                 no_of_bathrooms: faker.helpers.arrayElement(["One", "Two"]),
+//                 broker_id: broker.id,
+//                 amenities: faker.helpers.arrayElements(["Pool", "Gym", "Parking"], 3),
+//                 looking_for: faker.datatype.boolean(),
+//                 rental_frequency: "Yearly",
+//                 furnished: faker.helpers.arrayElement(["Furnished", "Unfurnished"]),
+//                 project_age: faker.number.int({ min: 1, max: 10 }),
+//                 payment_plan: faker.helpers.arrayElement(["Payment_done", "Payment_Pending"]),
+//                 sale_type: faker.helpers.arrayElement(["Direct", "Resale"]),
+//                 admin_status: "Approved",
+//                 handover_year: faker.number.int({ min: 2024, max: 2030 }),
+//                 handover_quarter: faker.helpers.arrayElement(["Q1", "Q2", "Q3", "Q4"]),
+//                 type_of_use: faker.helpers.arrayElement(["Residential", "Commercial", "Mixed"]),
+//                 deal_type: faker.helpers.arrayElement(["Rental", "Selling"]),
+//                 current_status: faker.helpers.arrayElement(["Occupied", "Vacant"]),
+//                 views: faker.helpers.arrayElement(["Sea", "City", "Lagoon"]),
+//                 market: faker.helpers.arrayElement(["Primary", "Secondary"]),
+//                 brokerage_id: broker.brokerageId ?? undefined,
+//             },
+//         });
+
+//         for (const type of ["General", "Inquiries", "Network", "Broadcast"] as const) {
+//             await prisma.notification.create({
+//                 data: {
+//                     broker_id: broker.id,
+//                     sent_by_id: adminUser.id,
+//                     text: `New ${type} alert for listing`,
+//                     message: faker.lorem.sentence(),
+//                     type,
+//                     listing_id: listing.id,
+//                 },
+//             });
+//         }
+//     }
+
+//     console.log("Creating applications...");
+//     for (let i = 0; i < 100; i++) {
+//         const user = faker.helpers.arrayElement(allUsers);
+//         const job = faker.helpers.arrayElement(allJobs);
+
+//         await prisma.application.create({
+//             data: {
+//                 resume: faker.internet.url(),
+//                 jobId: job.id,
+//                 userId: user.id,
+//                 status: faker.helpers.arrayElement(["Under_Review", "Accepted", "Rejected"]),
+//             },
+//         });
+//     }
+
+
+//     console.log("Seeding complete.");
+// }
+
+// main()
+//     .then(() => prisma.$disconnect())
+//     .catch((e) => {
+//         console.error(e);
+//         prisma.$disconnect();
+//         process.exit(1);
+//     });
+
+
+import { PrismaClient } from "@prisma/client";
+import { faker } from "@faker-js/faker";
+import fs from "fs";
+import path from "path";
 
 const prisma = new PrismaClient();
 
-// Import the real data
-import { realDevelopers } from './realData';
-import { realBrokerages } from './realData';
+// Load images and logos from files
+const listingsImages = JSON.parse(fs.readFileSync(path.join(__dirname, "listings_images.json"), "utf-8")).records;
+const brokeragesData = JSON.parse(fs.readFileSync(path.join(__dirname, "brokerages-logos.json"), "utf-8"));
+const developersData = JSON.parse(fs.readFileSync(path.join(__dirname, "developer-logos.json"), "utf-8"));
 
 async function main() {
-    console.log('Clearing existing data...');
+    console.log("Clearing existing data...");
 
-    // Handle dependent deletions first
     await prisma.notification.deleteMany({});
+    await prisma.reportedListing.deleteMany({});
+    await prisma.listingView.deleteMany({});
     await prisma.inquiry.deleteMany({});
     await prisma.connectionRequest.deleteMany({});
     await prisma.connections.deleteMany({});
     await prisma.application.deleteMany({});
     await prisma.job.deleteMany({});
-
-    // Handle custom table with FK constraint (e.g. ListingView)
-    try {
-        await prisma.$executeRawUnsafe(`DELETE FROM "ListingView";`);
-    } catch (e) {
-        console.log(
-            'Warning: Could not delete from ListingView (may not exist)'
-        );
-    }
-
     await prisma.listing.deleteMany({});
-    await prisma.broker.deleteMany({});
     await prisma.brokerage.deleteMany({});
-    await prisma.project.deleteMany({});
     await prisma.developer.deleteMany({});
+    await prisma.project.deleteMany({});
+    await prisma.broker.deleteMany({});
     await prisma.company.deleteMany({});
     await prisma.user.deleteMany({});
 
-    console.log('Creating admin and HR users...');
-
+    console.log("Creating admin and HR users...");
     const adminUser = await prisma.user.create({
         data: {
-            name: 'Sarah Admin',
-            email: 'sarah@realestatepro.com',
-            password: 'password123',
-            role: 'ADMIN',
+            name: "Admin",
+            email: "admin@example.com",
+            password: "password123",
+            role: "ADMIN",
         },
     });
 
     const hrUser = await prisma.user.create({
         data: {
-            name: 'Mike HR',
-            email: 'mike@realestatepro.com',
-            password: 'password123',
-            role: 'HR',
+            name: "HR Manager",
+            email: "hr@example.com",
+            password: "password123",
+            role: "HR",
         },
     });
 
-    console.log('Creating core companies...');
-
-    const companies = await Promise.all([
-        prisma.company.create({
-            data: {
-                name: 'Real Estate Pro',
-                description: 'Leading real estate company in Dubai',
-            },
-        }),
-        prisma.company.create({
-            data: {
-                name: 'Premium Properties',
-                description: 'Luxury real estate solutions',
-            },
-        }),
-    ]);
-
-    const companyIds = companies.map((c) => c.id);
-
-    console.log('Creating real developers and companies...');
-
-    // Create real developers
-    const createdDevelopers = await Promise.all(
-        realDevelopers.map(async (developer) => {
-            // First create the company for the developer
-            const developerCompany = await prisma.company.create({
-                data: {
-                    name: developer.name,
-                    description: developer.description,
-                    logo: developer.logo,
-                    type: 'Developer',
-                },
-            });
-
-            // Then create the developer linked to the company
-            const dev = await prisma.developer.create({
-                data: {
-                    name: developer.name,
-                    logo: developer.logo,
-                    cover_image: developer.cover_image,
-                    description: developer.description,
-                    email: developer.email,
-                    phone: developer.phone,
-                    company_id: developerCompany.id,
-                },
-            });
-
-            // Create another company linked to this developer
-            await prisma.company.create({
-                data: {
-                    name: developerCompany.name,
-                    type: 'Developer',
-                    description: developerCompany.description,
-                    logo: developerCompany.logo,
-                    developerId: dev.id,
-                },
-            });
-
-            return dev;
-        })
-    );
-
-    console.log('Creating real brokerages and companies...');
-
-    // Create real brokerages
-    const createdBrokerages = await Promise.all(
-        realBrokerages.map(async (brokerage) => {
-            // First create the company for the brokerage
-            const brokerageCompany = await prisma.company.create({
-                data: {
-                    name: brokerage.name,
-                    type: 'Brokerage',
-                    description: brokerage.description,
-                    logo: brokerage.logo,
-                },
-            });
-
-            // Then create the brokerage linked to the company
-            const bro = await prisma.brokerage.create({
-                data: {
-                    name: brokerage.name,
-                    logo: brokerage.logo,
-                    description: brokerage.description,
-                    ded: faker.string.numeric(6),
-                    rera: faker.string.numeric(4),
-                    contact_email: faker.internet.email(),
-                    contact_phone: faker.phone.number(),
-                    service_areas: [
-                        faker.location.city(),
-                        faker.location.city(),
-                    ],
-                    company_id: brokerageCompany.id,
-                },
-            });
-
-            // Create another company linked to this brokerage
-            await prisma.company.create({
-                data: {
-                    name: brokerage.name,
-                    type: 'Brokerage',
-                    description: brokerage.description,
-                    logo: brokerage.logo,
-                    brokerageId: bro.id,
-                },
-            });
-
-            return bro;
-        })
-    );
-
-    console.log('Creating brokers and listings...');
-
-    // Create brokers for each brokerage
     const allBrokers = [];
-    for (const brokerage of createdBrokerages) {
-        for (let i = 0; i < 5; i++) {
-            // Create 5 brokers per brokerage
-            const user = await prisma.user.create({
+    const allUsers = [];
+    const allJobs = [];
+
+    let listingImageIndex = 0;
+
+    for (let i = 0; i < 60; i++) {
+        const isDeveloper = i < 30;
+
+        const companyData = isDeveloper
+            ? developersData[i % developersData.length]
+            : brokeragesData[i % brokeragesData.length];
+
+        const company = await prisma.company.create({
+            data: {
+                name: companyData.name,
+                type: isDeveloper ? "Developer" : "Brokerage",
+                logo: companyData.logo,
+                description: "No description provided",
+            },
+        });
+
+        const user = await prisma.user.create({
+            data: {
+                name: faker.person.fullName(),
+                email: faker.internet.email(),
+                password: "password123",
+                role: "BROKER",
+            },
+        });
+        allUsers.push(user);
+
+        if (isDeveloper) {
+            const developer = await prisma.developer.create({
                 data: {
-                    name: faker.person.fullName(),
+                    name: company.name,
+                    logo: company.logo,
+                    description: faker.lorem.paragraph(),
                     email: faker.internet.email(),
-                    password: 'password123',
-                    role: 'BROKER',
+                    phone: faker.phone.number(),
+                    company_id: company.id,
+                    cover_image: listingsImages[listingImageIndex % listingsImages.length].images[0],
                 },
             });
 
@@ -207,218 +418,194 @@ async function main() {
                     email: user.email,
                     info: faker.lorem.sentence(),
                     y_o_e: faker.number.int({ min: 1, max: 20 }),
-                    languages: faker.helpers.arrayElements(
-                        ['English', 'Arabic', 'French', 'Hindi'],
-                        2
-                    ),
+                    languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
                     is_certified: faker.datatype.boolean(),
                     profile_pic: faker.image.avatar(),
-                    country_code: '+971',
+                    country_code: "+971",
                     w_number: `5${faker.string.numeric(8)}`,
                     ig_link: faker.internet.userName(),
                     linkedin_link: faker.internet.url(),
-                    designation: 'Broker',
-                    company_id: companyIds[i % companyIds.length],
+                    designation: "Broker",
                     user_id: user.id,
-                    type: faker.helpers.arrayElement([
-                        BrokerType.Off_plan,
-                        BrokerType.Ready_to_move,
-                        BrokerType.Both,
-                    ]),
-                    brokerageId: brokerage.id, // Link broker to brokerage
+                    company_id: company.id,
+                    developerId: developer.id,
+                    brokerageId: null,
+                    type: faker.helpers.arrayElement(["Off_plan", "Ready_to_move", "Both"]),
                 },
             });
 
-            allBrokers.push(broker);
+            allBrokers.push({ id: broker.id, developerId: developer.id });
 
-            // Create 2 listings for each broker
-            for (let j = 0; j < 2; j++) {
-                const listing = await prisma.listing.create({
+            const numProjects = faker.number.int({ min: 5, max: 10 });
+            for (let j = 0; j < numProjects; j++) {
+                const projectImages = listingsImages[listingImageIndex % listingsImages.length].images;
+                listingImageIndex++;
+
+                await prisma.project.create({
                     data: {
                         title: faker.company.catchPhrase(),
                         description: faker.lorem.paragraph(),
-                        min_price: faker.number.int({
-                            min: 100000,
-                            max: 5000000,
-                        }),
-                        max_price: faker.number.int({
-                            min: 5000000,
-                            max: 10000000,
-                        }),
-                        sq_ft: faker.number.int({ min: 500, max: 6000 }),
+                        image: projectImages[0],
+                        images: projectImages,
+                        floor_plans: projectImages,
+                        price: faker.number.float({ min: 100000, max: 5000000 }),
                         address: faker.location.streetAddress(),
-                        city: City.Dubai,
-                        image: faker.image.urlPicsumPhotos(),
-                        image_urls: [
-                            faker.image.urlPicsumPhotos(),
-                            faker.image.urlPicsumPhotos(),
-                        ],
-                        type: faker.helpers.arrayElement(Object.values(Type)),
-                        category: faker.helpers.arrayElement(
-                            Object.values(Category)
-                        ),
-                        no_of_bedrooms: faker.helpers.arrayElement(
-                            Object.values(Bedrooms)
-                        ),
-                        no_of_bathrooms: faker.helpers.arrayElement(
-                            Object.values(Bathrooms)
-                        ),
-                        broker_id: broker.id,
-                        amenities: faker.helpers.arrayElements(
-                            ['Pool', 'Gym', 'Parking', 'Garden', 'Smart Home'],
-                            3
-                        ),
-                        looking_for: faker.datatype.boolean(),
-                        rental_frequency: Rental_frequency.Yearly,
-                        furnished: faker.helpers.arrayElement(
-                            Object.values(Furnished)
-                        ),
-                        project_age: faker.number.int({ min: 1, max: 10 }),
-                        payment_plan: faker.helpers.arrayElement(
-                            Object.values(Payment_Plan)
-                        ),
-                        sale_type: faker.helpers.arrayElement(
-                            Object.values(Sale_Type)
-                        ),
-                        admin_status: faker.helpers.arrayElement(
-                            Object.values(Admin_Status)
-                        ),
-                        handover_year: faker.number.int({
-                            min: 2024,
-                            max: 2030,
-                        }),
-                        handover_quarter: faker.helpers.arrayElement(
-                            Object.values(Quarter)
-                        ),
-                        type_of_use: faker.helpers.arrayElement(
-                            Object.values(Type_of_use)
-                        ),
-                        deal_type: faker.helpers.arrayElement(
-                            Object.values(DealType)
-                        ),
-                        current_status: faker.helpers.arrayElement(
-                            Object.values(CurrentStatus)
-                        ),
-                        views: faker.helpers.arrayElement(Object.values(Views)),
-                        market: faker.helpers.arrayElement(
-                            Object.values(Market)
-                        ),
-                        locality: faker.location.city(),
+                        city: "Dubai",
+                        file_url: faker.internet.url(),
+                        type: "Off_plan",
+                        project_name: faker.company.name(),
+                        project_age: String(faker.number.int({ min: 1, max: 10 })),
+                        no_of_bedrooms: "Two",
+                        no_of_bathrooms: "Two",
+                        furnished: "Semi_furnished",
+                        property_size: faker.number.float({ min: 500, max: 5000 }),
+                        payment_plan: "Payment_Pending",
+                        unit_types: ["1BHK", "2BHK"],
+                        amenities: ["Pool", "Gym", "Parking"],
+                        developer_id: developer.id,
                     },
                 });
-
-                for (const type of Object.values(NotificationType)) {
-                    await prisma.notification.create({
-                        data: {
-                            broker_id: broker.id,
-                            sent_by_id: adminUser.id,
-                            text: `New ${type} alert for listing.`,
-                            message: faker.lorem.sentence(),
-                            type,
-                            listing_id: listing.id,
-                        },
-                    });
-                }
             }
+        } else {
+            const brokerage = await prisma.brokerage.create({
+                data: {
+                    name: company.name,
+                    logo: company.logo,
+                    description: faker.lorem.paragraph(),
+                    ded: faker.string.numeric(6),
+                    rera: faker.string.numeric(4),
+                    contact_email: faker.internet.email(),
+                    contact_phone: faker.phone.number(),
+                    service_areas: [faker.location.city(), faker.location.city()],
+                    company_id: company.id,
+                },
+            });
+
+            const broker = await prisma.broker.create({
+                data: {
+                    name: user.name!,
+                    email: user.email,
+                    info: faker.lorem.sentence(),
+                    y_o_e: faker.number.int({ min: 1, max: 20 }),
+                    languages: faker.helpers.arrayElements(["English", "Arabic", "French", "Hindi"], 2),
+                    is_certified: faker.datatype.boolean(),
+                    profile_pic: faker.image.avatar(),
+                    country_code: "+971",
+                    w_number: `5${faker.string.numeric(8)}`,
+                    ig_link: faker.internet.userName(),
+                    linkedin_link: faker.internet.url(),
+                    designation: "Broker",
+                    user_id: user.id,
+                    company_id: company.id,
+                    brokerageId: brokerage.id,
+                    developerId: null,
+                    type: faker.helpers.arrayElement(["Off_plan", "Ready_to_move", "Both"]),
+                },
+            });
+
+            allBrokers.push({ id: broker.id, brokerageId: brokerage.id });
+
+            const job = await prisma.job.create({
+                data: {
+                    title: faker.person.jobTitle(),
+                    description: `- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}`,
+                    workplace_type: "On_site",
+                    location: "Dubai",
+                    job_type: "Full_time",
+                    min_salary: 15000,
+                    max_salary: 30000,
+                    currency: "AED",
+                    min_experience: 2,
+                    max_experience: 10,
+                    company_id: company.id,
+                    brokerage_id: brokerage.id,
+                    userId: hrUser.id,
+                    skills: `- ${faker.lorem.word()}\n- ${faker.lorem.word()}\n- ${faker.lorem.word()}\n- ${faker.lorem.word()}`,
+                },
+            });
+
+            allJobs.push(job);
         }
     }
 
-    console.log('Creating projects for developers...');
+    console.log("Creating 200 listings...");
 
-    // Create projects for each developer
-    await Promise.all(
-        createdDevelopers.map(async (developer) => {
-            return prisma.project.create({
+    for (let i = 0; i < 200; i++) {
+        const broker = faker.helpers.arrayElement(allBrokers);
+        const images = listingsImages[listingImageIndex % listingsImages.length].images;
+        listingImageIndex++;
+
+        const listing = await prisma.listing.create({
+            data: {
+                title: faker.company.catchPhrase(),
+                description: faker.lorem.paragraph(),
+                image: images[0],
+                image_urls: images,
+                min_price: faker.number.float({ min: 100000, max: 5000000 }),
+                max_price: faker.number.float({ min: 5000000, max: 10000000 }),
+                sq_ft: faker.number.float({ min: 500, max: 6000 }),
+                address: faker.location.streetAddress(),
+                city: "Dubai",
+                type: faker.helpers.arrayElement(["Apartment", "Villa", "Office"]),
+                category: faker.helpers.arrayElement(["Ready_to_move", "Off_plan", "Rent"]),
+                no_of_bedrooms: faker.helpers.arrayElement(["Studio", "One", "Two"]),
+                no_of_bathrooms: faker.helpers.arrayElement(["One", "Two"]),
+                broker_id: broker.id,
+                amenities: faker.helpers.arrayElements(["Pool", "Gym", "Parking"], 3),
+                looking_for: faker.datatype.boolean(),
+                rental_frequency: "Yearly",
+                furnished: faker.helpers.arrayElement(["Furnished", "Unfurnished"]),
+                project_age: faker.number.int({ min: 1, max: 10 }),
+                payment_plan: faker.helpers.arrayElement(["Payment_done", "Payment_Pending"]),
+                sale_type: faker.helpers.arrayElement(["Direct", "Resale"]),
+                admin_status: "Approved",
+                handover_year: faker.number.int({ min: 2024, max: 2030 }),
+                handover_quarter: faker.helpers.arrayElement(["Q1", "Q2", "Q3", "Q4"]),
+                type_of_use: faker.helpers.arrayElement(["Residential", "Commercial", "Mixed"]),
+                deal_type: faker.helpers.arrayElement(["Rental", "Selling"]),
+                current_status: faker.helpers.arrayElement(["Occupied", "Vacant"]),
+                views: faker.helpers.arrayElement(["Sea", "City", "Lagoon"]),
+                market: faker.helpers.arrayElement(["Primary", "Secondary"]),
+                brokerage_id: broker.brokerageId ?? undefined,
+            },
+        });
+
+        for (const type of ["General", "Inquiries", "Network", "Broadcast"] as const) {
+            await prisma.notification.create({
                 data: {
-                    title: faker.company.catchPhrase(),
-                    description: faker.lorem.paragraph(),
-                    image: faker.image.urlPicsumPhotos(),
-                    images: [
-                        faker.image.urlPicsumPhotos(),
-                        faker.image.urlPicsumPhotos(),
-                    ],
-                    floor_plans: [faker.image.urlPicsumPhotos()],
-                    price: faker.number.float({
-                        min: 100000,
-                        max: 5000000,
-                        fractionDigits: 2,
-                    }),
-                    address: faker.location.streetAddress(),
-                    city: City.Dubai,
-                    file_url: faker.internet.url(),
-                    type: Category.Off_plan,
-                    project_name: faker.company.name(),
-                    project_age: String(faker.number.int({ min: 1, max: 10 })),
-                    no_of_bedrooms: Bedrooms.Two,
-                    no_of_bathrooms: Bathrooms.Two,
-                    furnished: Furnished.Semi_furnished,
-                    property_size: faker.number.float({
-                        min: 500,
-                        max: 5000,
-                        fractionDigits: 1,
-                    }),
-                    payment_plan: Payment_Plan.Payment_Pending,
-                    unit_types: ['1BHK', '2BHK'],
-                    amenities: ['Pool', 'Gym', 'Parking'],
-                    developer_id: developer.id,
+                    broker_id: broker.id,
+                    sent_by_id: adminUser.id,
+                    text: `New ${type} alert for listing`,
+                    message: faker.lorem.sentence(),
+                    type,
+                    listing_id: listing.id,
                 },
             });
-        })
-    );
+        }
+    }
 
-    console.log('Creating job listings...');
+    console.log("Creating applications...");
+    for (let i = 0; i < 100; i++) {
+        const user = faker.helpers.arrayElement(allUsers);
+        const job = faker.helpers.arrayElement(allJobs);
 
-    await prisma.job.createMany({
-        data: [
-            {
-                title: 'Senior Broker',
-                description: [
-                    faker.lorem.sentence(),
-                    faker.lorem.sentence(),
-                    faker.lorem.sentence(),
-                ].join('\n'), // ✅ Join array into string
-                workplace_type: 'On_site',
-                location: 'Dubai',
-                job_type: 'Full_time',
-                min_salary: 20000,
-                max_salary: 30000,
-                currency: 'AED',
-                skills: 'Sales Person',
-                min_experience: 5,
-                max_experience: 10,
-                company_id: companyIds[0],
-                userId: hrUser.id,
+        await prisma.application.create({
+            data: {
+                resume: faker.internet.url(),
+                jobId: job.id,
+                userId: user.id,
+                status: faker.helpers.arrayElement(["Under_Review", "Accepted", "Rejected"]),
             },
-            {
-                title: 'Property Consultant',
-                description: [
-                    faker.lorem.sentence(),
-                    faker.lorem.sentence(),
-                    faker.lorem.sentence(),
-                ].join('\n'), // ✅ Join array into string
-                workplace_type: 'Hybrid',
-                location: 'Dubai',
-                job_type: 'Full_time',
-                min_salary: 15000,
-                max_salary: 25000,
-                currency: 'AED',
-                skills: 'Real estate Knowledge',
-                min_experience: 3,
-                max_experience: 7,
-                company_id: companyIds[1],
-                userId: hrUser.id,
-            },
-        ],
-    });
+        });
+    }
 
-    console.log('✅ Seed data created successfully!');
+    console.log("Seeding complete.");
 }
 
 main()
+    .then(() => prisma.$disconnect())
     .catch((e) => {
-        console.error('❌ Error seeding data:', e);
+        console.error(e);
+        prisma.$disconnect();
         process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
     });

@@ -5,7 +5,8 @@ import {
     applyJobService,
     createJobService,
     getJobsService,
-    getJobByIdService
+    getJobByIdService,
+    getJobsAppliedByBrokerService
 } from '../services/job.service';
 
 export const applyJob = async (req: Request, res: Response) => {
@@ -104,6 +105,25 @@ export const getJobById = async (req: Request, res: Response) => {
             status: 'success',
             message: 'Job fetched successfully',
             data: job,
+        });
+    } catch (error) {
+        logger.error(error);
+        res.status(404).json({
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+export const getJobsAppliedByBroker = async (req: Request, res: Response) => {
+    const { brokerId } = req.params;
+
+    try {
+        const result = await getJobsAppliedByBrokerService(brokerId);
+        res.status(200).json({
+            status: 'success',
+            message: 'Jobs applied by broker fetched successfully',
+            data: result,
         });
     } catch (error) {
         logger.error(error);
