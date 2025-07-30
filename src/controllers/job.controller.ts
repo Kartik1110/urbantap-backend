@@ -78,13 +78,48 @@ export const createJob = async (req: Request, res: Response) => {
     }
 };
 
+// export const getJobs = async (req: Request, res: Response) => {
+//     try {
+//         const jobs = await getJobsService(req.body);
+//         res.status(200).json({
+//             status: 'success',
+//             message: 'Jobs fetched successfully',
+//             data: jobs,
+//         });
+//     } catch (error) {
+//         logger.error(error);
+//         res.status(500).json({
+//             status: 'error',
+//             message: 'Internal server error',
+//             error: error instanceof Error ? error.message : 'Unknown error',
+//         });
+//     }
+// };
+
 export const getJobs = async (req: Request, res: Response) => {
+    const token = req.headers.authorization;
+
+    let userId: string | null = null;
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(
+                token.replace('Bearer ', ''),
+                process.env.JWT_SECRET!
+            ) as { userId: string };
+            userId = decoded.userId;
+        } catch (error) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+    }
+
     try {
-        const jobs = await getJobsService(req.body);
+        const { jobs, pagination } = await getJobsService(req.body, userId ?? undefined);
+
         res.status(200).json({
             status: 'success',
             message: 'Jobs fetched successfully',
-            data: jobs,
+            data: { jobs, pagination },
         });
     } catch (error) {
         logger.error(error);
@@ -95,6 +130,7 @@ export const getJobs = async (req: Request, res: Response) => {
         });
     }
 };
+
 
 export const getJobById = async (req: Request, res: Response) => {
     const { id } = req.params;

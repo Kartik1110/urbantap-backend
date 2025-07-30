@@ -59,8 +59,98 @@ export const createJobService = async (job: Job) => {
     return await prisma.job.create({ data: job });
 };
 
+// export const getJobsService = async (
+//     body: { page?: number; page_size?: number; search?: string } = {}
+// ) => {
+//     const { page = 1, page_size = 10, search = '' } = body;
+//     const skip = (page - 1) * page_size;
+//     const take = page_size;
+
+//     const whereClause = search
+//         ? {
+//             title: {
+//                 contains: search,
+//                 mode: Prisma.QueryMode.insensitive,
+//             },
+//         }
+//         : {};
+
+//     const jobsRaw = await prisma.job.findMany({
+//         skip,
+//         take,
+//         orderBy: { createdAt: 'desc' },
+//         where: whereClause,
+//         select: {
+//             id: true,
+//             title: true,
+//             company_id: true,
+//             brokerage_id: true,
+//             workplace_type: true,
+//             location: true,
+//             job_type: true,
+//             description: true,
+//             min_salary: true,
+//             max_salary: true,
+//             skills: true,
+//             currency: true,
+//             min_experience: true,
+//             max_experience: true,
+//             userId: true,
+//             createdAt: true,
+//             updatedAt: true,
+//             company: {
+//                 select: {
+//                     id: true,
+//                     name: true,
+//                     logo: true,
+//                     description: true,
+//                 },
+//             },
+//             brokerage: {
+//                 select: {
+//                     id: true,
+//                     name: true,
+//                     logo: true,
+//                     description: true,
+//                     _count: {
+//                         select: { listings: true },
+//                     },
+//                 },
+//             },
+//         },
+//     });
+
+//     const jobs = jobsRaw.map((job) => {
+//         if (job.brokerage) {
+//             const { _count, ...brokerageData } = job.brokerage;
+//             return {
+//                 ...job,
+//                 brokerage: {
+//                     ...brokerageData,
+//                     listings_count: _count.listings,
+//                 },
+//             };
+//         }
+//         return job;
+//     });
+
+//     const totalJobs = await prisma.job.count({ where: whereClause });
+//     const totalPages = Math.ceil(totalJobs / page_size);
+
+//     return {
+//         jobs,
+//         pagination: {
+//             total: totalJobs,
+//             totalPages,
+//             page,
+//             page_size,
+//         },
+//     };
+// };
+
 export const getJobsService = async (
-    body: { page?: number; page_size?: number; search?: string } = {}
+    body: { page?: number; page_size?: number; search?: string } = {},
+    userId?: string
 ) => {
     const { page = 1, page_size = 10, search = '' } = body;
     const skip = (page - 1) * page_size;
@@ -120,6 +210,16 @@ export const getJobsService = async (
         },
     });
 
+    // Get all jobIds the user has applied to
+    let appliedJobIds: Set<string> = new Set();
+    if (userId) {
+        const userApplications = await prisma.application.findMany({
+            where: { userId },
+            select: { jobId: true },
+        });
+        appliedJobIds = new Set(userApplications.map(app => app.jobId));
+    }
+
     const jobs = jobsRaw.map((job) => {
         if (job.brokerage) {
             const { _count, ...brokerageData } = job.brokerage;
@@ -129,9 +229,13 @@ export const getJobsService = async (
                     ...brokerageData,
                     listings_count: _count.listings,
                 },
+                applied: appliedJobIds.has(job.id),
             };
         }
-        return job;
+        return {
+            ...job,
+            applied: appliedJobIds.has(job.id),
+        };
     });
 
     const totalJobs = await prisma.job.count({ where: whereClause });
@@ -147,6 +251,7 @@ export const getJobsService = async (
         },
     };
 };
+
 
 export const getJobByIdService = async (id: string) => {
     const job = await prisma.job.findUnique({
