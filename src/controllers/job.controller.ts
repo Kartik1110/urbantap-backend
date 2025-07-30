@@ -78,24 +78,6 @@ export const createJob = async (req: Request, res: Response) => {
     }
 };
 
-// export const getJobs = async (req: Request, res: Response) => {
-//     try {
-//         const jobs = await getJobsService(req.body);
-//         res.status(200).json({
-//             status: 'success',
-//             message: 'Jobs fetched successfully',
-//             data: jobs,
-//         });
-//     } catch (error) {
-//         logger.error(error);
-//         res.status(500).json({
-//             status: 'error',
-//             message: 'Internal server error',
-//             error: error instanceof Error ? error.message : 'Unknown error',
-//         });
-//     }
-// };
-
 export const getJobs = async (req: Request, res: Response) => {
     const token = req.headers.authorization;
 
