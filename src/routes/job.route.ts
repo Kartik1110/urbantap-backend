@@ -8,6 +8,7 @@ import {
     createJob,
     getJobs,
     getJobById,
+    getJobsAppliedByBroker
 } from '../controllers/job.controller';
 
 const router = Router();
@@ -15,6 +16,7 @@ const router = Router();
 router.get('/jobs', getJobs);
 router.post('/job', validateSchema(jobSchema), createJob);
 router.get('/jobs/:id', getJobById);
+router.get('/jobs/applied/:brokerId', getJobsAppliedByBroker);
 
 export default (upload: multer.Multer) => {
     router.post('/job/apply', upload.single('resume'), applyJob);

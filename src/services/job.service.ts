@@ -68,11 +68,11 @@ export const getJobsService = async (
 
     const whereClause = search
         ? {
-              title: {
-                  contains: search,
-                  mode: Prisma.QueryMode.insensitive,
-              },
-          }
+            title: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+            },
+        }
         : {};
 
     const jobsRaw = await prisma.job.findMany({
@@ -203,12 +203,12 @@ export const getJobByIdService = async (id: string) => {
 
     const cleanedBrokerage = job.brokerage
         ? {
-              id: job.brokerage.id,
-              name: job.brokerage.name,
-              logo: job.brokerage.logo,
-              description: job.brokerage.description,
-              listings_count: job.brokerage._count?.listings ?? 0,
-          }
+            id: job.brokerage.id,
+            name: job.brokerage.name,
+            logo: job.brokerage.logo,
+            description: job.brokerage.description,
+            listings_count: job.brokerage._count?.listings ?? 0,
+        }
         : null;
 
     const returnedJob = {
@@ -217,4 +217,85 @@ export const getJobByIdService = async (id: string) => {
     };
 
     return returnedJob;
+};
+
+export const getJobsAppliedByBrokerService = async (brokerId: string) => {
+    // First, find the broker and get their user ID
+    const broker = await prisma.broker.findUnique({
+        where: { id: brokerId },
+        select: {
+            user_id: true,
+            name: true,
+            email: true,
+        },
+    });
+
+    if (!broker) {
+        throw new Error('Broker not found');
+    }
+
+    if (!broker.user_id) {
+        throw new Error('Broker does not have an associated user account');
+    }
+
+    // Get all applications for this user
+    const applications = await prisma.application.findMany({
+        where: {
+            userId: broker.user_id,
+        },
+        select: {
+            id: true,
+            resume: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+            job: {
+                select: {
+                    id: true,
+                    title: true,
+                    company_id: true,
+                    brokerage_id: true,
+                    workplace_type: true,
+                    location: true,
+                    job_type: true,
+                    description: true,
+                    min_salary: true,
+                    max_salary: true,
+                    skills: true,
+                    currency: true,
+                    min_experience: true,
+                    max_experience: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logo: true,
+                        },
+                    },
+                    brokerage: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logo: true,
+                            description: true,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
+
+    return {
+        broker: {
+            id: brokerId,
+            name: broker.name,
+            email: broker.email,
+        },
+        applications,
+    };
 };
