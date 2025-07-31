@@ -164,7 +164,7 @@ export const getJobsService = async (
 };
 
 
-export const getJobByIdService = async (id: string) => {
+export const getJobByIdService = async (id: string, userId?: string) => {
     const job = await prisma.job.findUnique({
         where: { id },
         select: {
@@ -217,6 +217,20 @@ export const getJobByIdService = async (id: string) => {
         throw new Error('Job not found');
     }
 
+    let applied = false;
+    if (userId) {
+        const application = await prisma.application.findFirst({
+            where: {
+                userId,
+                jobId: job.id,
+            },
+            select: { id: true },
+        });
+        applied = !!application;
+    }
+
+
+
     const cleanedBrokerage = job.brokerage
         ? {
             id: job.brokerage.id,
@@ -230,6 +244,7 @@ export const getJobByIdService = async (id: string) => {
     const returnedJob = {
         ...job,
         brokerage: cleanedBrokerage,
+        applied
     };
 
     return returnedJob;

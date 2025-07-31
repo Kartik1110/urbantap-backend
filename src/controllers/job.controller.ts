@@ -107,11 +107,12 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 
-export const getJobById = async (req: Request, res: Response) => {
+export const getJobById = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const userId = req.user?.userId || undefined;
 
     try {
-        const job = await getJobByIdService(id);
+        const job = await getJobByIdService(id, userId);
         res.status(200).json({
             status: 'success',
             message: 'Job fetched successfully',
