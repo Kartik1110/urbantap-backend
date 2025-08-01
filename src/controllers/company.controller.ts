@@ -8,7 +8,7 @@ import {
     getCompaniesByUserIdService,
     getCompanyByIdService,
     getAllCompanyPostsService,
-    getCompanyPostByIdService
+    getCompanyPostByIdService,
 } from '../services/company.service';
 import prisma from '../utils/prisma';
 
@@ -189,7 +189,6 @@ export const getCompanyById = async (req: Request, res: Response) => {
         });
     }
 };
-
 
 export const getAllCompanyPosts = async (req: Request, res: Response) => {
     try {

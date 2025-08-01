@@ -7,7 +7,10 @@ class PrismaInstance {
 
     public static getInstance(): PrismaClient {
         if (!PrismaInstance.instance) {
-            PrismaInstance.instance = new PrismaClient();
+            PrismaInstance.instance = new PrismaClient({
+                log: ['query', 'info', 'warn', 'error'],
+                errorFormat: 'pretty',
+            });
         }
         return PrismaInstance.instance;
     }
@@ -16,11 +19,23 @@ class PrismaInstance {
 const prisma = PrismaInstance.getInstance();
 
 export const connectDB = async () => {
-    await prisma.$connect();
+    try {
+        await prisma.$connect();
+        console.log('Database connected successfully');
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        throw error;
+    }
 };
 
 export const disconnectDB = async () => {
-    await prisma.$disconnect();
+    try {
+        await prisma.$disconnect();
+        console.log('Database disconnected successfully');
+    } catch (error) {
+        console.error('Database disconnection failed:', error);
+        throw error;
+    }
 };
 
 export default prisma;

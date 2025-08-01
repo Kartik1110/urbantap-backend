@@ -1,15 +1,18 @@
+import { CompanyType } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 // Extend Request locally
-interface AuthenticatedRequest extends Request {
-    user?: {
-        id: string;
-        email: string;
-        companyId?: string;
-        developerId?: string;
-        brokerageId?: string;
-    };
+export interface AuthenticatedRequest extends Request {
+    user?: DecodedUser;
+}
+
+export interface DecodedUser {
+    id: string;
+    email: string;
+    companyId?: string;
+    type: CompanyType;
+    entityId?: string;
 }
 
 export const verifyToken = (
