@@ -87,21 +87,6 @@ enum BrokerType {
   Both
 }
 
-model AdminUser {
-  id          String     @id @default(uuid())
-  email       String     @unique
-  password    String
-  companyId   String
-  developerId String?
-  brokerageId String?
-  company     Company    @relation(fields: [companyId], references: [id])
-  developer   Developer? @relation(fields: [developerId], references: [id])
-  brokerage   Brokerage? @relation(fields: [brokerageId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Job         Job[]
-}
-
 model Company {
   id          String        @id @default(uuid())
   name        String        @default("")
@@ -228,90 +213,6 @@ enum Market {
   Secondary
 }
 
-model Developer {
-  id          String      @id @default(uuid())
-  name        String
-  logo        String
-  cover_image String?
-  description String
-  email       String?
-  phone       String?
-  projects    Project[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  Broker      Broker[]
-  company_id  String
-  company     Company?    @relation("CompanyToDeveloper")
-  AdminUser   AdminUser[]
-}
-
-model Project {
-  id              String       @id @default(uuid())
-  title           String
-  description     String
-  image           String
-  images          String[] // gallery images
-  floor_plans     String[] // floor plan images
-  price           Float
-  address         String
-  city            City
-  file_url        String? // optional downloadable file
-  type            Category
-  project_name    String
-  project_age     String
-  no_of_bedrooms  Bedrooms
-  no_of_bathrooms Bathrooms
-  furnished       Furnished
-  property_size   Float
-  payment_plan    Payment_Plan
-  unit_types      String[] // dynamic list like: [“1BHK”, “2BHK Villa”, etc.]
-  amenities       String[]
-  developer_id    String
-  developer       Developer    @relation(fields: [developer_id], references: [id])
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
-}
-
-model Brokerage {
-  id            String      @id @default(uuid())
-  name          String
-  logo          String
-  description   String
-  about         String?
-  ded           String?
-  rera          String?
-  contact_email String?
-  contact_phone String?
-  service_areas String[]
-  brokers       Broker[]
-  company_id    String
-  company       Company?    @relation("CompanyToBrokerage")
-  created_at    DateTime    @default(now())
-  updated_at    DateTime    @updatedAt
-  AdminUser     AdminUser[]
-  listings      Listing[]   @relation("BrokerageListings")
-  jobs          Job[]
-}
-
-model CompanyPost {
-  id         String       @id @default(uuid())
-  title      String?
-  caption    String?
-  images     String[]     @default([])
-  position   PostPosition @default(Home)
-  rank       Int          @default(1)
-  company_id String
-  company    Company      @relation(fields: [company_id], references: [id])
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
-}
-
-enum PostPosition {
-  Home
-  Listings
-  Jobs
-}
-
 enum Admin_Status {
   Approved
   Rejected
@@ -382,6 +283,89 @@ enum Payment_Plan {
 enum Sale_Type {
   Direct
   Resale
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Job       Job[]
+}
+
+model Developer {
+  id          String    @id @default(uuid())
+  cover_image String?
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Broker      Broker[]
+  company_id  String
+  company     Company?  @relation("CompanyToDeveloper")
+}
+
+model Project {
+  id              String       @id @default(uuid())
+  title           String
+  description     String
+  image           String
+  images          String[] // gallery images
+  floor_plans     String[] // floor plan images
+  currency        Currency
+  price           Float
+  address         String
+  city            City
+  file_url        String? // optional downloadable file
+  type            Category
+  project_name    String
+  project_age     String
+  no_of_bedrooms  Bedrooms
+  no_of_bathrooms Bathrooms
+  furnished       Furnished
+  property_size   Float
+  payment_plan    Payment_Plan
+  unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
+  amenities       String[]
+  developer_id    String
+  developer       Developer    @relation(fields: [developer_id], references: [id])
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+}
+
+model Brokerage {
+  id            String    @id @default(uuid())
+  about         String?
+  ded           String?
+  rera          String?
+  service_areas String[]
+  brokers       Broker[]
+  company_id    String
+  company       Company?  @relation("CompanyToBrokerage")
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  listings      Listing[] @relation("BrokerageListings")
+}
+
+model CompanyPost {
+  id         String       @id @default(uuid())
+  title      String?
+  caption    String?
+  images     String[]     @default([])
+  position   PostPosition @default(Home)
+  rank       Int          @default(1)
+  company_id String
+  company    Company      @relation(fields: [company_id], references: [id])
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+}
+
+enum PostPosition {
+  Home
+  Listings
+  Jobs
 }
 
 model ReportedListing {
@@ -469,8 +453,6 @@ model Job {
   title          String
   company_id     String
   company        Company       @relation(fields: [company_id], references: [id])
-  brokerage_id   String?
-  brokerage      Brokerage?    @relation(fields: [brokerage_id], references: [id])
   workplace_type WorkplaceType
   location       String
   job_type       JobType
@@ -483,8 +465,8 @@ model Job {
   max_experience Int?
   userId         String?
   adminUserId    String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
   user           User?         @relation(fields: [userId], references: [id])
   adminUser      AdminUser?    @relation(fields: [adminUserId], references: [id])
   applications   Application[]
@@ -510,15 +492,15 @@ enum JobType {
 }
 
 model Application {
-  id        String            @id @default(uuid())
-  resume    String // File path or URL to the uploaded CV
-  jobId     String
-  userId    String
-  status    ApplicationStatus @default(Under_Review)
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  job       Job               @relation(fields: [jobId], references: [id])
-  user      User              @relation(fields: [userId], references: [id])
+  id         String            @id @default(uuid())
+  resume     String // File path or URL to the uploaded CV
+  job_id     String
+  user_id    String
+  status     ApplicationStatus @default(Under_Review)
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
+  job        Job               @relation(fields: [job_id], references: [id])
+  user       User              @relation(fields: [user_id], references: [id])
 }
 
 enum ApplicationStatus {
