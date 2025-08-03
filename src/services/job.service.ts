@@ -25,27 +25,29 @@ export const applyJobService = async (
         throw new Error('Job not found');
     }
 
+    // check if user already applied for this job
+    const jobAlreadyApplied = await prisma.application.findFirst({
+        where: {
+            job_id: jobToApply.id,
+            user_id: user.id,
+        },
+    });
+
+    if (jobAlreadyApplied) {
+        throw new Error('You have already applied for this job');
+    }
+
     const resumeUrl = await uploadToS3(
         resume,
-        `resumes/${user.id}-${Date.now()}.pdf`
+        `resumes/${user.id}-${jobToApply.id}-${Date.now()}.pdf`
     );
 
     return await prisma.application.create({
-        data: { jobId: jobToApply.id, userId: user.id, resume: resumeUrl },
+        data: { job_id: jobToApply.id, user_id: user.id, resume: resumeUrl },
     });
 };
 
 export const createJobService = async (job: Job) => {
-    // if (job.userId) {
-    //     const user = await prisma.user.findUnique({
-    //         where: { id: job.userId, role: Role.HR },
-    //     });
-
-    //     if (!user) {
-    //         throw new Error('User not found or is not an HR');
-    //     }
-    // }
-
     if (job.company_id) {
         const company = await prisma.company.findUnique({
             where: { id: job.company_id },
@@ -69,23 +71,22 @@ export const getJobsService = async (
 
     const whereClause = search
         ? {
-            title: {
-                contains: search,
-                mode: Prisma.QueryMode.insensitive,
-            },
-        }
+              title: {
+                  contains: search,
+                  mode: Prisma.QueryMode.insensitive,
+              },
+          }
         : {};
 
     const jobsRaw = await prisma.job.findMany({
         skip,
         take,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         where: whereClause,
         select: {
             id: true,
             title: true,
             company_id: true,
-            brokerage_id: true,
             workplace_type: true,
             location: true,
             job_type: true,
@@ -97,24 +98,21 @@ export const getJobsService = async (
             min_experience: true,
             max_experience: true,
             userId: true,
-            createdAt: true,
-            updatedAt: true,
+            created_at: true,
+            updated_at: true,
             company: {
                 select: {
                     id: true,
                     name: true,
                     logo: true,
                     description: true,
-                },
-            },
-            brokerage: {
-                select: {
-                    id: true,
-                    name: true,
-                    logo: true,
-                    description: true,
-                    _count: {
-                        select: { listings: true },
+                    brokerage: {
+                        select: {
+                            id: true,
+                            _count: {
+                                select: { listings: true },
+                            },
+                        },
                     },
                 },
             },
@@ -125,15 +123,15 @@ export const getJobsService = async (
     let appliedJobIds: Set<string> = new Set();
     if (userId) {
         const userApplications = await prisma.application.findMany({
-            where: { userId },
-            select: { jobId: true },
+            where: { user_id: userId },
+            select: { job_id: true },
         });
-        appliedJobIds = new Set(userApplications.map(app => app.jobId));
+        appliedJobIds = new Set(userApplications.map((app) => app.job_id));
     }
 
     const jobs = jobsRaw.map((job) => {
-        if (job.brokerage) {
-            const { _count, ...brokerageData } = job.brokerage;
+        if (job.company?.brokerage) {
+            const { _count, ...brokerageData } = job.company.brokerage;
             return {
                 ...job,
                 brokerage: {
@@ -163,7 +161,6 @@ export const getJobsService = async (
     };
 };
 
-
 export const getJobByIdService = async (id: string, userId?: string) => {
     const job = await prisma.job.findUnique({
         where: { id },
@@ -171,7 +168,6 @@ export const getJobByIdService = async (id: string, userId?: string) => {
             id: true,
             title: true,
             company_id: true,
-            brokerage_id: true,
             workplace_type: true,
             location: true,
             job_type: true,
@@ -183,23 +179,23 @@ export const getJobByIdService = async (id: string, userId?: string) => {
             min_experience: true,
             max_experience: true,
             userId: true,
-            createdAt: true,
-            updatedAt: true,
+            created_at: true,
+            updated_at: true,
             company: {
                 select: {
                     id: true,
                     name: true,
                     logo: true,
-                },
-            },
-            brokerage: {
-                select: {
-                    id: true,
-                    name: true,
-                    logo: true,
                     description: true,
-                    _count: {
-                        select: { listings: true },
+                    brokerage: {
+                        select: {
+                            id: true,
+                            _count: {
+                                select: {
+                                    listings: true,
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -221,30 +217,28 @@ export const getJobByIdService = async (id: string, userId?: string) => {
     if (userId) {
         const application = await prisma.application.findFirst({
             where: {
-                userId,
-                jobId: job.id,
+                user_id: userId,
+                job_id: job.id,
             },
             select: { id: true },
         });
         applied = !!application;
     }
 
-
-
-    const cleanedBrokerage = job.brokerage
+    const cleanedBrokerage = job.company
         ? {
-            id: job.brokerage.id,
-            name: job.brokerage.name,
-            logo: job.brokerage.logo,
-            description: job.brokerage.description,
-            listings_count: job.brokerage._count?.listings ?? 0,
-        }
+              id: job.company?.brokerage?.id,
+              name: job.company.name,
+              logo: job.company.logo,
+              description: job.company.description,
+              listings_count: job.company?.brokerage?._count?.listings ?? 0,
+          }
         : null;
 
     const returnedJob = {
         ...job,
         brokerage: cleanedBrokerage,
-        applied
+        applied,
     };
 
     return returnedJob;
@@ -272,20 +266,19 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
     // Get all applications for this user
     const applications = await prisma.application.findMany({
         where: {
-            userId: broker.user_id,
+            user_id: broker.user_id,
         },
         select: {
             id: true,
             resume: true,
             status: true,
-            createdAt: true,
-            updatedAt: true,
+            created_at: true,
+            updated_at: true,
             job: {
                 select: {
                     id: true,
                     title: true,
                     company_id: true,
-                    brokerage_id: true,
                     workplace_type: true,
                     location: true,
                     job_type: true,
@@ -296,16 +289,9 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
                     currency: true,
                     min_experience: true,
                     max_experience: true,
-                    createdAt: true,
-                    updatedAt: true,
+                    created_at: true,
+                    updated_at: true,
                     company: {
-                        select: {
-                            id: true,
-                            name: true,
-                            logo: true,
-                        },
-                    },
-                    brokerage: {
                         select: {
                             id: true,
                             name: true,
@@ -317,7 +303,7 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
             },
         },
         orderBy: {
-            createdAt: 'desc',
+            created_at: 'desc',
         },
     });
 

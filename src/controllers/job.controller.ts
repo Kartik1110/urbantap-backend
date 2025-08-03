@@ -17,8 +17,6 @@ interface AuthenticatedRequest extends Request {
 }
 
 export const applyJob = async (req: Request, res: Response) => {
-    console.log('req.body', req.body);
-
     const token = req.headers.authorization;
 
     if (!token) {
