@@ -6,6 +6,7 @@ import {
     Bathrooms,
     Furnished,
     Payment_Plan,
+    Currency,
 } from '@prisma/client';
 
 export const createProjectSchema = z.object({
@@ -24,9 +25,14 @@ export const createProjectSchema = z.object({
         z
             .number()
             .positive('Price must be positive')
-            .min(1000, 'Price must be at least 3 digits (minimum 1000)')
             .max(1_000_000_000, 'Price seems unreasonably high')
     ),
+
+    currency: z.nativeEnum(Currency, {
+        errorMap: () => ({
+            message: `Currency must be one of: ${Object.values(Currency).join(', ')}`,
+        }),
+    }),
 
     address: z
         .string()

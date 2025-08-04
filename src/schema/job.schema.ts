@@ -16,9 +16,7 @@ export const jobSchema = z.object({
     //     .string()
     //     .min(1, 'Company ID is required'),
 
-    brokerage_id: z
-        .string()
-        .optional(),
+    brokerage_id: z.string().optional(),
 
     workplace_type: z.nativeEnum(WorkplaceType, {
         errorMap: () => ({
@@ -85,7 +83,6 @@ export const jobSchema = z.object({
             .max(50, 'Experience is too high')
             .optional()
     ),
-
 });
 
 export const applyJobSchema = z.object({
