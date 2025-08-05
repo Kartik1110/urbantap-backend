@@ -5,6 +5,8 @@ interface DashboardStats {
     profile_completion_percentage: number;
     jobs_count: number;
     projects_count: number;
+    rental_listings_count: number;
+    selling_listings_count: number;
 }
 
 export const getDashboardStatsService = async (
@@ -27,18 +29,71 @@ export const getDashboardStatsService = async (
         const profileCompletionPercentage =
             await calculateProfileCompletionPercentage(user);
 
-        // Jobs count
-        const jobsCount = 0;
+        let rentalListingsCount = 0;
+        let sellingListingsCount = 0;
+        let jobsCount = 0;
 
-        // Projects count
+        const broker = user.brokers?.[0];
+
+        if (broker) {
+            console.log('Broker found from user.brokers:', broker.id);
+
+            const allListings = await prisma.listing.findMany({
+                where: {
+                    broker_id: broker.id,
+                },
+                select: {
+                    id: true,
+                    deal_type: true,
+                    title: true,
+                },
+            });
+
+            console.log('All listings for broker:', allListings);
+
+            rentalListingsCount = await prisma.listing.count({
+                where: {
+                    broker_id: broker.id,
+                    OR: [
+                        { deal_type: 'Rental' },
+                        { deal_type: null, category: 'Rent' } // Fallback for older listings
+                    ],
+                },
+            });
+
+            sellingListingsCount = await prisma.listing.count({
+                where: {
+                    broker_id: broker.id,
+                    OR: [
+                        { deal_type: 'Selling' },
+                        { deal_type: null, category: { in: ['Ready_to_move', 'Off_plan'] } } // Fallback for older listings
+                    ],
+                },
+            });
+
+            console.log('Rental count:', rentalListingsCount);
+            console.log('Selling count:', sellingListingsCount);
+        } else {
+            console.log('No broker found for user:', userId);
+        }
+
+        jobsCount = await prisma.job.count({
+            where: {
+                userId: userId,
+            },
+        });
+
         const projectsCount = 0;
 
         return {
             profile_completion_percentage: profileCompletionPercentage,
             jobs_count: jobsCount,
             projects_count: projectsCount,
+            rental_listings_count: rentalListingsCount,
+            selling_listings_count: sellingListingsCount,
         };
     } catch (error) {
+        console.error('Dashboard service error:', error);
         throw new Error(
             `Failed to fetch dashboard stats: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
