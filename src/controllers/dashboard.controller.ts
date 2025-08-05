@@ -25,7 +25,13 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         res.json({
             status: 'success',
             message: 'Dashboard stats fetched successfully',
-            data: stats,
+            data: {
+                profile_completion_percentage: stats.profile_completion_percentage,
+                jobs_count: stats.jobs_count,
+                projects_count: stats.projects_count,
+                rental_listings_count: stats.rental_listings_count,
+                selling_listings_count: stats.selling_listings_count,
+            },
         });
     } catch (error) {
         logger.error('Dashboard stats error:', error);
