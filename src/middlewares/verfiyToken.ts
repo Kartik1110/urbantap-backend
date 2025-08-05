@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 interface AuthenticatedRequest extends Request {
     user?: {
         id: string;
+        userId: string; // Add this for compatibility with logging middleware
         email: string;
         companyId?: string;
         developerId?: string;
@@ -33,8 +34,17 @@ export const verifyToken = (
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET!
-        ) as AuthenticatedRequest['user'];
-        req.user = decoded;
+        ) as any;
+
+        // Set both id and userId for compatibility
+        req.user = {
+            id: decoded?.id || '',
+            userId: decoded?.id || '',
+            email: decoded?.email || '',
+            companyId: decoded?.companyId,
+            developerId: decoded?.developerId,
+            brokerageId: decoded?.brokerageId
+        };
         next();
     } catch (error) {
         return res.status(403).json({ message: 'Invalid or expired token' });
