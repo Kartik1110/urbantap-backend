@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma';
-import { Category, Prisma } from '@prisma/client';
+import { Category, CompanyType, Prisma } from '@prisma/client';
 
 export const getDevelopersService = async ({
     page,
@@ -18,21 +18,22 @@ export const getDevelopersService = async ({
                   contains: search,
                   mode: 'insensitive' as Prisma.QueryMode,
               },
+              type: CompanyType.Developer,
           }
-        : {};
+        : {
+              type: CompanyType.Developer,
+          };
 
     const [developers, totalCount] = await Promise.all([
-        prisma.developer.findMany({
+        prisma.company.findMany({
             where: whereClause,
             skip,
             take: pageSize,
             include: {
-                projects: {
-                    select: { id: true },
-                },
+                developer: true,
             },
         }),
-        prisma.developer.count({
+        prisma.company.count({
             where: whereClause,
         }),
     ]);
@@ -71,6 +72,16 @@ export const getDeveloperDetailsService = async (developerId: string) => {
                     company: true, // include company data for each broker
                 },
             },
+            company: {
+                select: {
+                    name: true,
+                    logo: true,
+                    description: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                },
+            },
         },
     });
 
@@ -103,14 +114,14 @@ export const getDeveloperDetailsService = async (developerId: string) => {
 
     return {
         id: developer.id,
-        name: developer.name,
-        logo: developer.logo,
+        name: developer.company?.name,
+        logo: developer.company?.logo,
         cover_image: developer.cover_image,
-        description: developer.description,
+        description: developer.company?.description,
         project_count: projectCount,
         contact: {
-            email: developer.email,
-            phone: developer.phone,
+            email: developer.company?.email,
+            phone: developer.company?.phone,
         },
         projects: groupedProjects,
         brokers,

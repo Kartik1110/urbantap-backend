@@ -9,7 +9,7 @@ import {
     getCompanyLinkInfo,
     getCompanyById,
     getAllCompanyPosts,
-    getCompanyPostById
+    getCompanyPostById,
 } from '../controllers/company.controller';
 
 const router = Router();

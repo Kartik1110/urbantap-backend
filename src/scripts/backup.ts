@@ -91,12 +91,12 @@ export async function performBackup(): Promise<void> {
                 }
 
                 // cleanup
-                try {
-                    fs.unlinkSync(backupFilePath);
-                    logger.info('Local backup file deleted.');
-                } catch (cleanupErr) {
-                    logger.error('Cleanup failed:', cleanupErr);
-                }
+                // try {
+                //     fs.unlinkSync(backupFilePath);
+                //     logger.info('Local backup file deleted.');
+                // } catch (cleanupErr) {
+                //     logger.error('Cleanup failed:', cleanupErr);
+                // }
 
                 resolve();
             }

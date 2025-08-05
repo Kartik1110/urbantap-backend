@@ -18,7 +18,6 @@ export const bulkInsertCompaniesService = async (companies: Company[]) => {
         data: companies,
     });
 
-    // Get the IDs of the newly created companies
     const createdCompanies = await prisma.company.findMany({
         where: {
             name: {
@@ -27,8 +26,47 @@ export const bulkInsertCompaniesService = async (companies: Company[]) => {
         },
         select: {
             id: true,
+            type: true,
+            name: true,
         },
     });
+
+    // Use Promise.all to handle async operations properly
+    await Promise.all(
+        createdCompanies.map(
+            async (company: {
+                id: string;
+                type: CompanyType;
+                name: string;
+            }) => {
+                if (company.type === CompanyType.Developer) {
+                    const developer = await prisma.developer.create({
+                        data: {
+                            company_id: company.id,
+                        },
+                    });
+
+                    // Update company with developerId
+                    await prisma.company.update({
+                        where: { id: company.id },
+                        data: { developerId: developer.id },
+                    });
+                } else if (company.type === CompanyType.Brokerage) {
+                    const brokerage = await prisma.brokerage.create({
+                        data: {
+                            company_id: company.id,
+                        },
+                    });
+
+                    // Update company with brokerageId
+                    await prisma.company.update({
+                        where: { id: company.id },
+                        data: { brokerageId: brokerage.id },
+                    });
+                }
+            }
+        )
+    );
 
     return createdCompanies.map((company) => company.id);
 };
@@ -41,11 +79,11 @@ export const getCompaniesService = async ({
     return await prisma.company.findMany({
         where: search
             ? {
-                name: {
-                    contains: search,
-                    mode: 'insensitive',
-                },
-            }
+                  name: {
+                      contains: search,
+                      mode: 'insensitive',
+                  },
+              }
             : {},
     });
 };
@@ -141,16 +179,16 @@ export const getCompanyByIdService = async (companyId: string) => {
                     id: true,
                     name: true,
                     profile_pic: true,
-                    Developer: {
-                        select: {
-                            name: true,
-                        },
-                    },
-                    Brokerage: {
-                        select: {
-                            name: true,
-                        },
-                    },
+                    // Developer: {
+                    //     select: {
+                    //         name: true,
+                    //     },
+                    // },
+                    // Brokerage: {
+                    //     select: {
+                    //         name: true,
+                    //     },
+                    // },
                 },
             },
             jobs: {
