@@ -1,5 +1,6 @@
-import { Broker, User } from '@prisma/client';
+import { Broker, User, DealType, Category } from '@prisma/client';
 import prisma from '../utils/prisma';
+import logger from '../utils/logger';
 
 interface DashboardStats {
     profile_completion_percentage: number;
@@ -36,7 +37,6 @@ export const getDashboardStatsService = async (
         const broker = user.brokers?.[0];
 
         if (broker) {
-            console.log('Broker found from user.brokers:', broker.id);
 
             const allListings = await prisma.listing.findMany({
                 where: {
@@ -49,14 +49,13 @@ export const getDashboardStatsService = async (
                 },
             });
 
-            console.log('All listings for broker:', allListings);
 
             rentalListingsCount = await prisma.listing.count({
                 where: {
                     broker_id: broker.id,
                     OR: [
-                        { deal_type: 'Rental' },
-                        { deal_type: null, category: 'Rent' } // Fallback for older listings
+                        { deal_type: DealType.Rental },
+                        { deal_type: null, category: Category.Rent } // Fallback for older listings
                     ],
                 },
             });
@@ -65,14 +64,13 @@ export const getDashboardStatsService = async (
                 where: {
                     broker_id: broker.id,
                     OR: [
-                        { deal_type: 'Selling' },
-                        { deal_type: null, category: { in: ['Ready_to_move', 'Off_plan'] } } // Fallback for older listings
+                        { deal_type: DealType.Selling },
+                        { deal_type: null, category: { in: [Category.Ready_to_move, Category.Off_plan] } } // Fallback for older listings
                     ],
                 },
             });
 
-            console.log('Rental count:', rentalListingsCount);
-            console.log('Selling count:', sellingListingsCount);
+
         } else {
             console.log('No broker found for user:', userId);
         }
@@ -93,7 +91,7 @@ export const getDashboardStatsService = async (
             selling_listings_count: sellingListingsCount,
         };
     } catch (error) {
-        console.error('Dashboard service error:', error);
+        logger.error(error);
         throw new Error(
             `Failed to fetch dashboard stats: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
