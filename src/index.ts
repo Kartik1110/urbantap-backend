@@ -5,13 +5,8 @@ import multer from 'multer';
 
 import logger from './utils/logger';
 import { authMiddleware } from './middlewares/auth.middleware';
-import { requestLoggingMiddleware } from './middlewares/logging.middleware';
-import {
-    errorLoggingMiddleware,
-    validationErrorMiddleware,
-    authErrorMiddleware,
-    databaseErrorMiddleware
-} from './middlewares/error-logging.middleware';
+import { requestResponseLoggingMiddleware } from './middlewares/logging.middleware';
+import { errorLoggingMiddleware } from './middlewares/error-logging.middleware';
 
 import brokersRoutes from './routes/brokers.route';
 import listingsRoutes from './routes/listings.route';
@@ -40,8 +35,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Add request logging middleware early in the pipeline
-app.use(requestLoggingMiddleware);
+// Add request/response logging middleware early in the pipeline
+app.use(requestResponseLoggingMiddleware);
 
 // Unprotected routes
 app.use('/api/v1', companyRoutes);
@@ -70,9 +65,6 @@ app.get('/health', (req, res) => {
 });
 
 // Error handling middleware (must be last)
-app.use(validationErrorMiddleware);
-app.use(authErrorMiddleware);
-app.use(databaseErrorMiddleware);
 app.use(errorLoggingMiddleware);
 
 const PORT = process.env.PORT || 5000;
