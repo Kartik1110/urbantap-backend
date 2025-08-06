@@ -165,6 +165,7 @@ async function main() {
                     unit_types: ['1BHK', '2BHK'],
                     amenities: ['Pool', 'Gym', 'Parking'],
                     developer_id: developer.id,
+                    currency: 'AED',
                 },
             });
         }
