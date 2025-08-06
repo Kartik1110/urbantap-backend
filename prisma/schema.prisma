@@ -314,7 +314,7 @@ model Project {
   image           String
   images          String[] // gallery images
   floor_plans     String[] // floor plan images
-  currency        Currency
+  currency        Currency?
   price           Float
   address         String
   city            City
