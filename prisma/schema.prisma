@@ -1,11 +1,11 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,29 +13,21 @@ model User {
   email              String        @unique
   password           String
   name               String?
-  role               Role
-  country_code       String?
-  w_number           String?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
-  brokers            Broker[]
-  googleId           String?       @unique
+  role               Role
   googleAccessToken  String?
+  googleId           String?       @unique
   googleRefreshToken String?
-  appleId            String?       @unique
   appleAccessToken   String?
+  appleId            String?       @unique
   appleRefreshToken  String?
+  w_number           String?
+  country_code       String?
   fcm_token          String?
-  jobs               Job[]
   applications       Application[]
-}
-
-enum Role {
-  BROKER
-  HR
-  SM
-  OTHER
-  ADMIN
+  brokers            Broker[]
+  jobs               Job[]
 }
 
 model Broker {
@@ -47,30 +39,296 @@ model Broker {
   languages                String[]
   is_certified             Boolean
   profile_pic              String
-  country_code             String?
   w_number                 String
   ig_link                  String?
   linkedin_link            String?
-  designation              String?
   company_id               String?
   user_id                  String?
+  designation              String?
+  country_code             String?
   type                     BrokerType?
+  brokerageId              String?
+  developerId              String?
   specialities             Speciality[]        @default([])
+  Brokerage                Brokerage?          @relation(fields: [brokerageId], references: [id])
   company                  Company?            @relation(fields: [company_id], references: [id])
-  listings                 Listing[]
+  Developer                Developer?          @relation(fields: [developerId], references: [id])
   user                     User?               @relation(fields: [user_id], references: [id])
-  notifications            Notification[]
   sentByConnectionRequests ConnectionRequest[] @relation("SentBy")
   sentToConnectionRequests ConnectionRequest[] @relation("SentTo")
-  sentByInquiries          Inquiry[]           @relation("InquirySentBy")
-  sentToInquiries          Inquiry[]           @relation("InquirySentTo")
   broker1Connections       Connections[]       @relation("Broker1")
   broker2Connections       Connections[]       @relation("Broker2")
+  sentByInquiries          Inquiry[]           @relation("InquirySentBy")
+  sentToInquiries          Inquiry[]           @relation("InquirySentTo")
+  listings                 Listing[]
+  notifications            Notification[]
   reportedListings         ReportedListing[]
-  Brokerage                Brokerage?          @relation(fields: [brokerageId], references: [id])
-  brokerageId              String?
-  Developer                Developer?          @relation(fields: [developerId], references: [id])
-  developerId              String?
+}
+
+model Company {
+  id          String        @id @default(uuid())
+  name        String        @default("")
+  description String        @default("")
+  logo        String        @default("")
+  address     String?       @default("")
+  email       String?       @default("")
+  name_ar     String?
+  phone       String?       @default("")
+  type        CompanyType   @default(Other)
+  website     String?       @default("")
+  brokerageId String?       @unique
+  developerId String?       @unique
+  AdminUser   AdminUser[]
+  brokers     Broker[]
+  brokerage   Brokerage?    @relation("CompanyToBrokerage", fields: [brokerageId], references: [id])
+  developer   Developer?    @relation("CompanyToDeveloper", fields: [developerId], references: [id])
+  CompanyPost CompanyPost[]
+  jobs        Job[]
+}
+
+model Listing {
+  id                    String            @id @default(uuid())
+  title                 String
+  description           String
+  image                 String
+  broker_id             String
+  address               String?           @default("")
+  amenities             String[]
+  category              Category
+  city                  City
+  furnished             Furnished?
+  image_urls            String[]
+  looking_for           Boolean
+  max_price             Float?            @default(0)
+  min_price             Float?            @default(0)
+  rental_frequency      Rental_frequency?
+  type                  Type
+  created_at            DateTime          @default(now())
+  sq_ft                 Float?
+  no_of_bathrooms       Bathrooms?
+  no_of_bedrooms        Bedrooms?
+  payment_plan          Payment_Plan?
+  sale_type             Sale_Type?
+  project_age           Int?
+  admin_status          Admin_Status?     @default(Pending)
+  latitude              Float?
+  longitude             Float?
+  cheques               Int?
+  construction_progress Int?
+  floor_area_ratio      Float?
+  gfa_bua               Int?
+  parking_space         Boolean?
+  service_charge        Int?
+  current_status        CurrentStatus?
+  deal_type             DealType?
+  handover_quarter      Quarter?
+  handover_year         Int?
+  market                Market?
+  type_of_use           Type_of_use?
+  views                 Views?
+  locality              String?
+  brokerage_id          String?
+  inquiries             Inquiry[]
+  broker                Broker            @relation(fields: [broker_id], references: [id])
+  brokerage             Brokerage?        @relation("BrokerageListings", fields: [brokerage_id], references: [id])
+  listing_views         ListingView?
+  notifications         Notification[]    @relation("ListingNotifications")
+  reported_listings     ReportedListing[]
+}
+
+model ListingView {
+  id         String   @id @default(uuid())
+  listing_id String   @unique
+  viewed_at  DateTime @default(now())
+  count      Int      @default(1)
+  listing    Listing  @relation(fields: [listing_id], references: [id])
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
+  Job       Job[]
+}
+
+model Developer {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  cover_image String?
+  company_id  String
+  Broker      Broker[]
+  company     Company?  @relation("CompanyToDeveloper")
+  projects    Project[]
+}
+
+model Project {
+  id              String       @id @default(uuid())
+  title           String
+  description     String
+  image           String
+  images          String[]
+  price           Float
+  address         String
+  city            City
+  file_url        String?
+  type            Category
+  amenities       String[]
+  created_at      DateTime     @default(now())
+  developer_id    String
+  floor_plans     String[]
+  furnished       Furnished
+  no_of_bathrooms Bathrooms
+  no_of_bedrooms  Bedrooms
+  payment_plan    Payment_Plan
+  project_age     String
+  project_name    String
+  property_size   Float
+  unit_types      String[]
+  updated_at      DateTime     @updatedAt
+  currency        Currency
+  developer       Developer    @relation(fields: [developer_id], references: [id])
+}
+
+model Brokerage {
+  id            String    @id @default(uuid())
+  ded           String?
+  rera          String?
+  service_areas String[]
+  company_id    String
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  about         String?
+  brokers       Broker[]
+  company       Company?  @relation("CompanyToBrokerage")
+  listings      Listing[] @relation("BrokerageListings")
+}
+
+model CompanyPost {
+  id         String       @id @default(uuid())
+  title      String?
+  caption    String?
+  company_id String
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  images     String[]     @default([])
+  position   PostPosition @default(Home)
+  rank       Int          @default(1)
+  company    Company      @relation(fields: [company_id], references: [id])
+}
+
+model ReportedListing {
+  id             String   @id @default(uuid())
+  listing_id     String
+  reported_by_id String
+  reason         String
+  description    String
+  created_at     DateTime @default(now())
+  listing        Listing  @relation(fields: [listing_id], references: [id])
+  reported_by    Broker   @relation(fields: [reported_by_id], references: [id])
+}
+
+model Notification {
+  id                   String             @id @default(uuid())
+  broker_id            String
+  timestamp            DateTime           @default(now())
+  text                 String
+  type                 NotificationType
+  inquiry_id           String?
+  connectionRequest_id String?
+  message              String?
+  sent_by_id           String
+  listing_id           String?
+  broker               Broker             @relation(fields: [broker_id], references: [id])
+  connectionRequest    ConnectionRequest? @relation("ConnectionRequestNotifications", fields: [connectionRequest_id], references: [id])
+  inquiry              Inquiry?           @relation("InquiryNotifications", fields: [inquiry_id], references: [id])
+  listing              Listing?           @relation("ListingNotifications", fields: [listing_id], references: [id])
+}
+
+model ConnectionRequest {
+  id            String         @id @default(uuid())
+  sent_by_id    String
+  sent_to_id    String
+  timestamp     DateTime       @default(now())
+  status        RequestStatus
+  text          String?
+  sent_by       Broker         @relation("SentBy", fields: [sent_by_id], references: [id])
+  sent_to       Broker         @relation("SentTo", fields: [sent_to_id], references: [id])
+  notifications Notification[] @relation("ConnectionRequestNotifications")
+}
+
+model Connections {
+  id         String   @id @default(uuid())
+  broker1_id String
+  broker2_id String
+  timestamp  DateTime @default(now())
+  broker1    Broker   @relation("Broker1", fields: [broker1_id], references: [id])
+  broker2    Broker   @relation("Broker2", fields: [broker2_id], references: [id])
+}
+
+model Inquiry {
+  id            String         @id @default(uuid())
+  sent_by_id    String
+  sent_to_id    String
+  timestamp     DateTime       @default(now())
+  listing_id    String
+  text          String
+  email         String
+  name          String
+  phone_no      String
+  country_code  String
+  listing       Listing        @relation(fields: [listing_id], references: [id], onDelete: Cascade)
+  sent_by       Broker         @relation("InquirySentBy", fields: [sent_by_id], references: [id])
+  sent_to       Broker         @relation("InquirySentTo", fields: [sent_to_id], references: [id])
+  notifications Notification[] @relation("InquiryNotifications")
+}
+
+model Job {
+  id             String        @id @default(uuid())
+  title          String
+  location       String
+  description    String
+  userId         String?
+  currency       Currency
+  max_experience Int?
+  max_salary     Float?
+  min_experience Int?
+  min_salary     Float?
+  company_id     String
+  job_type       JobType
+  workplace_type WorkplaceType
+  skills         String?
+  adminUserId    String?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime?     @updatedAt
+  applications   Application[]
+  adminUser      AdminUser?    @relation(fields: [adminUserId], references: [id])
+  company        Company       @relation(fields: [company_id], references: [id])
+  user           User?         @relation(fields: [userId], references: [id])
+}
+
+model Application {
+  id         String            @id @default(uuid())
+  resume     String
+  status     ApplicationStatus @default(Under_Review)
+  created_at DateTime          @default(now())
+  job_id     String
+  updated_at DateTime          @updatedAt
+  user_id    String
+  job        Job               @relation(fields: [job_id], references: [id])
+  user       User              @relation(fields: [user_id], references: [id])
+}
+
+enum Role {
+  BROKER
+  OTHER
+  ADMIN
+  HR
+  SM
 }
 
 enum Speciality {
@@ -87,89 +345,10 @@ enum BrokerType {
   Both
 }
 
-model Company {
-  id          String        @id @default(uuid())
-  name        String        @default("")
-  name_ar     String?
-  description String        @default("")
-  logo        String        @default("")
-  type        CompanyType   @default(Other)
-  website     String?       @default("")
-  email       String?       @default("")
-  phone       String?       @default("")
-  address     String?       @default("")
-  brokers     Broker[]
-  jobs        Job[]
-  developerId String?       @unique
-  brokerageId String?       @unique
-  developer   Developer?    @relation("CompanyToDeveloper", fields: [developerId], references: [id])
-  brokerage   Brokerage?    @relation("CompanyToBrokerage", fields: [brokerageId], references: [id])
-  AdminUser   AdminUser[]
-  CompanyPost CompanyPost[]
-}
-
 enum CompanyType {
   Developer
   Brokerage
   Other
-}
-
-model Listing {
-  id                    String            @id @default(uuid())
-  title                 String
-  description           String
-  image                 String
-  min_price             Float?            @default(0)
-  max_price             Float?            @default(0)
-  sq_ft                 Float?
-  type                  Type
-  category              Category
-  looking_for           Boolean // looking for or renting
-  rental_frequency      Rental_frequency?
-  no_of_bedrooms        Bedrooms?
-  no_of_bathrooms       Bathrooms?
-  furnished             Furnished?
-  cheques               Int?
-  city                  City
-  address               String?           @default("")
-  handover_year         Int? // e.g., 2025
-  handover_quarter      Quarter?
-  type_of_use           Type_of_use?
-  deal_type             DealType?
-  current_status        CurrentStatus?
-  views                 Views?
-  market                Market?
-  parking_space         Boolean?
-  service_charge        Int?
-  construction_progress Int?
-  gfa_bua               Int?
-  floor_area_ratio      Float?
-  latitude              Float?
-  longitude             Float?
-  locality              String?
-  amenities             String[]
-  image_urls            String[]
-  project_age           Int?
-  payment_plan          Payment_Plan?
-  sale_type             Sale_Type?
-  broker_id             String
-  created_at            DateTime          @default(now())
-  broker                Broker            @relation(fields: [broker_id], references: [id])
-  inquiries             Inquiry[]
-  admin_status          Admin_Status?     @default(Pending)
-  reported_listings     ReportedListing[]
-  notifications         Notification[]    @relation("ListingNotifications")
-  listing_views         ListingView[]
-  brokerage_id          String?
-  brokerage             Brokerage?        @relation("BrokerageListings", fields: [brokerage_id], references: [id])
-}
-
-model ListingView {
-  id         String   @id @default(uuid())
-  listing    Listing  @relation(fields: [listing_id], references: [id])
-  listing_id String   @unique
-  viewed_at  DateTime @default(now())
-  count      Int      @default(1)
 }
 
 enum Type_of_use {
@@ -285,115 +464,10 @@ enum Sale_Type {
   Resale
 }
 
-model AdminUser {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Job       Job[]
-}
-
-model Developer {
-  id          String    @id @default(uuid())
-  cover_image String?
-  projects    Project[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Broker      Broker[]
-  company_id  String
-  company     Company?  @relation("CompanyToDeveloper")
-}
-
-model Project {
-  id              String       @id @default(uuid())
-  title           String
-  description     String
-  image           String
-  images          String[] // gallery images
-  floor_plans     String[] // floor plan images
-  currency        Currency
-  price           Float
-  address         String
-  city            City
-  file_url        String? // optional downloadable file
-  type            Category
-  project_name    String
-  project_age     String
-  no_of_bedrooms  Bedrooms
-  no_of_bathrooms Bathrooms
-  furnished       Furnished
-  property_size   Float
-  payment_plan    Payment_Plan
-  unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
-  amenities       String[]
-  developer_id    String
-  developer       Developer    @relation(fields: [developer_id], references: [id])
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
-}
-
-model Brokerage {
-  id            String    @id @default(uuid())
-  about         String?
-  ded           String?
-  rera          String?
-  service_areas String[]
-  brokers       Broker[]
-  company_id    String
-  company       Company?  @relation("CompanyToBrokerage")
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  listings      Listing[] @relation("BrokerageListings")
-}
-
-model CompanyPost {
-  id         String       @id @default(uuid())
-  title      String?
-  caption    String?
-  images     String[]     @default([])
-  position   PostPosition @default(Home)
-  rank       Int          @default(1)
-  company_id String
-  company    Company      @relation(fields: [company_id], references: [id])
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
-}
-
 enum PostPosition {
   Home
   Listings
   Jobs
-}
-
-model ReportedListing {
-  id             String   @id @default(uuid())
-  listing_id     String
-  listing        Listing  @relation(fields: [listing_id], references: [id])
-  reported_by_id String
-  reported_by    Broker   @relation(fields: [reported_by_id], references: [id])
-  reason         String
-  description    String
-  created_at     DateTime @default(now())
-}
-
-model Notification {
-  id                   String             @id @default(uuid())
-  broker_id            String
-  broker               Broker             @relation(fields: [broker_id], references: [id])
-  sent_by_id           String
-  timestamp            DateTime           @default(now())
-  text                 String
-  message              String?
-  type                 NotificationType
-  inquiry_id           String?
-  inquiry              Inquiry?           @relation(fields: [inquiry_id], references: [id], name: "InquiryNotifications")
-  connectionRequest_id String?
-  connectionRequest    ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
-  listing_id           String?
-  listing              Listing?           @relation(fields: [listing_id], references: [id], name: "ListingNotifications")
 }
 
 enum NotificationType {
@@ -403,73 +477,11 @@ enum NotificationType {
   Broadcast
 }
 
-model ConnectionRequest {
-  id            String         @id @default(uuid())
-  sent_by_id    String
-  sent_to_id    String
-  sent_by       Broker         @relation("SentBy", fields: [sent_by_id], references: [id])
-  sent_to       Broker         @relation("SentTo", fields: [sent_to_id], references: [id])
-  timestamp     DateTime       @default(now())
-  status        RequestStatus
-  text          String?
-  notifications Notification[] @relation("ConnectionRequestNotifications")
-}
-
 enum RequestStatus {
   Accepted
   Rejected
   Pending
   Blocked
-}
-
-model Connections {
-  id         String   @id @default(uuid())
-  broker1_id String
-  broker2_id String
-  broker1    Broker   @relation("Broker1", fields: [broker1_id], references: [id])
-  broker2    Broker   @relation("Broker2", fields: [broker2_id], references: [id])
-  timestamp  DateTime @default(now())
-}
-
-model Inquiry {
-  id            String         @id @default(uuid())
-  sent_by_id    String
-  sent_to_id    String
-  sent_by       Broker         @relation("InquirySentBy", fields: [sent_by_id], references: [id])
-  sent_to       Broker         @relation("InquirySentTo", fields: [sent_to_id], references: [id])
-  timestamp     DateTime       @default(now())
-  listing_id    String
-  country_code  String
-  listing       Listing        @relation(fields: [listing_id], references: [id], onDelete: Cascade)
-  text          String
-  email         String
-  name          String
-  phone_no      String
-  notifications Notification[] @relation("InquiryNotifications")
-}
-
-model Job {
-  id             String        @id @default(uuid())
-  title          String
-  company_id     String
-  company        Company       @relation(fields: [company_id], references: [id])
-  workplace_type WorkplaceType
-  location       String
-  job_type       JobType
-  description    String
-  min_salary     Float?
-  max_salary     Float?
-  skills         String?
-  currency       Currency
-  min_experience Int?
-  max_experience Int?
-  userId         String?
-  adminUserId    String?
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
-  user           User?         @relation(fields: [userId], references: [id])
-  adminUser      AdminUser?    @relation(fields: [adminUserId], references: [id])
-  applications   Application[]
 }
 
 enum Currency {
@@ -489,18 +501,6 @@ enum JobType {
   Part_time
   Internship
   Contract
-}
-
-model Application {
-  id         String            @id @default(uuid())
-  resume     String // File path or URL to the uploaded CV
-  job_id     String
-  user_id    String
-  status     ApplicationStatus @default(Under_Review)
-  created_at DateTime          @default(now())
-  updated_at DateTime          @updatedAt
-  job        Job               @relation(fields: [job_id], references: [id])
-  user       User              @relation(fields: [user_id], references: [id])
 }
 
 enum ApplicationStatus {
