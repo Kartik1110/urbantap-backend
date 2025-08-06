@@ -5,6 +5,8 @@ import multer from 'multer';
 
 import logger from './utils/logger';
 import { authMiddleware } from './middlewares/auth.middleware';
+import { requestResponseLoggingMiddleware } from './middlewares/logging.middleware';
+import { errorLoggingMiddleware } from './middlewares/error-logging.middleware';
 
 import brokersRoutes from './routes/brokers.route';
 import listingsRoutes from './routes/listings.route';
@@ -33,6 +35,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add request/response logging middleware early in the pipeline
+app.use(requestResponseLoggingMiddleware);
+
 // Unprotected routes
 app.use('/api/v1', companyRoutes);
 app.use('/api/v1', authRoutes);
@@ -59,7 +64,14 @@ app.get('/health', (req, res) => {
     res.send('OK');
 });
 
+// Error handling middleware (must be last)
+app.use(errorLoggingMiddleware);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
+    logger.info('Server is running on port', {
+        port: PORT,
+        environment: process.env.NODE_ENV || 'development',
+        timestamp: new Date().toISOString()
+    });
 });
