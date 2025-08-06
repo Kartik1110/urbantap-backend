@@ -1,10 +1,14 @@
 import express from 'express';
+import { jobSchema } from '../schema/job.schema';
+import { verifyToken } from '../middlewares/verfiyToken';
+import validateSchema from '../middlewares/validate.middleware';
+import { editProfileSchema } from '../schema/editProfile.schema';
+import { createProjectSchema } from '../schema/createProject.schema';
 import {
     signup,
     login,
     logout,
     changePassword,
-    editDeveloper,
     getDevelopers,
     getDeveloperDetails,
     createProject,
@@ -15,29 +19,44 @@ import {
     getCompanyPostById,
     createJobController,
     getJobByIdController,
-    getJobsByBrokerageIdController
+    editProfile,
+    getProfile,
+    getJobsForCompanyController,
+    getJobApplicationsController,
+    getProjects,
+    getBrokers,
+    getListingsForBrokerage,
+    bulkInsertListingsAdmin,
 } from '../controllers/admin-user.controller';
-import { verifyToken } from '../middlewares/verfiyToken';
-import { createProjectSchema } from '../schema/createProjectschema';
-import { editDeveloperSchema } from '../schema/editDeveloperSchema';
-import validateSchema from '../middlewares/validate.middleware';
-import { jobSchema } from '../schema/job.schema';
 
 const router = express.Router();
 
+/* Auth Routes */
 router.post('/admin-user/signup', signup);
-
 router.post('/admin-user/login', login);
-
 router.post('/admin-user/logout', verifyToken, logout);
-
 router.post('/admin-user/change-password', verifyToken, changePassword);
+
+/* Profile Routes */
+router.get('/admin-user/profile', verifyToken, getProfile);
 
 router.get('/admin-user/developers', verifyToken, getDevelopers);
 
 router.get('/admin-user/developers/:id', verifyToken, getDeveloperDetails);
 
 export default (upload: any) => {
+    router.put(
+        '/admin-user/profile',
+        verifyToken,
+        upload.fields([
+            { name: 'logo', maxCount: 1 },
+            { name: 'cover_image', maxCount: 1 },
+        ]),
+        validateSchema(editProfileSchema),
+        editProfile
+    );
+
+    /* Project Routes */
     router.post(
         '/admin-user/projects',
         verifyToken,
@@ -51,16 +70,7 @@ export default (upload: any) => {
         createProject
     );
 
-    router.put(
-        '/admin-user/developer',
-        verifyToken,
-        upload.fields([
-            { name: 'logo', maxCount: 1 },
-            { name: 'cover_image', maxCount: 1 },
-        ]),
-        validateSchema(editDeveloperSchema),
-        editDeveloper
-    );
+    router.get('/admin-user/projects', verifyToken, getProjects);
 
     router.post(
         '/admin-user/company-post',
@@ -76,17 +86,50 @@ export default (upload: any) => {
         editCompanyPost
     );
 
+    /* Bulk insert listings */
+    router.post(
+        '/admin-user/listings/bulk',
+        verifyToken,
+        upload.array('images'),
+        bulkInsertListingsAdmin
+    );
+
+    // router.post(
+    //     '/admin-user/listings',
+    //     verifyToken,
+    //     upload.array('images'),
+    //     createListing
+    // );
+
     return router;
 };
 
 router.get('/admin-user/company/:id', verifyToken, getCompanyById);
 
-router.get('/admin-user/company-posts', getAllCompanyPosts);
+router.get('/admin-user/company-posts', verifyToken, getAllCompanyPosts);
 
-router.get('/admin-user/company-posts/:id', getCompanyPostById);
+router.get('/admin-user/company-posts/:id', verifyToken, getCompanyPostById);
 
-router.post('/admin-user/jobs', verifyToken, validateSchema(jobSchema), createJobController);
+/* Job Routes */
+router.post(
+    '/admin-user/jobs',
+    verifyToken,
+    validateSchema(jobSchema),
+    createJobController
+);
 
-router.get('/admin-user/jobs/brokerage', verifyToken, getJobsByBrokerageIdController);
+router.get('/admin-user/jobs', verifyToken, getJobsForCompanyController);
 
 router.get('/admin-user/jobs/:id', verifyToken, getJobByIdController);
+
+router.get(
+    '/admin-user/jobs/:id/applications',
+    verifyToken,
+    getJobApplicationsController
+);
+
+/* Broker Routes */
+// Note:  this should be /users to get users for a company but now user is not mapped to a company
+router.get('/admin-user/brokers', verifyToken, getBrokers);
+
+router.get('/admin-user/listings', verifyToken, getListingsForBrokerage);

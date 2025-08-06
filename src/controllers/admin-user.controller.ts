@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
 import {
     signupAdmin,
     loginAdmin,
     changeAdminPassword,
-    editLinkedDeveloper,
+    editLinkedCompany,
     getDevelopersService,
     getDeveloperDetailsService,
     createProjectService,
@@ -13,27 +12,34 @@ import {
     getAllCompanyPostsService,
     getCompanyPostByIdService,
     createJobService,
-    getJobsByBrokerageIdService,
-    getJobByIdService
+    getJobsForCompanyService,
+    getJobByIdService,
+    getProfileService,
+    getJobApplicationsService,
+    getProjectsService,
+    getListingsForBrokerageService,
+    getBrokersService,
+    createListingService,
+    bulkInsertListingsAdminService,
 } from '../services/admin-user.service';
-import { uploadToS3 } from '../utils/s3Upload';
+import { Express } from 'express';
 import prisma from '../utils/prisma';
-
-interface AuthenticatedRequest extends Request {
-    user?: {
-        id: string;
-        email: string;
-        companyId?: string;
-        developerId?: string;
-        brokerageId?: string;
-    };
-}
+import { Request, Response } from 'express';
+import { uploadToS3 } from '../utils/s3Upload';
+import { AuthenticatedRequest } from '../middlewares/verfiyToken';
+import { CompanyType, Listing } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 export const signup = async (req: Request, res: Response) => {
     try {
         const { email, password, companyId } = req.body;
-        const user = await signupAdmin(email, password, companyId);
-        res.status(201).json({ status: 'success', data: user });
+
+        await signupAdmin(email, password, companyId);
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Admin created successfully',
+        });
     } catch (error: any) {
         res.status(400).json({ status: 'error', message: error.message });
     }
@@ -87,9 +93,9 @@ export const changePassword = async (req: Request, res: Response) => {
     }
 };
 
-export const editDeveloper = async (req: Request, res: Response) => {
+export const editProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const user = (req as any).user;
+        const user = req.user;
         if (!user?.id) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -127,21 +133,50 @@ export const editDeveloper = async (req: Request, res: Response) => {
             description: req.body.description,
             email: req.body.email,
             phone: req.body.phone,
+            website: req.body.website,
+            address: req.body.address,
+            ded: req.body.ded,
+            rera: req.body.rera,
+            service_areas: req.body.service_areas
+                ? typeof req.body.service_areas === 'string'
+                    ? JSON.parse(req.body.service_areas)
+                    : req.body.service_areas
+                : undefined,
         };
 
         if (logoUrl) updateData.logo = logoUrl;
         if (coverImageUrl) updateData.cover_image = coverImageUrl;
 
-        const updatedDeveloper = await editLinkedDeveloper(user.id, updateData);
+        const updatedCompany = await editLinkedCompany(user, updateData);
 
         res.status(200).json({
             status: 'success',
-            message: 'Developer updated successfully.',
-            data: updatedDeveloper,
+            message: 'Company updated successfully.',
+            data: updatedCompany,
         });
     } catch (error: any) {
         console.error('editDeveloper error:', error);
         res.status(400).json({ status: 'error', message: error.message });
+    }
+};
+
+export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const profile = await getProfileService(user);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Profile fetched successfully',
+            data: profile,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
     }
 };
 
@@ -195,7 +230,7 @@ export const createProject = async (
     res: Response
 ) => {
     try {
-        if (!req.user?.developerId) {
+        if (!req.user?.entityId) {
             return res.status(403).json({
                 status: 'error',
                 message: 'Unauthorized: No developer linked.',
@@ -294,7 +329,7 @@ export const createProject = async (
             images: galleryImageUrls,
             floor_plans: floorPlanUrls,
             file_url: fileUrl,
-            developer_id: req.user.developerId,
+            developer_id: req.user.entityId,
         };
 
         const project = await createProjectService(projectData);
@@ -310,6 +345,34 @@ export const createProject = async (
             status: 'error',
             message: 'Failed to create project',
             error,
+        });
+    }
+};
+
+export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const entityData = req.user?.entityId;
+        const type = req.user?.type;
+
+        if (!entityData || !type || type !== CompanyType.Developer) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized',
+            });
+        }
+
+        const projects = await getProjectsService(entityData);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Projects fetched successfully',
+            data: projects,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch projects',
+            error: error.message || error,
         });
     }
 };
@@ -358,9 +421,10 @@ export const createCompanyPost = async (
 
         const files = req.files as Express.Multer.File[];
         if (!files || files.length === 0) {
-            return res
-                .status(400)
-                .json({ status: 'error', message: 'At least one image is required.' });
+            return res.status(400).json({
+                status: 'error',
+                message: 'At least one image is required.',
+            });
         }
 
         const imageUrls: string[] = await Promise.all(
@@ -437,10 +501,18 @@ export const editCompanyPost = async (
     }
 };
 
-
-export const getAllCompanyPosts = async (req: Request, res: Response) => {
+export const getAllCompanyPosts = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
-        const posts = await getAllCompanyPostsService();
+        const companyId = req.user?.companyId;
+        if (!companyId) {
+            return res
+                .status(400)
+                .json({ message: 'Company ID not found for user' });
+        }
+        const posts = await getAllCompanyPostsService(companyId);
         res.json({
             status: 'success',
             message: 'Company posts fetched successfully',
@@ -481,73 +553,53 @@ export const getCompanyPostById = async (req: Request, res: Response) => {
     }
 };
 
-// export const createJobController = async (req: AuthenticatedRequest, res: Response) => {
-//     try {
-//         const user = req.user;
-//         if (!user?.companyId) {
-//             return res.status(403).json({ message: 'Unauthorized: No company linked.' });
-//         }
-
-//         const data = {
-//             ...req.body,
-//             company_id: user.companyId,
-//             brokerage_id: user.brokerageId || null,
-//             userId: user.id,
-//         };
-
-//         const job = await createJobService(data);
-
-//         res.status(201).json({
-//             status: 'success',
-//             message: 'Job created successfully',
-//             data: job,
-//         });
-//     } catch (error: any) {
-//         res.status(500).json({ status: 'error', message: error.message });
-//     }
-// };
-
-export const createJobController = async (req: AuthenticatedRequest, res: Response) => {
+export const createJobController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         if (!req.user) {
             return res.status(401).json({
-                status: "error",
-                message: "Unauthorized",
+                status: 'error',
+                message: 'Unauthorized',
             });
         }
 
-        const { id: userId, companyId, brokerageId } = req.user;
+        const { id: userId, companyId } = req.user;
 
         const jobData = {
             ...req.body,
             adminUserId: userId,
-            company_id: companyId,
-            brokerage_id: brokerageId,
+            companyId,
         };
 
         const job = await createJobService(jobData);
 
         return res.status(201).json({
-            status: "success",
+            status: 'success',
             data: job,
         });
     } catch (err) {
-        console.error(err);
         return res.status(500).json({
-            status: "error",
-            message: "Server Error",
+            status: 'error',
+            message: 'Server Error',
         });
     }
 };
 
-export const getJobsByBrokerageIdController = async (req: AuthenticatedRequest, res: Response) => {
+export const getJobsForCompanyController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
-        const brokerageId = req.user?.brokerageId;
-        if (!brokerageId) {
-            return res.status(400).json({ message: 'Brokerage ID not found for user' });
+        const companyId = req.user?.companyId;
+        if (!companyId) {
+            return res
+                .status(400)
+                .json({ message: 'Company ID not found for user' });
         }
 
-        const jobs = await getJobsByBrokerageIdService(brokerageId);
+        const jobs = await getJobsForCompanyService(companyId);
 
         res.status(200).json({
             status: 'success',
@@ -558,13 +610,24 @@ export const getJobsByBrokerageIdController = async (req: AuthenticatedRequest, 
     }
 };
 
-export const getJobByIdController = async (req: Request, res: Response) => {
+export const getJobByIdController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const jobId = req.params.id;
-        const job = await getJobByIdService(jobId);
+        const companyId = req.user?.companyId;
+        if (!companyId) {
+            return res
+                .status(400)
+                .json({ message: 'Company ID not found for user' });
+        }
+        const job = await getJobByIdService(jobId, companyId);
 
         if (!job) {
-            return res.status(404).json({ status: 'error', message: 'Job not found' });
+            return res
+                .status(404)
+                .json({ status: 'error', message: 'Job not found' });
         }
 
         res.status(200).json({
@@ -573,5 +636,161 @@ export const getJobByIdController = async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const getJobApplicationsController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const jobId = req.params.id;
+        const companyId = req.user?.companyId;
+        if (!companyId) {
+            return res
+                .status(400)
+                .json({ message: 'Company ID not found for user' });
+        }
+
+        const applications = await getJobApplicationsService(jobId, companyId);
+
+        res.status(200).json({
+            status: 'success',
+            data: applications,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const getBrokers = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const companyId = req.user?.companyId;
+        if (!companyId || req.user?.type !== CompanyType.Brokerage) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized',
+            });
+        }
+        const users = await getBrokersService(companyId);
+
+        res.status(200).json({
+            status: 'success',
+            data: users,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const getListingsForBrokerage = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const brokerageId = req.user?.entityId;
+        if (!brokerageId || req.user?.type !== CompanyType.Brokerage) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized',
+            });
+        }
+
+        const listings = await getListingsForBrokerageService(brokerageId);
+
+        res.status(200).json({
+            status: 'success',
+            data: listings,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const createListing = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const brokerageId = req.user?.entityId;
+        if (!brokerageId || req.user?.type !== CompanyType.Brokerage) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized',
+            });
+        }
+
+        const listing = await createListingService(req.body, brokerageId);
+
+        res.status(201).json({
+            status: 'success',
+            data: listing,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+/* Bulk insert listings */
+export const bulkInsertListingsAdmin = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const images = req.files as Express.Multer.File[] | undefined;
+    const listings = req.body.listings;
+
+    const brokerageId = req.user?.entityId;
+    console.log('brokerageId:::', brokerageId, req.user?.type);
+    if (!brokerageId || req.user?.type !== CompanyType.Brokerage) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Unauthorized',
+        });
+    }
+
+    let imageUrls: string[] = [];
+
+    // Only process images if they exist
+    if (images && images.length > 0) {
+        try {
+            imageUrls = await Promise.all(
+                images.map(async (image) => {
+                    const fileExtension = image.originalname.split('.').pop();
+                    return await uploadToS3(
+                        image.path,
+                        `listings/${Date.now()}-${uuidv4()}.${fileExtension}`
+                    );
+                })
+            );
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: 'Failed to upload images to S3',
+                error: error,
+            });
+        }
+    }
+
+    const listingsWithImages = JSON.parse(listings).map((listing: Listing) => ({
+        ...listing,
+        image_urls: imageUrls,
+    }));
+
+    try {
+        const listings = await bulkInsertListingsAdminService(
+            listingsWithImages,
+            brokerageId
+        );
+        res.json({
+            status: 'success',
+            message: 'Listings inserted successfully',
+            data: listings,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to insert listings',
+            error: error,
+        });
     }
 };
