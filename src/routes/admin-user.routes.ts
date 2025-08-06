@@ -3,7 +3,7 @@ import { jobSchema } from '../schema/job.schema';
 import { verifyToken } from '../middlewares/verfiyToken';
 import validateSchema from '../middlewares/validate.middleware';
 import { editProfileSchema } from '../schema/editProfile.schema';
-import { createProjectSchema } from '../schema/createProject.schema';
+import { createProjectSchema } from '../schema/project.schema';
 import {
     signup,
     login,
