@@ -56,17 +56,32 @@ export const createBrokerage = async (req: Request, res: Response) => {
 export const getBrokerageDetails = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+        console.log('Controller received ID:', id);
+
+        if (!id) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Brokerage ID is required',
+                error: { id: 'Missing brokerage ID' }
+            });
+        }
+
         const brokerageDetails = await getBrokerageDetailsService(id);
+
         res.json({
             status: 'success',
             message: 'Brokerage details fetched successfully',
             data: brokerageDetails,
         });
     } catch (error) {
+        console.error('Controller error:', error);
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch brokerage details',
-            error,
+            error: {
+                message: error instanceof Error ? error.message : 'Unknown error',
+                stack: error instanceof Error ? error.stack : undefined
+            }
         });
     }
 };

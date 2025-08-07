@@ -14,15 +14,15 @@ export const getBrokeragesService = async ({
 
     const whereClause = search
         ? {
-              name: {
-                  contains: search,
-                  mode: 'insensitive' as Prisma.QueryMode,
-              },
-              type: CompanyType.Brokerage,
-          }
+            name: {
+                contains: search,
+                mode: 'insensitive' as Prisma.QueryMode,
+            },
+            type: CompanyType.Brokerage,
+        }
         : {
-              type: CompanyType.Brokerage,
-          };
+            type: CompanyType.Brokerage,
+        };
 
     const [brokeragesRaw, totalCount] = await Promise.all([
         prisma.company.findMany({
@@ -38,7 +38,11 @@ export const getBrokeragesService = async ({
                         id: true,
                     },
                 },
-                brokerage: true,
+                brokerage: {
+                    select: {
+                        id: true,
+                    },
+                },
             },
         }),
         prisma.company.count({ where: whereClause }),
@@ -74,6 +78,7 @@ export const getBrokeragesService = async ({
 
         return {
             id: brokerage.id,
+            brokerage_id: brokerage.brokerage?.id || null,
             name: brokerage.name,
             logo: brokerage.logo,
             broker_count: brokerCount,
@@ -108,76 +113,156 @@ export const createBrokerageService = async (data: {
 };
 
 export const getBrokerageDetailsService = async (brokerageId: string) => {
-    const brokerage = await prisma.brokerage.findUnique({
-        where: { id: brokerageId },
-        include: {
-            brokers: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    w_number: true,
+    try {
+        console.log('Starting getBrokerageDetailsService with ID:', brokerageId);
+
+        // First, test if the brokerage exists with a simple query
+        const brokerageExists = await prisma.brokerage.findUnique({
+            where: { id: brokerageId },
+            select: { id: true }
+        });
+
+        console.log('Brokerage exists check:', !!brokerageExists);
+        if (!brokerageExists) {
+            throw new Error(`Brokerage with ID ${brokerageId} not found`);
+        }
+
+        // Get the brokerage with its brokers
+        const brokerage = await prisma.brokerage.findUnique({
+            where: { id: brokerageId },
+            include: {
+                brokers: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        w_number: true,
+                        profile_pic: true,
+                        designation: true,
+                        country_code: true,
+                    },
                 },
             },
-            listings: {
-                // Include new direct listings
+        });
+
+        console.log('Brokerage found:', !!brokerage);
+        if (!brokerage) throw new Error('Brokerage not found');
+
+        // Get the company associated with this brokerage
+        const company = await prisma.company.findFirst({
+            where: { brokerageId: brokerageId },
+            select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                email: true,
+                phone: true,
+                website: true,
+                address: true,
+                type: true,
+            },
+        });
+
+        console.log('Company found:', !!company);
+
+        // Get broker IDs for listing queries
+        const brokerIds = brokerage.brokers.map((b) => b.id);
+        console.log('Broker IDs:', brokerIds);
+
+        // Initialize listings arrays
+        let brokerListings: any[] = [];
+        let directListings: any[] = [];
+
+        // Only query for broker listings if there are brokers
+        if (brokerIds.length > 0) {
+            brokerListings = await prisma.listing.findMany({
+                where: {
+                    broker_id: { in: brokerIds },
+                    admin_status: 'Approved',
+                },
                 select: {
                     id: true,
                     title: true,
                     min_price: true,
                     max_price: true,
                     image: true,
+                    type: true,
+                    category: true,
+                    city: true,
+                    address: true,
+                    created_at: true,
                 },
+                orderBy: { created_at: 'desc' },
+            });
+        }
+
+        console.log('Broker listings count:', brokerListings.length);
+
+        // Get direct listings associated with the brokerage
+        directListings = await prisma.listing.findMany({
+            where: {
+                brokerage_id: brokerageId,
+                admin_status: 'Approved',
             },
-            company: true,
-        },
-    });
+            select: {
+                id: true,
+                title: true,
+                min_price: true,
+                max_price: true,
+                image: true,
+                type: true,
+                category: true,
+                city: true,
+                address: true,
+                created_at: true,
+            },
+            orderBy: { created_at: 'desc' },
+        });
 
-    if (!brokerage) throw new Error('Brokerage not found');
+        console.log('Direct listings count:', directListings.length);
 
-    const brokerIds = brokerage.brokers.map((b) => b.id);
+        // Combine all listings
+        const allListings = [...brokerListings, ...directListings];
+        const totalListingsCount = allListings.length;
 
-    const brokerListings = await prisma.listing.findMany({
-        where: {
-            broker_id: { in: brokerIds },
-        },
-        select: {
-            id: true,
-            title: true,
-            min_price: true,
-            max_price: true,
-            image: true,
-        },
-    });
+        const result = {
+            id: brokerage.id,
+            name: company?.name || '',
+            logo: company?.logo || '',
+            description: company?.description || '',
+            about: brokerage.about || '',
+            ded: brokerage.ded,
+            rera: brokerage.rera,
+            contact: {
+                email: company?.email || '',
+                phone: company?.phone || '',
+                website: company?.website || '',
+                address: company?.address || '',
+            },
+            service_areas: brokerage.service_areas || [],
+            broker_count: brokerage.brokers.length,
+            brokers: brokerage.brokers,
+            listings: allListings,
+            properties_count: totalListingsCount,
+            company: company
+                ? {
+                    id: company.id,
+                    name: company.name,
+                    type: company.type,
+                }
+                : null,
+            created_at: brokerage.created_at,
+            updated_at: brokerage.updated_at,
+        };
 
-    const totalListingsCount =
-        brokerListings.length + brokerage.listings.length;
+        console.log('Service completed successfully');
+        return result;
 
-    return {
-        id: brokerage.id,
-        name: brokerage.company?.name,
-        logo: brokerage.company?.logo,
-        description: brokerage.company?.description,
-        about: brokerage.about ?? '',
-        ded: brokerage.ded,
-        rera: brokerage.rera,
-        contact: {
-            email: brokerage.company?.email,
-            phone: brokerage.company?.phone,
-        },
-        service_areas: brokerage.service_areas,
-        broker_count: brokerage.brokers.length,
-        brokers: brokerage.brokers,
-        listings: [...brokerage.listings, ...brokerListings],
-        properties_count: totalListingsCount,
-        company: brokerage.company
-            ? {
-                  id: brokerage.company.id,
-                  name: brokerage.company.name,
-                  type: brokerage.company.type,
-              }
-            : null,
-    };
+    } catch (error) {
+        console.error('Error in getBrokerageDetailsService:', error);
+        throw error;
+    }
 };
 
 export const getAboutService = async (id: string) => {
@@ -185,22 +270,10 @@ export const getAboutService = async (id: string) => {
         where: { id },
         select: {
             id: true,
-            company: {
-                select: {
-                    name: true,
-                    logo: true,
-                    description: true,
-                    email: true,
-                    phone: true,
-                },
-            },
             about: true,
             ded: true,
             rera: true,
             service_areas: true,
-            listings: {
-                select: { id: true },
-            },
             brokers: {
                 select: { id: true },
             },
@@ -209,28 +282,51 @@ export const getAboutService = async (id: string) => {
 
     if (!brokerage) throw new Error('Brokerage not found');
 
-    const brokerIds = brokerage.brokers.map((b) => b.id);
-
-    const brokerListingsCount = await prisma.listing.count({
-        where: {
-            broker_id: { in: brokerIds },
+    // Get the company associated with this brokerage
+    const company = await prisma.company.findFirst({
+        where: { brokerageId: id },
+        select: {
+            id: true,
+            name: true,
+            logo: true,
+            description: true,
+            email: true,
+            phone: true,
         },
     });
 
-    const totalListingsCount = brokerListingsCount + brokerage.listings.length;
+    const brokerIds = brokerage.brokers.map((b) => b.id);
+
+    // Get listings count for brokers
+    const brokerListingsCount = await prisma.listing.count({
+        where: {
+            broker_id: { in: brokerIds },
+            admin_status: 'Approved',
+        },
+    });
+
+    // Get direct listings count for the brokerage
+    const directListingsCount = await prisma.listing.count({
+        where: {
+            brokerage_id: id,
+            admin_status: 'Approved',
+        },
+    });
+
+    const totalListingsCount = brokerListingsCount + directListingsCount;
 
     return {
         id: brokerage.id,
-        name: brokerage.company?.name,
-        logo: brokerage.company?.logo,
-        description: brokerage.company?.description,
+        name: company?.name || '',
+        logo: company?.logo || '',
+        description: company?.description || '',
         about: brokerage.about,
         ded: brokerage.ded,
         rera: brokerage.rera,
         service_areas: brokerage.service_areas,
         contact: {
-            email: brokerage.company?.email,
-            phone: brokerage.company?.phone,
+            email: company?.email || '',
+            phone: company?.phone || '',
         },
         totalListingsCount,
     };
@@ -284,19 +380,19 @@ export const getListingsService = async (brokerageId: string) => {
             recentViews,
             broker: listing.broker
                 ? {
-                      id: listing.broker.id,
-                      name: listing.broker.name,
-                      profile_pic: listing.broker.profile_pic,
-                      country_code: listing.broker.country_code,
-                      w_number: listing.broker.w_number,
-                  }
+                    id: listing.broker.id,
+                    name: listing.broker.name,
+                    profile_pic: listing.broker.profile_pic,
+                    country_code: listing.broker.country_code,
+                    w_number: listing.broker.w_number,
+                }
                 : {
-                      id: '',
-                      name: '',
-                      profile_pic: '',
-                      country_code: '',
-                      w_number: '',
-                  },
+                    id: '',
+                    name: '',
+                    profile_pic: '',
+                    country_code: '',
+                    w_number: '',
+                },
             company: {
                 name: listing.broker?.company?.name || '',
             },
