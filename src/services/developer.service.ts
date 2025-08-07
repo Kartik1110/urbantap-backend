@@ -14,15 +14,15 @@ export const getDevelopersService = async ({
 
     const whereClause = search
         ? {
-              name: {
-                  contains: search,
-                  mode: 'insensitive' as Prisma.QueryMode,
-              },
-              type: CompanyType.Developer,
-          }
+            name: {
+                contains: search,
+                mode: 'insensitive' as Prisma.QueryMode,
+            },
+            type: CompanyType.Developer,
+        }
         : {
-              type: CompanyType.Developer,
-          };
+            type: CompanyType.Developer,
+        };
 
     const [developers, totalCount] = await Promise.all([
         prisma.company.findMany({
@@ -30,13 +30,31 @@ export const getDevelopersService = async ({
             skip,
             take: pageSize,
             include: {
-                developer: true,
+                developer: {
+                    include: {
+                        _count: {
+                            select: {
+                                projects: true,
+                            },
+                        },
+                    },
+                },
             },
         }),
         prisma.company.count({
             where: whereClause,
         }),
     ]);
+    const developersWithProjectCount = developers.map(company => ({
+        id: company.developer?.id,
+        name: company.name,
+        logo: company.logo,
+        description: company.description,
+        email: company.email,
+        phone: company.phone,
+        address: company.address,
+        projects_count: company.developer?._count?.projects || 0,
+    }));
 
     const pagination = {
         page,
@@ -45,7 +63,7 @@ export const getDevelopersService = async ({
         totalPages: Math.ceil(totalCount / pageSize),
     };
 
-    return { developers, pagination };
+    return { developers, pagination, Project_count: developersWithProjectCount };
 };
 
 export const createDeveloperService = async (data: {
@@ -105,10 +123,10 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         profile_pic: broker.profile_pic,
         company: broker.company
             ? {
-                  name: broker.company.name,
-                  logo: broker.company.logo,
-                  address: broker.company.address,
-              }
+                name: broker.company.name,
+                logo: broker.company.logo,
+                address: broker.company.address,
+            }
             : null,
     }));
 
