@@ -1,5 +1,6 @@
 import prisma from '../utils/prisma';
 import { CompanyType, Prisma } from '@prisma/client';
+import logger from '../utils/logger';
 
 export const getBrokeragesService = async ({
     page,
@@ -260,7 +261,7 @@ export const getBrokerageDetailsService = async (brokerageId: string) => {
         return result;
 
     } catch (error) {
-        console.error('Error in getBrokerageDetailsService:', error);
+        logger.error('Error in getBrokerageDetailsService:', error);
         throw error;
     }
 };
