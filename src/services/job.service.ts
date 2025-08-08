@@ -67,97 +67,73 @@ export const getJobsService = async (
 ) => {
     const { page = 1, page_size = 10, search = '' } = body;
     const skip = (page - 1) * page_size;
-    const take = page_size;
 
     const whereClause = search
         ? {
-              title: {
-                  contains: search,
-                  mode: Prisma.QueryMode.insensitive,
-              },
-          }
+            title: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+            },
+        }
         : {};
 
-    const jobsRaw = await prisma.job.findMany({
-        skip,
-        take,
-        orderBy: { created_at: 'desc' },
-        where: whereClause,
-        select: {
-            id: true,
-            title: true,
-            company_id: true,
-            workplace_type: true,
-            location: true,
-            job_type: true,
-            description: true,
-            min_salary: true,
-            max_salary: true,
-            skills: true,
-            currency: true,
-            min_experience: true,
-            max_experience: true,
-            userId: true,
-            created_at: true,
-            updated_at: true,
-            company: {
-                select: {
-                    id: true,
-                    name: true,
-                    logo: true,
-                    description: true,
-                    brokerage: {
-                        select: {
-                            id: true,
-                            _count: {
-                                select: { listings: true },
+    const [jobsRaw, totalJobs, appliedJobIds] = await Promise.all([
+        prisma.job.findMany({
+            skip,
+            take: page_size,
+            orderBy: { created_at: 'desc' },
+            where: whereClause,
+            select: {
+                id: true,
+                title: true,
+                company_id: true,
+                workplace_type: true,
+                location: true,
+                job_type: true,
+                description: true,
+                min_salary: true,
+                max_salary: true,
+                skills: true,
+                currency: true,
+                min_experience: true,
+                max_experience: true,
+                userId: true,
+                created_at: true,
+                updated_at: true,
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                        logo: true,
+                        description: true,
+                        brokerage: {
+                            select: {
+                                id: true,
+                                _count: {
+                                    select: { listings: true },
+                                },
                             },
                         },
                     },
                 },
             },
-        },
-    });
-
-    // Get all jobIds the user has applied to
-    let appliedJobIds: Set<string> = new Set();
-    if (userId) {
-        const userApplications = await prisma.application.findMany({
-            where: { user_id: userId },
-            select: { job_id: true },
-        });
-        appliedJobIds = new Set(userApplications.map((app) => app.job_id));
-    }
+        }),
+        prisma.job.count({ where: whereClause }),
+        _getUserAppliedJobIds(userId || ''),
+    ]);
 
     const jobs = jobsRaw.map((job) => {
-        if (job.company?.brokerage) {
-            const { _count, ...brokerageData } = job.company.brokerage;
-            return {
-                ...job,
-                brokerage: {
-                    ...brokerageData,
-                    listings_count: _count.listings,
-                },
-                applied: appliedJobIds.has(job.id),
-            };
-        }
+        const { company, ...jobWithoutCompany } = job;
         return {
-            ...job,
+            ...jobWithoutCompany,
+            brokerage: _transformBrokerageData(company),
             applied: appliedJobIds.has(job.id),
         };
     });
 
-    const totalJobs = await prisma.job.count({ where: whereClause });
-    const totalPages = Math.ceil(totalJobs / page_size);
-
     return {
         jobs,
-        pagination: {
-            total: totalJobs,
-            totalPages,
-            page,
-            page_size,
-        },
+        pagination: _createPaginationObject(totalJobs, page, page_size),
     };
 };
 
@@ -227,12 +203,12 @@ export const getJobByIdService = async (id: string, userId?: string) => {
 
     const cleanedBrokerage = job.company
         ? {
-              id: job.company?.brokerage?.id,
-              name: job.company.name,
-              logo: job.company.logo,
-              description: job.company.description,
-              listings_count: job.company?.brokerage?._count?.listings ?? 0,
-          }
+            id: job.company?.brokerage?.id,
+            name: job.company.name,
+            logo: job.company.logo,
+            description: job.company.description,
+            listings_count: job.company?.brokerage?._count?.listings ?? 0,
+        }
         : null;
 
     const returnedJob = {
@@ -316,3 +292,41 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
         applications,
     };
 };
+
+// TODO: Should we move these to a helper methods file?
+// Private helper function to transform brokerage data
+const _transformBrokerageData = (company: any) => {
+    if (!company?.brokerage) return null;
+
+    const { _count, ...brokerageData } = company.brokerage;
+    return {
+        id: brokerageData.id,
+        listings_count: _count.listings,
+        company: {
+            id: company.id,
+            name: company.name,
+            logo: company.logo,
+            description: company.description,
+        },
+    };
+};
+
+// Private helper function to check if user has applied to jobs
+const _getUserAppliedJobIds = async (userId: string): Promise<Set<string>> => {
+    if (!userId) return new Set();
+
+    const userApplications = await prisma.application.findMany({
+        where: { user_id: userId },
+        select: { job_id: true },
+    });
+    return new Set(userApplications.map((app) => app.job_id));
+};
+
+// Private helper function to create pagination object
+const _createPaginationObject = (total: number, page: number, page_size: number) => ({
+    total,
+    totalPages: Math.ceil(total / page_size),
+    page,
+    page_size,
+});
+
