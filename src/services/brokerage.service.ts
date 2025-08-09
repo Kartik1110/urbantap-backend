@@ -32,13 +32,27 @@ export const getBrokeragesService = async ({
             select: {
                 id: true,
                 name: true,
+                name_ar: true,
                 logo: true,
+                description: true,
+                phone: true,
+                email: true,
+                address: true,
+                website: true,
                 brokers: {
                     select: {
                         id: true,
                     },
                 },
-                brokerage: true,
+                brokerage: {
+                    select: {
+                        id: true,
+                        ded: true,
+                        rera: true,
+                        service_areas: true,
+                        about: true,
+                    },
+                },
             },
         }),
         prisma.company.count({ where: whereClause }),
@@ -73,9 +87,18 @@ export const getBrokeragesService = async ({
         }, 0);
 
         return {
-            id: brokerage.id,
-            name: brokerage.name,
-            logo: brokerage.logo,
+            ...brokerage.brokerage,
+            company: {
+                id: brokerage.id,
+                name: brokerage.name,
+                name_ar: brokerage.name_ar,
+                logo: brokerage.logo,
+                description: brokerage.description,
+                phone: brokerage.phone,
+                email: brokerage.email,
+                address: brokerage.address,
+                website: brokerage.website,
+            },
             broker_count: brokerCount,
             listing_count: listingCount,
         };

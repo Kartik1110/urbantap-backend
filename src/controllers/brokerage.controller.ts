@@ -24,8 +24,7 @@ export const getBrokerages = async (req: Request, res: Response) => {
         res.json({
             status: 'success',
             message: 'Brokerages fetched successfully',
-            data: brokerages,
-            pagination,
+            data: { brokerages, pagination },
         });
     } catch (error) {
         res.status(500).json({
