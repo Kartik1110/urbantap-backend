@@ -56,6 +56,7 @@ model Broker {
   user_id                  String?
   type                     BrokerType?
   specialities             Speciality[]        @default([])
+  referral_code            String?
   company                  Company?            @relation(fields: [company_id], references: [id])
   listings                 Listing[]
   user                     User?               @relation(fields: [user_id], references: [id])
