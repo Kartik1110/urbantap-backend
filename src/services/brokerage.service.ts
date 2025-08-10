@@ -1,3 +1,8 @@
+import {
+    createPaginationObject,
+    getUserAppliedJobIds,
+    transformBrokerageData,
+} from '../helper';
 import prisma from '../utils/prisma';
 import { CompanyType, Prisma } from '@prisma/client';
 
@@ -358,21 +363,75 @@ export const getBrokersService = async (id: string) => {
     return brokerage.brokers;
 };
 
-export const getJobsService = async (id: string) => {
-    const jobs = await prisma.job.findMany({
-        where: { company: { brokerage: { id } } },
-        select: {
-            id: true,
-            title: true,
-            location: true,
-            min_salary: true,
-            max_salary: true,
-            job_type: true,
-            min_experience: true,
-            max_experience: true,
-            created_at: true,
-        },
+export const getJobsService = async (
+    brokerageId: string,
+    body: { page?: number; page_size?: number },
+    userId: string
+) => {
+    const { page = 1, page_size = 10 } = body;
+    const skip = (page - 1) * page_size;
+
+    const [jobsRaw, appliedJobIds] = await Promise.all([
+        prisma.job.findMany({
+            where: {
+                company: {
+                    type: CompanyType.Brokerage,
+                    brokerage: { id: brokerageId },
+                },
+            },
+            select: {
+                id: true,
+                title: true,
+                company_id: true,
+                workplace_type: true,
+                location: true,
+                job_type: true,
+                description: true,
+                min_salary: true,
+                max_salary: true,
+                skills: true,
+                currency: true,
+                min_experience: true,
+                max_experience: true,
+                userId: true,
+                created_at: true,
+                updated_at: true,
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                        logo: true,
+                        description: true,
+                        type: true,
+                        brokerage: {
+                            select: {
+                                id: true,
+                                _count: {
+                                    select: { listings: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            skip,
+            take: page_size,
+            orderBy: { created_at: 'desc' },
+        }),
+        getUserAppliedJobIds(userId),
+    ]);
+
+    const jobs = jobsRaw.map((job) => {
+        const { company, ...jobWithoutCompany } = job;
+        return {
+            ...jobWithoutCompany,
+            brokerage: transformBrokerageData(company),
+            applied: appliedJobIds.has(job.id),
+        };
     });
 
-    return jobs;
+    return {
+        jobs,
+        pagination: createPaginationObject(jobs.length, 1, 10),
+    };
 };

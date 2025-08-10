@@ -70,11 +70,11 @@ export const getJobsService = async (
 
     const whereClause = search
         ? {
-            title: {
-                contains: search,
-                mode: Prisma.QueryMode.insensitive,
-            },
-        }
+              title: {
+                  contains: search,
+                  mode: Prisma.QueryMode.insensitive,
+              },
+          }
         : {};
 
     const [jobsRaw, totalJobs, appliedJobIds] = await Promise.all([
@@ -203,12 +203,12 @@ export const getJobByIdService = async (id: string, userId?: string) => {
 
     const cleanedBrokerage = job.company
         ? {
-            id: job.company?.brokerage?.id,
-            name: job.company.name,
-            logo: job.company.logo,
-            description: job.company.description,
-            listings_count: job.company?.brokerage?._count?.listings ?? 0,
-        }
+              id: job.company?.brokerage?.id,
+              name: job.company.name,
+              logo: job.company.logo,
+              description: job.company.description,
+              listings_count: job.company?.brokerage?._count?.listings ?? 0,
+          }
         : null;
 
     const returnedJob = {
@@ -323,10 +323,13 @@ const _getUserAppliedJobIds = async (userId: string): Promise<Set<string>> => {
 };
 
 // Private helper function to create pagination object
-const _createPaginationObject = (total: number, page: number, page_size: number) => ({
+const _createPaginationObject = (
+    total: number,
+    page: number,
+    page_size: number
+) => ({
     total,
     totalPages: Math.ceil(total / page_size),
     page,
     page_size,
 });
-

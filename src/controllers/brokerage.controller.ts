@@ -8,6 +8,7 @@ import {
     getBrokersService,
     getJobsService,
 } from '../services/brokerage.service';
+import jwt from 'jsonwebtoken';
 
 export const getBrokerages = async (req: Request, res: Response) => {
     try {
@@ -119,7 +120,18 @@ export const getBrokerageBrokers = async (req: Request, res: Response) => {
 
 export const getBrokerageJobs = async (req: Request, res: Response) => {
     try {
-        const data = await getJobsService(req.params.id);
+        const token = req.headers.authorization as string;
+
+        const decoded = jwt.verify(
+            token.replace('Bearer ', ''),
+            process.env.JWT_SECRET!
+        ) as { userId: string };
+
+        const data = await getJobsService(
+            req.params.id,
+            req.body,
+            decoded.userId
+        );
         res.json({ status: 'success', data });
     } catch (error) {
         res.status(500).json({
