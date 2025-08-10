@@ -33,9 +33,11 @@ export const getProjectsService = async ({
         }),
         ...(developer && {
             developer: {
-                name: {
-                    contains: developer,
-                    mode: 'insensitive' as Prisma.QueryMode,
+                company: {
+                    name: {
+                        contains: developer,
+                        mode: 'insensitive' as Prisma.QueryMode,
+                    },
                 },
             },
         }),
@@ -50,12 +52,15 @@ export const getProjectsService = async ({
                 developer: {
                     select: {
                         id: true,
-                        name: true,
-                        logo: true,
-                        cover_image: true,
-                        description: true,
-                        email: true,
-                        phone: true,
+                        company: {
+                            select: {
+                                name: true,
+                                logo: true,
+                                description: true,
+                                email: true,
+                                phone: true,
+                            },
+                        },
                     },
                 },
             },

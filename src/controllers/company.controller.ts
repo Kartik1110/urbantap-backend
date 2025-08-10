@@ -6,7 +6,11 @@ import {
     updateCompanyService,
     getListingsByCompanyIdService,
     getCompaniesByUserIdService,
+    getCompanyByIdService,
+    getAllCompanyPostsService,
+    getCompanyPostByIdService,
 } from '../services/company.service';
+import prisma from '../utils/prisma';
 
 export const bulkInsertCompanies = async (req: Request, res: Response) => {
     try {
@@ -134,6 +138,96 @@ export const getCompaniesByUserId = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch companies by user ID',
+            error,
+        });
+    }
+};
+
+export const getCompanyLinkInfo = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const company = await prisma.company.findUnique({
+        where: { id },
+        select: {
+            developerId: true,
+            brokerageId: true,
+        },
+    });
+
+    if (!company) {
+        return res.status(404).json({ message: 'Company not found' });
+    }
+
+    res.json({
+        developerId: company.developerId,
+        brokerageId: company.brokerageId,
+    });
+};
+
+export const getCompanyById = async (req: Request, res: Response) => {
+    try {
+        const companyId = req.params.id;
+
+        const company = await getCompanyByIdService(companyId);
+
+        if (!company) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Company not found',
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Company fetched successfully',
+            data: company,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company by ID',
+            error,
+        });
+    }
+};
+
+export const getAllCompanyPosts = async (req: Request, res: Response) => {
+    try {
+        const posts = await getAllCompanyPostsService();
+        res.json({
+            status: 'success',
+            message: 'Company posts fetched successfully',
+            data: posts,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company posts',
+            error,
+        });
+    }
+};
+
+export const getCompanyPostById = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.id;
+        const post = await getCompanyPostByIdService(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Company post not found',
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Company post fetched successfully',
+            data: post,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch company post',
             error,
         });
     }

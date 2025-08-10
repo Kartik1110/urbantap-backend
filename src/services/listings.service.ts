@@ -19,6 +19,8 @@ import {
     Market,
 } from '@prisma/client';
 import generateListingFromText from '../scripts/generate-listings';
+import { Prisma } from '@prisma/client';
+import { geocodeAddress } from '../utils/geocoding';
 
 /* Get listings */
 interface ListingFilters {
@@ -27,6 +29,64 @@ interface ListingFilters {
 
 export const getListingByIdService = async (id: string) => {
     try {
+        const now = new Date();
+
+        // Try to upsert the view row safely
+        const view = await prisma.listingView.findUnique({
+            where: { listing_id: id },
+        });
+
+        if (view) {
+            const hoursPassed =
+                (now.getTime() - new Date(view.viewed_at).getTime()) /
+                (1000 * 60 * 60);
+
+            if (hoursPassed > 48) {
+                // const minutesPassed = (now.getTime() - new Date(view.viewed_at).getTime()) / (1000 * 60);
+                // if (minutesPassed > 1) {
+                await prisma.listingView.update({
+                    where: { listing_id: id },
+                    data: {
+                        count: 1,
+                        viewed_at: now,
+                    },
+                });
+            } else {
+                await prisma.listingView.update({
+                    where: { listing_id: id },
+                    data: {
+                        count: { increment: 1 },
+                    },
+                });
+            }
+        } else {
+            try {
+                await prisma.listingView.create({
+                    data: {
+                        listing_id: id,
+                        viewed_at: now,
+                        count: 1,
+                    },
+                });
+            } catch (error) {
+                // If create fails due to race condition, fallback to update
+                if (
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'code' in error &&
+                    (error as { code?: string }).code === 'P2002'
+                ) {
+                    await prisma.listingView.update({
+                        where: { listing_id: id },
+                        data: {
+                            count: { increment: 1 },
+                        },
+                    });
+                } else {
+                    throw error;
+                }
+            }
+        }
         const listing = await prisma.listing.findUnique({
             where: { id },
             include: {
@@ -47,6 +107,7 @@ export const getListingByIdService = async (id: string) => {
                         },
                     },
                 },
+                listing_views: true,
             },
         });
 
@@ -63,10 +124,11 @@ export const getListingByIdService = async (id: string) => {
                 company: { name: '' },
             };
         }
-
+        const recentViews = listing.listing_views?.[0]?.count || 0;
         const { broker, ...listingWithoutBroker } = listing;
         return {
             listing: listingWithoutBroker,
+            recentViews,
             broker: {
                 id: broker.id,
                 name: broker.name,
@@ -90,6 +152,7 @@ export const getListingByIdService = async (id: string) => {
 
 export const getListingsService = async (
     filters: {
+        views_feature?: boolean;
         looking_for?: boolean;
         category?: 'Ready_to_move' | 'Off_plan' | 'Rent';
         min_price?: number;
@@ -119,12 +182,13 @@ export const getListingsService = async (
         payment_plan?: ('Payment_done' | 'Payment_Pending')[];
         sale_type?: ('Direct' | 'Resale')[];
         amenities?: string[];
+        search?: string;
         page?: number;
         page_size?: number;
     } & ListingFilters
 ): Promise<{
     listings: Array<{
-        listing: Partial<Listing>;
+        listing: Partial<Listing> & { recentViews?: number };
         broker: {
             id: string;
             name: string;
@@ -147,6 +211,9 @@ export const getListingsService = async (
         const { page = 1, page_size = 10, ...filterParams } = filters;
 
         // Remove these properties from filterParams before constructing whereCondition
+        const skip = (page - 1) * page_size;
+
+        // ---------- Non-trending (default) logic ----------
         const {
             type,
             no_of_bathrooms,
@@ -172,12 +239,11 @@ export const getListingsService = async (
             current_status,
             views,
             market,
+            // eslint-disable-next-line
+            search,
             ...restFilters
         } = filterParams;
 
-        // Calculate skip value for pagination
-        const skip = (page - 1) * page_size;
-        console.log('filterParams.type', type);
         // Base WHERE condition with admin_status
         const whereCondition = {
             AND: [
@@ -185,9 +251,7 @@ export const getListingsService = async (
                 {
                     broker: {
                         sentToConnectionRequests: {
-                            none: {
-                                status: RequestStatus.Blocked,
-                            },
+                            none: { status: RequestStatus.Blocked },
                         },
                     },
                 },
@@ -298,13 +362,47 @@ export const getListingsService = async (
         delete filterParams.page;
         delete filterParams.page_size;
 
+        const normalizedSearch = filters.search?.trim().toLowerCase();
+
+        const searchConditions: Prisma.ListingWhereInput = normalizedSearch
+            ? {
+                  OR: [
+                      {
+                          address: {
+                              contains: normalizedSearch,
+                              mode: 'insensitive' as Prisma.QueryMode,
+                          },
+                      },
+                      {
+                          locality: {
+                              contains: normalizedSearch,
+                              mode: 'insensitive' as Prisma.QueryMode,
+                          },
+                      },
+                      {
+                          city: {
+                              equals: Object.values(City).find(
+                                  (c) => c.toLowerCase() === normalizedSearch
+                              ) as City | undefined, // Safely cast to enum
+                          },
+                      },
+                  ],
+              }
+            : {};
+
         // Get total count for pagination
         const total = await prisma.listing.count({
-            where: whereCondition,
+            where: {
+                ...whereCondition,
+                ...searchConditions,
+            },
         });
 
         const listings = await prisma.listing.findMany({
-            where: whereCondition,
+            where: {
+                ...whereCondition,
+                ...searchConditions,
+            },
             skip,
             take: page_size,
             orderBy: {
@@ -323,6 +421,11 @@ export const getListingsService = async (
                                 name: true,
                             },
                         },
+                    },
+                },
+                listing_views: {
+                    select: {
+                        count: true,
                     },
                 },
             },
@@ -354,8 +457,11 @@ export const getListingsService = async (
 
         const formattedListings = listings.map((listing: any) => {
             const { broker, ...listingWithoutBroker } = listing;
+            const recentViews = listing.listing_views?.[0]?.count || 0;
+
             return {
                 listing: listingWithoutBroker,
+                recentViews,
                 broker: {
                     id: broker.id,
                     name: broker.name,
@@ -385,17 +491,202 @@ export const getListingsService = async (
     }
 };
 
+export const getFeaturedListingsService = async () => {
+    const now = new Date();
+    const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+    // Clean up old views
+    await prisma.listingView.updateMany({
+        where: {
+            viewed_at: {
+                lt: since,
+            },
+        },
+        data: {
+            count: 0,
+            viewed_at: now,
+        },
+    });
+
+    const trendingListings = await prisma.listing.findMany({
+        where: {
+            admin_status: Admin_Status.Approved,
+            listing_views: {
+                some: {
+                    viewed_at: {
+                        gte: since,
+                    },
+                },
+            },
+        },
+
+        skip: 0,
+        take: 5,
+        orderBy: {
+            listing_views: {
+                _count: 'desc',
+            },
+        },
+        include: {
+            listing_views: {
+                where: {
+                    viewed_at: {
+                        gte: since,
+                    },
+                },
+                select: {
+                    id: true,
+                    count: true,
+                },
+            },
+            broker: {
+                select: {
+                    id: true,
+                    name: true,
+                    profile_pic: true,
+                    country_code: true,
+                    w_number: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    return {
+        listings: trendingListings.map((listing) => {
+            const recentViews = listing.listing_views?.[0]?.count || 0;
+            const { broker, ...rest } = listing;
+            return {
+                listing: {
+                    ...rest,
+                    recent_views: recentViews,
+                },
+                broker: {
+                    id: broker.id,
+                    name: broker.name,
+                    profile_pic: broker.profile_pic,
+                    country_code: broker.country_code,
+                    w_number: broker.w_number,
+                },
+                company: {
+                    name: broker.company?.name || '',
+                },
+            };
+        }),
+    };
+};
+
+export const getRecentListingsService = async () => {
+    const listings = await prisma.listing.findMany({
+        where: {
+            admin_status: Admin_Status.Approved,
+            image_urls: {
+                isEmpty: false,
+            },
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+        take: 5,
+        include: {
+            broker: {
+                select: {
+                    id: true,
+                    name: true,
+                    profile_pic: true,
+                    country_code: true,
+                    w_number: true,
+                    company: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+            listing_views: {
+                select: {
+                    count: true,
+                },
+            },
+        },
+    });
+
+    const formattedListings = listings.map((listing: any) => {
+        const { broker, ...listingWithoutBroker } = listing;
+        const recentViews = listing.listing_views?.[0]?.count || 0;
+
+        return {
+            listing: listingWithoutBroker,
+            recentViews,
+            broker: {
+                id: broker.id,
+                name: broker.name,
+                profile_pic: broker.profile_pic,
+                country_code: broker.country_code,
+                w_number: broker.w_number,
+            },
+            company: {
+                name: broker.company?.name || '',
+            },
+        };
+    });
+
+    return {
+        listings: formattedListings,
+    };
+};
+
 /* Bulk insert listings */
 export const bulkInsertListingsService = async (listings: Listing[]) => {
     try {
-        const listingsWithPendingStatus = listings.map((listing) => ({
-            ...listing,
-            admin_status: Admin_Status.Pending,
-        }));
+        const enrichedListings = [];
 
-        return await prisma.listing.create({
-            data: listingsWithPendingStatus[0],
+        for (const listing of listings) {
+            let enrichedListing = {
+                ...listing,
+                admin_status: Admin_Status.Pending,
+            };
+
+            // Add locality information if address is provided
+            if (listing.address) {
+                const rawAddress = `${listing.address}, Dubai`;
+                const geocodeResult = await geocodeAddress(rawAddress);
+
+                if (geocodeResult) {
+                    enrichedListing = {
+                        ...enrichedListing,
+                        address: geocodeResult.formatted_address,
+                        locality: geocodeResult.locality,
+                    };
+                    console.log(
+                        `✅ Geocoded listing with address: ${listing.address}`
+                    );
+                } else {
+                    console.log(
+                        `⚠️ Unable to geocode address: ${listing.address}`
+                    );
+                }
+            }
+
+            enrichedListings.push(enrichedListing);
+
+            // Add a small delay to respect API limits (100ms)
+            if (listings.length > 1) {
+                await new Promise((resolve) => global.setTimeout(resolve, 100));
+            }
+        }
+
+        // Use createMany for bulk insertion
+        const result = await prisma.listing.createMany({
+            data: enrichedListings,
+            skipDuplicates: true,
         });
+
+        return result;
     } catch (error) {
         console.error(error);
         logger.error(error);

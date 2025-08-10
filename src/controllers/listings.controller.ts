@@ -10,10 +10,11 @@ import {
     editListingService,
     generateListingFromTextService,
     getTopLocalitiesWithCounts,
+    getFeaturedListingsService,
+    getRecentListingsService,
 } from '../services/listings.service';
 import { uploadToS3 } from '../utils/s3Upload';
 import prisma from '../utils/prisma';
-import { City } from '@prisma/client';
 
 /* Get listings */
 export const getListings = async (req: Request, res: Response) => {
@@ -31,6 +32,42 @@ export const getListings = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch listings',
+            error: error,
+        });
+    }
+};
+
+/* Get featured listings */
+export const getFeaturedListings = async (req: Request, res: Response) => {
+    try {
+        const listings = await getFeaturedListingsService();
+        res.json({
+            status: 'success',
+            message: 'Featured listings fetched successfully',
+            data: listings,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch featured listings',
+            error: error,
+        });
+    }
+};
+
+/* Get recent listings */
+export const getRecentListings = async (req: Request, res: Response) => {
+    try {
+        const listings = await getRecentListingsService();
+        res.json({
+            status: 'success',
+            message: 'Recent listings fetched successfully',
+            data: listings,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch recent listings',
             error: error,
         });
     }
@@ -269,7 +306,6 @@ export const getPopularLocalities = async (req: Request, res: Response) => {
             data: popularLocalities,
         });
     } catch (error) {
-        console.error(error);
         return res.status(500).json({
             status: 'error',
             message: 'Failed to fetch popular localities',
