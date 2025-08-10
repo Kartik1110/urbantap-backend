@@ -299,18 +299,18 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
     });
 
     // Transform the applications to match getJobs format
-    const jobs = applications.map((application) => {
+    const applicationsWithJobs = applications.map((application) => {
         const { company, ...jobWithoutCompany } = application.job;
         return {
-            ...jobWithoutCompany,
-            brokerage: transformBrokerageData(company),
-            applied: true, // Since these are applications, they are always applied
-            application: {
-                id: application.id,
-                resume: application.resume,
-                status: application.status,
-                created_at: application.created_at,
-                updated_at: application.updated_at,
+            id: application.id,
+            resume: application.resume,
+            status: application.status,
+            created_at: application.created_at,
+            updated_at: application.updated_at,
+            job: {
+                ...jobWithoutCompany,
+                brokerage: transformBrokerageData(company),
+                applied: true, // Since these are applications, they are always applied
             },
         };
     });
@@ -321,6 +321,6 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
             name: broker.name,
             email: broker.email,
         },
-        jobs,
+        applications: applicationsWithJobs,
     };
 };
