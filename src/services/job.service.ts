@@ -103,6 +103,7 @@ export const getJobsService = async (
                 min_experience: true,
                 max_experience: true,
                 userId: true,
+                is_sponsored: true,
                 created_at: true,
                 updated_at: true,
                 company: {
@@ -160,6 +161,7 @@ export const getJobByIdService = async (id: string, userId?: string) => {
             min_experience: true,
             max_experience: true,
             userId: true,
+            is_sponsored: true,
             created_at: true,
             updated_at: true,
             company: {

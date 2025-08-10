@@ -465,6 +465,8 @@ model Job {
   max_experience Int?
   userId         String?
   adminUserId    String?
+  expiry_date    DateTime?
+  is_sponsored   Boolean?      @default(false)
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
   user           User?         @relation(fields: [userId], references: [id])
