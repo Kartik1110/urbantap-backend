@@ -26,7 +26,7 @@ import { Express } from 'express';
 import prisma from '../utils/prisma';
 import { Request, Response } from 'express';
 import { uploadToS3 } from '../utils/s3Upload';
-import { AuthenticatedRequest } from '../middlewares/verfiyToken';
+import { AuthenticatedRequest } from '../utils/verifyToken';
 import { CompanyType, Listing } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 

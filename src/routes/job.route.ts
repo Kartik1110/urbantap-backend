@@ -8,7 +8,7 @@ import {
     createJob,
     getJobs,
     getJobById,
-    getJobsAppliedByBroker
+    getJobsAppliedByBroker,
 } from '../controllers/job.controller';
 
 const router = Router();

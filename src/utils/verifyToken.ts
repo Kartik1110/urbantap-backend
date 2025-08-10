@@ -4,10 +4,10 @@ import jwt from 'jsonwebtoken';
 
 // Extend Request locally
 export interface AuthenticatedRequest extends Request {
-    user?: DecodedUser;
+    user?: DecodedAdminUser;
 }
 
-export interface DecodedUser {
+export interface DecodedAdminUser {
     id: string;
     email: string;
     companyId?: string;

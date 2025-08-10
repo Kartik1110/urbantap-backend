@@ -10,7 +10,7 @@ import {
     Listing,
     Admin_Status,
 } from '@prisma/client';
-import { DecodedUser } from '../middlewares/verfiyToken';
+import { DecodedAdminUser } from '../utils/verifyToken';
 import logger from '../utils/logger';
 import { geocodeAddress } from '../utils/geocoding';
 
@@ -92,7 +92,7 @@ export const changeAdminPassword = async (
 };
 
 export const editLinkedCompany = async (
-    user: DecodedUser,
+    user: DecodedAdminUser,
     updateData: {
         name?: string;
         description?: string;
@@ -167,7 +167,7 @@ export const editLinkedCompany = async (
     }
 };
 
-export const getProfileService = async (user: DecodedUser) => {
+export const getProfileService = async (user: DecodedAdminUser) => {
     const data = await prisma.company.findUnique({
         where: { id: user.companyId },
         include: {
