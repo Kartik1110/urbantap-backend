@@ -1,6 +1,6 @@
 import express from 'express';
 import { jobSchema } from '../schema/job.schema';
-import { verifyToken } from '../middlewares/verfiyToken';
+import { verifyToken } from '../utils/verifyToken';
 import validateSchema from '../middlewares/validate.middleware';
 import { editProfileSchema } from '../schema/editProfile.schema';
 import { createProjectSchema } from '../schema/project.schema';

@@ -1,6 +1,11 @@
-import { PrismaClient, Job, Prisma } from '@prisma/client';
-import { ApplyJobInput } from '../schema/job.schema';
 import { uploadToS3 } from '../utils/s3Upload';
+import { ApplyJobInput } from '../schema/job.schema';
+import { PrismaClient, Job, Prisma } from '@prisma/client';
+import {
+    createPaginationObject,
+    getUserAppliedJobIds,
+    transformBrokerageData,
+} from '../helper';
 
 const prisma = new PrismaClient();
 
@@ -119,21 +124,21 @@ export const getJobsService = async (
             },
         }),
         prisma.job.count({ where: whereClause }),
-        _getUserAppliedJobIds(userId || ''),
+        getUserAppliedJobIds(userId || ''),
     ]);
 
     const jobs = jobsRaw.map((job) => {
         const { company, ...jobWithoutCompany } = job;
         return {
             ...jobWithoutCompany,
-            brokerage: _transformBrokerageData(company),
+            brokerage: transformBrokerageData(company),
             applied: appliedJobIds.has(job.id),
         };
     });
 
     return {
         jobs,
-        pagination: _createPaginationObject(totalJobs, page, page_size),
+        pagination: createPaginationObject(totalJobs, page, page_size),
     };
 };
 
@@ -265,6 +270,7 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
                     currency: true,
                     min_experience: true,
                     max_experience: true,
+                    userId: true,
                     created_at: true,
                     updated_at: true,
                     company: {
@@ -273,6 +279,15 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
                             name: true,
                             logo: true,
                             description: true,
+                            type: true,
+                            brokerage: {
+                                select: {
+                                    id: true,
+                                    _count: {
+                                        select: { listings: true },
+                                    },
+                                },
+                            },
                         },
                     },
                 },
@@ -283,53 +298,29 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
         },
     });
 
+    // Transform the applications to match getJobs format
+    const jobs = applications.map((application) => {
+        const { company, ...jobWithoutCompany } = application.job;
+        return {
+            ...jobWithoutCompany,
+            brokerage: transformBrokerageData(company),
+            applied: true, // Since these are applications, they are always applied
+            application: {
+                id: application.id,
+                resume: application.resume,
+                status: application.status,
+                created_at: application.created_at,
+                updated_at: application.updated_at,
+            },
+        };
+    });
+
     return {
         broker: {
             id: brokerId,
             name: broker.name,
             email: broker.email,
         },
-        applications,
+        jobs,
     };
 };
-
-// TODO: Should we move these to a helper methods file?
-// Private helper function to transform brokerage data
-const _transformBrokerageData = (company: any) => {
-    if (!company?.brokerage) return null;
-
-    const { _count, ...brokerageData } = company.brokerage;
-    return {
-        id: brokerageData.id,
-        listings_count: _count.listings,
-        company: {
-            id: company.id,
-            name: company.name,
-            logo: company.logo,
-            description: company.description,
-        },
-    };
-};
-
-// Private helper function to check if user has applied to jobs
-const _getUserAppliedJobIds = async (userId: string): Promise<Set<string>> => {
-    if (!userId) return new Set();
-
-    const userApplications = await prisma.application.findMany({
-        where: { user_id: userId },
-        select: { job_id: true },
-    });
-    return new Set(userApplications.map((app) => app.job_id));
-};
-
-// Private helper function to create pagination object
-const _createPaginationObject = (
-    total: number,
-    page: number,
-    page_size: number
-) => ({
-    total,
-    totalPages: Math.ceil(total / page_size),
-    page,
-    page_size,
-});
