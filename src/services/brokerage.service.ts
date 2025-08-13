@@ -257,8 +257,8 @@ export const getAboutService = async (id: string) => {
         rera: brokerage.rera,
         service_areas: brokerage.service_areas,
         contact: {
-            email: brokerage.company?.email,
-            phone: brokerage.company?.phone,
+            email: brokerage.company?.email || null,
+            phone: brokerage.company?.phone || null,
         },
         totalListingsCount,
     };
