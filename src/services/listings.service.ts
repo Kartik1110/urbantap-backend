@@ -88,7 +88,7 @@ export const getListingByIdService = async (id: string) => {
             }
         }
         const listing = await prisma.listing.findUnique({
-            where: { id },
+            where: { id, admin_status: Admin_Status.Approved },
             include: {
                 broker: {
                     select: {
@@ -144,7 +144,6 @@ export const getListingByIdService = async (id: string) => {
             },
         };
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -485,7 +484,6 @@ export const getListingsService = async (
             },
         };
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -688,7 +686,6 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
 
         return result;
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -714,7 +711,6 @@ export const editListingService = async (
 
         return updatedListing;
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -731,7 +727,6 @@ export const deleteListingbyId = async (listingId: string) => {
 
         return deletedListing;
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
