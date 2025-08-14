@@ -40,11 +40,15 @@ export const getListings = async (req: Request, res: Response) => {
 /* Get featured listings */
 export const getFeaturedListings = async (req: Request, res: Response) => {
     try {
-        const listings = await getFeaturedListingsService();
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = parseInt(req.query.pageSize as string) || 10;
+        
+        const result = await getFeaturedListingsService(page, pageSize);
         res.json({
             status: 'success',
             message: 'Featured listings fetched successfully',
-            data: listings,
+            data: result.listings,
+            pagination: result.pagination,
         });
     } catch (error) {
         res.status(500).json({

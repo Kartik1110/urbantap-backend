@@ -489,7 +489,7 @@ export const getListingsService = async (
     }
 };
 
-export const getFeaturedListingsService = async () => {
+export const getFeaturedListingsService = async (page: number = 1, pageSize: number = 10) => {
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
@@ -506,20 +506,36 @@ export const getFeaturedListingsService = async () => {
         },
     });
 
+    // Get total count of listings with at least one view
+    const totalCount = await prisma.listing.count({
+        where: {
+            admin_status: Admin_Status.Approved,
+            listing_views: {
+                some: {
+                    count: {
+                        gt: 0,
+                    },
+                },
+            },
+        },
+    });
+
+    const skip = (page - 1) * pageSize;
+    const take = Math.min(pageSize, 30); // Ensure we don't exceed 30 listings
+
     const trendingListings = await prisma.listing.findMany({
         where: {
             admin_status: Admin_Status.Approved,
             listing_views: {
                 some: {
-                    viewed_at: {
-                        gte: since,
+                    count: {
+                        gt: 0, // Only show listings with at least one view
                     },
                 },
             },
         },
-
-        skip: 0,
-        take: 5,
+        skip,
+        take,
         orderBy: {
             listing_views: {
                 _count: 'desc',
@@ -527,11 +543,6 @@ export const getFeaturedListingsService = async () => {
         },
         include: {
             listing_views: {
-                where: {
-                    viewed_at: {
-                        gte: since,
-                    },
-                },
                 select: {
                     id: true,
                     count: true,
@@ -554,6 +565,13 @@ export const getFeaturedListingsService = async () => {
         },
     });
 
+    const pagination = {
+        page,
+        pageSize,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
+    };
+
     return {
         listings: trendingListings.map((listing) => {
             const recentViews = listing.listing_views?.[0]?.count || 0;
@@ -575,6 +593,7 @@ export const getFeaturedListingsService = async () => {
                 },
             };
         }),
+        pagination,
     };
 };
 
