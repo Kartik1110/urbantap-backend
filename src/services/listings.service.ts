@@ -489,7 +489,7 @@ export const getListingsService = async (
     }
 };
 
-export const getFeaturedListingsService = async (page: number = 1, pageSize: number = 10) => {
+export const getFeaturedListingsService = async (page: number = 1, page_size: number = 10) => {
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
@@ -520,8 +520,8 @@ export const getFeaturedListingsService = async (page: number = 1, pageSize: num
         },
     });
 
-    const skip = (page - 1) * pageSize;
-    const take = Math.min(pageSize, 30); // Ensure we don't exceed 30 listings
+    const skip = (page - 1) * page_size;
+    const take = Math.min(page_size, 30); // Ensure we don't exceed 30 listings
 
     const trendingListings = await prisma.listing.findMany({
         where: {
@@ -567,9 +567,9 @@ export const getFeaturedListingsService = async (page: number = 1, pageSize: num
 
     const pagination = {
         page,
-        pageSize,
+        page_size,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / pageSize),
+        totalPages: Math.ceil(totalCount / page_size),
     };
 
     return {
