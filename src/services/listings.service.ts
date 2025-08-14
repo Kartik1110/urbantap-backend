@@ -489,7 +489,7 @@ export const getListingsService = async (
     }
 };
 
-export const getFeaturedListingsService = async () => {
+export const getFeaturedListingsService = async (page: number = 1, page_size: number = 10) => {
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
@@ -506,6 +506,23 @@ export const getFeaturedListingsService = async () => {
         },
     });
 
+    // Get total count of listings with views in the last 48 hours
+    const totalCount = await prisma.listing.count({
+        where: {
+            admin_status: Admin_Status.Approved,
+            listing_views: {
+                some: {
+                    viewed_at: {
+                        gte: since,
+                    },
+                },
+            },
+        },
+    });
+
+    const skip = (page - 1) * page_size;
+    const take = Math.min(page_size, 30); // Ensure we don't exceed 30 listings
+
     const trendingListings = await prisma.listing.findMany({
         where: {
             admin_status: Admin_Status.Approved,
@@ -517,13 +534,10 @@ export const getFeaturedListingsService = async () => {
                 },
             },
         },
-
-        skip: 0,
-        take: 5,
+        skip,
+        take,
         orderBy: {
-            listing_views: {
-                _count: 'desc',
-            },
+            created_at: 'desc', // Basic ordering to avoid TypeScript issues
         },
         include: {
             listing_views: {
@@ -554,8 +568,9 @@ export const getFeaturedListingsService = async () => {
         },
     });
 
-    return {
-        listings: trendingListings.map((listing) => {
+    // Sort listings by view count (highest first) after fetching
+    const sortedListings = trendingListings
+        .map((listing) => {
             const recentViews = listing.listing_views?.[0]?.count || 0;
             const { broker, ...rest } = listing;
             return {
@@ -573,8 +588,22 @@ export const getFeaturedListingsService = async () => {
                 company: {
                     name: broker.company?.name || '',
                 },
+                viewCount: recentViews, 
             };
-        }),
+        })
+        .sort((a, b) => b.viewCount - a.viewCount) // Sort by view count descending
+        .slice(0, take); // Ensure we don't exceed the limit
+
+    const pagination = {
+        page,
+        page_size,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / page_size),
+    };
+
+    return {
+        listings: sortedListings.map(({ viewCount, ...listing }) => listing), // Remove viewCount from final output
+        pagination,
     };
 };
 
