@@ -537,9 +537,7 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         skip,
         take,
         orderBy: {
-            listing_views: {
-                _count: 'desc',
-            },
+            created_at: 'desc',
         },
         include: {
             listing_views: {
@@ -572,8 +570,8 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         totalPages: Math.ceil(totalCount / page_size),
     };
 
-    return {
-        listings: trendingListings.map((listing) => {
+    const sortedListings = trendingListings
+        .map((listing) => {
             const recentViews = listing.listing_views?.[0]?.count || 0;
             const { broker, ...rest } = listing;
             return {
@@ -591,8 +589,14 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
                 company: {
                     name: broker.company?.name || '',
                 },
+                viewCount: recentViews, 
             };
-        }),
+        })
+        .sort((a, b) => b.viewCount - a.viewCount) 
+        .slice(0, take); 
+
+    return {
+        listings: sortedListings.map(({ viewCount, ...listing }) => listing), 
         pagination,
     };
 };
