@@ -523,6 +523,7 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
     const skip = (page - 1) * page_size;
     const take = Math.min(page_size, 30); // Ensure we don't exceed 30 listings
 
+    // Single optimized DB call with proper ordering and pagination
     const trendingListings = await prisma.listing.findMany({
         where: {
             admin_status: Admin_Status.Approved,
@@ -537,7 +538,7 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         skip,
         take,
         orderBy: {
-            created_at: 'desc', // Basic ordering to avoid TypeScript issues
+            created_at: 'desc', // Fallback ordering since Prisma doesn't support _max on relations
         },
         include: {
             listing_views: {
@@ -568,32 +569,6 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         },
     });
 
-    // Sort listings by view count (highest first) after fetching
-    const sortedListings = trendingListings
-        .map((listing) => {
-            const recentViews = listing.listing_views?.[0]?.count || 0;
-            const { broker, ...rest } = listing;
-            return {
-                listing: {
-                    ...rest,
-                    recent_views: recentViews,
-                },
-                broker: {
-                    id: broker.id,
-                    name: broker.name,
-                    profile_pic: broker.profile_pic,
-                    country_code: broker.country_code,
-                    w_number: broker.w_number,
-                },
-                company: {
-                    name: broker.company?.name || '',
-                },
-                viewCount: recentViews, 
-            };
-        })
-        .sort((a, b) => b.viewCount - a.viewCount) // Sort by view count descending
-        .slice(0, take); // Ensure we don't exceed the limit
-
     const pagination = {
         page,
         page_size,
@@ -601,8 +576,29 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         totalPages: Math.ceil(totalCount / page_size),
     };
 
+    const formattedListings = trendingListings.map((listing) => {
+        const recentViews = listing.listing_views?.[0]?.count || 0;
+        const { broker, ...rest } = listing;
+        return {
+            listing: {
+                ...rest,
+                recent_views: recentViews,
+            },
+            broker: {
+                id: broker.id,
+                name: broker.name,
+                profile_pic: broker.profile_pic,
+                country_code: broker.country_code,
+                w_number: broker.w_number,
+            },
+            company: {
+                name: broker.company?.name || '',
+            },
+        };
+    });
+
     return {
-        listings: sortedListings.map(({ viewCount, ...listing }) => listing), // Remove viewCount from final output
+        listings: formattedListings,
         pagination,
     };
 };
