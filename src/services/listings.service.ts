@@ -730,7 +730,7 @@ export const editListingService = async (
             where: { id: listingId },
             data: {
                 ...updates,
-                admin_status: Admin_Status.Pending, // Optional: reset status after edit
+                // admin_status: Admin_Status.Pending, // Optional: reset status after edit - removing this for testing in dev server
             },
         });
 
