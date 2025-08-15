@@ -260,7 +260,7 @@ export const getAboutService = async (id: string) => {
             email: brokerage.company?.email || null,
             phone: brokerage.company?.phone || null,
         },
-        totalListingsCount,
+        listings_count: totalListingsCount,
     };
 };
 
