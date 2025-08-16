@@ -47,8 +47,7 @@ export const getFeaturedListings = async (req: Request, res: Response) => {
         res.json({
             status: 'success',
             message: 'Featured listings fetched successfully',
-            data: result.listings,
-            pagination: result.pagination,
+            data: result,
         });
     } catch (error) {
         res.status(500).json({
