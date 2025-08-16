@@ -27,8 +27,61 @@ interface ListingFilters {
     [key: string]: any; // TODO: Define the type of filters
 }
 
-export const getListingByIdService = async (id: string) => {
+export const getListingByIdService = async (id: string, userId: string) => {
     try {
+        // User is always authenticated, so check if they can see the listing
+        // They can see: approved listings OR their own listings regardless of admin status
+        const listing = await prisma.listing.findFirst({
+            where: {
+                id,
+                OR: [
+                    { admin_status: Admin_Status.Approved },
+                    {
+                        AND: [
+                            { broker: { user_id: userId } },
+                            { admin_status: { not: Admin_Status.Approved } }
+                        ]
+                    }
+                ]
+            },
+            include: {
+                broker: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile_pic: true,
+                        country_code: true,
+                        w_number: true,
+                        email: true,
+                        linkedin_link: true,
+                        ig_link: true,
+                        user_id: true,
+                        company: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+                listing_views: true,
+            },
+        });
+
+        if (!listing) {
+            return {
+                listing: {},
+                broker: {
+                    id: '',
+                    name: '',
+                    profile_pic: '',
+                    country_code: '',
+                    w_number: '',
+                },
+                company: { name: '' },
+            };
+        }
+
+        // Now that we know the listing exists, update the view count
         const now = new Date();
 
         // Try to upsert the view row safely
@@ -86,43 +139,6 @@ export const getListingByIdService = async (id: string) => {
                     throw error;
                 }
             }
-        }
-        const listing = await prisma.listing.findUnique({
-            where: { id, admin_status: Admin_Status.Approved },
-            include: {
-                broker: {
-                    select: {
-                        id: true,
-                        name: true,
-                        profile_pic: true,
-                        country_code: true,
-                        w_number: true,
-                        email: true,
-                        linkedin_link: true,
-                        ig_link: true,
-                        company: {
-                            select: {
-                                name: true,
-                            },
-                        },
-                    },
-                },
-                listing_views: true,
-            },
-        });
-
-        if (!listing) {
-            return {
-                listing: {},
-                broker: {
-                    id: '',
-                    name: '',
-                    profile_pic: '',
-                    country_code: '',
-                    w_number: '',
-                },
-                company: { name: '' },
-            };
         }
         const recentViews = listing.listing_views?.[0]?.count || 0;
         const { broker, ...listingWithoutBroker } = listing;
