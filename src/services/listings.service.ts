@@ -198,6 +198,7 @@ export const getListingsService = async (
         sale_type?: ('Direct' | 'Resale')[];
         amenities?: string[];
         search?: string;
+        sort_by?: 'price_high_to_low' | 'price_low_to_high';
         page?: number;
         page_size?: number;
     } & ListingFilters
@@ -223,7 +224,7 @@ export const getListingsService = async (
     };
 }> => {
     try {
-        const { page = 1, page_size = 10, ...filterParams } = filters;
+        const { page = 1, page_size = 10, sort_by, ...filterParams } = filters;
 
         // Remove these properties from filterParams before constructing whereCondition
         const skip = (page - 1) * page_size;
@@ -413,6 +414,15 @@ export const getListingsService = async (
             },
         });
 
+        // Apply sorting logic right before pagination
+        let orderByClause: any = { created_at: 'desc' }; // Default sorting
+
+        if (sort_by === 'price_high_to_low') {
+            orderByClause = { max_price: 'desc' };
+        } else if (sort_by === 'price_low_to_high') {
+            orderByClause = { max_price: 'asc' };
+        }
+
         const listings = await prisma.listing.findMany({
             where: {
                 ...whereCondition,
@@ -420,9 +430,7 @@ export const getListingsService = async (
             },
             skip,
             take: page_size,
-            orderBy: {
-                created_at: 'desc',
-            },
+            orderBy: orderByClause,
             include: {
                 broker: {
                     select: {
