@@ -339,7 +339,7 @@ async function main() {
                     'Occupied',
                     'Vacant',
                 ]),
-                views: faker.helpers.arrayElement(['Sea', 'City', 'Lagoon']),
+                views: [faker.helpers.arrayElement(['Sea', 'City', 'Lagoon'])] as any,
                 market: faker.helpers.arrayElement(['Primary', 'Secondary']),
                 brokerage_id: broker.brokerageId ?? undefined,
             },

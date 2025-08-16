@@ -19,6 +19,9 @@ export const getNotificationsService = async (
                     { type: NotificationType.General },
                     { type: NotificationType.Broadcast },
                 ],
+                broker_id: {
+                    not: brokerId,
+                },
             },
             orderBy: {
                 timestamp: 'desc',
@@ -32,7 +35,9 @@ export const getNotificationsService = async (
     ) {
         return await prisma.notification.findMany({
             where: {
-                broker_id: brokerId,
+                broker_id: {
+                    not: brokerId,
+                },
                 type: type,
             },
             orderBy: {
@@ -46,6 +51,10 @@ export const getNotificationsService = async (
             type: {
                 equals: type,
                 notIn: [NotificationType.Inquiries, NotificationType.Network],
+            },
+            // Always exclude own notifications
+            broker_id: {
+                not: brokerId,
             },
         },
         orderBy: {

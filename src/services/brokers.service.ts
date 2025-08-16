@@ -186,7 +186,10 @@ export const getBrokerDetailService = async (
             // Return the new response format
             return {
                 localities,
-                broker: brokerData,
+                broker: {
+                    ...brokerData,
+                    listings_count: listings.length,
+                },
                 company: company || {},
                 mask,
                 request_id,
@@ -195,7 +198,10 @@ export const getBrokerDetailService = async (
             // Return the old response format
             return {
                 listings: listings || [],
-                broker: brokerData,
+                broker: {
+                    ...brokerData,
+                    listings_count: listings.length,
+                },
                 company: company || {},
                 mask,
                 request_id,

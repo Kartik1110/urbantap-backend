@@ -8,8 +8,8 @@ class PrismaInstance {
     public static getInstance(): PrismaClient {
         if (!PrismaInstance.instance) {
             PrismaInstance.instance = new PrismaClient({
-                log: ['query', 'info', 'warn', 'error'],
-                errorFormat: 'pretty',
+                // log: ['query', 'info', 'warn', 'error'],
+                // errorFormat: 'pretty',
             });
         }
         return PrismaInstance.instance;
