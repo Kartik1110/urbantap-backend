@@ -17,6 +17,7 @@ import {
     CurrentStatus,
     Views,
     Market,
+    Category,
 } from '@prisma/client';
 import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
@@ -271,7 +272,46 @@ export const getListingsService = async (
                     ? [{ type_of_use: { in: type_of_use } }]
                     : []),
                 ...(deal_type?.length
-                    ? [{ deal_type: { in: deal_type } }]
+                    ? [
+                          {
+                              OR: [
+                                  { deal_type: { in: deal_type } },
+                                  {
+                                      AND: [
+                                          { deal_type: null },
+                                          {
+                                              OR: [
+                                                  ...(deal_type.includes(
+                                                      DealType.Selling
+                                                  )
+                                                      ? [
+                                                            {
+                                                                category:
+                                                                    Category.Ready_to_move,
+                                                            },
+                                                            {
+                                                                category:
+                                                                    Category.Off_plan,
+                                                            },
+                                                        ]
+                                                      : []),
+                                                  ...(deal_type.includes(
+                                                      DealType.Rental
+                                                  )
+                                                      ? [
+                                                            {
+                                                                category:
+                                                                    Category.Rent,
+                                                            },
+                                                        ]
+                                                      : []),
+                                              ],
+                                          },
+                                      ],
+                                  },
+                              ],
+                          },
+                      ]
                     : []),
                 ...(current_status?.length
                     ? [{ current_status: { in: current_status } }]
@@ -489,7 +529,10 @@ export const getListingsService = async (
     }
 };
 
-export const getFeaturedListingsService = async (page: number = 1, page_size: number = 10) => {
+export const getFeaturedListingsService = async (
+    page: number = 1,
+    page_size: number = 10
+) => {
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 

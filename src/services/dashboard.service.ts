@@ -1,4 +1,4 @@
-import { Broker, User, DealType, Category } from '@prisma/client';
+import { Broker, User, DealType, Category, Admin_Status } from '@prisma/client';
 import prisma from '../utils/prisma';
 import logger from '../utils/logger';
 
@@ -33,18 +33,25 @@ export const getDashboardStatsService = async (
         // Get total counts from database (not user-specific)
         const rentalListingsCount = await prisma.listing.count({
             where: {
+                admin_status: Admin_Status.Approved,
                 OR: [
                     { deal_type: DealType.Rental },
-                    { deal_type: null, category: Category.Rent } // Fallback for older listings
+                    { deal_type: null, category: Category.Rent }, // Fallback for older listings
                 ],
             },
         });
 
         const sellingListingsCount = await prisma.listing.count({
             where: {
+                admin_status: Admin_Status.Approved,
                 OR: [
                     { deal_type: DealType.Selling },
-                    { deal_type: null, category: { in: [Category.Ready_to_move, Category.Off_plan] } } // Fallback for older listings
+                    {
+                        deal_type: null,
+                        category: {
+                            in: [Category.Ready_to_move, Category.Off_plan],
+                        },
+                    }, // Fallback for older listings
                 ],
             },
         });
