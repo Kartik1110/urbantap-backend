@@ -80,7 +80,9 @@ export const getRecentListings = async (req: Request, res: Response) => {
 /* Get listing by id */
 export const getListingById = async (req: Request, res: Response) => {
     const listingId = req.params.id;
-    const listing = await getListingByIdService(listingId);
+    const userId = (req as any).user?.userId; // Extract user ID from authenticated request
+
+    const listing = await getListingByIdService(listingId, userId);
     res.json({
         status: 'success',
         message: 'Listing fetched successfully',
