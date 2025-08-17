@@ -113,26 +113,28 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
     }
 
     // Upload profile picture and cover image to S3 if files exist
-    let profilePicUrl = '';
-    let coverImageUrl = '';
+    let profile_pic_url = '';
+    let cover_image_url = '';
     
     if (files) {
         try {
             // Handle profile picture
             if (files.profile_pic && files.profile_pic[0]) {
                 const fileExtension = files.profile_pic[0].originalname.split('.').pop();
-                profilePicUrl = await uploadToS3(
+                const userId = brokers[0]?.user_id || 'unknown';
+                profile_pic_url = await uploadToS3(
                     files.profile_pic[0].path,
-                    `profiles/${Date.now()}.${fileExtension}`
+                    `profiles/${Date.now()}_${userId}.${fileExtension}`
                 );
             }
             
             // Handle cover image
             if (files.cover_image && files.cover_image[0]) {
                 const fileExtension = files.cover_image[0].originalname.split('.').pop();
-                coverImageUrl = await uploadToS3(
+                const userId = brokers[0]?.user_id || 'unknown';
+                cover_image_url = await uploadToS3(
                     files.cover_image[0].path,
-                    `covers/${Date.now()}.${fileExtension}`
+                    `covers/${Date.now()}_${userId}.${fileExtension}`
                 );
             }
         } catch (error) {
@@ -146,8 +148,8 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
 
     const brokersWithPics = brokers.map((broker: Broker) => ({
         ...broker,
-        profile_pic: profilePicUrl,
-        cover_image: coverImageUrl,
+        profile_pic: profile_pic_url,
+        cover_image: cover_image_url,
         company_id: broker.company_id || null,
     }));
 
@@ -155,8 +157,8 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         const newBrokers = await bulkInsertBrokersService(brokersWithPics);
         const data = {
             broker_id: newBrokers[0], // return the single broker
-            profilePicUrl: profilePicUrl,
-            coverImageUrl: coverImageUrl,
+            profile_pic_url: profile_pic_url,
+            cover_image_url: cover_image_url,
             company_id: brokersWithPics[0].company_id || null,
         };
         res.json({
@@ -186,26 +188,28 @@ export const updateBroker = async (req: Request, res: Response) => {
     const updateData = JSON.parse(req.body.data);
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    let profilePicUrl;
-    let coverImageUrl;
+    let profile_pic_url;
+    let cover_image_url;
 
     if (files) {
         try {
             // Handle profile picture
             if (files.profile_pic && files.profile_pic[0]) {
                 const fileExtension = files.profile_pic[0].originalname.split('.').pop();
-                profilePicUrl = await uploadToS3(
+                const userId = updateData.user_id || 'unknown';
+                profile_pic_url = await uploadToS3(
                     files.profile_pic[0].path,
-                    `profiles/${Date.now()}.${fileExtension}`
+                    `profiles/${Date.now()}_${userId}.${fileExtension}`
                 );
             }
             
             // Handle cover image
             if (files.cover_image && files.cover_image[0]) {
                 const fileExtension = files.cover_image[0].originalname.split('.').pop();
-                coverImageUrl = await uploadToS3(
+                const userId = updateData.user_id || 'unknown';
+                cover_image_url = await uploadToS3(
                     files.cover_image[0].path,
-                    `covers/${Date.now()}.${fileExtension}`
+                    `covers/${Date.now()}_${userId}.${fileExtension}`
                 );
             }
         } catch (error) {
@@ -219,8 +223,8 @@ export const updateBroker = async (req: Request, res: Response) => {
 
     const updatedBrokerData = {
         ...updateData,
-        profile_pic: profilePicUrl || updateData.profile_pic,
-        cover_image: coverImageUrl || updateData.cover_image,
+        profile_pic: profile_pic_url || updateData.profile_pic,
+        cover_image: cover_image_url || updateData.cover_image,
     };
 
     try {
