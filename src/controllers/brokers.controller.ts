@@ -98,7 +98,7 @@ export const getBrokerList = async (req: Request, res: Response) => {
 
 /* Bulk insert brokers */
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
-    const file = req.file as Express.Multer.File | undefined;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     const brokersJson = req.body.brokers;
 
     let brokers = [];
@@ -112,20 +112,34 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         });
     }
 
-    // Upload single profile picture to S3 and get URL if file exists
+    // Upload profile picture and cover image to S3 if files exist
     let profilePicUrl = '';
-    if (file) {
-        const fileExtension = file.originalname.split('.').pop();
+    let coverImageUrl = '';
+    
+    if (files) {
         try {
-            profilePicUrl = await uploadToS3(
-                file.path,
-                `profiles/${Date.now()}.${fileExtension}`
-            );
+            // Handle profile picture
+            if (files.profile_pic && files.profile_pic[0]) {
+                const fileExtension = files.profile_pic[0].originalname.split('.').pop();
+                profilePicUrl = await uploadToS3(
+                    files.profile_pic[0].path,
+                    `profiles/${Date.now()}.${fileExtension}`
+                );
+            }
+            
+            // Handle cover image
+            if (files.cover_image && files.cover_image[0]) {
+                const fileExtension = files.cover_image[0].originalname.split('.').pop();
+                coverImageUrl = await uploadToS3(
+                    files.cover_image[0].path,
+                    `covers/${Date.now()}.${fileExtension}`
+                );
+            }
         } catch (error) {
             logger.error(error);
             return res.status(400).json({
                 status: 'error',
-                message: 'Failed to upload file to S3',
+                message: 'Failed to upload files to S3',
             });
         }
     }
@@ -133,6 +147,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
     const brokersWithPics = brokers.map((broker: Broker) => ({
         ...broker,
         profile_pic: profilePicUrl,
+        cover_image: coverImageUrl,
         company_id: broker.company_id || null,
     }));
 
@@ -141,6 +156,7 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         const data = {
             broker_id: newBrokers[0], // return the single broker
             profilePicUrl: profilePicUrl,
+            coverImageUrl: coverImageUrl,
             company_id: brokersWithPics[0].company_id || null,
         };
         res.json({
@@ -169,21 +185,34 @@ export const updateBroker = async (req: Request, res: Response) => {
     const brokerId = req.params.id;
     const updateData = JSON.parse(req.body.data);
 
-    const file = req.file as Express.Multer.File | undefined;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     let profilePicUrl;
+    let coverImageUrl;
 
-    if (file) {
-        const fileExtension = file.originalname.split('.').pop();
+    if (files) {
         try {
-            profilePicUrl = await uploadToS3(
-                file.path,
-                `profiles/${Date.now()}.${fileExtension}`
-            );
+            // Handle profile picture
+            if (files.profile_pic && files.profile_pic[0]) {
+                const fileExtension = files.profile_pic[0].originalname.split('.').pop();
+                profilePicUrl = await uploadToS3(
+                    files.profile_pic[0].path,
+                    `profiles/${Date.now()}.${fileExtension}`
+                );
+            }
+            
+            // Handle cover image
+            if (files.cover_image && files.cover_image[0]) {
+                const fileExtension = files.cover_image[0].originalname.split('.').pop();
+                coverImageUrl = await uploadToS3(
+                    files.cover_image[0].path,
+                    `covers/${Date.now()}.${fileExtension}`
+                );
+            }
         } catch (error) {
             logger.error(error);
             return res.status(400).json({
                 status: 'error',
-                message: 'Failed to upload file to S3',
+                message: 'Failed to upload files to S3',
             });
         }
     }
@@ -191,6 +220,7 @@ export const updateBroker = async (req: Request, res: Response) => {
     const updatedBrokerData = {
         ...updateData,
         profile_pic: profilePicUrl || updateData.profile_pic,
+        cover_image: coverImageUrl || updateData.cover_image,
     };
 
     try {

@@ -47,6 +47,7 @@ model Broker {
   languages                String[]
   is_certified             Boolean
   profile_pic              String
+  cover_image              String?
   country_code             String?
   w_number                 String
   ig_link                  String?
