@@ -530,7 +530,7 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         },
     });
 
-    // Get total count of listings with views in the last 48 hours
+    // Get total count of listings with views in the last 48 hours (limited to 30)
     const totalCount = await prisma.listing.count({
         where: {
             admin_status: Admin_Status.Approved,
@@ -542,10 +542,27 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
                 },
             },
         },
+        take: 30, // Limit total count to 30 listings
     });
 
+    // Ensure we don't exceed 30 total listings
+    const maxTotalListings = Math.min(totalCount, 30);
+    
     const skip = (page - 1) * page_size;
-    const take = Math.min(page_size, 30); // Ensure we don't exceed 30 listings
+    const take = Math.min(page_size, maxTotalListings - skip); // Adjust take based on remaining listings
+
+    // If skip exceeds the total available listings, return empty result
+    if (skip >= maxTotalListings) {
+        return {
+            listings: [],
+            pagination: {
+                page,
+                page_size,
+                total: maxTotalListings,
+                totalPages: Math.ceil(maxTotalListings / page_size),
+            },
+        };
+    }
 
     // Single optimized DB call with proper ordering and pagination
     const trendingListings = await prisma.listing.findMany({
@@ -596,8 +613,8 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
     const pagination = {
         page,
         page_size,
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / page_size),
+        total: maxTotalListings,
+        totalPages: Math.ceil(maxTotalListings / page_size),
     };
 
     const formattedListings = trendingListings.map((listing) => {
