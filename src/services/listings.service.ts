@@ -573,7 +573,7 @@ export const getFeaturedListingsService = async (
         },
     });
 
-    // Get total count of listings with views in the last 48 hours
+    // Get total count of listings with views in the last 48 hours (limited to 30)
     const totalCount = await prisma.listing.count({
         where: {
             admin_status: Admin_Status.Approved,
@@ -587,10 +587,26 @@ export const getFeaturedListingsService = async (
         },
     });
 
+    // Ensure we don't exceed 30 total listings
+    const maxTotalListings = Math.min(totalCount, 30);
+    
     const skip = (page - 1) * page_size;
-    const take = Math.min(page_size, 30); // Ensure we don't exceed 30 listings
+    const take = Math.min(page_size, maxTotalListings - skip); // Adjust take based on remaining listings
 
-    // Single optimized DB call with proper ordering and pagination
+    // If skip exceeds the total available listings, return empty result
+    if (skip >= maxTotalListings) {
+        return {
+            listings: [],
+            pagination: {
+                page,
+                page_size,
+                total: maxTotalListings,
+                totalPages: Math.ceil(maxTotalListings / page_size),
+            },
+        };
+    }
+
+    // Get listings with recent views and sort by view count in Prisma
     const trendingListings = await prisma.listing.findMany({
         where: {
             admin_status: Admin_Status.Approved,
@@ -601,11 +617,6 @@ export const getFeaturedListingsService = async (
                     },
                 },
             },
-        },
-        skip,
-        take,
-        orderBy: {
-            created_at: 'desc', // Fallback ordering since Prisma doesn't support _max on relations
         },
         include: {
             listing_views: {
@@ -618,6 +629,10 @@ export const getFeaturedListingsService = async (
                     id: true,
                     count: true,
                 },
+                orderBy: {
+                    count: 'desc',
+                },
+                take: 1,
             },
             broker: {
                 select: {
@@ -634,16 +649,30 @@ export const getFeaturedListingsService = async (
                 },
             },
         },
+        orderBy: [
+            {
+                listing_views: {
+                    _count: 'desc',
+                },
+            },
+            {
+                created_at: 'desc',
+            },
+        ],
+        take: 30,
     });
+
+    // Apply pagination to the sorted results
+    const paginatedListings = trendingListings.slice(skip, skip + take);
 
     const pagination = {
         page,
         page_size,
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / page_size),
+        total: maxTotalListings,
+        totalPages: Math.ceil(maxTotalListings / page_size),
     };
 
-    const formattedListings = trendingListings.map((listing) => {
+    const formattedListings = paginatedListings.map((listing) => {
         const recentViews = listing.listing_views?.[0]?.count || 0;
         const { broker, ...rest } = listing;
         return {
