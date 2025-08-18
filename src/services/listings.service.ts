@@ -563,7 +563,7 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
         };
     }
 
-    // Get ALL listings with recent views, then sort by view count and take top 30
+    // Get listings with recent views and sort by view count in Prisma
     const trendingListings = await prisma.listing.findMany({
         where: {
             admin_status: Admin_Status.Approved,
@@ -586,6 +586,10 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
                     id: true,
                     count: true,
                 },
+                orderBy: {
+                    count: 'desc',
+                },
+                take: 1,
             },
             broker: {
                 select: {
@@ -602,20 +606,21 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
                 },
             },
         },
-        // No take limit - get ALL listings with recent views
+        orderBy: [
+            {
+                listing_views: {
+                    _count: 'desc',
+                },
+            },
+            {
+                created_at: 'desc',
+            },
+        ],
+        take: 30,
     });
 
-    // Sort by view count (most viewed first) and limit to 30 total
-    const sortedListings = trendingListings
-        .map(listing => ({
-            ...listing,
-            recentViews: listing.listing_views?.[0]?.count || 0
-        }))
-        .sort((a, b) => b.recentViews - a.recentViews) // Sort by view count descending
-        .slice(0, 30); // Limit to 30 total listings
-
     // Apply pagination to the sorted results
-    const paginatedListings = sortedListings.slice(skip, skip + take);
+    const paginatedListings = trendingListings.slice(skip, skip + take);
 
     const pagination = {
         page,
@@ -625,7 +630,7 @@ export const getFeaturedListingsService = async (page: number = 1, page_size: nu
     };
 
     const formattedListings = paginatedListings.map((listing) => {
-        const recentViews = listing.recentViews || 0;
+        const recentViews = listing.listing_views?.[0]?.count || 0;
         const { broker, ...rest } = listing;
         return {
             listing: {
