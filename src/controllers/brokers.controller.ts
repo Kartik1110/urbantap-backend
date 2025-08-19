@@ -98,7 +98,7 @@ export const getBrokerList = async (req: Request, res: Response) => {
 
 /* Bulk insert brokers */
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
-    const file = req.file as Express.Multer.File | undefined;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     const brokersJson = req.body.brokers;
 
     let brokers = [];
@@ -112,27 +112,44 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         });
     }
 
-    // Upload single profile picture to S3 and get URL if file exists
-    let profilePicUrl = '';
-    if (file) {
-        const fileExtension = file.originalname.split('.').pop();
+    // Upload profile picture and cover image to S3 if files exist
+    let profile_pic_url = '';
+    let cover_image_url = '';
+    
+    if (files) {
         try {
-            profilePicUrl = await uploadToS3(
-                file.path,
-                `profiles/${Date.now()}.${fileExtension}`
-            );
+            // Handle profile picture
+            if (files.profile_pic && files.profile_pic[0]) {
+                const fileExtension = files.profile_pic[0].originalname.split('.').pop();
+                const userId = brokers[0]?.user_id || 'unknown';
+                profile_pic_url = await uploadToS3(
+                    files.profile_pic[0].path,
+                    `profiles/${Date.now()}_${userId}.${fileExtension}`
+                );
+            }
+            
+            // Handle cover image
+            if (files.cover_image && files.cover_image[0]) {
+                const fileExtension = files.cover_image[0].originalname.split('.').pop();
+                const userId = brokers[0]?.user_id || 'unknown';
+                cover_image_url = await uploadToS3(
+                    files.cover_image[0].path,
+                    `covers/${Date.now()}_${userId}.${fileExtension}`
+                );
+            }
         } catch (error) {
             logger.error(error);
             return res.status(400).json({
                 status: 'error',
-                message: 'Failed to upload file to S3',
+                message: 'Failed to upload files to S3',
             });
         }
     }
 
     const brokersWithPics = brokers.map((broker: Broker) => ({
         ...broker,
-        profile_pic: profilePicUrl,
+        profile_pic: profile_pic_url,
+        cover_image: cover_image_url,
         company_id: broker.company_id || null,
     }));
 
@@ -140,7 +157,8 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         const newBrokers = await bulkInsertBrokersService(brokersWithPics);
         const data = {
             broker_id: newBrokers[0], // return the single broker
-            profilePicUrl: profilePicUrl,
+            profile_pic_url: profile_pic_url,
+            cover_image_url: cover_image_url,
             company_id: brokersWithPics[0].company_id || null,
         };
         res.json({
@@ -169,28 +187,44 @@ export const updateBroker = async (req: Request, res: Response) => {
     const brokerId = req.params.id;
     const updateData = JSON.parse(req.body.data);
 
-    const file = req.file as Express.Multer.File | undefined;
-    let profilePicUrl;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    let profile_pic_url;
+    let cover_image_url;
 
-    if (file) {
-        const fileExtension = file.originalname.split('.').pop();
+    if (files) {
         try {
-            profilePicUrl = await uploadToS3(
-                file.path,
-                `profiles/${Date.now()}.${fileExtension}`
-            );
+            // Handle profile picture
+            if (files.profile_pic && files.profile_pic[0]) {
+                const fileExtension = files.profile_pic[0].originalname.split('.').pop();
+                const userId = updateData.user_id || 'unknown';
+                profile_pic_url = await uploadToS3(
+                    files.profile_pic[0].path,
+                    `profiles/${Date.now()}_${userId}.${fileExtension}`
+                );
+            }
+            
+            // Handle cover image
+            if (files.cover_image && files.cover_image[0]) {
+                const fileExtension = files.cover_image[0].originalname.split('.').pop();
+                const userId = updateData.user_id || 'unknown';
+                cover_image_url = await uploadToS3(
+                    files.cover_image[0].path,
+                    `covers/${Date.now()}_${userId}.${fileExtension}`
+                );
+            }
         } catch (error) {
             logger.error(error);
             return res.status(400).json({
                 status: 'error',
-                message: 'Failed to upload file to S3',
+                message: 'Failed to upload files to S3',
             });
         }
     }
 
     const updatedBrokerData = {
         ...updateData,
-        profile_pic: profilePicUrl || updateData.profile_pic,
+        profile_pic: profile_pic_url || updateData.profile_pic,
+        cover_image: cover_image_url || updateData.cover_image,
     };
 
     try {

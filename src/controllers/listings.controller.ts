@@ -40,11 +40,14 @@ export const getListings = async (req: Request, res: Response) => {
 /* Get featured listings */
 export const getFeaturedListings = async (req: Request, res: Response) => {
     try {
-        const listings = await getFeaturedListingsService();
+        const page = parseInt(req.body.page as string) || 1;
+        const page_size = parseInt(req.body.page_size as string) || 10;
+        
+        const result = await getFeaturedListingsService(page, page_size);
         res.json({
             status: 'success',
             message: 'Featured listings fetched successfully',
-            data: listings,
+            data: result,
         });
     } catch (error) {
         res.status(500).json({
@@ -76,7 +79,9 @@ export const getRecentListings = async (req: Request, res: Response) => {
 /* Get listing by id */
 export const getListingById = async (req: Request, res: Response) => {
     const listingId = req.params.id;
-    const listing = await getListingByIdService(listingId);
+    const userId = (req as any).user?.userId; // Extract user ID from authenticated request
+
+    const listing = await getListingByIdService(listingId, userId);
     res.json({
         status: 'success',
         message: 'Listing fetched successfully',

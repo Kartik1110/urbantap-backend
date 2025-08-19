@@ -47,6 +47,7 @@ model Broker {
   languages                String[]
   is_certified             Boolean
   profile_pic              String
+  cover_image              String?
   country_code             String?
   w_number                 String
   ig_link                  String?
@@ -138,7 +139,7 @@ model Listing {
   type_of_use           Type_of_use?
   deal_type             DealType?
   current_status        CurrentStatus?
-  views                 Views?
+  views                 Views[] @default([])
   market                Market?
   parking_space         Boolean?
   service_charge        Int?

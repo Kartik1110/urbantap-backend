@@ -1,4 +1,4 @@
-import { Broker, User, DealType, Category } from '@prisma/client';
+import { Broker, User, DealType, Category, Admin_Status } from '@prisma/client';
 import prisma from '../utils/prisma';
 import logger from '../utils/logger';
 
@@ -30,56 +30,34 @@ export const getDashboardStatsService = async (
         const profileCompletionPercentage =
             await calculateProfileCompletionPercentage(user);
 
-        let rentalListingsCount = 0;
-        let sellingListingsCount = 0;
-        let jobsCount = 0;
-
-        const broker = user.brokers?.[0];
-
-        if (broker) {
-
-            const allListings = await prisma.listing.findMany({
-                where: {
-                    broker_id: broker.id,
-                },
-                select: {
-                    id: true,
-                    deal_type: true,
-                    title: true,
-                },
-            });
-
-
-            rentalListingsCount = await prisma.listing.count({
-                where: {
-                    broker_id: broker.id,
-                    OR: [
-                        { deal_type: DealType.Rental },
-                        { deal_type: null, category: Category.Rent } // Fallback for older listings
-                    ],
-                },
-            });
-
-            sellingListingsCount = await prisma.listing.count({
-                where: {
-                    broker_id: broker.id,
-                    OR: [
-                        { deal_type: DealType.Selling },
-                        { deal_type: null, category: { in: [Category.Ready_to_move, Category.Off_plan] } } // Fallback for older listings
-                    ],
-                },
-            });
-
-
-        } else {
-            console.log('No broker found for user:', userId);
-        }
-
-        jobsCount = await prisma.job.count({
+        // Get total counts from database (not user-specific)
+        const rentalListingsCount = await prisma.listing.count({
             where: {
-                userId: userId,
+                admin_status: Admin_Status.Approved,
+                OR: [
+                    { deal_type: DealType.Rental },
+                    { deal_type: null, category: Category.Rent }, // Fallback for older listings
+                ],
             },
         });
+
+        const sellingListingsCount = await prisma.listing.count({
+            where: {
+                admin_status: Admin_Status.Approved,
+                OR: [
+                    { deal_type: DealType.Selling },
+                    {
+                        deal_type: null,
+                        category: {
+                            in: [Category.Ready_to_move, Category.Off_plan],
+                        },
+                    }, // Fallback for older listings
+                ],
+            },
+        });
+
+        // Get total jobs count from database
+        const jobsCount = await prisma.job.count();
 
         const projectsCount = 0;
 

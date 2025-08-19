@@ -41,7 +41,7 @@ export const editListingSchema = z
         Type_of_use: z.nativeEnum(Type_of_use).optional(),
         DealType: z.nativeEnum(DealType).optional(),
         CurrentStatus: z.nativeEnum(CurrentStatus).optional(),
-        Views: z.nativeEnum(Views).optional(),
+        Views: z.array(z.nativeEnum(Views)).optional(),
         Market: z.nativeEnum(Market).optional(),
         latitude: z.number().optional(),
         longitude: z.number().optional(),

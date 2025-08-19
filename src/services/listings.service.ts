@@ -17,6 +17,7 @@ import {
     CurrentStatus,
     Views,
     Market,
+    Category,
 } from '@prisma/client';
 import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
@@ -27,8 +28,61 @@ interface ListingFilters {
     [key: string]: any; // TODO: Define the type of filters
 }
 
-export const getListingByIdService = async (id: string) => {
+export const getListingByIdService = async (id: string, userId: string) => {
     try {
+        // User is always authenticated, so check if they can see the listing
+        // They can see: approved listings OR their own listings regardless of admin status
+        const listing = await prisma.listing.findFirst({
+            where: {
+                id,
+                OR: [
+                    { admin_status: Admin_Status.Approved },
+                    {
+                        AND: [
+                            { broker: { user_id: userId } },
+                            { admin_status: { not: Admin_Status.Approved } }
+                        ]
+                    }
+                ]
+            },
+            include: {
+                broker: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile_pic: true,
+                        country_code: true,
+                        w_number: true,
+                        email: true,
+                        linkedin_link: true,
+                        ig_link: true,
+                        user_id: true,
+                        company: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+                listing_views: true,
+            },
+        });
+
+        if (!listing) {
+            return {
+                listing: {},
+                broker: {
+                    id: '',
+                    name: '',
+                    profile_pic: '',
+                    country_code: '',
+                    w_number: '',
+                },
+                company: { name: '' },
+            };
+        }
+
+        // Now that we know the listing exists, update the view count
         const now = new Date();
 
         // Try to upsert the view row safely
@@ -87,43 +141,6 @@ export const getListingByIdService = async (id: string) => {
                 }
             }
         }
-        const listing = await prisma.listing.findUnique({
-            where: { id },
-            include: {
-                broker: {
-                    select: {
-                        id: true,
-                        name: true,
-                        profile_pic: true,
-                        country_code: true,
-                        w_number: true,
-                        email: true,
-                        linkedin_link: true,
-                        ig_link: true,
-                        company: {
-                            select: {
-                                name: true,
-                            },
-                        },
-                    },
-                },
-                listing_views: true,
-            },
-        });
-
-        if (!listing) {
-            return {
-                listing: {},
-                broker: {
-                    id: '',
-                    name: '',
-                    profile_pic: '',
-                    country_code: '',
-                    w_number: '',
-                },
-                company: { name: '' },
-            };
-        }
         const recentViews = listing.listing_views?.[0]?.count || 0;
         const { broker, ...listingWithoutBroker } = listing;
         return {
@@ -144,7 +161,6 @@ export const getListingByIdService = async (id: string) => {
             },
         };
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -183,6 +199,7 @@ export const getListingsService = async (
         sale_type?: ('Direct' | 'Resale')[];
         amenities?: string[];
         search?: string;
+        sort_by?: 'price_high_to_low' | 'price_low_to_high';
         page?: number;
         page_size?: number;
     } & ListingFilters
@@ -208,7 +225,7 @@ export const getListingsService = async (
     };
 }> => {
     try {
-        const { page = 1, page_size = 10, ...filterParams } = filters;
+        const { page = 1, page_size = 10, sort_by, ...filterParams } = filters;
 
         // Remove these properties from filterParams before constructing whereCondition
         const skip = (page - 1) * page_size;
@@ -272,7 +289,46 @@ export const getListingsService = async (
                     ? [{ type_of_use: { in: type_of_use } }]
                     : []),
                 ...(deal_type?.length
-                    ? [{ deal_type: { in: deal_type } }]
+                    ? [
+                          {
+                              OR: [
+                                  { deal_type: { in: deal_type } },
+                                  {
+                                      AND: [
+                                          { deal_type: null },
+                                          {
+                                              OR: [
+                                                  ...(deal_type.includes(
+                                                      DealType.Selling
+                                                  )
+                                                      ? [
+                                                            {
+                                                                category:
+                                                                    Category.Ready_to_move,
+                                                            },
+                                                            {
+                                                                category:
+                                                                    Category.Off_plan,
+                                                            },
+                                                        ]
+                                                      : []),
+                                                  ...(deal_type.includes(
+                                                      DealType.Rental
+                                                  )
+                                                      ? [
+                                                            {
+                                                                category:
+                                                                    Category.Rent,
+                                                            },
+                                                        ]
+                                                      : []),
+                                              ],
+                                          },
+                                      ],
+                                  },
+                              ],
+                          },
+                      ]
                     : []),
                 ...(current_status?.length
                     ? [{ current_status: { in: current_status } }]
@@ -398,6 +454,15 @@ export const getListingsService = async (
             },
         });
 
+        // Apply sorting logic right before pagination
+        let orderByClause: any = { created_at: 'desc' }; // Default sorting
+
+        if (sort_by === 'price_high_to_low') {
+            orderByClause = { max_price: 'desc' };
+        } else if (sort_by === 'price_low_to_high') {
+            orderByClause = { max_price: 'asc' };
+        }
+
         const listings = await prisma.listing.findMany({
             where: {
                 ...whereCondition,
@@ -405,9 +470,7 @@ export const getListingsService = async (
             },
             skip,
             take: page_size,
-            orderBy: {
-                created_at: 'desc',
-            },
+            orderBy: orderByClause,
             include: {
                 broker: {
                     select: {
@@ -485,13 +548,15 @@ export const getListingsService = async (
             },
         };
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
 };
 
-export const getFeaturedListingsService = async () => {
+export const getFeaturedListingsService = async (
+    page: number = 1,
+    page_size: number = 10
+) => {
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
@@ -508,7 +573,8 @@ export const getFeaturedListingsService = async () => {
         },
     });
 
-    const trendingListings = await prisma.listing.findMany({
+    // Get total count of listings with views in the last 48 hours (limited to 30)
+    const totalCount = await prisma.listing.count({
         where: {
             admin_status: Admin_Status.Approved,
             listing_views: {
@@ -519,12 +585,37 @@ export const getFeaturedListingsService = async () => {
                 },
             },
         },
+    });
 
-        skip: 0,
-        take: 5,
-        orderBy: {
+    // Ensure we don't exceed 30 total listings
+    const maxTotalListings = Math.min(totalCount, 30);
+    
+    const skip = (page - 1) * page_size;
+    const take = Math.min(page_size, maxTotalListings - skip); // Adjust take based on remaining listings
+
+    // If skip exceeds the total available listings, return empty result
+    if (skip >= maxTotalListings) {
+        return {
+            listings: [],
+            pagination: {
+                page,
+                page_size,
+                total: maxTotalListings,
+                totalPages: Math.ceil(maxTotalListings / page_size),
+            },
+        };
+    }
+
+    // Get listings with recent views and sort by view count in Prisma
+    const trendingListings = await prisma.listing.findMany({
+        where: {
+            admin_status: Admin_Status.Approved,
             listing_views: {
-                _count: 'desc',
+                some: {
+                    viewed_at: {
+                        gte: since,
+                    },
+                },
             },
         },
         include: {
@@ -538,6 +629,10 @@ export const getFeaturedListingsService = async () => {
                     id: true,
                     count: true,
                 },
+                orderBy: {
+                    count: 'desc',
+                },
+                take: 1,
             },
             broker: {
                 select: {
@@ -554,29 +649,53 @@ export const getFeaturedListingsService = async () => {
                 },
             },
         },
+        orderBy: [
+            {
+                listing_views: {
+                    _count: 'desc',
+                },
+            },
+            {
+                created_at: 'desc',
+            },
+        ],
+        take: 30,
+    });
+
+    // Apply pagination to the sorted results
+    const paginatedListings = trendingListings.slice(skip, skip + take);
+
+    const pagination = {
+        page,
+        page_size,
+        total: maxTotalListings,
+        totalPages: Math.ceil(maxTotalListings / page_size),
+    };
+
+    const formattedListings = paginatedListings.map((listing) => {
+        const recentViews = listing.listing_views?.[0]?.count || 0;
+        const { broker, ...rest } = listing;
+        return {
+            listing: {
+                ...rest,
+                recent_views: recentViews,
+            },
+            broker: {
+                id: broker.id,
+                name: broker.name,
+                profile_pic: broker.profile_pic,
+                country_code: broker.country_code,
+                w_number: broker.w_number,
+            },
+            company: {
+                name: broker.company?.name || '',
+            },
+        };
     });
 
     return {
-        listings: trendingListings.map((listing) => {
-            const recentViews = listing.listing_views?.[0]?.count || 0;
-            const { broker, ...rest } = listing;
-            return {
-                listing: {
-                    ...rest,
-                    recent_views: recentViews,
-                },
-                broker: {
-                    id: broker.id,
-                    name: broker.name,
-                    profile_pic: broker.profile_pic,
-                    country_code: broker.country_code,
-                    w_number: broker.w_number,
-                },
-                company: {
-                    name: broker.company?.name || '',
-                },
-            };
-        }),
+        listings: formattedListings,
+        pagination,
     };
 };
 
@@ -688,7 +807,6 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
 
         return result;
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -708,13 +826,12 @@ export const editListingService = async (
             where: { id: listingId },
             data: {
                 ...updates,
-                admin_status: Admin_Status.Pending, // Optional: reset status after edit
+                // admin_status: Admin_Status.Pending, // Optional: reset status after edit - removing this for testing in dev server
             },
         });
 
         return updatedListing;
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
@@ -731,7 +848,6 @@ export const deleteListingbyId = async (listingId: string) => {
 
         return deletedListing;
     } catch (error) {
-        console.error(error);
         logger.error(error);
         throw error;
     }
