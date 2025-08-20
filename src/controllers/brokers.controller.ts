@@ -115,19 +115,19 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
     // Upload profile picture and cover image to S3 if files exist
     let profile_pic_url = '';
     let cover_image_url = '';
-    
+
     if (files) {
         try {
             // Handle profile picture
-            if (files.profile_pic && files.profile_pic[0]) {
-                const fileExtension = files.profile_pic[0].originalname.split('.').pop();
+            if (files.file && files.file[0]) {
+                const fileExtension = files.file[0].originalname.split('.').pop();
                 const userId = brokers[0]?.user_id || 'unknown';
                 profile_pic_url = await uploadToS3(
-                    files.profile_pic[0].path,
+                    files.file[0].path,
                     `profiles/${Date.now()}_${userId}.${fileExtension}`
                 );
             }
-            
+
             // Handle cover image
             if (files.cover_image && files.cover_image[0]) {
                 const fileExtension = files.cover_image[0].originalname.split('.').pop();
@@ -194,15 +194,15 @@ export const updateBroker = async (req: Request, res: Response) => {
     if (files) {
         try {
             // Handle profile picture
-            if (files.profile_pic && files.profile_pic[0]) {
-                const fileExtension = files.profile_pic[0].originalname.split('.').pop();
+            if (files.file && files.file[0]) {
+                const fileExtension = files.file[0].originalname.split('.').pop();
                 const userId = updateData.user_id || 'unknown';
                 profile_pic_url = await uploadToS3(
-                    files.profile_pic[0].path,
+                    files.file[0].path,
                     `profiles/${Date.now()}_${userId}.${fileExtension}`
                 );
             }
-            
+
             // Handle cover image
             if (files.cover_image && files.cover_image[0]) {
                 const fileExtension = files.cover_image[0].originalname.split('.').pop();
