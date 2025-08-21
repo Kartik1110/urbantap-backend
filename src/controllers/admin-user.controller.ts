@@ -81,12 +81,12 @@ export const changePassword = async (req: Request, res: Response) => {
         const user = (req as any).user;
         if (!user?.id) return res.status(401).json({ message: 'Unauthorized' });
 
-        const { oldPassword, newPassword } = req.body;
-        if (!oldPassword || !newPassword) {
+        const { old_password, new_password } = req.body;
+        if (!old_password || !new_password) {
             return res.status(400).json({ message: 'Missing passwords.' });
         }
 
-        await changeAdminPassword(user.id, oldPassword, newPassword);
+        await changeAdminPassword(user.id, old_password, new_password);
         res.status(200).json({ message: 'Password changed successfully.' });
     } catch (error: any) {
         res.status(400).json({ message: error.message });

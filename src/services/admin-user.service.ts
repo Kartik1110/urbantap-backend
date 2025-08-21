@@ -71,8 +71,8 @@ export const loginAdmin = async (email: string, password: string) => {
 
 export const changeAdminPassword = async (
     adminUserId: string,
-    oldPassword: string,
-    newPassword: string
+    old_password: string,
+    new_password: string
 ) => {
     const user = await prisma.adminUser.findUnique({
         where: { id: adminUserId },
@@ -80,10 +80,10 @@ export const changeAdminPassword = async (
 
     if (!user) throw new Error('Admin user not found');
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    const isMatch = await bcrypt.compare(old_password, user.password);
     if (!isMatch) throw new Error('Old password is incorrect');
 
-    const hashedNew = await bcrypt.hash(newPassword, 10);
+    const hashedNew = await bcrypt.hash(new_password, 10);
 
     await prisma.adminUser.update({
         where: { id: adminUserId },
