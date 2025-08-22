@@ -557,3 +557,155 @@ export function calculateAppreciationDataPoints(
 
     return datapoints;
 }
+
+/**
+ * Investment goal benefit structure with ROI calculation
+ */
+export interface InvestmentGoalBenefit {
+    year: number;
+    goal: string;
+    roi: number;
+}
+
+/**
+ * Retrieves investment goal benefits with ROI calculations for specific years.
+ * Returns benefits for years 1, 3, 5, and 7 with calculated ROI from today.
+ *
+ * @param propertyData - The merged property data from the JSON file
+ * @param location - The specific location/area name
+ * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param isSelfUse - Boolean: true for self-use, false for rental
+ * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
+ * @param initialInvestment - The initial investment amount in the base currency
+ * @param propertySize - The property size in square feet
+ * @returns Array of investment goal benefits with ROI calculations, or null if not found
+ */
+export function getInvestmentGoalsWithROI(
+    propertyData: MergedPropertyData,
+    location: string,
+    propertyType: string,
+    isSelfUse: boolean,
+    isSelfPaid: boolean,
+    initialInvestment: number,
+    propertySize: number
+): InvestmentGoalBenefit[] | null {
+    // Helper method to get cumulative ROI for a specific year
+    const getCumulativeROI = (years: number): number => {
+        return (
+            calculateCumulativeROI(
+                propertyData,
+                location,
+                propertyType,
+                years,
+                initialInvestment,
+                propertySize
+            ) || 0
+        );
+    };
+
+    if (!isSelfUse && !isSelfPaid) {
+        // rental + mortgage
+        return [
+            {
+                year: 1,
+                goal: 'Rental income covers most of your mortgage, reducing out-of-pocket costs.',
+                roi: getCumulativeROI(1),
+            },
+            {
+                year: 3,
+                goal: 'Accumulated rental surplus allows you to pay down a chunk of your loan principal.',
+                roi: getCumulativeROI(3),
+            },
+            {
+                year: 5,
+                goal: "Tap into home equity (from both repayments & appreciation) to fund a second property's down payment.",
+                roi: getCumulativeROI(5),
+            },
+            {
+                year: 7,
+                goal: 'Use combined rental profits & equity to refinance for better terms or larger investment.',
+                roi: getCumulativeROI(7),
+            },
+        ];
+    }
+
+    if (!isSelfUse && isSelfPaid) {
+        // rental + self_paid
+        return [
+            {
+                year: 1,
+                goal: 'Generate steady positive cash flow from rentals immediately.',
+                roi: getCumulativeROI(1),
+            },
+            {
+                year: 3,
+                goal: 'Use accumulated rental profits to upgrade furnishings or install smart-home tech.',
+                roi: getCumulativeROI(3),
+            },
+            {
+                year: 5,
+                goal: 'Leverage your built-up equity to refinance or unlock cash for a second investment.',
+                roi: getCumulativeROI(5),
+            },
+            {
+                year: 7,
+                goal: 'Reinvest combined profits & equity gains into a larger renovation for even higher rental yields.',
+                roi: getCumulativeROI(7),
+            },
+        ];
+    }
+
+    if (isSelfUse && !isSelfPaid) {
+        // self_use + mortgage
+        return [
+            {
+                year: 1,
+                goal: 'Enjoy rent savings that cover part of your mortgage payment.',
+                roi: getCumulativeROI(1),
+            },
+            {
+                year: 3,
+                goal: 'Property appreciation plus repayments gives you enough equity to fund a major renovation.',
+                roi: getCumulativeROI(3),
+            },
+            {
+                year: 5,
+                goal: 'Refinance or tap home equity to upgrade to a larger unit or neighborhood.',
+                roi: getCumulativeROI(5),
+            },
+            {
+                year: 7,
+                goal: 'Convert built-up equity into a personal vehicle loan or other lifestyle upgrade.',
+                roi: getCumulativeROI(7),
+            },
+        ];
+    }
+
+    if (isSelfUse && isSelfPaid) {
+        // self_use + self_paid
+        return [
+            {
+                year: 1,
+                goal: 'Stop renting—save on housing costs immediately while building equity.',
+                roi: getCumulativeROI(1),
+            },
+            {
+                year: 3,
+                goal: 'Use rising equity to secure a home-improvement loan at favorable terms.',
+                roi: getCumulativeROI(3),
+            },
+            {
+                year: 5,
+                goal: 'Reinvest profits from any occasional short-lets or equity release into a weekend getaway.',
+                roi: getCumulativeROI(5),
+            },
+            {
+                year: 7,
+                goal: "Leverage your full ownership to finance your children's education or other family goals.",
+                roi: getCumulativeROI(7),
+            },
+        ];
+    }
+
+    return null;
+}
