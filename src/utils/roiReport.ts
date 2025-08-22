@@ -542,16 +542,34 @@ export function calculateAppreciationDataPoints(
     }
 
     const limit = Math.min(years, typeData.length);
+
+    // Return three specific data points: today, mid-point, and final year
     const datapoints: { year: number; appreciation_perc: number }[] = [];
 
-    for (let i = 0; i < limit; i++) {
-        const yearData = typeData[i];
-        if (!yearData) {
-            return null;
+    // Today (year 0) - always 0% appreciation
+    datapoints.push({
+        year: 0,
+        appreciation_perc: 0,
+    });
+
+    // Mid-point year
+    const midYear = Math.ceil(limit / 2);
+    if (midYear > 0) {
+        const midYearData = typeData[midYear - 1]; // Convert to 0-based index
+        if (midYearData) {
+            datapoints.push({
+                year: midYear,
+                appreciation_perc: midYearData.appreciation_perc,
+            });
         }
+    }
+
+    // Final year
+    const finalYearData = typeData[limit - 1]; // Convert to 0-based index
+    if (finalYearData) {
         datapoints.push({
-            year: i + 1,
-            appreciation_perc: yearData.appreciation_perc,
+            year: limit,
+            appreciation_perc: finalYearData.appreciation_perc,
         });
     }
 
