@@ -727,3 +727,57 @@ export function getInvestmentGoalsWithROI(
 
     return null;
 }
+
+/**
+ * Calculates the rental demand increase percentage from today to a specified number of years.
+ * This shows how much rent will increase over the investment period.
+ *
+ * @param propertyData - The merged property data from the JSON file
+ * @param location - The specific location/area name
+ * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param years - The investment period in years (1-10)
+ * @param propertySize - The property size in square feet
+ * @returns The rental demand increase percentage, or null if data is not available
+ */
+export function calculateRentalDemandIncrease(
+    propertyData: MergedPropertyData,
+    location: string,
+    propertyType: string,
+    years: number,
+    propertySize: number
+): number | null {
+    if (years < 1 || years > 10) {
+        throw new Error('Years must be between 1 and 10');
+    }
+    if (propertySize <= 0) {
+        throw new Error('Property size must be positive');
+    }
+
+    const locationData = propertyData[location];
+    if (!locationData) {
+        return null;
+    }
+    const typeData = locationData[propertyType];
+    if (!typeData || typeData.length === 0) {
+        return null;
+    }
+
+    const limit = Math.min(years, typeData.length);
+
+    // Get today's rent (year 0)
+    const todayData = typeData[0];
+    if (!todayData) {
+        return null;
+    }
+    const todayRent = todayData.rent_per_sq_ft * propertySize * 12;
+
+    // Get future rent (year X)
+    const futureData = typeData[limit - 1];
+    if (!futureData) {
+        return null;
+    }
+    const futureRent = futureData.rent_per_sq_ft * propertySize * 12;
+
+    // Calculate and return percentage increase
+    return ((futureRent - todayRent) / todayRent) * 100;
+}
