@@ -7,7 +7,7 @@ const propertyData: {
     };
 } = {
     'Al Barsha First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 11.69,
                 rent_per_sq_ft: 10,
@@ -51,7 +51,7 @@ const propertyData: {
         ],
     },
     'Al Barsha South Fifth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 4.34,
                 rent_per_sq_ft: 8,
@@ -137,7 +137,7 @@ const propertyData: {
         ],
     },
     'Al Barsha South Fourth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 4.84,
                 rent_per_sq_ft: 8.5,
@@ -223,7 +223,7 @@ const propertyData: {
         ],
     },
     'Al Barshaa South Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 10.71,
                 rent_per_sq_ft: 8,
@@ -267,7 +267,7 @@ const propertyData: {
         ],
     },
     'Al Barshaa South Third': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 3.31,
                 rent_per_sq_ft: 9,
@@ -311,7 +311,7 @@ const propertyData: {
         ],
     },
     'Al Goze Fourth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 3.47,
                 rent_per_sq_ft: 9,
@@ -397,7 +397,7 @@ const propertyData: {
         ],
     },
     'Al Hebiah Fifth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.86,
                 rent_per_sq_ft: 10,
@@ -483,7 +483,7 @@ const propertyData: {
         ],
     },
     'Al Hebiah First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 11.8,
                 rent_per_sq_ft: 8.5,
@@ -569,7 +569,7 @@ const propertyData: {
         ],
     },
     'Al Hebiah Fourth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.01,
                 rent_per_sq_ft: 6,
@@ -655,7 +655,7 @@ const propertyData: {
         ],
     },
     'Al Hebiah Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 6.21,
                 rent_per_sq_ft: 7.5,
@@ -699,7 +699,7 @@ const propertyData: {
         ],
     },
     'Al Hebiah Sixth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.04,
                 rent_per_sq_ft: 12,
@@ -785,7 +785,7 @@ const propertyData: {
         ],
     },
     'Al Hebiah Third': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.31,
                 rent_per_sq_ft: 8,
@@ -829,7 +829,7 @@ const propertyData: {
         ],
     },
     'Al Jadaf': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.98,
                 rent_per_sq_ft: 8,
@@ -873,7 +873,7 @@ const propertyData: {
         ],
     },
     'Al Khairan First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.12,
                 rent_per_sq_ft: 7,
@@ -917,7 +917,7 @@ const propertyData: {
         ],
     },
     'Al Kheeran': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.13,
                 rent_per_sq_ft: 3.5,
@@ -1003,7 +1003,7 @@ const propertyData: {
         ],
     },
     'Al Kifaf': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 6.26,
                 rent_per_sq_ft: 11,
@@ -1047,7 +1047,7 @@ const propertyData: {
         ],
     },
     'Al Merkadh': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.67,
                 rent_per_sq_ft: 7,
@@ -1133,7 +1133,7 @@ const propertyData: {
         ],
     },
     'Al Qusais Industrial Fourth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 4.42,
                 rent_per_sq_ft: 9,
@@ -1177,7 +1177,7 @@ const propertyData: {
         ],
     },
     'Al Safouh First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.07,
                 rent_per_sq_ft: 11.5,
@@ -1221,7 +1221,7 @@ const propertyData: {
         ],
     },
     'Al Safouh Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 6.51,
                 rent_per_sq_ft: 12,
@@ -1265,7 +1265,7 @@ const propertyData: {
         ],
     },
     'Al Satwa': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.26,
                 rent_per_sq_ft: 9,
@@ -1309,7 +1309,7 @@ const propertyData: {
         ],
     },
     'Al Thanyah Fifth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.49,
                 rent_per_sq_ft: 7,
@@ -1395,7 +1395,7 @@ const propertyData: {
         ],
     },
     'Al Thanyah First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 10.32,
                 rent_per_sq_ft: 7,
@@ -1439,7 +1439,7 @@ const propertyData: {
         ],
     },
     'Al Thanyah Third': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 3.5,
                 rent_per_sq_ft: 7,
@@ -1525,7 +1525,7 @@ const propertyData: {
         ],
     },
     'Al Warsan First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 8.23,
                 rent_per_sq_ft: 4,
@@ -1569,7 +1569,7 @@ const propertyData: {
         ],
     },
     'Al Wasl': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.24,
                 rent_per_sq_ft: 10,
@@ -1613,7 +1613,7 @@ const propertyData: {
         ],
     },
     'Al Yelayiss 2': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 8.91,
                 rent_per_sq_ft: 7,
@@ -1699,7 +1699,7 @@ const propertyData: {
         ],
     },
     Bukadra: {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 3.14,
                 rent_per_sq_ft: 6,
@@ -1743,7 +1743,7 @@ const propertyData: {
         ],
     },
     'Burj Khalifa': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 6.1,
                 rent_per_sq_ft: 13,
@@ -1787,7 +1787,7 @@ const propertyData: {
         ],
     },
     'Business Bay': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.62,
                 rent_per_sq_ft: 11,
@@ -1831,7 +1831,7 @@ const propertyData: {
         ],
     },
     'Dubai Investment Park First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.42,
                 rent_per_sq_ft: 10,
@@ -1917,7 +1917,7 @@ const propertyData: {
         ],
     },
     'Dubai Investment Park Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 11.01,
                 rent_per_sq_ft: 7,
@@ -2003,7 +2003,7 @@ const propertyData: {
         ],
     },
     'Hadaeq Sheikh Mohammed Bin Rashid': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.78,
                 rent_per_sq_ft: 11,
@@ -2089,7 +2089,7 @@ const propertyData: {
         ],
     },
     'Hessyan First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.09,
                 rent_per_sq_ft: 7,
@@ -2133,7 +2133,7 @@ const propertyData: {
         ],
     },
     'Island 2': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 9.19,
                 rent_per_sq_ft: 7,
@@ -2219,7 +2219,7 @@ const propertyData: {
         ],
     },
     'Jabal Ali': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 6.77,
                 rent_per_sq_ft: 8,
@@ -2263,7 +2263,7 @@ const propertyData: {
         ],
     },
     'Jabal Ali First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 7.17,
                 rent_per_sq_ft: 9,
@@ -2349,7 +2349,7 @@ const propertyData: {
         ],
     },
     'Jabal Ali Industrial Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 11.1,
                 rent_per_sq_ft: 8,
@@ -2393,7 +2393,7 @@ const propertyData: {
         ],
     },
     'Jumeirah First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 4.29,
                 rent_per_sq_ft: 9,
@@ -2479,7 +2479,7 @@ const propertyData: {
         ],
     },
     'Jumeirah Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 10.52,
                 rent_per_sq_ft: 10,
@@ -2523,7 +2523,7 @@ const propertyData: {
         ],
     },
     'Madinat Al Mataar': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.72,
                 rent_per_sq_ft: 8,
@@ -2609,7 +2609,7 @@ const propertyData: {
         ],
     },
     'Madinat Dubai Almelaheyah': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 9.3,
                 rent_per_sq_ft: 8,
@@ -2653,7 +2653,7 @@ const propertyData: {
         ],
     },
     'Madinat Hind 4': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 8.32,
                 rent_per_sq_ft: 7,
@@ -2697,7 +2697,7 @@ const propertyData: {
         ],
     },
     'Marsa Dubai': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 5.58,
                 rent_per_sq_ft: 12,
@@ -2783,7 +2783,7 @@ const propertyData: {
         ],
     },
     "Me'Aisem First": {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 11.13,
                 rent_per_sq_ft: 7,
@@ -2869,7 +2869,7 @@ const propertyData: {
         ],
     },
     Mirdif: {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.84,
                 rent_per_sq_ft: 7,
@@ -2955,7 +2955,7 @@ const propertyData: {
         ],
     },
     'Muhaisanah First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 6.59,
                 rent_per_sq_ft: 8,
@@ -2999,7 +2999,7 @@ const propertyData: {
         ],
     },
     'Nad Al Hamar': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 4.4,
                 rent_per_sq_ft: 10,
@@ -3043,7 +3043,7 @@ const propertyData: {
         ],
     },
     'Nad Al Shiba': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 10.45,
                 rent_per_sq_ft: 4,
@@ -3087,7 +3087,7 @@ const propertyData: {
         ],
     },
     'Nad Al Shiba First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 8.61,
                 rent_per_sq_ft: 7,
@@ -3173,7 +3173,7 @@ const propertyData: {
         ],
     },
     'Nadd Hessa': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.01,
                 rent_per_sq_ft: 7,
@@ -3217,7 +3217,7 @@ const propertyData: {
         ],
     },
     'Palm Deira': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.46,
                 rent_per_sq_ft: 7,
@@ -3261,7 +3261,7 @@ const propertyData: {
         ],
     },
     'Palm Jumeirah': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 9.94,
                 rent_per_sq_ft: 12,
@@ -3347,7 +3347,7 @@ const propertyData: {
         ],
     },
     'Ras Al Khor Industrial First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.67,
                 rent_per_sq_ft: 7,
@@ -3391,7 +3391,7 @@ const propertyData: {
         ],
     },
     'Rega Al Buteen': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 9.51,
                 rent_per_sq_ft: 7.25,
@@ -3435,7 +3435,7 @@ const propertyData: {
         ],
     },
     'Saih Shuaib 2': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.33,
                 rent_per_sq_ft: 7,
@@ -3521,7 +3521,7 @@ const propertyData: {
         ],
     },
     'Trade Center Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.59,
                 rent_per_sq_ft: 7.5,
@@ -3565,7 +3565,7 @@ const propertyData: {
         ],
     },
     'Um Hurair Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 0.79,
                 rent_per_sq_ft: 8,
@@ -3609,7 +3609,7 @@ const propertyData: {
         ],
     },
     'Um Suqaim Third': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.25,
                 rent_per_sq_ft: 16,
@@ -3653,7 +3653,7 @@ const propertyData: {
         ],
     },
     'Wadi Al Safa 2': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.66,
                 rent_per_sq_ft: 7,
@@ -3739,7 +3739,7 @@ const propertyData: {
         ],
     },
     'Wadi Al Safa 3': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 1.18,
                 rent_per_sq_ft: 7,
@@ -3825,7 +3825,7 @@ const propertyData: {
         ],
     },
     'Wadi Al Safa 4': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.94,
                 rent_per_sq_ft: 7,
@@ -3911,7 +3911,7 @@ const propertyData: {
         ],
     },
     'Wadi Al Safa 5': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 12.3,
                 rent_per_sq_ft: 7,
@@ -3997,7 +3997,7 @@ const propertyData: {
         ],
     },
     'Wadi Al Safa 7': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 7.36,
                 rent_per_sq_ft: 7,
@@ -4083,7 +4083,7 @@ const propertyData: {
         ],
     },
     'Warsan Fourth': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 11.37,
                 rent_per_sq_ft: 6,
@@ -4127,7 +4127,7 @@ const propertyData: {
         ],
     },
     'Zaabeel First': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 3.29,
                 rent_per_sq_ft: 7,
@@ -4171,7 +4171,7 @@ const propertyData: {
         ],
     },
     'Zaabeel Second': {
-        Flat: [
+        Apartment: [
             {
                 appreciation_perc: 2.07,
                 rent_per_sq_ft: 7,
