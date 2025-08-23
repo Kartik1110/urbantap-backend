@@ -22,6 +22,7 @@ import {
 import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
 import { geocodeAddress } from '../utils/geocoding';
+import propertyData from '../data/property-data';
 
 /* Get listings */
 interface ListingFilters {
@@ -40,10 +41,10 @@ export const getListingByIdService = async (id: string, userId: string) => {
                     {
                         AND: [
                             { broker: { user_id: userId } },
-                            { admin_status: { not: Admin_Status.Approved } }
-                        ]
-                    }
-                ]
+                            { admin_status: { not: Admin_Status.Approved } },
+                        ],
+                    },
+                ],
             },
             include: {
                 broker: {
@@ -589,7 +590,7 @@ export const getFeaturedListingsService = async (
 
     // Ensure we don't exceed 30 total listings
     const maxTotalListings = Math.min(totalCount, 30);
-    
+
     const skip = (page - 1) * page_size;
     const take = Math.min(page_size, maxTotalListings - skip); // Adjust take based on remaining listings
 
@@ -941,4 +942,44 @@ export const getTopLocalitiesWithCounts = async () => {
     }));
 
     return response;
+};
+
+// Get listing appreciation service
+export const getListingAppreciationProjections = async (
+    listingId: string
+): Promise<number[]> => {
+    // Fetch listing
+    const listing = await prisma.listing.findFirst({
+        where: {
+            id: listingId,
+            OR: [
+                {
+                    AND: [{ admin_status: { not: Admin_Status.Approved } }],
+                },
+            ],
+            deal_type: 'Selling',
+            category: {
+                in: ['Ready_to_move', 'Off_plan'],
+            },
+        },
+    });
+
+    if (!listing) {
+        throw new Error('Listing not found');
+    }
+
+    if (!listing.locality || !listing.type) {
+        if (!listing.locality) {
+            throw new Error('Listing locality not found');
+        }
+
+        if (!listing.type) {
+            throw new Error('Listing type not found');
+        }
+    }
+
+    const lsitingData = propertyData[listing.locality][listing.type];
+    const appreciation = lsitingData.map((item) => item.appreciation_perc);
+
+    return appreciation;
 };

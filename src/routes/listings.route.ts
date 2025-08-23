@@ -10,6 +10,7 @@ import {
     getPopularLocalities,
     getFeaturedListings,
     getRecentListings,
+    getListingAppreciation,
 } from '../controllers/listings.controller';
 
 const router = Router();
@@ -22,6 +23,8 @@ router.get('/listings/featured', getFeaturedListings);
 router.get('/listings/recent', getRecentListings);
 
 router.get('/listings/:id', getListingById);
+
+router.get('/listings/:id/appreciation', getListingAppreciation);
 
 /* Bulk insert listings */
 export default (upload: any) => {
