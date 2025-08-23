@@ -13,6 +13,7 @@ import {
     getFeaturedListingsService,
     getRecentListingsService,
     getListingAppreciationProjections,
+    getListingROIReportService,
 } from '../services/listings.service';
 import { uploadToS3 } from '../utils/s3Upload';
 import prisma from '../utils/prisma';
@@ -331,13 +332,51 @@ export const getListingAppreciation = async (req: Request, res: Response) => {
             status: 'success',
             message: 'Listing appreciation fetched successfully',
             data: {
-                cumulative_apprecition_percentage: appreciation,
+                cumulative_appreciation_percentage: appreciation,
             },
         });
     } catch (error) {
         return res.status(500).json({
             status: 'error',
-            message: 'Failed to fetch listing appreciation',
+            message:
+                (error as Error).message ||
+                'Failed to fetch listing appreciation',
+            error,
+        });
+    }
+};
+
+// Get listing ROI report
+export const getListingROIReport = async (req: Request, res: Response) => {
+    const listingId = req.params.id;
+    const {
+        user_preference: num_of_years,
+        goal,
+        mortgage,
+    }: {
+        user_preference: number;
+        goal: 'Rental' | 'Self Use';
+        mortgage: boolean;
+    } = req.body;
+
+    try {
+        const roiReport = await getListingROIReportService(listingId, {
+            num_of_years,
+            is_self_use: goal === 'Self Use',
+            is_self_paid: mortgage,
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Listing ROI report fetched successfully',
+            data: roiReport,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message:
+                (error as Error).message ||
+                'Failed to fetch listing ROI report',
             error,
         });
     }

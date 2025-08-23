@@ -11,6 +11,7 @@ import {
     getFeaturedListings,
     getRecentListings,
     getListingAppreciation,
+    getListingROIReport,
 } from '../controllers/listings.controller';
 
 const router = Router();
@@ -25,6 +26,8 @@ router.get('/listings/recent', getRecentListings);
 router.get('/listings/:id', getListingById);
 
 router.get('/listings/:id/appreciation', getListingAppreciation);
+
+router.post('/listings/:id/roi-report', getListingROIReport);
 
 /* Bulk insert listings */
 export default (upload: any) => {

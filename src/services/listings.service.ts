@@ -23,6 +23,18 @@ import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
 import { geocodeAddress } from '../utils/geocoding';
 import propertyData from '../data/property-data';
+import {
+    calculateAppreciationDataPoints,
+    calculateAverageROI,
+    calculateBreakEvenPeriod,
+    calculateCapitalGains,
+    calculateCumulativeProfitPerYear,
+    calculateExpectedRental,
+    calculateRentalDemandIncrease,
+    calculateRoiDataPoints,
+    getCurrentRentalPrice,
+    getInvestmentGoalsWithROI,
+} from '../utils/roiReport';
 
 /* Get listings */
 interface ListingFilters {
@@ -952,17 +964,14 @@ export const getListingAppreciationProjections = async (
     const listing = await prisma.listing.findFirst({
         where: {
             id: listingId,
-            OR: [
-                {
-                    AND: [{ admin_status: { not: Admin_Status.Approved } }],
-                },
-            ],
-            deal_type: 'Selling',
+            deal_type: DealType.Selling,
             category: {
-                in: ['Ready_to_move', 'Off_plan'],
+                in: [Category.Ready_to_move, Category.Off_plan],
             },
         },
     });
+
+    console.log('listing', listingId, listing);
 
     if (!listing) {
         throw new Error('Listing not found');
@@ -978,8 +987,218 @@ export const getListingAppreciationProjections = async (
         }
     }
 
-    const lsitingData = propertyData[listing.locality][listing.type];
-    const appreciation = lsitingData.map((item) => item.appreciation_perc);
+    const listingData = propertyData[listing.locality][listing.type];
+    const appreciation = listingData.map((item) => item.appreciation_perc);
 
     return appreciation;
+};
+
+export const getListingROIReportService = async (
+    listingId: string,
+    {
+        num_of_years,
+        is_self_use,
+        is_self_paid,
+    }: {
+        num_of_years: number;
+        is_self_use: boolean;
+        is_self_paid: boolean;
+    }
+): Promise<{
+    capital_gains: {
+        today: number;
+        preference_year: number;
+    };
+    expected_rental: {
+        short_term: number;
+        long_term: number;
+    };
+    break_even_year: number;
+    avg_roi_per_year: number;
+    cumulative_profit: number;
+    roi_graph: { year: number; roi: number }[];
+    goals: { year: number; goal: string; roi: number }[];
+    area_appreciation_graph: {
+        year: number;
+        appreciation_perc: number;
+    }[];
+    rental_demand: number;
+    what_if_presets: {
+        conservative: {
+            monthly_rent: number;
+            interest_rate: number;
+            down_payment: number;
+        };
+        balanced: {
+            monthly_rent: number;
+            interest_rate: number;
+            down_payment: number;
+        };
+        aggressive: {
+            monthly_rent: number;
+            interest_rate: number;
+            down_payment: number;
+        };
+    };
+}> => {
+    const listing = await prisma.listing.findFirst({
+        where: {
+            id: listingId,
+            deal_type: DealType.Selling,
+            category: {
+                in: [Category.Ready_to_move, Category.Off_plan],
+            },
+        },
+    });
+
+    if (!listing) {
+        throw new Error('Listing not found');
+    }
+
+    if (
+        !listing.locality ||
+        !listing.type ||
+        !listing.sq_ft ||
+        !listing.max_price
+    ) {
+        if (!listing.locality) {
+            throw new Error('Listing locality not found');
+        }
+
+        if (!listing.type) {
+            throw new Error('Listing type not found');
+        }
+
+        if (!listing.sq_ft) {
+            throw new Error('Listing size not found');
+        }
+
+        if (!listing.max_price) {
+            throw new Error('Listing price not found');
+        }
+    }
+
+    const { futureValue } = calculateCapitalGains(
+        propertyData,
+        listing.locality,
+        listing.type,
+        num_of_years,
+        listing.max_price!
+    );
+
+    const expectedRental = calculateExpectedRental(
+        propertyData,
+        listing.locality,
+        listing.type,
+        num_of_years,
+        listing.sq_ft,
+        'annual'
+    );
+
+    const breakEvenYear = calculateBreakEvenPeriod(
+        propertyData,
+        listing.locality,
+        listing.type,
+        listing.max_price,
+        listing.sq_ft
+    );
+
+    const avgRoiPerYear = calculateAverageROI(
+        propertyData,
+        listing.locality,
+        listing.type,
+        num_of_years,
+        listing.max_price,
+        listing.sq_ft
+    );
+
+    const cumulativeProfitPerYear = calculateCumulativeProfitPerYear(
+        propertyData,
+        listing.locality,
+        listing.type,
+        listing.max_price,
+        listing.sq_ft
+    );
+
+    const cumulativeProfit = cumulativeProfitPerYear.reduce(
+        (acc, curr) => acc + curr,
+        0
+    );
+
+    const roiGraph = calculateRoiDataPoints(
+        propertyData,
+        listing.locality,
+        listing.type,
+        num_of_years,
+        listing.max_price,
+        listing.sq_ft
+    );
+
+    const goals = getInvestmentGoalsWithROI(
+        propertyData,
+        listing.locality,
+        listing.type,
+        is_self_use,
+        is_self_paid,
+        listing.max_price,
+        listing.sq_ft
+    );
+
+    const areaAppreciationGraph = calculateAppreciationDataPoints(
+        propertyData,
+        listing.locality,
+        listing.type,
+        num_of_years
+    );
+
+    const rentalDemandIncrease = calculateRentalDemandIncrease(
+        propertyData,
+        listing.locality,
+        listing.type,
+        num_of_years,
+        listing.sq_ft
+    );
+
+    const currentRentalPrice = getCurrentRentalPrice(
+        propertyData,
+        listing.locality,
+        listing.type,
+        listing.sq_ft,
+        'monthly'
+    );
+
+    return {
+        capital_gains: {
+            today: listing.max_price,
+            preference_year: futureValue,
+        },
+        expected_rental: {
+            short_term: expectedRental.today,
+            long_term: expectedRental.long_term,
+        },
+        break_even_year: breakEvenYear,
+        avg_roi_per_year: avgRoiPerYear,
+        cumulative_profit: cumulativeProfit,
+        roi_graph: roiGraph,
+        goals,
+        area_appreciation_graph: areaAppreciationGraph,
+        rental_demand: rentalDemandIncrease,
+        what_if_presets: {
+            conservative: {
+                monthly_rent: currentRentalPrice - currentRentalPrice * 0.2,
+                interest_rate: 3.99,
+                down_payment: 40,
+            },
+            balanced: {
+                monthly_rent: currentRentalPrice,
+                interest_rate: 3.99,
+                down_payment: 40,
+            },
+            aggressive: {
+                monthly_rent: currentRentalPrice + currentRentalPrice * 0.2,
+                interest_rate: 3.99,
+                down_payment: 40,
+            },
+        },
+    };
 };
