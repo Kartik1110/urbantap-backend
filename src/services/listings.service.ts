@@ -971,8 +971,6 @@ export const getListingAppreciationProjections = async (
         },
     });
 
-    console.log('listing', listingId, listing);
-
     if (!listing) {
         throw new Error('Listing not found');
     }
