@@ -27,6 +27,7 @@ import {
     getBrokers,
     getListingsForBrokerage,
     bulkInsertListingsAdmin,
+    deleteJobController,
 } from '../controllers/admin-user.controller';
 
 const router = express.Router();
@@ -127,6 +128,8 @@ router.get(
     verifyToken,
     getJobApplicationsController
 );
+
+router.delete('/admin-user/jobs/:id', verifyToken, deleteJobController);
 
 /* Broker Routes */
 // Note:  this should be /users to get users for a company but now user is not mapped to a company

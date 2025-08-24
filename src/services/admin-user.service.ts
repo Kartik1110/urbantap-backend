@@ -512,6 +512,15 @@ export const getJobApplicationsService = async (
     });
 };
 
+export const deleteJobService = async (jobId: string, companyId: string) => {
+    return await prisma.job.delete({
+        where: {
+            id: jobId,
+            company_id: companyId,
+        },
+    });
+};
+
 export const getBrokersService = async (companyId: string) => {
     return await prisma.broker.findMany({
         where: {

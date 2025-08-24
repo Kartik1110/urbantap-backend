@@ -21,6 +21,7 @@ import {
     getBrokersService,
     createListingService,
     bulkInsertListingsAdminService,
+    deleteJobService,
 } from '../services/admin-user.service';
 import { Express } from 'express';
 import prisma from '../utils/prisma';
@@ -657,6 +658,31 @@ export const getJobApplicationsController = async (
         res.status(200).json({
             status: 'success',
             data: applications,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+export const deleteJobController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const jobId = req.params.id;
+        const companyId = req.user?.companyId;
+
+        if (!companyId) {
+            return res
+                .status(400)
+                .json({ message: 'Company ID not found for user' });
+        }
+
+        const job = await deleteJobService(jobId, companyId);
+
+        res.status(200).json({
+            status: 'success',
+            data: job,
         });
     } catch (error: any) {
         res.status(500).json({ status: 'error', message: error.message });
