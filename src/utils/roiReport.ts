@@ -12,23 +12,26 @@ export interface MergedPropertyData {
     [location: string]: PropertyTypeData;
 }
 
+const DEFFAULT_DP_RATIO = 0.4;
+const DEFFAULT_INTEREST_RATE = 0.0399;
+
 /**
  * Calculates the property ROI for a given year based on appreciation rate, rental income, and mortgage costs
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param year - The year to calculate ROI for (0-9, where 0 is the first year)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
  * @returns The calculated ROI percentage, or null if data is not available
  */
 export function calculatePropertyROI(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     year: number,
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number | null {
     // Validate inputs
     if (year < 0 || year > 9) {
@@ -43,18 +46,11 @@ export function calculatePropertyROI(
         throw new Error('Property size must be positive');
     }
 
-    // Get the property data for the specified location and type
-    const locationData = propertyData[location];
-    if (!locationData) {
-        return null;
+    if (!propertyData || !propertyData[year]) {
+        throw new Error('Property data points not provided');
     }
 
-    const typeData = locationData[propertyType];
-    if (!typeData || !typeData[year]) {
-        return null;
-    }
-
-    const yearData = typeData[year];
+    const yearData = propertyData[year];
 
     // Calculate property value appreciation
     // appreciation_perc is cumulative from year 0, so we need to calculate year-over-year
@@ -65,7 +61,7 @@ export function calculatePropertyROI(
         appreciationPercentage = yearData.appreciation_perc;
     } else {
         // Get previous year's cumulative appreciation
-        const previousYearData = typeData[year - 1];
+        const previousYearData = propertyData[year - 1];
         if (!previousYearData) {
             return null; // Previous year data not available
         }
@@ -82,10 +78,8 @@ export function calculatePropertyROI(
     const rentPerSqFt = yearData.rent_per_sq_ft;
     const annualRentalIncome = rentPerSqFt * propertySize * 12; // Assuming 12 months
 
-    // Calculate mortgage costs (60/40 split with 3.99% annual interest)
-    const loanAmount = initialInvestment * 0.6; // 60% loan
-    const downPayment = initialInvestment * 0.4; // 40% down payment
-    const annualInterestRate = 0.0399; // 3.99% PA
+    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
+    const downPayment = initialInvestment * downPaymentToLoanRatio;
 
     // Calculate annual mortgage interest payment
     const annualMortgageInterest = loanAmount * annualInterestRate;
@@ -102,35 +96,35 @@ export function calculatePropertyROI(
 
 /**
  * Calculates cumulative ROI over multiple years including mortgage costs
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param years - The number of years to calculate cumulative ROI for
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
  * @returns The cumulative ROI percentage, or null if data is not available
  */
 export function calculateCumulativeROI(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     years: number,
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO
 ): number | null {
     if (years < 1 || years > 10) {
         throw new Error('Years must be between 1 and 10');
     }
 
+    if (!propertyData || propertyData.length === 0) {
+        throw new Error('Property data not provided');
+    }
+
     // Use explicit net return accumulation for clarity
-    const downPayment = initialInvestment * 0.4;
+    const downPayment = initialInvestment * downPaymentToLoanRatio;
     let totalNetReturnAmount = 0;
 
     for (let year = 0; year < years; year++) {
         const yearROI = calculatePropertyROI(
             propertyData,
-            location,
-            propertyType,
             year,
             initialInvestment,
             propertySize
@@ -153,18 +147,16 @@ export function calculateCumulativeROI(
  * Arithmetic mean of yearly ROI%, where each year's ROI% is computed as
  * netReturnThisYear / downPayment.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param years - The number of years to average over (>=1)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
  * @returns The average ROI percentage per year, or null if data is not available
  */
 export function calculateAverageROI(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     years: number,
     initialInvestment: number,
     propertySize: number
@@ -173,10 +165,12 @@ export function calculateAverageROI(
         throw new Error('Years must be between 1 and 10');
     }
 
+    if (!propertyData || propertyData.length === 0) {
+        throw new Error('Property data not provided');
+    }
+
     const cumulativeROI = calculateCumulativeROI(
         propertyData,
-        location,
-        propertyType,
         years,
         initialInvestment,
         propertySize
@@ -191,17 +185,13 @@ export function calculateAverageROI(
 
 /**
  * Calculates capital gains and future value after a number of years using cumulative appreciation
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param years - Number of years ahead (1..10). Year 1 corresponds to index 0 in data
  * @param currentValue - Current property value (today)
  * @returns Object with futureValue and capitalGains, or null if data is not available
  */
 export function calculateCapitalGains(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     years: number,
     currentValue: number
 ): { futureValue: number; capitalGains: number } {
@@ -212,18 +202,12 @@ export function calculateCapitalGains(
         throw new Error('Current value must be positive');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
-    }
-
-    const typeData = locationData[propertyType];
-    if (!typeData) {
-        throw new Error('Property type not found');
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data points not provided');
     }
 
     const idx = years - 1; // cumulative appreciation index
-    const yearData = typeData[idx];
+    const yearData = propertyData[idx];
     if (!yearData) {
         throw new Error('Year data not found');
     }
@@ -237,26 +221,26 @@ export function calculateCapitalGains(
 
 /**
  * Gets all available locations from the property data
- * @param propertyData - The merged property data from the JSON file
+ * @param propertiesData - The merged properties data from the JSON file
  * @returns Array of available location names
  */
 export function getAvailableLocations(
-    propertyData: MergedPropertyData
+    propertiesData: MergedPropertyData
 ): string[] {
-    return Object.keys(propertyData);
+    return Object.keys(propertiesData);
 }
 
 /**
  * Gets all available property types for a specific location
- * @param propertyData - The merged property data from the JSON file
+ * @param propertiesData - The merged properties data from the JSON file
  * @param location - The specific location/area name
  * @returns Array of available property types, or empty array if location not found
  */
 export function getAvailablePropertyTypes(
-    propertyData: MergedPropertyData,
+    propertiesData: MergedPropertyData,
     location: string
 ): string[] {
-    const locationData = propertyData[location];
+    const locationData = propertiesData[location];
     if (!locationData) {
         return [];
     }
@@ -266,18 +250,14 @@ export function getAvailablePropertyTypes(
 
 /**
  * Calculates expected rental for a given year based on rent per sq ft and property size
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param year - The year to calculate rental for (0-9, where 0 is the current year)
  * @param propertySize - The property size in square feet
  * @param period - 'annual' (default) or 'monthly' amount to return
  * @returns The expected rental for the requested period, or null if data is not available
  */
 export function calculateExpectedRental(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     year: number,
     propertySize: number,
     period: 'annual' | 'monthly' = 'annual'
@@ -285,21 +265,20 @@ export function calculateExpectedRental(
     if (year < 0 || year > 9) {
         throw new Error('Year must be between 0 and 9');
     }
+
+    if (!propertyData || propertyData.length === 0) {
+        throw new Error('Property data not provided');
+    }
+
     if (propertySize <= 0) {
         throw new Error('Property size must be positive');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
+    if (!propertyData || !propertyData[year]) {
+        throw new Error('Property data points not provided');
     }
 
-    const typeData = locationData[propertyType];
-    if (!typeData || !typeData[year]) {
-        throw new Error('Property type not found');
-    }
-
-    const yearData = typeData[year];
+    const yearData = propertyData[year];
     const monthlyRent = yearData.rent_per_sq_ft * propertySize;
 
     if (period === 'monthly') {
@@ -321,19 +300,17 @@ export function calculateExpectedRental(
  *                     + annual rental income
  *                     - annual mortgage interest (3.99% on 60% loan)
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
  * @returns The smallest integer number of years to break-even (>=1), or null if not within available data
  */
 export function calculateBreakEvenPeriod(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -343,24 +320,17 @@ export function calculateBreakEvenPeriod(
         throw new Error('Property size must be positive');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data points not provided');
     }
 
-    const typeData = locationData[propertyType];
-    if (!typeData) {
-        throw new Error('Property type not found');
-    }
-
-    const downPayment = initialInvestment * 0.4;
-    const loanAmount = initialInvestment * 0.6;
-    const annualInterestRate = 0.0399;
+    const downPayment = initialInvestment * downPaymentToLoanRatio;
+    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
 
     let cumulativeNetReturn = 0;
 
-    for (let year = 0; year < typeData.length; year++) {
-        const yearData = typeData[year];
+    for (let year = 0; year < propertyData.length; year++) {
+        const yearData = propertyData[year];
         if (!yearData) {
             throw new Error('Year data not found');
         }
@@ -370,7 +340,7 @@ export function calculateBreakEvenPeriod(
         if (year === 0) {
             yoyAppreciationPerc = yearData.appreciation_perc;
         } else {
-            const prev = typeData[year - 1];
+            const prev = propertyData[year - 1];
             if (!prev) {
                 throw new Error('Previous year data not found');
             }
@@ -402,19 +372,17 @@ export function calculateBreakEvenPeriod(
  *
  * Year indexing: year 0 = current → end of year 1 period.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
  * @returns Array of cumulative profit per year, or null if data is not available
  */
 export function calculateCumulativeProfitPerYear(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number[] {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -424,25 +392,18 @@ export function calculateCumulativeProfitPerYear(
         throw new Error('Property size must be positive');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data points not provided');
     }
 
-    const typeData = locationData[propertyType];
-    if (!typeData || typeData.length === 0) {
-        throw new Error('Property type not found');
-    }
-
-    const loanAmount = initialInvestment * 0.6;
-    const annualInterestRate = 0.0399;
+    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
     const annualInterest = loanAmount * annualInterestRate;
 
     const cumulative: number[] = [];
     let runningTotal = 0;
 
-    for (let year = 0; year < typeData.length; year++) {
-        const yearData = typeData[year];
+    for (let year = 0; year < propertyData.length; year++) {
+        const yearData = propertyData[year];
         if (!yearData) {
             throw new Error('Year data not found');
         }
@@ -452,7 +413,7 @@ export function calculateCumulativeProfitPerYear(
         if (year === 0) {
             yoyAppreciationPerc = yearData.appreciation_perc;
         } else {
-            const prev = typeData[year - 1];
+            const prev = propertyData[year - 1];
 
             if (!prev) {
                 throw new Error('Previous year data not found');
@@ -484,21 +445,21 @@ export function calculateCumulativeProfitPerYear(
  * - Monthly appreciation (YoY appreciation / 12)
  * - Monthly mortgage interest (annual interest / 12)
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param year - The specific year to get monthly breakdown for (0-based index)
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
  * @returns Array of 12 monthly profit values, or null if data is not available
  */
 export function calculateMonthlyProfitForYear(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     year: number,
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -512,24 +473,17 @@ export function calculateMonthlyProfitForYear(
         throw new Error('Year must be non-negative');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
+    if (!propertyData || !propertyData.length || year >= propertyData.length) {
+        throw new Error('Property data points not provided');
     }
 
-    const typeData = locationData[propertyType];
-    if (!typeData || typeData.length === 0 || year >= typeData.length) {
-        throw new Error('Property type not found');
-    }
-
-    const yearData = typeData[year];
+    const yearData = propertyData[year];
     if (!yearData) {
         throw new Error('Year data not found');
     }
 
     // Calculate the same components as the original method
-    const loanAmount = initialInvestment * 0.6;
-    const annualInterestRate = 0.0399;
+    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
     const monthlyInterest = (loanAmount * annualInterestRate) / 12;
 
     // Year-over-year appreciation percentage
@@ -537,7 +491,7 @@ export function calculateMonthlyProfitForYear(
     if (year === 0) {
         yoyAppreciationPerc = yearData.appreciation_perc;
     } else {
-        const prev = typeData[year - 1];
+        const prev = propertyData[year - 1];
         if (!prev) {
             throw new Error('Previous year data not found');
         }
@@ -556,34 +510,26 @@ export function calculateMonthlyProfitForYear(
 }
 
 /**
- * Builds datapoints to plot cumulative ROI (amount) after each year up to `years`.
- * Each point is { year: 1..years, roi: cumulative net return amount }.
+ * Builds datapoints to plot cumulative ROI (amount) for years 1, 3, and 5.
+ * Each point is { year: 1|3|5, roi: cumulative net return amount }.
  * Net return uses the same logic: YoY appreciation + annual rent − annual interest.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
- * @param years - Number of years to include (>=1)
+ * @param propertyData - The property data from the JSON file
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
- * @returns Array of { year, roi } where roi is amount, or null if data missing
+ * @returns Array of { year, roi } for years 1, 3, and 5, or null if data missing
  */
 export function calculateRoiDataPoints(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
-    years: number,
+    propertyData: PropertyDataPoint[],
     initialInvestment: number,
     propertySize: number
 ): { year: number; roi: number }[] {
-    if (years < 1) {
-        throw new Error('Years must be at least 1');
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data not provided');
     }
 
     const cumulative = calculateCumulativeProfitPerYear(
         propertyData,
-        location,
-        propertyType,
         initialInvestment,
         propertySize
     );
@@ -592,11 +538,19 @@ export function calculateRoiDataPoints(
         throw new Error('Cumulative ROI not found');
     }
 
-    const limit = Math.min(years, cumulative.length);
     const datapoints: { year: number; roi: number }[] = [];
 
-    for (let i = 0; i < limit; i++) {
-        datapoints.push({ year: i + 1, roi: cumulative[i] });
+    // Always return years 1, 3, and 5
+    const targetYears = [1, 3, 5];
+    const targetIndices = [0, 2, 4];
+
+    for (let i = 0; i < targetYears.length; i++) {
+        const year = targetYears[i];
+        const index = targetIndices[i];
+
+        if (index < cumulative.length) {
+            datapoints.push({ year, roi: cumulative[index] });
+        }
     }
 
     return datapoints;
@@ -607,33 +561,23 @@ export function calculateRoiDataPoints(
  * Each point is { year: 1..years, appreciation: percentage }.
  * Uses the cumulative appreciation_perc values directly from the data.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param years - Number of years to include (>=1)
  * @returns Array of { year, appreciation } where appreciation is percentage, or null if data missing
  */
 export function calculateAppreciationDataPoints(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     years: number
 ): { year: number; appreciation_perc: number }[] {
     if (years < 1) {
         throw new Error('Years must be at least 1');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data points not provided');
     }
 
-    const typeData = locationData[propertyType];
-    if (!typeData || typeData.length === 0) {
-        throw new Error('Property type not found');
-    }
-
-    const limit = Math.min(years, typeData.length);
+    const limit = Math.min(years, propertyData.length);
 
     // Return three specific data points: today, mid-point, and final year
     const datapoints: { year: number; appreciation_perc: number }[] = [];
@@ -647,7 +591,7 @@ export function calculateAppreciationDataPoints(
     // Mid-point year
     const midYear = Math.ceil(limit / 2);
     if (midYear > 0) {
-        const midYearData = typeData[midYear - 1]; // Convert to 0-based index
+        const midYearData = propertyData[midYear - 1]; // Convert to 0-based index
         if (midYearData) {
             datapoints.push({
                 year: midYear,
@@ -657,7 +601,7 @@ export function calculateAppreciationDataPoints(
     }
 
     // Final year
-    const finalYearData = typeData[limit - 1]; // Convert to 0-based index
+    const finalYearData = propertyData[limit - 1]; // Convert to 0-based index
     if (finalYearData) {
         datapoints.push({
             year: limit,
@@ -681,9 +625,7 @@ export interface InvestmentGoalBenefit {
  * Retrieves investment goal benefits with ROI calculations for specific years.
  * Returns benefits for years 1, 3, 5, and 7 with calculated ROI from today.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param isSelfUse - Boolean: true for self-use, false for rental
  * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
  * @param initialInvestment - The initial investment amount in the base currency
@@ -691,9 +633,7 @@ export interface InvestmentGoalBenefit {
  * @returns Array of investment goal benefits with ROI calculations, or null if not found
  */
 export function getInvestmentGoalsWithROI(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     isSelfUse: boolean,
     isSelfPaid: boolean,
     initialInvestment: number,
@@ -704,8 +644,6 @@ export function getInvestmentGoalsWithROI(
         return (
             calculateCumulativeROI(
                 propertyData,
-                location,
-                propertyType,
                 years,
                 initialInvestment,
                 propertySize
@@ -824,17 +762,13 @@ export function getInvestmentGoalsWithROI(
  * Calculates the rental demand increase percentage from today to a specified number of years.
  * This shows how much rent will increase over the investment period.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param years - The investment period in years (1-10)
  * @param propertySize - The property size in square feet
  * @returns The rental demand increase percentage, or null if data is not available
  */
 export function calculateRentalDemandIncrease(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     years: number,
     propertySize: number
 ): number {
@@ -846,20 +780,14 @@ export function calculateRentalDemandIncrease(
         throw new Error('Property size must be positive');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
-    }
-
-    const typeData = locationData[propertyType];
-    if (!typeData || typeData.length === 0) {
+    if (!propertyData || !propertyData.length) {
         throw new Error('Property type not found');
     }
 
-    const limit = Math.min(years, typeData.length);
+    const limit = Math.min(years, propertyData.length);
 
     // Get today's rent (year 0)
-    const todayData = typeData[0];
+    const todayData = propertyData[0];
     if (!todayData) {
         throw new Error('Today data not found');
     }
@@ -867,7 +795,7 @@ export function calculateRentalDemandIncrease(
     const todayRent = todayData.rent_per_sq_ft * propertySize * 12;
 
     // Get future rent (year X)
-    const futureData = typeData[limit - 1];
+    const futureData = propertyData[limit - 1];
     if (!futureData) {
         throw new Error('Future data not found');
     }
@@ -881,17 +809,13 @@ export function calculateRentalDemandIncrease(
 /**
  * Gets today's rental price for a property.
  *
- * @param propertyData - The merged property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param propertyData - The property data from the JSON file
  * @param propertySize - The property size in square feet
  * @param period - Whether to return monthly or annual rent (default: 'annual')
  * @returns Today's rental price, or throws error if data is not available
  */
 export function getCurrentRentalPrice(
-    propertyData: MergedPropertyData,
-    location: string,
-    propertyType: string,
+    propertyData: PropertyDataPoint[],
     propertySize: number,
     period: 'annual' | 'monthly' = 'annual'
 ): number {
@@ -899,18 +823,12 @@ export function getCurrentRentalPrice(
         throw new Error('Property size must be positive');
     }
 
-    const locationData = propertyData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
-    }
-
-    const typeData = locationData[propertyType];
-    if (!typeData || typeData.length === 0) {
+    if (!propertyData || !propertyData.length) {
         throw new Error('Property type not found');
     }
 
     // Get today's data (year 0)
-    const todayData = typeData[0];
+    const todayData = propertyData[0];
     if (!todayData) {
         throw new Error('Today data not found');
     }
@@ -925,4 +843,34 @@ export function getCurrentRentalPrice(
 
     // Default: annual rent
     return monthlyRent * 12;
+}
+
+/**
+ * Gets property data for a given location, property type, and years.
+ *
+ * @param propertiesData - The merged properties data from the JSON file
+ * @param location - The specific location/area name
+ * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @returns Property data points for the given location, property type, and years
+ */
+export function getPropertyData(
+    propertiesData: MergedPropertyData,
+    location: string,
+    propertyType: string
+): PropertyDataPoint[] {
+    if (!propertiesData) {
+        throw new Error('Property data not provided');
+    }
+
+    const locationData = propertiesData[location];
+    if (!locationData) {
+        throw new Error('Location not found');
+    }
+
+    const propertyData = locationData[propertyType];
+    if (!propertyData || propertyData.length === 0) {
+        throw new Error('Property type not found');
+    }
+
+    return propertyData;
 }
