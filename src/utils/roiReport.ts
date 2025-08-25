@@ -476,6 +476,86 @@ export function calculateCumulativeProfitPerYear(
 }
 
 /**
+ * Calculates monthly profit breakdown for a specific year.
+ * Returns an array of 12 monthly profit values for the given year.
+ *
+ * Monthly profit includes:
+ * - Monthly rental income (annual rent / 12)
+ * - Monthly appreciation (YoY appreciation / 12)
+ * - Monthly mortgage interest (annual interest / 12)
+ *
+ * @param propertyData - The merged property data from the JSON file
+ * @param location - The specific location/area name
+ * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @param year - The specific year to get monthly breakdown for (0-based index)
+ * @param initialInvestment - Total property value today
+ * @param propertySize - Property size in square feet
+ * @returns Array of 12 monthly profit values, or null if data is not available
+ */
+export function calculateMonthlyProfitForYear(
+    propertyData: MergedPropertyData,
+    location: string,
+    propertyType: string,
+    year: number,
+    initialInvestment: number,
+    propertySize: number
+): number {
+    if (initialInvestment <= 0) {
+        throw new Error('Initial investment must be positive');
+    }
+
+    if (propertySize <= 0) {
+        throw new Error('Property size must be positive');
+    }
+
+    if (year < 0) {
+        throw new Error('Year must be non-negative');
+    }
+
+    const locationData = propertyData[location];
+    if (!locationData) {
+        throw new Error('Location not found');
+    }
+
+    const typeData = locationData[propertyType];
+    if (!typeData || typeData.length === 0 || year >= typeData.length) {
+        throw new Error('Property type not found');
+    }
+
+    const yearData = typeData[year];
+    if (!yearData) {
+        throw new Error('Year data not found');
+    }
+
+    // Calculate the same components as the original method
+    const loanAmount = initialInvestment * 0.6;
+    const annualInterestRate = 0.0399;
+    const monthlyInterest = (loanAmount * annualInterestRate) / 12;
+
+    // Year-over-year appreciation percentage
+    let yoyAppreciationPerc: number;
+    if (year === 0) {
+        yoyAppreciationPerc = yearData.appreciation_perc;
+    } else {
+        const prev = typeData[year - 1];
+        if (!prev) {
+            throw new Error('Previous year data not found');
+        }
+        yoyAppreciationPerc =
+            yearData.appreciation_perc - prev.appreciation_perc;
+    }
+
+    // Monthly components
+    const monthlyAppreciation =
+        (initialInvestment * (yoyAppreciationPerc / 100)) / 12;
+    const monthlyRent = yearData.rent_per_sq_ft * propertySize;
+    const monthlyNetProfit =
+        monthlyAppreciation + monthlyRent - monthlyInterest;
+
+    return monthlyNetProfit;
+}
+
+/**
  * Builds datapoints to plot cumulative ROI (amount) after each year up to `years`.
  * Each point is { year: 1..years, roi: cumulative net return amount }.
  * Net return uses the same logic: YoY appreciation + annual rent − annual interest.
