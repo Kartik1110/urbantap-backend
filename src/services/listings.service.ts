@@ -1167,33 +1167,47 @@ export const getListingROIReportService = async (
 
     return {
         capital_gains: {
-            today: listing.max_price,
-            preference_year: futureValue,
+            today: Math.round(listing.max_price),
+            preference_year: Math.round(futureValue),
         },
         expected_rental: {
-            short_term: expectedRental.today,
-            long_term: expectedRental.long_term,
+            short_term: Math.round(expectedRental.today),
+            long_term: Math.round(expectedRental.long_term),
         },
         break_even_year: breakEvenYear,
-        avg_roi_per_year: avgRoiPerYear,
-        cumulative_profit: cumulativeProfit,
-        roi_graph: roiGraph,
-        goals,
-        area_appreciation_graph: areaAppreciationGraph,
-        rental_demand: rentalDemandIncrease,
+        avg_roi_per_year: Math.round(avgRoiPerYear * 100) / 100, // Round to 2 decimal places
+        cumulative_profit: Math.round(cumulativeProfit),
+        roi_graph: roiGraph.map((item) => ({
+            year: item.year,
+            roi: Math.round(item.roi),
+        })),
+        goals: goals.map((goal) => ({
+            year: goal.year,
+            goal: goal.goal,
+            roi: Math.round(goal.roi),
+        })),
+        area_appreciation_graph: areaAppreciationGraph.map((item) => ({
+            year: item.year,
+            appreciation_perc: Math.round(item.appreciation_perc * 100) / 100, // Round to 2 decimal places
+        })),
+        rental_demand: Math.round(rentalDemandIncrease),
         what_if_presets: {
             conservative: {
-                monthly_rent: currentRentalPrice - currentRentalPrice * 0.2,
+                monthly_rent: Math.round(
+                    currentRentalPrice - currentRentalPrice * 0.2
+                ),
                 interest_rate: 3.99,
                 down_payment: 40,
             },
             balanced: {
-                monthly_rent: currentRentalPrice,
+                monthly_rent: Math.round(currentRentalPrice),
                 interest_rate: 3.99,
                 down_payment: 40,
             },
             aggressive: {
-                monthly_rent: currentRentalPrice + currentRentalPrice * 0.2,
+                monthly_rent: Math.round(
+                    currentRentalPrice + currentRentalPrice * 0.2
+                ),
                 interest_rate: 3.99,
                 down_payment: 40,
             },
