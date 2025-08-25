@@ -22,7 +22,7 @@ import {
 import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
 import { geocodeAddress } from '../utils/geocoding';
-import propertyData from '../data/property-data';
+import propertiesData from '../data/property-data';
 import {
     calculateAppreciationDataPoints,
     calculateAverageROI,
@@ -34,6 +34,7 @@ import {
     calculateRoiDataPoints,
     getCurrentRentalPrice,
     getInvestmentGoalsWithROI,
+    getPropertyData,
 } from '../utils/roiReport';
 
 /* Get listings */
@@ -985,7 +986,12 @@ export const getListingAppreciationProjections = async (
         }
     }
 
-    const listingData = propertyData[listing.locality][listing.type];
+    const listingData = getPropertyData(
+        propertiesData,
+        listing.locality,
+        listing.type
+    );
+
     const appreciation = listingData.map((item) => item.appreciation_perc);
 
     return appreciation;
@@ -1076,35 +1082,32 @@ export const getListingROIReportService = async (
         }
     }
 
+    const propertyData = getPropertyData(
+        propertiesData,
+        listing.locality,
+        listing.type
+    );
+
     const { futureValue } = calculateCapitalGains(
         propertyData,
-        listing.locality,
-        listing.type,
         num_of_years,
-        listing.max_price!
+        listing.max_price
     );
 
     const expectedRental = calculateExpectedRental(
         propertyData,
-        listing.locality,
-        listing.type,
         num_of_years,
-        listing.sq_ft,
-        'annual'
+        listing.sq_ft
     );
 
     const breakEvenYear = calculateBreakEvenPeriod(
         propertyData,
-        listing.locality,
-        listing.type,
         listing.max_price,
         listing.sq_ft
     );
 
     const avgRoiPerYear = calculateAverageROI(
         propertyData,
-        listing.locality,
-        listing.type,
         num_of_years,
         listing.max_price,
         listing.sq_ft
@@ -1112,8 +1115,6 @@ export const getListingROIReportService = async (
 
     const cumulativeProfitPerYear = calculateCumulativeProfitPerYear(
         propertyData,
-        listing.locality,
-        listing.type,
         listing.max_price,
         listing.sq_ft
     );
@@ -1125,8 +1126,6 @@ export const getListingROIReportService = async (
 
     const roiGraph = calculateRoiDataPoints(
         propertyData,
-        listing.locality,
-        listing.type,
         num_of_years,
         listing.max_price,
         listing.sq_ft
@@ -1134,8 +1133,6 @@ export const getListingROIReportService = async (
 
     const goals = getInvestmentGoalsWithROI(
         propertyData,
-        listing.locality,
-        listing.type,
         is_self_use,
         is_self_paid,
         listing.max_price,
@@ -1144,25 +1141,18 @@ export const getListingROIReportService = async (
 
     const areaAppreciationGraph = calculateAppreciationDataPoints(
         propertyData,
-        listing.locality,
-        listing.type,
         num_of_years
     );
 
     const rentalDemandIncrease = calculateRentalDemandIncrease(
         propertyData,
-        listing.locality,
-        listing.type,
         num_of_years,
         listing.sq_ft
     );
 
     const currentRentalPrice = getCurrentRentalPrice(
         propertyData,
-        listing.locality,
-        listing.type,
-        listing.sq_ft,
-        'monthly'
+        listing.sq_ft
     );
 
     return {
