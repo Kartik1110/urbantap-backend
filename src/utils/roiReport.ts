@@ -510,28 +510,20 @@ export function calculateMonthlyProfitForYear(
 }
 
 /**
- * Builds datapoints to plot cumulative ROI (amount) after each year up to `years`.
- * Each point is { year: 1..years, roi: cumulative net return amount }.
+ * Builds datapoints to plot cumulative ROI (amount) for years 1, 3, and 5.
+ * Each point is { year: 1|3|5, roi: cumulative net return amount }.
  * Net return uses the same logic: YoY appreciation + annual rent − annual interest.
  *
  * @param propertyData - The property data from the JSON file
- * @param location - The specific location/area name
- * @param propertyType - The property type (e.g., "Flat", "Villa")
- * @param years - Number of years to include (>=1)
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
- * @returns Array of { year, roi } where roi is amount, or null if data missing
+ * @returns Array of { year, roi } for years 1, 3, and 5, or null if data missing
  */
 export function calculateRoiDataPoints(
     propertyData: PropertyDataPoint[],
-    years: number,
     initialInvestment: number,
     propertySize: number
 ): { year: number; roi: number }[] {
-    if (years < 1) {
-        throw new Error('Years must be at least 1');
-    }
-
     if (!propertyData || !propertyData.length) {
         throw new Error('Property data not provided');
     }
@@ -546,11 +538,19 @@ export function calculateRoiDataPoints(
         throw new Error('Cumulative ROI not found');
     }
 
-    const limit = Math.min(years, cumulative.length);
     const datapoints: { year: number; roi: number }[] = [];
 
-    for (let i = 0; i < limit; i++) {
-        datapoints.push({ year: i + 1, roi: cumulative[i] });
+    // Always return years 1, 3, and 5
+    const targetYears = [1, 3, 5];
+    const targetIndices = [0, 2, 4];
+
+    for (let i = 0; i < targetYears.length; i++) {
+        const year = targetYears[i];
+        const index = targetIndices[i];
+
+        if (index < cumulative.length) {
+            datapoints.push({ year, roi: cumulative[index] });
+        }
     }
 
     return datapoints;

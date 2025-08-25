@@ -1125,7 +1125,6 @@ export const getListingROIReportService = async (
 
     const roiGraph = calculateRoiDataPoints(
         propertyData,
-        num_of_years,
         listing.max_price,
         listing.sq_ft
     );
