@@ -926,3 +926,33 @@ export function getCurrentRentalPrice(
     // Default: annual rent
     return monthlyRent * 12;
 }
+
+/**
+ * Gets property data points for a given location, property type, and years.
+ *
+ * @param propertyData - The merged property data from the JSON file
+ * @param location - The specific location/area name
+ * @param propertyType - The property type (e.g., "Flat", "Villa")
+ * @returns Property data points for the given location, property type, and years
+ */
+export function getPropertyDataPoints(
+    propertyData: MergedPropertyData,
+    location: string,
+    propertyType: string
+): PropertyDataPoint[] {
+    if (!propertyData) {
+        throw new Error('Property data not provided');
+    }
+
+    const locationData = propertyData[location];
+    if (!locationData) {
+        throw new Error('Location not found');
+    }
+
+    const typeData = locationData[propertyType];
+    if (!typeData || typeData.length === 0) {
+        throw new Error('Property type not found');
+    }
+
+    return typeData;
+}
