@@ -1127,7 +1127,6 @@ export const getListingROIReportService = async (
         propertyData,
         listing.locality,
         listing.type,
-        num_of_years,
         listing.max_price,
         listing.sq_ft
     );

@@ -556,30 +556,24 @@ export function calculateMonthlyProfitForYear(
 }
 
 /**
- * Builds datapoints to plot cumulative ROI (amount) after each year up to `years`.
- * Each point is { year: 1..years, roi: cumulative net return amount }.
+ * Builds datapoints for cumulative ROI at specific years (1, 3, and 5).
+ * Each value represents the cumulative net return amount for that year.
  * Net return uses the same logic: YoY appreciation + annual rent − annual interest.
  *
  * @param propertyData - The merged property data from the JSON file
  * @param location - The specific location/area name
  * @param propertyType - The property type (e.g., "Flat", "Villa")
- * @param years - Number of years to include (>=1)
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
- * @returns Array of { year, roi } where roi is amount, or null if data missing
+ * @returns Array of ROI values for years 1, 3, and 5. Throws error if any year data is missing.
  */
 export function calculateRoiDataPoints(
     propertyData: MergedPropertyData,
     location: string,
     propertyType: string,
-    years: number,
     initialInvestment: number,
     propertySize: number
 ): { year: number; roi: number }[] {
-    if (years < 1) {
-        throw new Error('Years must be at least 1');
-    }
-
     const cumulative = calculateCumulativeProfitPerYear(
         propertyData,
         location,
@@ -592,11 +586,28 @@ export function calculateRoiDataPoints(
         throw new Error('Cumulative ROI not found');
     }
 
-    const limit = Math.min(years, cumulative.length);
+    // Always return ROI values for years 1, 3, and 5
     const datapoints: { year: number; roi: number }[] = [];
-
-    for (let i = 0; i < limit; i++) {
-        datapoints.push({ year: i + 1, roi: cumulative[i] });
+    
+    // Year 1 (index 0)
+    if (cumulative.length > 0) {
+        datapoints.push({ year: 1, roi: cumulative[0] });
+    } else {
+        throw new Error('ROI data not available for year 1');
+    }
+    
+    // Year 3 (index 2)
+    if (cumulative.length > 2) {
+        datapoints.push({ year: 3, roi: cumulative[2] });
+    } else {
+        throw new Error('ROI data not available for year 3');
+    }
+    
+    // Year 5 (index 4)
+    if (cumulative.length > 4) {
+        datapoints.push({ year: 5, roi: cumulative[4] });
+    } else {
+        throw new Error('ROI data not available for year 5');
     }
 
     return datapoints;
