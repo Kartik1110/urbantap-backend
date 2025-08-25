@@ -12,12 +12,17 @@ export interface MergedPropertyData {
     [location: string]: PropertyTypeData;
 }
 
+const DEFFAULT_DP_RATIO = 0.4;
+const DEFFAULT_INTEREST_RATE = 0.0399;
+
 /**
  * Calculates the property ROI for a given year based on appreciation rate, rental income, and mortgage costs
  * @param propertyData - The property data from the JSON file
  * @param year - The year to calculate ROI for (0-9, where 0 is the first year)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
  * @returns The calculated ROI percentage, or null if data is not available
  */
 export function calculatePropertyROI(
@@ -25,8 +30,8 @@ export function calculatePropertyROI(
     year: number,
     initialInvestment: number,
     propertySize: number,
-    downPaymentToLoanRatio: number = 0.4,
-    annualInterestRate: number = 0.0399
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number | null {
     // Validate inputs
     if (year < 0 || year > 9) {
@@ -95,13 +100,15 @@ export function calculatePropertyROI(
  * @param years - The number of years to calculate cumulative ROI for
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
  * @returns The cumulative ROI percentage, or null if data is not available
  */
 export function calculateCumulativeROI(
     propertyData: PropertyDataPoint[],
     years: number,
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO
 ): number | null {
     if (years < 1 || years > 10) {
         throw new Error('Years must be between 1 and 10');
@@ -112,7 +119,7 @@ export function calculateCumulativeROI(
     }
 
     // Use explicit net return accumulation for clarity
-    const downPayment = initialInvestment * 0.4;
+    const downPayment = initialInvestment * downPaymentToLoanRatio;
     let totalNetReturnAmount = 0;
 
     for (let year = 0; year < years; year++) {
@@ -144,6 +151,8 @@ export function calculateCumulativeROI(
  * @param years - The number of years to average over (>=1)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
  * @returns The average ROI percentage per year, or null if data is not available
  */
 export function calculateAverageROI(
@@ -300,8 +309,8 @@ export function calculateBreakEvenPeriod(
     propertyData: PropertyDataPoint[],
     initialInvestment: number,
     propertySize: number,
-    downPaymentToLoanRatio: number = 0.4,
-    annualInterestRate: number = 0.0399
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -371,7 +380,9 @@ export function calculateBreakEvenPeriod(
 export function calculateCumulativeProfitPerYear(
     propertyData: PropertyDataPoint[],
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number[] {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -385,8 +396,7 @@ export function calculateCumulativeProfitPerYear(
         throw new Error('Property data points not provided');
     }
 
-    const loanAmount = initialInvestment * 0.6;
-    const annualInterestRate = 0.0399;
+    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
     const annualInterest = loanAmount * annualInterestRate;
 
     const cumulative: number[] = [];
@@ -439,13 +449,17 @@ export function calculateCumulativeProfitPerYear(
  * @param year - The specific year to get monthly breakdown for (0-based index)
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
  * @returns Array of 12 monthly profit values, or null if data is not available
  */
 export function calculateMonthlyProfitForYear(
     propertyData: PropertyDataPoint[],
     year: number,
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -469,8 +483,7 @@ export function calculateMonthlyProfitForYear(
     }
 
     // Calculate the same components as the original method
-    const loanAmount = initialInvestment * 0.6;
-    const annualInterestRate = 0.0399;
+    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
     const monthlyInterest = (loanAmount * annualInterestRate) / 12;
 
     // Year-over-year appreciation percentage
