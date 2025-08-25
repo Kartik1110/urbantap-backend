@@ -35,6 +35,7 @@ import {
     getCurrentRentalPrice,
     getInvestmentGoalsWithROI,
     getPropertyData,
+    PropertyDataPoint,
 } from '../utils/roiReport';
 
 /* Get listings */
@@ -960,7 +961,7 @@ export const getTopLocalitiesWithCounts = async () => {
 // Get listing appreciation service
 export const getListingAppreciationProjections = async (
     listingId: string
-): Promise<number[]> => {
+): Promise<PropertyDataPoint[]> => {
     // Fetch listing
     const listing = await prisma.listing.findFirst({
         where: {
@@ -986,15 +987,13 @@ export const getListingAppreciationProjections = async (
         }
     }
 
-    const listingData = getPropertyData(
+    const propertyData = getPropertyData(
         propertiesData,
         listing.locality,
         listing.type
     );
 
-    const appreciation = listingData.map((item) => item.appreciation_perc);
-
-    return appreciation;
+    return propertyData;
 };
 
 export const getListingROIReportService = async (

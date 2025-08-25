@@ -326,13 +326,13 @@ export const getListingAppreciation = async (req: Request, res: Response) => {
     const listingId = req.params.id;
 
     try {
-        const appreciation = await getListingAppreciationProjections(listingId);
+        const propertyData = await getListingAppreciationProjections(listingId);
 
         return res.status(200).json({
             status: 'success',
             message: 'Listing appreciation fetched successfully',
             data: {
-                cumulative_appreciation_percentage: appreciation,
+                property_data: propertyData,
             },
         });
     } catch (error) {
