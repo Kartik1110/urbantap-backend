@@ -995,15 +995,6 @@ export const getListingAppreciationProjections = async (
         throw new Error('Listing price is too low, should be at least 100,000');
     }
 
-    if (
-        listing.deal_type !== DealType.Selling ||
-        listing.category !== Category.Ready_to_move
-    ) {
-        throw new Error(
-            'Appreciation projections are only available for sell type listings, and ready to move listings'
-        );
-    }
-
     const propertyData = getPropertyData(
         propertiesData,
         listing.locality,
@@ -1102,15 +1093,6 @@ export const getListingROIReportService = async (
 
     if (listing.max_price < 100_000) {
         throw new Error('Listing price is too low, should be at least 100,000');
-    }
-
-    if (
-        listing.deal_type !== DealType.Selling ||
-        listing.category !== Category.Ready_to_move
-    ) {
-        throw new Error(
-            'ROI report is only available for sell type listings, and ready to move listings'
-        );
     }
 
     const propertyData = getPropertyData(
