@@ -1069,7 +1069,9 @@ export const getListingROIReportService = async (
         }
 
         if (!listing.type) {
-            throw new Error('Listing type not found');
+            throw new Error(
+                'Listing type not found, should be either Apartment or Villa'
+            );
         }
 
         if (!listing.sq_ft) {
@@ -1079,6 +1081,10 @@ export const getListingROIReportService = async (
         if (!listing.max_price) {
             throw new Error('Listing price not found');
         }
+    }
+
+    if (listing.max_price < 100_000) {
+        throw new Error('Listing price is too low, should be at least 100,000');
     }
 
     const propertyData = getPropertyData(
