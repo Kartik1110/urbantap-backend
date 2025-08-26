@@ -977,7 +977,7 @@ export const getListingAppreciationProjections = async (
         throw new Error('Listing not found');
     }
 
-    if (!listing.locality || !listing.type) {
+    if (!listing.locality || !listing.type || !listing.max_price) {
         if (!listing.locality) {
             throw new Error('Listing locality not found');
         }
@@ -985,6 +985,23 @@ export const getListingAppreciationProjections = async (
         if (!listing.type) {
             throw new Error('Listing type not found');
         }
+
+        if (!listing.max_price) {
+            throw new Error('Listing price not found');
+        }
+    }
+
+    if (listing.max_price < 100_000) {
+        throw new Error('Listing price is too low, should be at least 100,000');
+    }
+
+    if (
+        listing.deal_type !== DealType.Selling ||
+        listing.category !== Category.Ready_to_move
+    ) {
+        throw new Error(
+            'Appreciation projections are only available for sell type listings, and ready to move listings'
+        );
     }
 
     const propertyData = getPropertyData(
@@ -1085,6 +1102,15 @@ export const getListingROIReportService = async (
 
     if (listing.max_price < 100_000) {
         throw new Error('Listing price is too low, should be at least 100,000');
+    }
+
+    if (
+        listing.deal_type !== DealType.Selling ||
+        listing.category !== Category.Ready_to_move
+    ) {
+        throw new Error(
+            'ROI report is only available for sell type listings, and ready to move listings'
+        );
     }
 
     const propertyData = getPropertyData(
