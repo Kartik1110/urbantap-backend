@@ -550,9 +550,6 @@ export function calculateRoiDataPoints(
         throw new Error('Cumulative ROI not found');
     }
 
-    // Calculate down payment to convert absolute profit to percentage ROI
-    const downPayment = initialInvestment * DEFFAULT_DP_RATIO;
-
     const datapoints: { year: number; roi: number }[] = [];
 
     // Always return years 1, 3, and 5
@@ -564,9 +561,7 @@ export function calculateRoiDataPoints(
         const index = targetIndices[i];
 
         if (index < cumulative.length) {
-            // Convert absolute cumulative profit to percentage ROI
-            const roiPercentage = (cumulative[index] / downPayment) * 100;
-            datapoints.push({ year, roi: roiPercentage });
+            datapoints.push({ year, roi: cumulative[index] });
         }
     }
 
