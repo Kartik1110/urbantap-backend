@@ -23,6 +23,7 @@ const DEFFAULT_INTEREST_RATE = 0.0399;
  * @param propertySize - The property size in square feet
  * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
  * @param annualInterestRate - The annual interest rate (default: 0.0399)
+ * @param monthlyRent - The monthly rent (default: undefined)
  * @returns The calculated ROI percentage, or null if data is not available
  */
 export function calculatePropertyROI(
@@ -31,7 +32,8 @@ export function calculatePropertyROI(
     initialInvestment: number,
     propertySize: number,
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
-    annualInterestRate: number = DEFFAULT_INTEREST_RATE
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE,
+    monthlyRent?: number
 ): number | null {
     // Validate inputs
     if (year < 0 || year > 9) {
@@ -76,7 +78,7 @@ export function calculatePropertyROI(
 
     // Calculate rental income for the year
     const rentPerSqFt = yearData.rent_per_sq_ft;
-    const annualRentalIncome = rentPerSqFt * propertySize * 12; // Assuming 12 months
+    const annualRentalIncome = (monthlyRent || rentPerSqFt * propertySize) * 12; // Assuming 12 months
 
     const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
     const downPayment = initialInvestment * downPaymentToLoanRatio;
@@ -303,6 +305,9 @@ export function calculateExpectedRental(
  * @param propertyData - The property data from the JSON file
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
+ * @param monthlyRent - The monthly rent (default: undefined)
  * @returns The smallest integer number of years to break-even (>=1), or null if not within available data
  */
 export function calculateBreakEvenPeriod(
@@ -310,7 +315,8 @@ export function calculateBreakEvenPeriod(
     initialInvestment: number,
     propertySize: number,
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
-    annualInterestRate: number = DEFFAULT_INTEREST_RATE
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE,
+    monthlyRent?: number
 ): number {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -350,7 +356,8 @@ export function calculateBreakEvenPeriod(
 
         const appreciationAmount =
             initialInvestment * (yoyAppreciationPerc / 100);
-        const annualRent = yearData.rent_per_sq_ft * propertySize * 12;
+        const annualRent =
+            (monthlyRent || yearData.rent_per_sq_ft * propertySize) * 12;
         const annualInterest = loanAmount * annualInterestRate;
 
         const netReturnThisYear =
@@ -375,6 +382,9 @@ export function calculateBreakEvenPeriod(
  * @param propertyData - The property data from the JSON file
  * @param initialInvestment - Total property value today
  * @param propertySize - Property size in square feet
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
+ * @param monthlyRent - The monthly rent (default: undefined)
  * @returns Array of cumulative profit per year, or null if data is not available
  */
 export function calculateCumulativeProfitPerYear(
@@ -382,7 +392,8 @@ export function calculateCumulativeProfitPerYear(
     initialInvestment: number,
     propertySize: number,
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
-    annualInterestRate: number = DEFFAULT_INTEREST_RATE
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE,
+    monthlyRent?: number
 ): number[] {
     if (initialInvestment <= 0) {
         throw new Error('Initial investment must be positive');
@@ -425,7 +436,8 @@ export function calculateCumulativeProfitPerYear(
 
         const appreciationAmount =
             initialInvestment * (yoyAppreciationPerc / 100);
-        const annualRent = yearData.rent_per_sq_ft * propertySize * 12;
+        const annualRent =
+            (monthlyRent || yearData.rent_per_sq_ft * propertySize) * 12;
         const netProfitThisYear =
             appreciationAmount + annualRent - annualInterest;
 
