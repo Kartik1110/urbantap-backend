@@ -309,45 +309,45 @@ export const getListingsService = async (
                     : []),
                 ...(deal_type?.length
                     ? [
-                          {
-                              OR: [
-                                  { deal_type: { in: deal_type } },
-                                  {
-                                      AND: [
-                                          { deal_type: null },
-                                          {
-                                              OR: [
-                                                  ...(deal_type.includes(
-                                                      DealType.Selling
-                                                  )
-                                                      ? [
-                                                            {
-                                                                category:
-                                                                    Category.Ready_to_move,
-                                                            },
-                                                            {
-                                                                category:
-                                                                    Category.Off_plan,
-                                                            },
-                                                        ]
-                                                      : []),
-                                                  ...(deal_type.includes(
-                                                      DealType.Rental
-                                                  )
-                                                      ? [
-                                                            {
-                                                                category:
-                                                                    Category.Rent,
-                                                            },
-                                                        ]
-                                                      : []),
-                                              ],
-                                          },
-                                      ],
-                                  },
-                              ],
-                          },
-                      ]
+                        {
+                            OR: [
+                                { deal_type: { in: deal_type } },
+                                {
+                                    AND: [
+                                        { deal_type: null },
+                                        {
+                                            OR: [
+                                                ...(deal_type.includes(
+                                                    DealType.Selling
+                                                )
+                                                    ? [
+                                                        {
+                                                            category:
+                                                                Category.Ready_to_move,
+                                                        },
+                                                        {
+                                                            category:
+                                                                Category.Off_plan,
+                                                        },
+                                                    ]
+                                                    : []),
+                                                ...(deal_type.includes(
+                                                    DealType.Rental
+                                                )
+                                                    ? [
+                                                        {
+                                                            category:
+                                                                Category.Rent,
+                                                        },
+                                                    ]
+                                                    : []),
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ]
                     : []),
                 ...(current_status?.length
                     ? [{ current_status: { in: current_status } }]
@@ -373,29 +373,29 @@ export const getListingsService = async (
                 // Price range condition
                 ...(min_price || max_price
                     ? [
-                          {
-                              AND: [
-                                  ...(min_price
-                                      ? [{ min_price: { gte: min_price } }]
-                                      : []),
-                                  ...(max_price
-                                      ? [{ max_price: { lte: max_price } }]
-                                      : []),
-                              ],
-                          },
-                      ]
+                        {
+                            AND: [
+                                ...(min_price
+                                    ? [{ min_price: { gte: min_price } }]
+                                    : []),
+                                ...(max_price
+                                    ? [{ max_price: { lte: max_price } }]
+                                    : []),
+                            ],
+                        },
+                    ]
                     : []),
 
                 // Square footage condition
                 ...(min_sqft || max_sqft
                     ? [
-                          {
-                              sq_ft: {
-                                  ...(min_sqft && { gte: min_sqft }),
-                                  ...(max_sqft && { lte: max_sqft }),
-                              },
-                          },
-                      ]
+                        {
+                            sq_ft: {
+                                ...(min_sqft && { gte: min_sqft }),
+                                ...(max_sqft && { lte: max_sqft }),
+                            },
+                        },
+                    ]
                     : []),
 
                 // Array filters
@@ -441,28 +441,28 @@ export const getListingsService = async (
 
         const searchConditions: Prisma.ListingWhereInput = normalizedSearch
             ? {
-                  OR: [
-                      {
-                          address: {
-                              contains: normalizedSearch,
-                              mode: 'insensitive' as Prisma.QueryMode,
-                          },
-                      },
-                      {
-                          locality: {
-                              contains: normalizedSearch,
-                              mode: 'insensitive' as Prisma.QueryMode,
-                          },
-                      },
-                      {
-                          city: {
-                              equals: Object.values(City).find(
-                                  (c) => c.toLowerCase() === normalizedSearch
-                              ) as City | undefined, // Safely cast to enum
-                          },
-                      },
-                  ],
-              }
+                OR: [
+                    {
+                        address: {
+                            contains: normalizedSearch,
+                            mode: 'insensitive' as Prisma.QueryMode,
+                        },
+                    },
+                    {
+                        locality: {
+                            contains: normalizedSearch,
+                            mode: 'insensitive' as Prisma.QueryMode,
+                        },
+                    },
+                    {
+                        city: {
+                            equals: Object.values(City).find(
+                                (c) => c.toLowerCase() === normalizedSearch
+                            ) as City | undefined, // Safely cast to enum
+                        },
+                    },
+                ],
+            }
             : {};
 
         // Get total count for pagination
@@ -574,10 +574,17 @@ export const getListingsService = async (
 
 export const getFeaturedListingsService = async (
     page: number = 1,
-    page_size: number = 10
+    page_size: number = 10,
+    filters: {
+        deal_type?: DealType[];
+        [key: string]: any;
+    } = {}
 ) => {
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+    // Log the filters being applied
+    logger.info(`Featured listings filters: ${JSON.stringify(filters)}`);
 
     // Clean up old views
     await prisma.listingView.updateMany({
@@ -592,22 +599,84 @@ export const getFeaturedListingsService = async (
         },
     });
 
-    // Get total count of listings with views in the last 48 hours (limited to 30)
-    const totalCount = await prisma.listing.count({
-        where: {
-            admin_status: Admin_Status.Approved,
-            listing_views: {
-                some: {
-                    viewed_at: {
-                        gte: since,
+    // Build where condition with filters
+    const whereCondition = {
+        AND: [
+            { admin_status: Admin_Status.Approved },
+            {
+                listing_views: {
+                    some: {
+                        viewed_at: {
+                            gte: since,
+                        },
                     },
                 },
             },
-        },
+            // Add deal_type filter if provided
+            ...(filters.deal_type?.length
+                ? [
+                    {
+                        OR: [
+                            { deal_type: { in: filters.deal_type } },
+                            {
+                                AND: [
+                                    { deal_type: null },
+                                    {
+                                        OR: [
+                                            ...(filters.deal_type.includes(
+                                                DealType.Selling
+                                            )
+                                                ? [
+                                                    {
+                                                        category:
+                                                            Category.Ready_to_move,
+                                                    },
+                                                    {
+                                                        category:
+                                                            Category.Off_plan,
+                                                    },
+                                                ]
+                                                : []),
+                                            ...(filters.deal_type.includes(
+                                                DealType.Rental
+                                            )
+                                                ? [
+                                                    {
+                                                        category:
+                                                            Category.Rent,
+                                                    },
+                                                ]
+                                                : []),
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ]
+                : []),
+        ],
+    };
+
+    // Log the where condition being applied
+    logger.info(`Featured listings where condition: ${JSON.stringify(whereCondition)}`);
+
+    // Get total count of listings with views in the last 48 hours (limited to 30 per deal type)
+    const totalCount = await prisma.listing.count({
+        where: whereCondition,
     });
 
-    // Ensure we don't exceed 30 total listings
-    const maxTotalListings = Math.min(totalCount, 30);
+    // Calculate max listings based on deal type filter
+    let maxTotalListings = totalCount;
+    if (filters.deal_type?.length === 1) {
+        // If only one deal type is selected, limit to 30 for that type
+        maxTotalListings = Math.min(totalCount, 30);
+    } else {
+        // If no deal type filter or multiple types, limit to 60 (30 rental + 30 selling)
+        maxTotalListings = Math.min(totalCount, 60);
+    }
+
+    logger.info(`Featured listings total count: ${totalCount}, max listings: ${maxTotalListings}`);
 
     const skip = (page - 1) * page_size;
     const take = Math.min(page_size, maxTotalListings - skip); // Adjust take based on remaining listings
@@ -627,16 +696,7 @@ export const getFeaturedListingsService = async (
 
     // Get listings with recent views and sort by view count in Prisma
     const trendingListings = await prisma.listing.findMany({
-        where: {
-            admin_status: Admin_Status.Approved,
-            listing_views: {
-                some: {
-                    viewed_at: {
-                        gte: since,
-                    },
-                },
-            },
-        },
+        where: whereCondition,
         include: {
             listing_views: {
                 where: {
@@ -678,8 +738,10 @@ export const getFeaturedListingsService = async (
                 created_at: 'desc',
             },
         ],
-        take: 30,
+        take: maxTotalListings,
     });
+
+    logger.info(`Featured listings fetched: ${trendingListings.length}`);
 
     // Apply pagination to the sorted results
     const paginatedListings = trendingListings.slice(skip, skip + take);
