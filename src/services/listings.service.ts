@@ -27,11 +27,15 @@ import {
     calculateAppreciationDataPoints,
     calculateAverageROI,
     calculateBreakEvenPeriod,
+    calculateBreakEvenPeriodByType,
     calculateCapitalGains,
     calculateCumulativeProfitPerYear,
+    calculateCumulativeProfitPerYearByType,
     calculateExpectedRental,
     calculateRentalDemandIncrease,
     calculateRoiDataPoints,
+    calculateRoiDataPointsByType,
+    calculateCumulativeROIByType,
     getCurrentRentalPrice,
     getInvestmentGoalsWithROI,
     getPropertyData,
@@ -970,6 +974,7 @@ export const getListingAppreciationProjections = async (
             category: {
                 in: [Category.Ready_to_move, Category.Off_plan],
             },
+            looking_for: false,
         },
     });
 
@@ -1059,6 +1064,7 @@ export const getListingROIReportService = async (
             category: {
                 in: [Category.Ready_to_move, Category.Off_plan],
             },
+            looking_for: false,
         },
     });
 
@@ -1113,23 +1119,30 @@ export const getListingROIReportService = async (
         listing.sq_ft
     );
 
-    const breakEvenYear = calculateBreakEvenPeriod(
+    const breakEvenYear = calculateBreakEvenPeriodByType(
         propertyData,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        is_self_use,
+        is_self_paid
     );
 
-    const avgRoiPerYear = calculateAverageROI(
+    const cumulativeROI = calculateCumulativeROIByType(
         propertyData,
         num_of_years,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        is_self_use,
+        is_self_paid
     );
+    const avgRoiPerYear = cumulativeROI ? cumulativeROI / num_of_years : 0;
 
-    const cumulativeProfitPerYear = calculateCumulativeProfitPerYear(
+    const cumulativeProfitPerYear = calculateCumulativeProfitPerYearByType(
         propertyData,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        is_self_use,
+        is_self_paid
     );
 
     const cumulativeProfit = cumulativeProfitPerYear.reduce(
@@ -1137,10 +1150,12 @@ export const getListingROIReportService = async (
         0
     );
 
-    const roiGraph = calculateRoiDataPoints(
+    const roiGraph = calculateRoiDataPointsByType(
         propertyData,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        is_self_use,
+        is_self_paid
     );
 
     const goals = getInvestmentGoalsWithROI(

@@ -651,14 +651,16 @@ export function getInvestmentGoalsWithROI(
     initialInvestment: number,
     propertySize: number
 ): InvestmentGoalBenefit[] {
-    // Helper method to get cumulative ROI for a specific year
+    // Helper method to get cumulative ROI for a specific year based on investment type
     const getCumulativeROI = (years: number): number => {
         return (
-            calculateCumulativeROI(
+            calculateCumulativeROIByType(
                 propertyData,
                 years,
                 initialInvestment,
-                propertySize
+                propertySize,
+                isSelfUse,
+                isSelfPaid
             ) || 0
         );
     };
@@ -768,6 +770,90 @@ export function getInvestmentGoalsWithROI(
     }
 
     throw new Error('Invalid goal combination');
+}
+
+/**
+ * Calculates cumulative ROI over multiple years based on investment type
+ * @param propertyData - The property data from the JSON file
+ * @param years - The number of years to calculate cumulative ROI for
+ * @param initialInvestment - The initial investment amount in the base currency
+ * @param propertySize - The property size in square feet
+ * @param isSelfUse - Boolean: true for self-use, false for rental
+ * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
+ * @returns The cumulative ROI percentage, or null if data is not available
+ */
+export function calculateCumulativeROIByType(
+    propertyData: PropertyDataPoint[],
+    years: number,
+    initialInvestment: number,
+    propertySize: number,
+    isSelfUse: boolean,
+    isSelfPaid: boolean,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
+): number | null {
+    if (years < 1 || years > 10) {
+        throw new Error('Years must be between 1 and 10');
+    }
+
+    if (!propertyData || propertyData.length === 0) {
+        throw new Error('Property data not provided');
+    }
+
+    // For self-paid investments, the initial investment is the full amount
+    // For mortgage investments, we use the down payment
+    const cashInvested = isSelfPaid
+        ? initialInvestment
+        : initialInvestment * downPaymentToLoanRatio;
+    let totalNetReturnAmount = 0;
+
+    for (let year = 0; year < years; year++) {
+        const yearData = propertyData[year];
+        if (!yearData) {
+            return null; // Data not available for this year
+        }
+
+        // Calculate year-over-year appreciation
+        let appreciationPercentage: number;
+        if (year === 0) {
+            appreciationPercentage = yearData.appreciation_perc;
+        } else {
+            const previousYearData = propertyData[year - 1];
+            if (!previousYearData) {
+                return null; // Previous year data not available
+            }
+            appreciationPercentage =
+                yearData.appreciation_perc - previousYearData.appreciation_perc;
+        }
+
+        const propertyValueIncrease =
+            initialInvestment * (appreciationPercentage / 100);
+
+        // Calculate rental income (only for rental properties)
+        let annualRentalIncome = 0;
+        if (!isSelfUse) {
+            const rentPerSqFt = yearData.rent_per_sq_ft;
+            annualRentalIncome = rentPerSqFt * propertySize * 12;
+        }
+
+        // Calculate mortgage costs (only for mortgage properties)
+        let annualMortgageInterest = 0;
+        if (!isSelfPaid) {
+            const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
+            annualMortgageInterest = loanAmount * annualInterestRate;
+        }
+
+        // Calculate net return for this year
+        const netReturn =
+            propertyValueIncrease + annualRentalIncome - annualMortgageInterest;
+        totalNetReturnAmount += netReturn;
+    }
+
+    // ROI is calculated on the actual cash invested
+    const roi = (totalNetReturnAmount / cashInvested) * 100;
+    return roi;
 }
 
 /**
@@ -885,4 +971,236 @@ export function getPropertyData(
     }
 
     return propertyData;
+}
+
+/**
+ * Calculates cumulative profit per year (currency) based on investment type
+ * Each year's net profit = YoY appreciation + annual rent (if rental) − annual mortgage interest (if mortgage)
+ * Returns a running total array: [after year 1, after year 2, ...].
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param initialInvestment - Total property value today
+ * @param propertySize - Property size in square feet
+ * @param isSelfUse - Boolean: true for self-use, false for rental
+ * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
+ * @returns Array of cumulative profit per year, or null if data is not available
+ */
+export function calculateCumulativeProfitPerYearByType(
+    propertyData: PropertyDataPoint[],
+    initialInvestment: number,
+    propertySize: number,
+    isSelfUse: boolean,
+    isSelfPaid: boolean,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
+): number[] {
+    if (initialInvestment <= 0) {
+        throw new Error('Initial investment must be positive');
+    }
+
+    if (propertySize <= 0) {
+        throw new Error('Property size must be positive');
+    }
+
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data points not provided');
+    }
+
+    // Calculate mortgage costs only if not self-paid
+    let annualInterest = 0;
+    if (!isSelfPaid) {
+        const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
+        annualInterest = loanAmount * annualInterestRate;
+    }
+
+    const cumulative: number[] = [];
+    let runningTotal = 0;
+
+    for (let year = 0; year < propertyData.length; year++) {
+        const yearData = propertyData[year];
+        if (!yearData) {
+            throw new Error('Year data not found');
+        }
+
+        // Year-over-year appreciation percentage
+        let yoyAppreciationPerc: number;
+        if (year === 0) {
+            yoyAppreciationPerc = yearData.appreciation_perc;
+        } else {
+            const prev = propertyData[year - 1];
+            if (!prev) {
+                throw new Error('Previous year data not found');
+            }
+            yoyAppreciationPerc =
+                yearData.appreciation_perc - prev.appreciation_perc;
+        }
+
+        const appreciationAmount =
+            initialInvestment * (yoyAppreciationPerc / 100);
+
+        // Calculate rental income only if not self-use
+        let annualRent = 0;
+        if (!isSelfUse) {
+            annualRent = yearData.rent_per_sq_ft * propertySize * 12;
+        }
+
+        const netProfitThisYear =
+            appreciationAmount + annualRent - annualInterest;
+
+        runningTotal += netProfitThisYear;
+        cumulative.push(runningTotal);
+    }
+
+    return cumulative;
+}
+
+/**
+ * Builds datapoints to plot cumulative ROI (amount) for years 1, 3, and 5 based on investment type.
+ * Each point is { year: 1|3|5, roi: cumulative net return amount }.
+ * Net return uses the same logic: YoY appreciation + annual rent (if rental) − annual interest (if mortgage).
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param initialInvestment - Total property value today
+ * @param propertySize - Property size in square feet
+ * @param isSelfUse - Boolean: true for self-use, false for rental
+ * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
+ * @returns Array of { year, roi } for years 1, 3, and 5, or null if data missing
+ */
+export function calculateRoiDataPointsByType(
+    propertyData: PropertyDataPoint[],
+    initialInvestment: number,
+    propertySize: number,
+    isSelfUse: boolean,
+    isSelfPaid: boolean
+): { year: number; roi: number }[] {
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data not provided');
+    }
+
+    const cumulative = calculateCumulativeProfitPerYearByType(
+        propertyData,
+        initialInvestment,
+        propertySize,
+        isSelfUse,
+        isSelfPaid
+    );
+
+    if (!cumulative) {
+        throw new Error('Cumulative ROI not found');
+    }
+
+    const datapoints: { year: number; roi: number }[] = [];
+
+    // Always return years 1, 3, and 5
+    const targetYears = [1, 3, 5];
+    const targetIndices = [0, 2, 4];
+
+    for (let i = 0; i < targetYears.length; i++) {
+        const year = targetYears[i];
+        const index = targetIndices[i];
+
+        if (index < cumulative.length) {
+            datapoints.push({ year, roi: cumulative[index] });
+        }
+    }
+
+    return datapoints;
+}
+
+/**
+ * Calculates the break-even period (in years) based on investment type when cumulative net returns
+ * equal or exceed the initial cash invested (down payment for mortgage, full amount for self-paid).
+ *
+ * Year indexing: year 0 represents current→end of year 1 period, so a
+ * returned value of 1 means break-even within the first year period.
+ *
+ * Net return per year = year-over-year appreciation amount
+ *                     + annual rental income (if rental)
+ *                     - annual mortgage interest (if mortgage)
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param initialInvestment - Total property value today
+ * @param propertySize - Property size in square feet
+ * @param isSelfUse - Boolean: true for self-use, false for rental
+ * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
+ * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
+ * @param annualInterestRate - The annual interest rate (default: 0.0399)
+ * @returns The smallest integer number of years to break-even (>=1), or null if not within available data
+ */
+export function calculateBreakEvenPeriodByType(
+    propertyData: PropertyDataPoint[],
+    initialInvestment: number,
+    propertySize: number,
+    isSelfUse: boolean,
+    isSelfPaid: boolean,
+    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
+    annualInterestRate: number = DEFFAULT_INTEREST_RATE
+): number {
+    if (initialInvestment <= 0) {
+        throw new Error('Initial investment must be positive');
+    }
+
+    if (propertySize <= 0) {
+        throw new Error('Property size must be positive');
+    }
+
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data points not provided');
+    }
+
+    // For self-paid investments, the break-even point is when cumulative returns >= full investment
+    // For mortgage investments, the break-even point is when cumulative returns >= down payment
+    const breakEvenAmount = isSelfPaid
+        ? initialInvestment
+        : initialInvestment * downPaymentToLoanRatio;
+
+    // Calculate mortgage costs only if not self-paid
+    let annualInterest = 0;
+    if (!isSelfPaid) {
+        const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
+        annualInterest = loanAmount * annualInterestRate;
+    }
+
+    let cumulativeNetReturn = 0;
+
+    for (let year = 0; year < propertyData.length; year++) {
+        const yearData = propertyData[year];
+        if (!yearData) {
+            throw new Error('Year data not found');
+        }
+
+        // Year-over-year appreciation percentage
+        let yoyAppreciationPerc: number;
+        if (year === 0) {
+            yoyAppreciationPerc = yearData.appreciation_perc;
+        } else {
+            const prev = propertyData[year - 1];
+            if (!prev) {
+                throw new Error('Previous year data not found');
+            }
+            yoyAppreciationPerc =
+                yearData.appreciation_perc - prev.appreciation_perc;
+        }
+
+        const appreciationAmount =
+            initialInvestment * (yoyAppreciationPerc / 100);
+
+        // Calculate rental income only if not self-use
+        let annualRent = 0;
+        if (!isSelfUse) {
+            annualRent = yearData.rent_per_sq_ft * propertySize * 12;
+        }
+
+        const netReturnThisYear =
+            appreciationAmount + annualRent - annualInterest;
+        cumulativeNetReturn += netReturnThisYear;
+
+        if (cumulativeNetReturn >= breakEvenAmount) {
+            return year + 1; // convert 0-based index to 1-based years
+        }
+    }
+
+    throw new Error('Not breaking even within available data horizon');
 }
