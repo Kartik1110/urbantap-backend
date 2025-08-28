@@ -909,30 +909,51 @@ export function calculateRentalDemandIncrease(
  *
  * @param propertyData - The property data from the JSON file
  * @param propertySize - The property size in square feet
+ * @param initialInvestment - The initial property price/value
+ * @param year - The year to calculate for (0-9, where 0 is current year)
  * @param period - Whether to return monthly or annual rent (default: 'annual')
- * @returns Today's rental price, or throws error if data is not available
+ * @returns Rental price for the specified year, or throws error if data is not available
  */
 export function getCurrentRentalPrice(
     propertyData: PropertyDataPoint[],
     propertySize: number,
+    initialInvestment: number,
+    year: number = 0,
     period: 'annual' | 'monthly' = 'annual'
 ): number {
     if (propertySize <= 0) {
         throw new Error('Property size must be positive');
     }
 
+    if (initialInvestment <= 0) {
+        throw new Error('Initial investment must be positive');
+    }
+
+    if (year < 0 || year > 9) {
+        throw new Error('Year must be between 0 and 9');
+    }
+
     if (!propertyData || !propertyData.length) {
         throw new Error('Property type not found');
     }
 
-    // Get today's data (year 0)
-    const todayData = propertyData[0];
-    if (!todayData) {
-        throw new Error('Today data not found');
+    // Get data for the specified year
+    const yearData = propertyData[year];
+    if (!yearData) {
+        throw new Error('Property data not found for specified year');
     }
 
-    // Calculate monthly rent
-    const monthlyRent = todayData.rent_per_sq_ft * propertySize;
+    // Calculate current property price with 5% annual appreciation
+    const currentPropertyPrice = initialInvestment * Math.pow(1.05, year);
+
+    // Calculate monthly rent based on rent per sq ft for the specified year
+    const calculatedMonthlyRent = yearData.rent_per_sq_ft * propertySize;
+    
+    // Calculate minimum monthly rent (7% of current property price annually, divided by 12 months)
+    const minimumMonthlyRent = (currentPropertyPrice * 0.07) / 12;
+    
+    // Use the min of calculated rent or minimum rent
+    const monthlyRent = Math.min(calculatedMonthlyRent, minimumMonthlyRent);
 
     // Return based on period requested
     if (period === 'monthly') {
