@@ -8,6 +8,7 @@ import {
     createProjectService,
     getCompanyByIdService,
     createCompanyPostService,
+    createSponsoredCompanyPostService,
     editCompanyPostService,
     getAllCompanyPostsService,
     getCompanyPostByIdService,
@@ -27,6 +28,7 @@ import { Express } from 'express';
 import prisma from '../utils/prisma';
 import { Request, Response } from 'express';
 import { uploadToS3 } from '../utils/s3Upload';
+import { createSponsoredJobService } from '../services/job.service';
 import { AuthenticatedRequest } from '../utils/verifyToken';
 import { CompanyType, Listing } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
@@ -817,6 +819,117 @@ export const bulkInsertListingsAdmin = async (
             status: 'error',
             message: 'Failed to insert listings',
             error: error,
+        });
+    }
+};
+
+export const createSponsoredJobController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized',
+            });
+        }
+
+        const { id: userId, companyId } = req.user;
+
+        if (!companyId) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'No company linked to user',
+            });
+        }
+
+        const { sponsor_duration_days, ...jobBody } = req.body;
+
+        const jobData = {
+            ...jobBody,
+            adminUserId: userId,
+        };
+
+        const result = await createSponsoredJobService(
+            jobData,
+            companyId,
+            sponsor_duration_days
+        );
+
+        return res.status(201).json({
+            status: 'success',
+            message: 'Sponsored job created successfully',
+            data: result,
+        });
+    } catch (error: any) {
+        console.error('Create sponsored job error:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: error.message || 'Server Error',
+        });
+    }
+};
+
+export const createSponsoredCompanyPostController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const user = req.user;
+        if (!user?.companyId) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Unauthorized: No company linked.',
+            });
+        }
+
+        const { title, caption, position, sponsor_duration_days } = req.body;
+
+        const files = req.files as Express.Multer.File[];
+        if (!files || files.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'At least one image is required.',
+            });
+        }
+
+        const imageUrls: string[] = await Promise.all(
+            files.map(async (file) => {
+                const ext = file.originalname.split('.').pop();
+                const fileName = `company_posts/image_${Date.now()}_${Math.random()
+                    .toString(36)
+                    .substring(2)}.${ext}`;
+                return await uploadToS3(file.path, fileName);
+            })
+        );
+
+        // Get current count of posts to assign rank
+        const currentCount = await prisma.companyPost.count();
+        const rank = currentCount + 1;
+
+        const result = await createSponsoredCompanyPostService(
+            {
+                title,
+                caption,
+                images: imageUrls,
+                position,
+                rank,
+            },
+            user.companyId,
+            sponsor_duration_days
+        );
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Sponsored company post created successfully',
+            data: result,
+        });
+    } catch (error: any) {
+        console.error('Create sponsored company post error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message || 'Server Error',
         });
     }
 };
