@@ -287,6 +287,13 @@ enum Sale_Type {
   Resale
 }
 
+// New Property_Type enum for projects
+enum Property_Type {
+  Villa
+  Apartment
+  Townhouse
+}
+
 model AdminUser {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -299,14 +306,15 @@ model AdminUser {
 }
 
 model Developer {
-  id          String    @id @default(uuid())
-  cover_image String?
-  projects    Project[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Broker      Broker[]
-  company_id  String
-  company     Company?  @relation("CompanyToDeveloper")
+  id             String    @id @default(uuid())
+  cover_image    String?
+  developer_logo String?   // Added developer logo field
+  projects       Project[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  Broker         Broker[]
+  company_id     String
+  company        Company?  @relation("CompanyToDeveloper")
 }
 
 model Project {
@@ -324,13 +332,14 @@ model Project {
   type            Category
   project_name    String
   project_age     String
-  no_of_bedrooms  Bedrooms
-  no_of_bathrooms Bathrooms
+  property_type   Property_Type // New property type field
   furnished       Furnished
   property_size   Float
   payment_plan    Payment_Plan
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
   amenities       String[]
+  x_coordinate    Float?        // Added x coordinate
+  y_coordinate    Float?        // Added y coordinate
   developer_id    String
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
