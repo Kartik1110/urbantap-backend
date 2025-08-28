@@ -34,7 +34,7 @@ export function calculatePropertyROI(
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
     annualInterestRate: number = DEFFAULT_INTEREST_RATE,
     monthlyRent?: number
-): number | null {
+): number {
     // Validate inputs
     if (year < 0 || year > 9) {
         throw new Error('Year must be between 0 and 9');
@@ -65,7 +65,7 @@ export function calculatePropertyROI(
         // Get previous year's cumulative appreciation
         const previousYearData = propertyData[year - 1];
         if (!previousYearData) {
-            return null; // Previous year data not available
+            throw new Error('Previous year data not found');
         }
 
         // Calculate year-over-year appreciation
@@ -944,6 +944,39 @@ export function getCurrentRentalPrice(
 }
 
 /**
+ * Gets the rental price for a given year.
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param propertySize - The property size in square feet
+ * @param year - The year to get the rental price for (0-9)
+ * @param period - Whether to return monthly or annual rent (default: 'annual')
+ * @returns The rental price for the given year, or throws error if data is not available
+ */
+export function getRentalPriceInYear(
+    propertyData: PropertyDataPoint[],
+    propertySize: number,
+    year: number,
+    period: 'annual' | 'monthly' = 'annual'
+): number {
+    if (year < 0 || year > 9) {
+        throw new Error('Year must be between 0 and 9');
+    }
+
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property type not found');
+    }
+
+    const monthlyRent = propertyData[year].rent_per_sq_ft * propertySize;
+
+    if (period === 'monthly') {
+        return monthlyRent;
+    }
+
+    // Default: annual rent
+    return monthlyRent * 12;
+}
+
+/**
  * Gets property data for a given location, property type, and years.
  *
  * @param propertiesData - The merged properties data from the JSON file
@@ -1203,4 +1236,24 @@ export function calculateBreakEvenPeriodByType(
     }
 
     throw new Error('Not breaking even within available data horizon');
+}
+
+export function getListingAppreciationInYear(
+    propertyData: PropertyDataPoint[],
+    listingPrice: number,
+    year: number
+): number {
+    if (year === 0) {
+        return 0;
+    }
+
+    if (year > 10) {
+        throw new Error('Year must be between 1 and 10');
+    }
+
+    if (!propertyData || !propertyData.length) {
+        throw new Error('Property data not provided');
+    }
+
+    return listingPrice * (propertyData[year - 1].appreciation_perc / 100);
 }
