@@ -108,6 +108,8 @@ model Company {
   brokerage   Brokerage?    @relation("CompanyToBrokerage", fields: [brokerageId], references: [id])
   AdminUser   AdminUser[]
   CompanyPost CompanyPost[]
+  credits     Credit[]
+  orders      Order[]
 }
 
 enum CompanyType {
@@ -352,16 +354,18 @@ model Brokerage {
 }
 
 model CompanyPost {
-  id         String       @id @default(uuid())
-  title      String?
-  caption    String?
-  images     String[]     @default([])
-  position   PostPosition @default(Home)
-  rank       Int          @default(1)
-  company_id String
-  company    Company      @relation(fields: [company_id], references: [id])
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
+  id           String       @id @default(uuid())
+  title        String?
+  caption      String?
+  images       String[]     @default([])
+  position     PostPosition @default(Home)
+  rank         Int          @default(1)
+  company_id   String
+  company      Company      @relation(fields: [company_id], references: [id])
+  expiry_date  DateTime?
+  is_sponsored Boolean?     @default(false)
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
 }
 
 enum PostPosition {
@@ -511,4 +515,34 @@ enum ApplicationStatus {
   Under_Review
   Accepted
   Rejected
+}
+
+model Credit {
+  id          String   @id @default(uuid())
+  company_id  String
+  balance     Int      @default(0)
+  expiry_date DateTime
+  start_date  DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  company     Company  @relation(fields: [company_id], references: [id])
+  
+  @@unique([company_id])
+}
+
+model Order {
+  id            String    @id @default(uuid())
+  company_id    String
+  type          OrderType
+  date          DateTime  @default(now())
+  credits_spent Int
+  type_id       String    // ID of Job or CompanyPost
+  created_at    DateTime  @default(now())
+  company       Company   @relation(fields: [company_id], references: [id])
+}
+
+enum OrderType {
+  COMPANY_POST
+  JOB
+  LISTING
 }

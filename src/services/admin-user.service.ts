@@ -9,10 +9,13 @@ import {
     CompanyType,
     Listing,
     Admin_Status,
+    OrderType,
 } from '@prisma/client';
 import { DecodedAdminUser } from '../utils/verifyToken';
 import logger from '../utils/logger';
 import { geocodeAddress } from '../utils/geocoding';
+import { CREDIT_CONFIG } from '../config/credit.config';
+import { deductCreditsAndCreateOrder } from './credit.service';
 
 export const signupAdmin = async (
     email: string,
@@ -391,10 +394,23 @@ export const getAllCompanyPostsService = async (companyId: string) => {
     return await prisma.companyPost.findMany({
         where: {
             company_id: companyId,
+            OR: [
+                { is_sponsored: false },
+                { is_sponsored: null },
+                {
+                    AND: [
+                        { is_sponsored: true },
+                        { expiry_date: { gt: new Date() } }
+                    ]
+                }
+            ]
         },
-        orderBy: {
-            rank: 'asc',
-        },
+        orderBy: [
+            // Prioritize active sponsored posts
+            { is_sponsored: 'desc' },
+            // Then by rank
+            { rank: 'asc' }
+        ],
         include: {
             company: {
                 select: {
@@ -604,4 +620,64 @@ export const bulkInsertListingsAdminService = async (
         logger.error(error);
         throw error;
     }
+};
+
+// Create sponsored company post with credit deduction
+export const createSponsoredCompanyPostService = async (
+    postData: {
+        title?: string;
+        caption?: string;
+        images: string[];
+        position: PostPosition;
+        rank: number;
+    },
+    company_id: string,
+    sponsor_duration_days?: number
+) => {
+    // Validate company exists
+    const company = await prisma.company.findUnique({
+        where: { id: company_id },
+    });
+
+    if (!company) {
+        throw new Error('Company not found');
+    }
+
+    const creditsRequired = CREDIT_CONFIG.creditPricing.featuredCompanyPost;
+    const durationDays = sponsor_duration_days || CREDIT_CONFIG.visibilityDuration.featuredCompanyPost;
+
+    // Calculate expiry date
+    const expiry_date = new Date();
+    expiry_date.setDate(expiry_date.getDate() + durationDays);
+
+    // Deduct credits and create order in transaction
+    const creditResult = await deductCreditsAndCreateOrder({
+        company_id,
+        credits: creditsRequired,
+        type: OrderType.COMPANY_POST,
+        type_id: '', // Will be updated after post creation
+    });
+
+    // Create the sponsored company post
+    const post = await prisma.companyPost.create({
+        data: {
+            ...postData,
+            company_id,
+            is_sponsored: true,
+            expiry_date,
+        },
+    });
+
+    // Update the order with the actual post ID
+    await prisma.order.update({
+        where: { id: creditResult.order.id },
+        data: { type_id: post.id },
+    });
+
+    return {
+        post,
+        credits_deducted: creditsRequired,
+        remaining_balance: creditResult.remaining_balance,
+        expiry_date,
+    };
 };

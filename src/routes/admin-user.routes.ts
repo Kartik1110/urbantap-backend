@@ -13,11 +13,11 @@ import {
     getDeveloperDetails,
     createProject,
     getCompanyById,
-    createCompanyPost,
     editCompanyPost,
     getAllCompanyPosts,
     getCompanyPostById,
-    createJobController,
+    createSponsoredJobController,
+    createSponsoredCompanyPostController,
     getJobByIdController,
     editProfile,
     getProfile,
@@ -73,11 +73,18 @@ export default (upload: any) => {
 
     router.get('/admin-user/projects', verifyToken, getProjects);
 
+    // router.post(
+    //     '/admin-user/company-post',
+    //     verifyToken,
+    //     upload.array('images'),
+    //     createCompanyPost
+    // );
+
     router.post(
         '/admin-user/company-post',
         verifyToken,
         upload.array('images'),
-        createCompanyPost
+        createSponsoredCompanyPostController
     );
 
     router.put(
@@ -112,11 +119,20 @@ router.get('/admin-user/company-posts', verifyToken, getAllCompanyPosts);
 router.get('/admin-user/company-posts/:id', verifyToken, getCompanyPostById);
 
 /* Job Routes */
+
+/* TODO - Deprecate this route as all jobs will be sponsored */
+// router.post(
+//     '/admin-user/jobs',
+//     verifyToken,
+//     validateSchema(jobSchema),
+//     createJobController
+// );
+
 router.post(
     '/admin-user/jobs',
     verifyToken,
     validateSchema(jobSchema),
-    createJobController
+    createSponsoredJobController
 );
 
 router.get('/admin-user/jobs', verifyToken, getJobsForCompanyController);

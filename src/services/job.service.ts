@@ -1,11 +1,13 @@
 import { uploadToS3 } from '../utils/s3Upload';
 import { ApplyJobInput } from '../schema/job.schema';
-import { PrismaClient, Job, Prisma } from '@prisma/client';
+import { PrismaClient, Job, Prisma, OrderType } from '@prisma/client';
 import {
     createPaginationObject,
     getUserAppliedJobIds,
     transformBrokerageData,
 } from '../helper';
+import { CREDIT_CONFIG } from '../config/credit.config';
+import { deductCreditsAndCreateOrder } from './credit.service';
 
 const prisma = new PrismaClient();
 
@@ -67,26 +69,85 @@ export const createJobService = async (job: Job) => {
 };
 
 export const getJobsService = async (
-    body: { page?: number; page_size?: number; search?: string } = {},
+    body: {
+        page?: number;
+        page_size?: number;
+        search?: string;
+        show_expired_sponsored?: boolean;
+    } = {},
     userId?: string
 ) => {
-    const { page = 1, page_size = 10, search = '' } = body;
+    const {
+        page = 1,
+        page_size = 10,
+        search = '',
+        show_expired_sponsored = false,
+    } = body;
     const skip = (page - 1) * page_size;
 
-    const whereClause = search
-        ? {
-              title: {
-                  contains: search,
-                  mode: Prisma.QueryMode.insensitive,
-              },
-          }
-        : {};
+    let whereClause: any = {};
+
+    // Add search filter
+    if (search) {
+        whereClause.title = {
+            contains: search,
+            mode: Prisma.QueryMode.insensitive,
+        };
+    }
+
+    // Add expiry filter for sponsored content unless explicitly requested to show expired
+    if (!show_expired_sponsored) {
+        if (search) {
+            // If we have search, combine with AND
+            whereClause = {
+                AND: [
+                    {
+                        title: {
+                            contains: search,
+                            mode: Prisma.QueryMode.insensitive,
+                        },
+                    },
+                    {
+                        OR: [
+                            { is_sponsored: false },
+                            { is_sponsored: null },
+                            {
+                                AND: [
+                                    { is_sponsored: true },
+                                    { expiry_date: { gt: new Date() } },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            };
+        } else {
+            // No search, just expiry filter
+            whereClause.OR = [
+                { is_sponsored: false },
+                { is_sponsored: null },
+                {
+                    AND: [
+                        { is_sponsored: true },
+                        { expiry_date: { gt: new Date() } },
+                    ],
+                },
+            ];
+        }
+    }
 
     const [jobsRaw, totalJobs, appliedJobIds] = await Promise.all([
         prisma.job.findMany({
             skip,
             take: page_size,
-            orderBy: { created_at: 'desc' },
+            orderBy: [
+                // Prioritize active sponsored jobs
+                {
+                    is_sponsored: 'desc',
+                },
+                // Then by creation date
+                { created_at: 'desc' },
+            ],
             where: whereClause,
             select: {
                 id: true,
@@ -104,6 +165,7 @@ export const getJobsService = async (
                 max_experience: true,
                 userId: true,
                 is_sponsored: true,
+                expiry_date: true,
                 created_at: true,
                 updated_at: true,
                 company: {
@@ -352,5 +414,60 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
             email: broker.email,
         },
         applications: applicationsWithJobs,
+    };
+};
+
+// Create sponsored job with credit deduction
+export const createSponsoredJobService = async (
+    jobData: Omit<Job, 'id' | 'created_at' | 'updated_at'>,
+    company_id: string,
+    sponsor_duration_days?: number
+) => {
+    // Validate company exists
+    const company = await prisma.company.findUnique({
+        where: { id: company_id },
+    });
+
+    if (!company) {
+        throw new Error('Company not found');
+    }
+
+    const creditsRequired = CREDIT_CONFIG.creditPricing.featuredJob;
+    const durationDays =
+        sponsor_duration_days || CREDIT_CONFIG.visibilityDuration.featuredJob;
+
+    // Calculate expiry date
+    const expiry_date = new Date();
+    expiry_date.setDate(expiry_date.getDate() + durationDays);
+
+    // Deduct credits and create order in transaction
+    const creditResult = await deductCreditsAndCreateOrder({
+        company_id,
+        credits: creditsRequired,
+        type: OrderType.JOB,
+        type_id: '', // Will be updated after job creation
+    });
+
+    // Create the sponsored job
+    const job = await prisma.job.create({
+        data: {
+            ...jobData,
+            company_id,
+            is_sponsored: true,
+            expiry_date,
+        },
+    });
+
+    // Update the order with the actual job ID
+    await prisma.order.update({
+        where: { id: creditResult.order.id },
+        data: { type_id: job.id },
+    });
+
+    return {
+        job,
+        credits_deducted: creditsRequired,
+        remaining_balance: creditResult.remaining_balance,
+        expiry_date,
     };
 };
