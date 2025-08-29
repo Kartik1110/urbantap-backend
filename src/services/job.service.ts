@@ -143,9 +143,8 @@ export const getJobsService = async (
             //     email: broker.email,
             //     linkedin_link: broker.linkedin_link,
             //     ig_link: broker.ig_link,
-            // },
-            // company: {
-            //     name: broker.company?.name || '',
+            //     company: {
+            //          name: broker.company?.name || '',
             // },
             broker: null,
             company: null,
@@ -246,9 +245,8 @@ export const getJobByIdService = async (id: string, userId?: string) => {
         //     email: broker.email,
         //     linkedin_link: broker.linkedin_link,
         //     ig_link: broker.ig_link,
-        // },
-        // company: {
-        //     name: broker.company?.name || '',
+        //     company: {
+        //          name: broker.company?.name || '',
         // },
         broker: null,
         company: null,
