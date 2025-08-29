@@ -134,6 +134,21 @@ export const getJobsService = async (
             ...jobWithoutCompany,
             brokerage: transformBrokerageData(company),
             applied: appliedJobIds.has(job.id),
+            // broker: {
+            //     id: broker.id,
+            //     name: broker.name,
+            //     profile_pic: broker.profile_pic,
+            //     country_code: broker.country_code,
+            //     w_number: broker.w_number,
+            //     email: broker.email,
+            //     linkedin_link: broker.linkedin_link,
+            //     ig_link: broker.ig_link,
+            // },
+            // company: {
+            //     name: broker.company?.name || '',
+            // },
+            broker: null,
+            company: null,
         };
     });
 
@@ -222,6 +237,21 @@ export const getJobByIdService = async (id: string, userId?: string) => {
         ...job,
         brokerage: cleanedBrokerage,
         applied,
+        // broker: {
+        //     id: broker.id,
+        //     name: broker.name,
+        //     profile_pic: broker.profile_pic,
+        //     country_code: broker.country_code,
+        //     w_number: broker.w_number,
+        //     email: broker.email,
+        //     linkedin_link: broker.linkedin_link,
+        //     ig_link: broker.ig_link,
+        // },
+        // company: {
+        //     name: broker.company?.name || '',
+        // },
+        broker: null,
+        company: null,
     };
 
     return returnedJob;
