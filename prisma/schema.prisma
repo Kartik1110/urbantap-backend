@@ -299,14 +299,18 @@ model AdminUser {
 }
 
 model Developer {
-  id          String    @id @default(uuid())
-  cover_image String?
-  projects    Project[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Broker      Broker[]
-  company_id  String
-  company     Company?  @relation("CompanyToDeveloper")
+  id            String    @id @default(uuid())
+  cover_image   String?
+  developerlogo String?
+  tot_projects  Float?
+  years_in_biz
+  overview      String?
+  projects      Project[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Broker        Broker[]
+  company_id    String
+  company       Company?  @relation("CompanyToDeveloper")
 }
 
 model Project {
@@ -317,24 +321,33 @@ model Project {
   images          String[] // gallery images
   floor_plans     String[] // floor plan images
   currency        Currency
-  price           Float
+  min_price       Float?
+  max_price       Float?
   address         String
   city            City
   file_url        String? // optional downloadable file
   type            Category
   project_name    String
   project_age     String
-  no_of_bedrooms  Bedrooms
-  no_of_bathrooms Bathrooms
+  total_floor     Int?
+  min_bedrooms    Int?
+  max_Bedrooms    Int?
   furnished       Furnished
-  property_size   Float
+  unit_size_min   Float?
+  unit_size_max   Float?
+  plot_size       Float?
   payment_plan    Payment_Plan
+  payment_plan2   String
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
   amenities       String[]
+  locality        String? //function
+  lat             Float? //from position
+  long            Float?
   developer_id    String
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
+  handover_time   DateTime?     
 }
 
 model Brokerage {
@@ -511,4 +524,33 @@ enum ApplicationStatus {
   Under_Review
   Accepted
   Rejected
+}
+
+enum UnitType {
+  Villa
+  Apartment
+  PentHouse
+  Resort
+  Duplex
+  Studio
+  1BHK
+  2BHK
+  3BHK
+  4BHK
+  5BHK
+  6BHK
+  
+}
+
+enum Amenities {
+  ChildrensPool
+  SharedGym
+  Balcony
+  Security
+  CoveredParking
+  LobbyInBuilding
+  SharedPool
+  ChildrensPlayArea
+  ViewOfWater
+  ViewOfLandmark
 }
