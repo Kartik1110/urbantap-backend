@@ -53,13 +53,11 @@ export const signupAdmin = async (
 export const loginAdmin = async (email: string, password: string) => {
     const user = await prisma.adminUser.findUnique({ where: { email } });
 
-    if (!user || !user.role_group_id) throw new Error('Invalid credentials');
+    if (!user) throw new Error('User not found');
 
-    const roleGroup = await prisma.roleGroup.findUnique({
-        where: { id: user.role_group_id },
-    });
-
-    if (!user) throw new Error('Invalid credentials');
+    if (user.type !== AdminUserType.ADMIN && !user.role_group_id) {
+        throw new Error('Access denied');
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error('Invalid credentials');
@@ -69,30 +67,39 @@ export const loginAdmin = async (email: string, password: string) => {
         select: { type: true, developerId: true, brokerageId: true },
     });
 
-    const token = jwt.sign(
-        {
-            id: user.id,
-            email: user.email,
-            companyId: user.company_id,
-            type: company?.type,
-            entityId:
-                company &&
-                (company.type === CompanyType.Developer
-                    ? company.developerId
-                    : company.brokerageId),
-            adminUserType: user.type,
-            permissions: roleGroup?.permissions,
-            broker:
-                company?.type === CompanyType.Brokerage
-                    ? {
-                          id: company.brokerageId,
-                          name: company.brokerageId,
-                      }
-                    : undefined,
-        },
-        process.env.JWT_SECRET as string,
-        { expiresIn: '7d' }
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tokenPayload: any = {
+        id: user.id,
+        email: user.email,
+        companyId: user.company_id,
+        type: company?.type,
+        entityId:
+            company &&
+            (company.type === CompanyType.Developer
+                ? company.developerId
+                : company.brokerageId),
+        adminUserType: user.type,
+        permissions: [],
+        broker:
+            company?.type === CompanyType.Brokerage
+                ? {
+                      id: company.brokerageId,
+                      name: company.brokerageId,
+                  }
+                : undefined,
+    };
+
+    if (user.role_group_id) {
+        const roleGroup = await prisma.roleGroup.findUnique({
+            where: { id: user.role_group_id || '' },
+        });
+
+        tokenPayload.permissions = roleGroup?.permissions || [];
+    }
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET as string, {
+        expiresIn: '7d',
+    });
 
     return token;
 };
