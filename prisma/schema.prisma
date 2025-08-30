@@ -269,6 +269,10 @@ enum Bedrooms {
   Two
   Three
   Four_Plus
+  Four
+  Five
+  Six
+  Seven
 }
 
 enum Bathrooms {
@@ -301,6 +305,8 @@ model AdminUser {
 model Developer {
   id          String    @id @default(uuid())
   cover_image String?
+  total_projects Int?
+  years_in_business Int?
   projects    Project[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -315,26 +321,46 @@ model Project {
   description     String
   image           String
   images          String[] // gallery images
-  floor_plans     String[] // floor plan images
   currency        Currency
-  price           Float
+  min_price       Float?
+  max_price       Float?
   address         String
   city            City
   file_url        String? // optional downloadable file
   type            Category
   project_name    String
   project_age     String
-  no_of_bedrooms  Bedrooms
-  no_of_bathrooms Bathrooms
+  min_bedrooms    Bedrooms?  
+  max_bedrooms    Bedrooms?
   furnished       Furnished
-  property_size   Float
-  payment_plan    Payment_Plan
+  min_sq_ft       Float?
+  max_sq_ft   Float?  
+  property_size       Float?
+  payment_plan    Payment_Plan?
+  payment_plan2   String?
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
-  amenities       String[]
+  locality        String? //function
+  latitude        Float?
+  longitude       Float?
+  amenities       String[] @default([])
   developer_id    String
+  handover_time   DateTime?
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
+  floor_plans     FloorPlan[] 
+}
+
+model FloorPlan {
+  id         String   @id @default(uuid())
+  title       String?
+  images      String[]  @default([])
+  min_price   Float?
+  max_price   Float?
+  unit_size   Float?
+  bedrooms    Bedrooms?
+  project_id String
+  project    Project  @relation(fields: [project_id], references: [id])
 }
 
 model Brokerage {
