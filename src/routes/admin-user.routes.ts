@@ -29,6 +29,24 @@ import {
     bulkInsertListingsAdmin,
     deleteJobController,
 } from '../controllers/admin-user.controller';
+import {
+    createTeamMember,
+    getTeamMembers,
+    updateTeamMemberRole,
+    deleteTeamMember,
+    getAvailableBrokers,
+    createRoleGroup,
+    getRoleGroups,
+    getRoleGroupById,
+    updateRoleGroup,
+    deleteRoleGroup,
+    getAvailablePermissions,
+} from '../controllers/team-member.controller';
+import {
+    requireTeamManagementAccess,
+    requirePermission,
+    requireResourceAccess,
+} from '../middlewares/rbac.middleware';
 
 const router = express.Router();
 
@@ -83,13 +101,15 @@ export default (upload: any) => {
     router.post(
         '/admin-user/company-post',
         verifyToken,
+        requirePermission('CREATE_COMPANY_POST'),
         upload.array('images'),
         createSponsoredCompanyPostController
     );
 
     router.put(
-        '/admin-user/company-post',
+        '/admin-user/company-post/:id',
         verifyToken,
+        requireResourceAccess('COMPANY_POST', 'EDIT'),
         upload.array('images'),
         editCompanyPost
     );
@@ -118,6 +138,85 @@ router.get('/admin-user/company-posts', verifyToken, getAllCompanyPosts);
 
 router.get('/admin-user/company-posts/:id', verifyToken, getCompanyPostById);
 
+/* RBAC Routes - Team Member Management */
+
+// Team member routes (admin only)
+router.post(
+    '/admin-user/team-members',
+    verifyToken,
+    requireTeamManagementAccess(),
+    createTeamMember
+);
+router.get(
+    '/admin-user/team-members',
+    verifyToken,
+    requireTeamManagementAccess(),
+    getTeamMembers
+);
+router.put(
+    '/admin-user/team-members/:id/role',
+    verifyToken,
+    requireTeamManagementAccess(),
+    updateTeamMemberRole
+);
+router.delete(
+    '/admin-user/team-members/:id',
+    verifyToken,
+    requireTeamManagementAccess(),
+    deleteTeamMember
+);
+router.get(
+    '/admin-user/available-brokers',
+    verifyToken,
+    requireTeamManagementAccess(),
+    getAvailableBrokers
+);
+
+// Role group routes (admin only)
+router.post(
+    '/admin-user/role-groups',
+    verifyToken,
+    requireTeamManagementAccess(),
+    createRoleGroup
+);
+router.get(
+    '/admin-user/role-groups',
+    verifyToken,
+    requireTeamManagementAccess(),
+    getRoleGroups
+);
+router.get(
+    '/admin-user/role-groups/:id',
+    verifyToken,
+    requireTeamManagementAccess(),
+    getRoleGroupById
+);
+router.put(
+    '/admin-user/role-groups/:id',
+    verifyToken,
+    requireTeamManagementAccess(),
+    updateRoleGroup
+);
+router.delete(
+    '/admin-user/role-groups/:id',
+    verifyToken,
+    requireTeamManagementAccess(),
+    deleteRoleGroup
+);
+
+/* Broker Routes */
+router.get(
+    '/admin-user/brokers',
+    verifyToken,
+    requireTeamManagementAccess(),
+    getBrokers
+);
+
+router.get('/admin-user/listings', verifyToken, getListingsForBrokerage);
+
+// Permission routes
+router.get('/admin-user/permissions', verifyToken, getAvailablePermissions);
+
 /* Job Routes */
 
 /* TODO - Deprecate this route as all jobs will be sponsored */
@@ -131,6 +230,7 @@ router.get('/admin-user/company-posts/:id', verifyToken, getCompanyPostById);
 router.post(
     '/admin-user/jobs',
     verifyToken,
+    requirePermission('CREATE_JOB'),
     validateSchema(jobSchema),
     createSponsoredJobController
 );
@@ -145,10 +245,9 @@ router.get(
     getJobApplicationsController
 );
 
-router.delete('/admin-user/jobs/:id', verifyToken, deleteJobController);
-
-/* Broker Routes */
-// Note:  this should be /users to get users for a company but now user is not mapped to a company
-router.get('/admin-user/brokers', verifyToken, getBrokers);
-
-router.get('/admin-user/listings', verifyToken, getListingsForBrokerage);
+router.delete(
+    '/admin-user/jobs/:id',
+    verifyToken,
+    requireResourceAccess('JOB', 'DELETE'),
+    deleteJobController
+);

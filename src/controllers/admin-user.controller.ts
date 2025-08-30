@@ -23,6 +23,10 @@ import {
     createListingService,
     bulkInsertListingsAdminService,
     deleteJobService,
+    getJobsWithRBACService,
+    getCompanyPostsWithRBACService,
+    getJobByIdWithRBACService,
+    getCompanyPostByIdWithRBACService,
 } from '../services/admin-user.service';
 import { Express } from 'express';
 import prisma from '../utils/prisma';
@@ -30,7 +34,7 @@ import { Request, Response } from 'express';
 import { uploadToS3 } from '../utils/s3Upload';
 import { createSponsoredJobService } from '../services/job.service';
 import { AuthenticatedRequest } from '../utils/verifyToken';
-import { CompanyType, Listing } from '@prisma/client';
+import { CompanyType, Currency, Listing } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 export const signup = async (req: Request, res: Response) => {
@@ -333,6 +337,12 @@ export const createProject = async (
             floor_plans: floorPlanUrls,
             file_url: fileUrl,
             developer_id: req.user.entityId,
+            currency: Currency.AED,
+            developer: {
+                connect: {
+                    id: req.user.entityId,
+                },
+            },
         };
 
         const project = await createProjectService(projectData);
@@ -509,13 +519,12 @@ export const getAllCompanyPosts = async (
     res: Response
 ) => {
     try {
-        const companyId = req.user?.companyId;
-        if (!companyId) {
-            return res
-                .status(400)
-                .json({ message: 'Company ID not found for user' });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
-        const posts = await getAllCompanyPostsService(companyId);
+
+        const posts = await getCompanyPostsWithRBACService(adminUserId);
         res.json({
             status: 'success',
             message: 'Company posts fetched successfully',
@@ -530,10 +539,22 @@ export const getAllCompanyPosts = async (
     }
 };
 
-export const getCompanyPostById = async (req: Request, res: Response) => {
+export const getCompanyPostById = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const postId = req.params.id;
-        const post = await getCompanyPostByIdService(postId);
+        const adminUserId = req.user?.id;
+
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
+        }
+
+        const post = await getCompanyPostByIdWithRBACService(
+            adminUserId,
+            postId
+        );
 
         if (!post) {
             return res.status(404).json({
@@ -572,7 +593,7 @@ export const createJobController = async (
 
         const jobData = {
             ...req.body,
-            adminUserId: userId,
+            admin_user_id: userId,
             companyId,
         };
 
@@ -585,7 +606,7 @@ export const createJobController = async (
     } catch (err) {
         return res.status(500).json({
             status: 'error',
-            message: 'Server Error',
+            message: err instanceof Error ? err.message : 'Server Error',
         });
     }
 };
@@ -595,14 +616,12 @@ export const getJobsForCompanyController = async (
     res: Response
 ) => {
     try {
-        const companyId = req.user?.companyId;
-        if (!companyId) {
-            return res
-                .status(400)
-                .json({ message: 'Company ID not found for user' });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
 
-        const jobs = await getJobsForCompanyService(companyId);
+        const jobs = await getJobsWithRBACService(adminUserId);
 
         res.status(200).json({
             status: 'success',
@@ -619,13 +638,12 @@ export const getJobByIdController = async (
 ) => {
     try {
         const jobId = req.params.id;
-        const companyId = req.user?.companyId;
-        if (!companyId) {
-            return res
-                .status(400)
-                .json({ message: 'Company ID not found for user' });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
-        const job = await getJobByIdService(jobId, companyId);
+
+        const job = await getJobByIdWithRBACService(adminUserId, jobId);
 
         if (!job) {
             return res
@@ -694,10 +712,10 @@ export const deleteJobController = async (
 export const getBrokers = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const companyId = req.user?.companyId;
-        if (!companyId || req.user?.type !== CompanyType.Brokerage) {
-            return res.status(401).json({
+        if (!companyId) {
+            return res.status(400).json({
                 status: 'error',
-                message: 'Unauthorized',
+                message: 'Company ID not found for user',
             });
         }
         const users = await getBrokersService(companyId);
@@ -848,7 +866,7 @@ export const createSponsoredJobController = async (
 
         const jobData = {
             ...jobBody,
-            adminUserId: userId,
+            admin_user_id: userId,
         };
 
         const result = await createSponsoredJobService(

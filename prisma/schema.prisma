@@ -57,6 +57,8 @@ model Broker {
   user_id                  String?
   type                     BrokerType?
   specialities             Speciality[]        @default([])
+  admin_user_id            String?              @unique
+  admin_user               AdminUser?          @relation(fields: [admin_user_id], references: [id])
   referral_code            String?
   company                  Company?            @relation(fields: [company_id], references: [id])
   listings                 Listing[]
@@ -290,14 +292,46 @@ enum Sale_Type {
 }
 
 model AdminUser {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Job       Job[]
+  id              String        @id @default(uuid())
+  email           String        @unique
+  password        String
+  type            AdminUserType @default(MEMBER)
+  broker_id       String?              @unique
+  broker          Broker?
+  role_group_id   String?
+  role_group      RoleGroup?    @relation(fields: [role_group_id], references: [id])
+  company_id      String
+  company         Company       @relation(fields: [company_id], references: [id])
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  jobs            Job[]
+  companyPosts    CompanyPost[]
+}
+
+enum AdminUserType {
+  ADMIN
+  MEMBER
+}
+
+model RoleGroup {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  permissions Permission[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  admin_users AdminUser[]
+}
+
+enum Permission {
+  CREATE_JOB
+  EDIT_JOB
+  VIEW_JOB
+  DELETE_JOB
+  CREATE_COMPANY_POST
+  EDIT_COMPANY_POST
+  VIEW_COMPANY_POST
+  DELETE_COMPANY_POST
 }
 
 model Developer {
@@ -362,6 +396,8 @@ model CompanyPost {
   rank         Int          @default(1)
   company_id   String
   company      Company      @relation(fields: [company_id], references: [id])
+  admin_user_id String?
+  admin_user    AdminUser?   @relation(fields: [admin_user_id], references: [id])
   expiry_date  DateTime?
   is_sponsored Boolean?     @default(false)
   created_at   DateTime     @default(now())
@@ -470,13 +506,13 @@ model Job {
   min_experience Int?
   max_experience Int?
   userId         String?
-  adminUserId    String?
+  admin_user_id  String?
   expiry_date    DateTime?
   is_sponsored   Boolean?      @default(false)
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
   user           User?         @relation(fields: [userId], references: [id])
-  adminUser      AdminUser?    @relation(fields: [adminUserId], references: [id])
+  admin_user     AdminUser?    @relation(fields: [admin_user_id], references: [id])
   applications   Application[]
 }
 
