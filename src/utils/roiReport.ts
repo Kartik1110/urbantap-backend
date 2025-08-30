@@ -1053,9 +1053,8 @@ export function getPropertyData(
 
         return propertyData;
     } catch (error) {
-        logger.error(
-            (error as Error).message,
-            'Returning default property data'
+        logger.warn(
+            (error as Error).message + ', returning default property data'
         );
 
         return defaultPropertyData;
