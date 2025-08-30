@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../utils/verifyToken';
 import { RoleGroupService } from '../services/role-group.service';
 import { TeamMemberService } from '../services/team-member.service';
+import { PermissionChecker } from '../utils/permissions';
 
 /**
  * Create team member
@@ -418,6 +419,40 @@ export const getAvailablePermissions = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: error.message || 'Failed to get available permissions',
+        });
+    }
+};
+
+/**
+ * Get current user permissions
+ */
+export const getUserPermissions = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const adminUserId = req.user?.id;
+
+        if (!adminUserId) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized: No user found',
+            });
+        }
+
+        const permissions =
+            await PermissionChecker.getUserPermissions(adminUserId);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'User permissions fetched successfully',
+            data: permissions,
+        });
+    } catch (error: any) {
+        logger.error('Get user permissions error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message || 'Failed to get user permissions',
         });
     }
 };

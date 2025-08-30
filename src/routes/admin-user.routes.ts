@@ -41,6 +41,7 @@ import {
     updateRoleGroup,
     deleteRoleGroup,
     getAvailablePermissions,
+    getUserPermissions,
 } from '../controllers/team-member.controller';
 import {
     requireTeamManagementAccess,
@@ -216,6 +217,7 @@ router.get('/admin-user/listings', verifyToken, getListingsForBrokerage);
 
 // Permission routes
 router.get('/admin-user/permissions', verifyToken, getAvailablePermissions);
+router.get('/admin-user/user-permissions', verifyToken, getUserPermissions);
 
 /* Job Routes */
 
