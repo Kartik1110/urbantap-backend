@@ -1,3 +1,5 @@
+import logger from './logger';
+
 // Types for the merged property data structure
 export interface PropertyDataPoint {
     appreciation_perc: number;
@@ -976,6 +978,50 @@ export function getRentalPriceInYear(
     return monthlyRent * 12;
 }
 
+const DEFAULT_PROPERTY_DATA = [
+    //edit
+    {
+        appreciation_perc: 8, // Starting at 8%
+        rent_per_sq_ft: 5, // Starting at 5
+    },
+    {
+        appreciation_perc: 16.64, // 8 + (8 * 0.08) = 16.64
+        rent_per_sq_ft: 5.25, // 5 + (5 * 0.05) = 5.25
+    },
+    {
+        appreciation_perc: 25.97, // 16.64 + (16.64 * 0.08) = 25.97
+        rent_per_sq_ft: 5.51, // 5.25 + (5.25 * 0.05) = 5.51
+    },
+    {
+        appreciation_perc: 36.05, // 25.97 + (25.97 * 0.08) = 36.05
+        rent_per_sq_ft: 5.79, // 5.51 + (5.51 * 0.05) = 5.79
+    },
+    {
+        appreciation_perc: 46.93, // 36.05 + (36.05 * 0.08) = 46.93
+        rent_per_sq_ft: 6.08, // 5.79 + (5.79 * 0.05) = 6.08
+    },
+    {
+        appreciation_perc: 58.68, // 46.93 + (46.93 * 0.08) = 58.68
+        rent_per_sq_ft: 6.38, // 6.08 + (6.08 * 0.05) = 6.38
+    },
+    {
+        appreciation_perc: 71.37, // 58.68 + (58.68 * 0.08) = 71.37
+        rent_per_sq_ft: 6.7, // 6.38 + (6.38 * 0.05) = 6.70
+    },
+    {
+        appreciation_perc: 85.08, // 71.37 + (71.37 * 0.08) = 85.08
+        rent_per_sq_ft: 7.04, // 6.70 + (6.70 * 0.05) = 7.04
+    },
+    {
+        appreciation_perc: 99.89, // 85.08 + (85.08 * 0.08) = 99.89
+        rent_per_sq_ft: 7.39, // 7.04 + (7.04 * 0.05) = 7.39
+    },
+    {
+        appreciation_perc: 115.88, // 99.89 + (99.89 * 0.08) = 115.88
+        rent_per_sq_ft: 7.76, // 7.39 + (7.39 * 0.05) = 7.76
+    },
+];
+
 /**
  * Gets property data for a given location, property type, and years.
  *
@@ -987,23 +1033,33 @@ export function getRentalPriceInYear(
 export function getPropertyData(
     propertiesData: MergedPropertyData,
     location: string,
-    propertyType: string
+    propertyType: string,
+    defaultPropertyData: PropertyDataPoint[] = DEFAULT_PROPERTY_DATA
 ): PropertyDataPoint[] {
-    if (!propertiesData) {
-        throw new Error('Property data not provided');
-    }
+    try {
+        if (!propertiesData) {
+            throw new Error('Property data not provided');
+        }
 
-    const locationData = propertiesData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
-    }
+        const locationData = propertiesData[location];
+        if (!locationData) {
+            throw new Error('Location not found');
+        }
 
-    const propertyData = locationData[propertyType];
-    if (!propertyData || propertyData.length === 0) {
-        throw new Error('Property type not found');
-    }
+        const propertyData = locationData[propertyType];
+        if (!propertyData || propertyData.length === 0) {
+            throw new Error('Property type not found');
+        }
 
-    return propertyData;
+        return propertyData;
+    } catch (error) {
+        logger.error(
+            (error as Error).message,
+            'Returning default property data'
+        );
+
+        return defaultPropertyData;
+    }
 }
 
 /**
