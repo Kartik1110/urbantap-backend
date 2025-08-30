@@ -91,7 +91,7 @@ export const loginAdmin = async (email: string, password: string) => {
 
     if (user.role_group_id) {
         const roleGroup = await prisma.roleGroup.findUnique({
-            where: { id: user.role_group_id || '' },
+            where: { id: user.role_group_id },
         });
 
         tokenPayload.permissions = roleGroup?.permissions || [];
