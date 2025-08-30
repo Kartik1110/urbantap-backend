@@ -13,7 +13,7 @@ async function createRBACDemoData() {
         const jobManagerRole = await prisma.roleGroup.create({
             data: {
                 name: 'Job Manager',
-                description: 'Can manage jobs but not company posts',
+                description: 'Can manage jobs',
                 permissions: [
                     Permission.CREATE_JOB,
                     Permission.EDIT_JOB,
@@ -26,7 +26,7 @@ async function createRBACDemoData() {
         const postManagerRole = await prisma.roleGroup.create({
             data: {
                 name: 'Post Manager',
-                description: 'Can manage company posts but not jobs',
+                description: 'Can manage company posts',
                 permissions: [
                     Permission.CREATE_COMPANY_POST,
                     Permission.EDIT_COMPANY_POST,

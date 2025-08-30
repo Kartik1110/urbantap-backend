@@ -4,8 +4,6 @@ import { AdminUserType } from '@prisma/client';
 
 export interface CreateTeamMemberDto {
     brokerId: string;
-    email: string;
-    password: string;
     roleGroupId: string;
 }
 
@@ -34,7 +32,12 @@ export class TeamMemberService {
         // Validate broker belongs to the same company
         const broker = await prisma.broker.findUnique({
             where: { id: teamMemberData.brokerId },
-            select: { company_id: true, admin_user_id: true },
+            select: {
+                company_id: true,
+                admin_user_id: true,
+                name: true,
+                w_number: true,
+            },
         });
 
         if (!broker) {
@@ -58,22 +61,21 @@ export class TeamMemberService {
             throw new Error('Role group not found');
         }
 
-        // Check if email already exists
-        const existingUser = await prisma.adminUser.findUnique({
-            where: { email: teamMemberData.email },
-        });
+        // Generate username and password for this team member
+        const username = [
+            (broker.name || '').replace(' ', '').toLowerCase().trim(),
+            (broker.w_number || '').trim().slice(-4),
+        ].join();
 
-        if (existingUser) {
-            throw new Error('Email already exists');
-        }
+        const password = Math.random().toString(36).substring(2, 15);
 
         // Hash password
-        const hashedPassword = await bcrypt.hash(teamMemberData.password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create team member
         const teamMember = await prisma.adminUser.create({
             data: {
-                email: teamMemberData.email,
+                email: username,
                 password: hashedPassword,
                 type: AdminUserType.MEMBER,
                 broker_id: teamMemberData.brokerId,
@@ -104,7 +106,10 @@ export class TeamMemberService {
             data: { admin_user_id: teamMember.id },
         });
 
-        return teamMember;
+        return {
+            username: teamMember.email,
+            password,
+        };
     }
 
     /**

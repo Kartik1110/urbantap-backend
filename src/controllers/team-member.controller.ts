@@ -21,13 +21,12 @@ export const createTeamMember = async (
             });
         }
 
-        const { brokerId, email, password, roleGroupId } = req.body;
+        const { brokerId, roleGroupId } = req.body;
 
-        if (!brokerId || !email || !password || !roleGroupId) {
+        if (!brokerId || !roleGroupId) {
             return res.status(400).json({
                 status: 'error',
-                message:
-                    'Missing required fields: brokerId, email, password, roleGroupId',
+                message: 'Missing required fields: brokerId, roleGroupId',
             });
         }
 
@@ -35,8 +34,6 @@ export const createTeamMember = async (
             adminUserId,
             {
                 brokerId,
-                email,
-                password,
                 roleGroupId,
             }
         );

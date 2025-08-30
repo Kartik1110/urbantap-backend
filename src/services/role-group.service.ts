@@ -141,8 +141,12 @@ export class RoleGroupService {
                 where: { id: roleGroupId },
                 data: {
                     ...(updateData.name && { name: updateData.name }),
-                    ...(updateData.description !== undefined && { description: updateData.description }),
-                    ...(updateData.permissions && { permissions: updateData.permissions }),
+                    ...(updateData.description !== undefined && {
+                        description: updateData.description,
+                    }),
+                    ...(updateData.permissions && {
+                        permissions: updateData.permissions,
+                    }),
                 },
             });
         } catch (error) {
@@ -181,14 +185,19 @@ export class RoleGroupService {
             }
 
             if (roleGroup._count.admin_users > 0) {
-                throw new Error('Cannot delete role group that has assigned users');
+                throw new Error(
+                    'Cannot delete role group that has assigned users'
+                );
             }
 
             await prisma.roleGroup.delete({
                 where: { id: roleGroupId },
             });
 
-            return { success: true, message: 'Role group deleted successfully' };
+            return {
+                success: true,
+                message: 'Role group deleted successfully',
+            };
         } catch (error) {
             console.error('Error deleting role group:', error);
             throw error;
