@@ -22,18 +22,37 @@ import {
 import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
 import { geocodeAddress } from '../utils/geocoding';
-import propertiesData from '../data/property-data';
+// Dynamic import based on environment variable
+const PROPERTY_DATA_PATH = process.env.PROPERTY_DATA_PATH || 'v1';
+let propertiesData: MergedPropertyData;
+
+// Dynamic import based on environment variable
+(async () => {
+    try {
+        const module = await import(
+            `../data/property-data-${PROPERTY_DATA_PATH}`
+        );
+        propertiesData = module.default;
+    } catch (error) {
+        logger.error(
+            `Failed to load property data for version ${PROPERTY_DATA_PATH}:`,
+            error
+        );
+
+        // Fallback to v2
+        const fallbackModule = await import('../data/property-data-v2');
+        propertiesData = fallbackModule.default;
+    }
+})();
+
 import {
     calculateAppreciationDataPoints,
-    calculateAverageROI,
     calculateBreakEvenPeriod,
     calculateBreakEvenPeriodByType,
     calculateCapitalGains,
-    calculateCumulativeProfitPerYear,
     calculateCumulativeProfitPerYearByType,
     calculateExpectedRental,
     calculateRentalDemandIncrease,
-    calculateRoiDataPoints,
     calculateRoiDataPointsByType,
     calculateCumulativeROIByType,
     getCurrentRentalPrice,
@@ -43,6 +62,7 @@ import {
     calculatePropertyROI,
     getListingAppreciationInYear,
     getRentalPriceInYear,
+    MergedPropertyData,
 } from '../utils/roiReport';
 
 declare const fetch: typeof globalThis.fetch;
