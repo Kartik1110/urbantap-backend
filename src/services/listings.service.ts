@@ -22,18 +22,15 @@ import {
 import generateListingFromText from '../scripts/generate-listings';
 import { Prisma } from '@prisma/client';
 import { geocodeAddress } from '../utils/geocoding';
-import propertiesData from '../data/property-data';
+import propertiesData from '../data/property-data-v1';
 import {
     calculateAppreciationDataPoints,
-    calculateAverageROI,
     calculateBreakEvenPeriod,
     calculateBreakEvenPeriodByType,
     calculateCapitalGains,
-    calculateCumulativeProfitPerYear,
     calculateCumulativeProfitPerYearByType,
     calculateExpectedRental,
     calculateRentalDemandIncrease,
-    calculateRoiDataPoints,
     calculateRoiDataPointsByType,
     calculateCumulativeROIByType,
     getCurrentRentalPrice,
