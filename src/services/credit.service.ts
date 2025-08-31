@@ -14,6 +14,7 @@ export interface DeductCreditsInput {
     credits: number;
     type: OrderType;
     type_id: string;
+    user_id?: string;
 }
 
 // Assign credits to a company
@@ -41,6 +42,14 @@ export const assignCreditsToCompany = async ({
     // Check if company already has credits
     const existingCredit = await prisma.credit.findUnique({
         where: { company_id },
+    });
+
+    await prisma.order.create({
+        data: {
+            company_id,
+            type: OrderType.CREDIT,
+            credits_spent: credits,
+        },
     });
 
     if (existingCredit) {
@@ -116,6 +125,7 @@ export const deductCreditsAndCreateOrder = async ({
     credits,
     type,
     type_id,
+    user_id,
 }: DeductCreditsInput) => {
     // Check if company has sufficient credits
     const creditCheck = await checkSufficientCredits(company_id, credits);
@@ -151,6 +161,7 @@ export const deductCreditsAndCreateOrder = async ({
                 type,
                 credits_spent: credits,
                 type_id,
+                admin_user_id: user_id,
             },
         });
 

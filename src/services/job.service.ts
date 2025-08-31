@@ -138,8 +138,7 @@ export const getJobsService = async (
 
     const [jobsRaw, totalJobs, appliedJobIds] = await Promise.all([
         prisma.job.findMany({
-            skip,
-            take: page_size,
+            where: whereClause,
             orderBy: [
                 // Prioritize active sponsored jobs
                 {
@@ -148,7 +147,8 @@ export const getJobsService = async (
                 // Then by creation date
                 { created_at: 'desc' },
             ],
-            where: whereClause,
+            skip,
+            take: page_size,
             select: {
                 id: true,
                 title: true,
@@ -184,32 +184,38 @@ export const getJobsService = async (
                         },
                     },
                 },
+                admin_user: {
+                    include: { broker: true },
+                },
             },
         }),
+
         prisma.job.count({ where: whereClause }),
         getUserAppliedJobIds(userId || ''),
     ]);
 
     const jobs = jobsRaw.map((job) => {
-        const { company, ...jobWithoutCompany } = job;
+        const { company, admin_user, ...jobWithoutCompany } = job;
+
         return {
             ...jobWithoutCompany,
             brokerage: transformBrokerageData(company),
             applied: appliedJobIds.has(job.id),
-            // broker: {
-            //     id: broker.id,
-            //     name: broker.name,
-            //     profile_pic: broker.profile_pic,
-            //     country_code: broker.country_code,
-            //     w_number: broker.w_number,
-            //     email: broker.email,
-            //     linkedin_link: broker.linkedin_link,
-            //     ig_link: broker.ig_link,
-            //     company: {
-            //          name: broker.company?.name || '',
-            // },
-            broker: null,
-            company: null,
+            broker: admin_user?.broker
+                ? {
+                      id: admin_user?.broker?.id,
+                      name: admin_user?.broker?.name,
+                      profile_pic: admin_user?.broker?.profile_pic,
+                      country_code: admin_user?.broker?.country_code,
+                      w_number: admin_user?.broker?.w_number,
+                      email: admin_user?.broker?.email,
+                      linkedin_link: admin_user?.broker?.linkedin_link,
+                      ig_link: admin_user?.broker?.ig_link,
+                      company: {
+                          name: company?.name || '',
+                      },
+                  }
+                : null,
         };
     });
 
@@ -265,6 +271,11 @@ export const getJobByIdService = async (id: string, userId?: string) => {
                     email: true,
                 },
             },
+            admin_user: {
+                select: {
+                    broker: true,
+                },
+            },
         },
     });
 
@@ -294,24 +305,26 @@ export const getJobByIdService = async (id: string, userId?: string) => {
           }
         : null;
 
+    const { admin_user, ...jobWithoutAdminUser } = job;
     const returnedJob = {
-        ...job,
+        ...jobWithoutAdminUser,
         brokerage: cleanedBrokerage,
         applied,
-        // broker: {
-        //     id: broker.id,
-        //     name: broker.name,
-        //     profile_pic: broker.profile_pic,
-        //     country_code: broker.country_code,
-        //     w_number: broker.w_number,
-        //     email: broker.email,
-        //     linkedin_link: broker.linkedin_link,
-        //     ig_link: broker.ig_link,
-        //     company: {
-        //          name: broker.company?.name || '',
-        // },
-        broker: null,
-        company: null,
+        broker: admin_user?.broker
+            ? {
+                  id: admin_user?.broker?.id,
+                  name: admin_user?.broker?.name,
+                  profile_pic: admin_user?.broker?.profile_pic,
+                  country_code: admin_user?.broker?.country_code,
+                  w_number: admin_user?.broker?.w_number,
+                  email: admin_user?.broker?.email,
+                  linkedin_link: admin_user?.broker?.linkedin_link,
+                  ig_link: admin_user?.broker?.ig_link,
+                  company: {
+                      name: job.company?.name || '',
+                  },
+              }
+            : null,
     };
 
     return returnedJob;
@@ -446,16 +459,38 @@ export const createSponsoredJobService = async (
         credits: creditsRequired,
         type: OrderType.JOB,
         type_id: '', // Will be updated after job creation
+        user_id: jobData.admin_user_id || '',
     });
+
+    const jobObj: any = {
+        ...jobData,
+        company_id,
+        is_sponsored: true,
+        expiry_date,
+    };
+
+    if (jobData.admin_user_id) {
+        const adminUser = await prisma.adminUser.findUnique({
+            where: { id: jobData.admin_user_id },
+            include: {
+                broker: {
+                    include: {
+                        user: {
+                            select: { id: true },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (adminUser?.broker?.user?.id) {
+            jobObj.userId = adminUser.broker?.user?.id;
+        }
+    }
 
     // Create the sponsored job
     const job = await prisma.job.create({
-        data: {
-            ...jobData,
-            company_id,
-            is_sponsored: true,
-            expiry_date,
-        },
+        data: jobObj,
     });
 
     // Update the order with the actual job ID

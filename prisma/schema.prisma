@@ -57,7 +57,7 @@ model Broker {
   user_id                  String?
   type                     BrokerType?
   specialities             Speciality[]        @default([])
-  admin_user_id            String?              @unique
+  admin_user_id            String?             @unique
   admin_user               AdminUser?          @relation(fields: [admin_user_id], references: [id])
   referral_code            String?
   company                  Company?            @relation(fields: [company_id], references: [id])
@@ -143,7 +143,7 @@ model Listing {
   type_of_use           Type_of_use?
   deal_type             DealType?
   current_status        CurrentStatus?
-  views                 Views[] @default([])
+  views                 Views[]           @default([])
   market                Market?
   parking_space         Boolean?
   service_charge        Int?
@@ -292,20 +292,21 @@ enum Sale_Type {
 }
 
 model AdminUser {
-  id              String        @id @default(uuid())
-  email           String        @unique
-  password        String
-  type            AdminUserType @default(MEMBER)
-  broker_id       String?              @unique
-  broker          Broker?
-  role_group_id   String?
-  role_group      RoleGroup?    @relation(fields: [role_group_id], references: [id])
-  company_id      String
-  company         Company       @relation(fields: [company_id], references: [id])
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-  jobs            Job[]
-  companyPosts    CompanyPost[]
+  id            String        @id @default(uuid())
+  email         String        @unique
+  password      String
+  type          AdminUserType @default(MEMBER)
+  broker_id     String?       @unique
+  broker        Broker?
+  role_group_id String?
+  role_group    RoleGroup?    @relation(fields: [role_group_id], references: [id])
+  company_id    String
+  company       Company       @relation(fields: [company_id], references: [id])
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  jobs          Job[]
+  companyPosts  CompanyPost[]
+  Order         Order[]
 }
 
 enum AdminUserType {
@@ -314,12 +315,12 @@ enum AdminUserType {
 }
 
 model RoleGroup {
-  id          String   @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?
   permissions Permission[]
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
   admin_users AdminUser[]
 }
 
@@ -388,20 +389,20 @@ model Brokerage {
 }
 
 model CompanyPost {
-  id           String       @id @default(uuid())
-  title        String?
-  caption      String?
-  images       String[]     @default([])
-  position     PostPosition @default(Home)
-  rank         Int          @default(1)
-  company_id   String
-  company      Company      @relation(fields: [company_id], references: [id])
+  id            String       @id @default(uuid())
+  title         String?
+  caption       String?
+  images        String[]     @default([])
+  position      PostPosition @default(Home)
+  rank          Int          @default(1)
+  company_id    String
+  company       Company      @relation(fields: [company_id], references: [id])
   admin_user_id String?
   admin_user    AdminUser?   @relation(fields: [admin_user_id], references: [id])
-  expiry_date  DateTime?
-  is_sponsored Boolean?     @default(false)
-  created_at   DateTime     @default(now())
-  updated_at   DateTime     @updatedAt
+  expiry_date   DateTime?
+  is_sponsored  Boolean?     @default(false)
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
 }
 
 enum PostPosition {
@@ -562,23 +563,26 @@ model Credit {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   company     Company  @relation(fields: [company_id], references: [id])
-  
+
   @@unique([company_id])
 }
 
 model Order {
-  id            String    @id @default(uuid())
+  id            String     @id @default(uuid())
   company_id    String
   type          OrderType
-  date          DateTime  @default(now())
+  date          DateTime   @default(now())
   credits_spent Int
-  type_id       String    // ID of Job or CompanyPost
-  created_at    DateTime  @default(now())
-  company       Company   @relation(fields: [company_id], references: [id])
+  type_id       String? // ID of Job or CompanyPost
+  created_at    DateTime   @default(now())
+  company       Company    @relation(fields: [company_id], references: [id])
+  admin_user_id String?
+  admin_user    AdminUser? @relation(fields: [admin_user_id], references: [id])
 }
 
 enum OrderType {
   COMPANY_POST
   JOB
   LISTING
+  CREDIT
 }

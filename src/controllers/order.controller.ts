@@ -1,10 +1,19 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { getOrdersService } from '../services/order.service';
+import { AuthenticatedRequest } from '../utils/verifyToken';
 
-export const getOrders = async (req: Request, res: Response) => {
+export const getOrders = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { company_id } = req.params;
-        const orders = await getOrdersService(company_id);
+        // Get company_id from authenticated admin user
+        const user = req.user;
+        if (!user?.companyId) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Unauthorized: No company linked',
+            });
+        }
+
+        const orders = await getOrdersService(user.companyId);
 
         res.status(200).json({
             status: 'success',
