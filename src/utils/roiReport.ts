@@ -282,15 +282,26 @@ export function calculateExpectedRental(
         throw new Error('Property data points not provided');
     }
 
+    // Today's rent is always from year 0 (current year)
+    const todayData = propertyData[0];
+    const todayMonthlyRent = todayData.rent_per_sq_ft * propertySize;
+
+    // Long term rent is from the specified year
     const yearData = propertyData[year];
-    const monthlyRent = yearData.rent_per_sq_ft * propertySize;
+    const longTermMonthlyRent = yearData.rent_per_sq_ft * propertySize;
 
     if (period === 'monthly') {
-        return { today: monthlyRent, long_term: monthlyRent * 12 };
+        return {
+            today: todayMonthlyRent,
+            long_term: longTermMonthlyRent,
+        };
     }
 
-    // Default: annual expected rental (assuming monthly rates in data)
-    return { today: monthlyRent, long_term: monthlyRent * 12 };
+    // Default: annual expected rental (monthly rates * 12)
+    return {
+        today: todayMonthlyRent * 12,
+        long_term: longTermMonthlyRent * 12,
+    };
 }
 
 /**
