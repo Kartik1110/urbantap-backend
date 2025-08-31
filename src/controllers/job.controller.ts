@@ -6,7 +6,7 @@ import {
     createJobService,
     getJobsService,
     getJobByIdService,
-    getJobsAppliedByBrokerService
+    getJobsAppliedByBrokerService,
 } from '../services/job.service';
 
 interface AuthenticatedRequest extends Request {
@@ -87,7 +87,14 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.userId || undefined;
 
     try {
-        const { jobs, pagination } = await getJobsService(req.body, userId);
+        const queryParams = {
+            page: parseInt(req.query.page as string) || undefined,
+            page_size: parseInt(req.query.page_size as string) || undefined,
+            search: (req.query.search as string) || undefined,
+            show_expired_sponsored: false, // Always filter out expired sponsored jobs
+        };
+
+        const { jobs, pagination } = await getJobsService(queryParams, userId);
 
         res.status(200).json({
             status: 'success',
@@ -103,7 +110,6 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
         });
     }
 };
-
 
 export const getJobById = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;

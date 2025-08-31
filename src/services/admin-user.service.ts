@@ -9,16 +9,28 @@ import {
     CompanyType,
     Listing,
     Admin_Status,
+    OrderType,
+    AdminUserType,
 } from '@prisma/client';
 import { DecodedAdminUser } from '../utils/verifyToken';
 import logger from '../utils/logger';
 import { geocodeAddress } from '../utils/geocoding';
+import { CREDIT_CONFIG } from '../config/credit.config';
+import { deductCreditsAndCreateOrder } from './credit.service';
+import { PermissionChecker } from '../utils/permissions';
 
 export const signupAdmin = async (
     email: string,
     password: string,
     companyId: string
 ) => {
+    const adminEmail = await prisma.adminUser.findUnique({
+        where: { email },
+    });
+    if (adminEmail) {
+        throw new Error('Email already exists');
+    }
+
     const company = await prisma.company.findUnique({
         where: { id: companyId },
         select: { developerId: true, brokerageId: true, type: true },
@@ -32,7 +44,8 @@ export const signupAdmin = async (
         data: {
             email,
             password: hashedPassword,
-            companyId,
+            company_id: companyId,
+            type: AdminUserType.ADMIN,
         },
     });
 };
@@ -40,39 +53,61 @@ export const signupAdmin = async (
 export const loginAdmin = async (email: string, password: string) => {
     const user = await prisma.adminUser.findUnique({ where: { email } });
 
-    if (!user) throw new Error('Invalid credentials');
+    if (!user) throw new Error('User not found');
+
+    if (user.type !== AdminUserType.ADMIN && !user.role_group_id) {
+        throw new Error('Access denied');
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error('Invalid credentials');
 
     const company = await prisma.company.findUnique({
-        where: { id: user.companyId },
+        where: { id: user.company_id },
         select: { type: true, developerId: true, brokerageId: true },
     });
 
-    const token = jwt.sign(
-        {
-            id: user.id,
-            email: user.email,
-            companyId: user.companyId,
-            type: company?.type,
-            entityId:
-                company &&
-                (company.type === CompanyType.Developer
-                    ? company.developerId
-                    : company.brokerageId),
-        },
-        process.env.JWT_SECRET as string,
-        { expiresIn: '7d' }
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tokenPayload: any = {
+        id: user.id,
+        email: user.email,
+        companyId: user.company_id,
+        type: company?.type,
+        entityId:
+            company &&
+            (company.type === CompanyType.Developer
+                ? company.developerId
+                : company.brokerageId),
+        adminUserType: user.type,
+        permissions: [],
+        broker:
+            company?.type === CompanyType.Brokerage
+                ? {
+                      id: company.brokerageId,
+                      name: company.brokerageId,
+                  }
+                : undefined,
+    };
+
+    if (user.role_group_id) {
+        const roleGroup = await prisma.roleGroup.findUnique({
+            where: { id: user.role_group_id },
+        });
+
+        tokenPayload.permissions = roleGroup?.permissions || [];
+    }
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET as string, {
+        expiresIn: '7d',
+    });
 
     return token;
 };
 
 export const changeAdminPassword = async (
     adminUserId: string,
-    oldPassword: string,
-    newPassword: string
+    old_password: string,
+    new_password: string
 ) => {
     const user = await prisma.adminUser.findUnique({
         where: { id: adminUserId },
@@ -80,10 +115,10 @@ export const changeAdminPassword = async (
 
     if (!user) throw new Error('Admin user not found');
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    const isMatch = await bcrypt.compare(old_password, user.password);
     if (!isMatch) throw new Error('Old password is incorrect');
 
-    const hashedNew = await bcrypt.hash(newPassword, 10);
+    const hashedNew = await bcrypt.hash(new_password, 10);
 
     await prisma.adminUser.update({
         where: { id: adminUserId },
@@ -112,7 +147,7 @@ export const editLinkedCompany = async (
     const adminUser = await prisma.adminUser.findUnique({
         where: { id: user.id },
         select: {
-            companyId: true,
+            company_id: true,
             company: {
                 select: {
                     type: true,
@@ -128,12 +163,12 @@ export const editLinkedCompany = async (
         throw new Error('Admin user not found');
     }
 
-    if (!adminUser.companyId) {
+    if (!adminUser.company_id) {
         throw new Error('This admin is not linked to any company');
     }
 
     await prisma.company.update({
-        where: { id: adminUser.companyId },
+        where: { id: adminUser.company_id },
         data: {
             name: updateData.name,
             description: updateData.description,
@@ -334,7 +369,7 @@ export const getDeveloperDetailsService = async (developerId: string) => {
     };
 };
 
-export const createProjectService = async (data: any) => {
+export const createProjectService = async (data: Prisma.ProjectCreateInput) => {
     return await prisma.project.create({
         data,
     });
@@ -391,10 +426,23 @@ export const getAllCompanyPostsService = async (companyId: string) => {
     return await prisma.companyPost.findMany({
         where: {
             company_id: companyId,
+            OR: [
+                { is_sponsored: false },
+                { is_sponsored: null },
+                {
+                    AND: [
+                        { is_sponsored: true },
+                        { expiry_date: { gt: new Date() } },
+                    ],
+                },
+            ],
         },
-        orderBy: {
-            rank: 'asc',
-        },
+        orderBy: [
+            // Prioritize active sponsored posts
+            { is_sponsored: 'desc' },
+            // Then by rank
+            { rank: 'asc' },
+        ],
         include: {
             company: {
                 select: {
@@ -430,7 +478,7 @@ export const getCompanyPostByIdService = async (postId: string) => {
 
 export const createJobService = async (
     data: JobInput & {
-        adminUserId: string;
+        admin_user_id: string;
         companyId: string;
     }
 ) => {
@@ -448,7 +496,7 @@ export const createJobService = async (
             skills: data.skills ?? null,
             min_experience: data.min_experience ?? null,
             max_experience: data.max_experience ?? null,
-            adminUserId: data.adminUserId,
+            admin_user_id: data.admin_user_id,
             userId: null,
         },
     });
@@ -512,10 +560,34 @@ export const getJobApplicationsService = async (
     });
 };
 
+export const deleteJobService = async (jobId: string, companyId: string) => {
+    return await prisma.job.delete({
+        where: {
+            id: jobId,
+            company_id: companyId,
+        },
+    });
+};
+
 export const getBrokersService = async (companyId: string) => {
+    // Get all broker IDs that are already admin users (team members) for this company
+    const adminUserBrokers = await prisma.adminUser.findMany({
+        where: {
+            company_id: companyId,
+            broker_id: { not: null },
+        },
+        select: { broker_id: true },
+    });
+
+    const brokerIdsInAdminUser = adminUserBrokers
+        .map((au) => au.broker_id)
+        .filter((id): id is string => !!id);
+
+    // Return brokers who are NOT in adminUser as a member
     return await prisma.broker.findMany({
         where: {
             company_id: companyId,
+            id: { notIn: brokerIdsInAdminUser },
         },
     });
 };
@@ -566,11 +638,11 @@ export const bulkInsertListingsAdminService = async (
                         address: geocodeResult.formatted_address,
                         locality: geocodeResult.locality,
                     };
-                    console.log(
+                    logger.info(
                         `✅ Geocoded listing with address: ${listing.address}`
                     );
                 } else {
-                    console.log(
+                    logger.warn(
                         `⚠️ Unable to geocode address: ${listing.address}`
                     );
                 }
@@ -595,4 +667,151 @@ export const bulkInsertListingsAdminService = async (
         logger.error(error);
         throw error;
     }
+};
+
+// Create sponsored company post with credit deduction
+export const createSponsoredCompanyPostService = async (
+    postData: {
+        title?: string;
+        caption?: string;
+        images: string[];
+        position: PostPosition;
+        rank: number;
+    },
+    company_id: string,
+    sponsor_duration_days?: number
+) => {
+    // Validate company exists
+    const company = await prisma.company.findUnique({
+        where: { id: company_id },
+    });
+
+    if (!company) {
+        throw new Error('Company not found');
+    }
+
+    const creditsRequired = CREDIT_CONFIG.creditPricing.featuredCompanyPost;
+    const durationDays =
+        sponsor_duration_days ||
+        CREDIT_CONFIG.visibilityDuration.featuredCompanyPost;
+
+    // Calculate expiry date
+    const expiry_date = new Date();
+    expiry_date.setDate(expiry_date.getDate() + durationDays);
+
+    // Deduct credits and create order in transaction
+    const creditResult = await deductCreditsAndCreateOrder({
+        company_id,
+        credits: creditsRequired,
+        type: OrderType.COMPANY_POST,
+        type_id: '', // Will be updated after post creation
+    });
+
+    // Create the sponsored company post
+    const post = await prisma.companyPost.create({
+        data: {
+            ...postData,
+            company_id,
+            is_sponsored: true,
+            expiry_date,
+        },
+    });
+
+    // Update the order with the actual post ID
+    await prisma.order.update({
+        where: { id: creditResult.order.id },
+        data: { type_id: post.id },
+    });
+
+    return {
+        post,
+        credits_deducted: creditsRequired,
+        remaining_balance: creditResult.remaining_balance,
+        expiry_date,
+    };
+};
+
+// RBAC-aware service functions
+
+/**
+ * Get jobs with RBAC filtering
+ */
+export const getJobsWithRBACService = async (adminUserId: string) => {
+    return await PermissionChecker.getAccessibleJobs(adminUserId);
+};
+
+/**
+ * Get company posts with RBAC filtering
+ */
+export const getCompanyPostsWithRBACService = async (adminUserId: string) => {
+    return await PermissionChecker.getAccessibleCompanyPosts(adminUserId);
+};
+
+/**
+ * Get job by ID with RBAC validation
+ */
+export const getJobByIdWithRBACService = async (
+    adminUserId: string,
+    jobId: string
+) => {
+    const canView = await PermissionChecker.canViewJob(adminUserId, jobId);
+
+    if (!canView) {
+        throw new Error('Access denied: Cannot view this job');
+    }
+
+    return await prisma.job.findUnique({
+        where: { id: jobId },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+            admin_user: {
+                select: {
+                    id: true,
+                    email: true,
+                },
+            },
+        },
+    });
+};
+
+/**
+ * Get company post by ID with RBAC validation
+ */
+export const getCompanyPostByIdWithRBACService = async (
+    adminUserId: string,
+    postId: string
+) => {
+    const canView = await PermissionChecker.canViewCompanyPost(
+        adminUserId,
+        postId
+    );
+
+    if (!canView) {
+        throw new Error('Access denied: Cannot view this company post');
+    }
+
+    return await prisma.companyPost.findUnique({
+        where: { id: postId },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                },
+            },
+            admin_user: {
+                select: {
+                    id: true,
+                    email: true,
+                },
+            },
+        },
+    });
 };
