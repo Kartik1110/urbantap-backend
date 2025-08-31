@@ -65,7 +65,7 @@ export class TeamMemberService {
         const username = [
             (broker.name || '').replace(' ', '').toLowerCase().trim(),
             (broker.w_number || '').trim().slice(-4),
-        ].join();
+        ].join('');
 
         const password = Math.random().toString(36).substring(2, 15);
 
