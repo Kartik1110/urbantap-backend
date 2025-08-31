@@ -8,6 +8,8 @@ import jobRoutes from './routes/job.route';
 import { connectDB } from './utils/prisma';
 import authRoutes from './routes/auth.route';
 import adminRoutes from './routes/admin.route';
+import orderRoutes from './routes/order.route';
+import creditRoutes from './routes/credit.route';
 import projectRoutes from './routes/project.route';
 import companyRoutes from './routes/company.route';
 import brokersRoutes from './routes/brokers.route';
@@ -40,7 +42,11 @@ app.use(express.urlencoded({ extended: true }));
 // Unprotected routes
 app.use('/api/v1', companyRoutes);
 app.use('/api/v1', authRoutes);
+
+/* Admin User Routes */
 app.use('/api/v1', adminuserRoutes(upload));
+app.use('/api/v1', creditRoutes);
+app.use('/api/v1', orderRoutes);
 
 // Protected routes
 app.use('/api/v1', authMiddleware, notificationsRoutes);

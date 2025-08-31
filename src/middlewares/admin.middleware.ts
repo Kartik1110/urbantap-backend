@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
+/* This middleware is for Ruba ADMINs only */
 export const adminMiddleware = (
     req: Request,
     res: Response,
