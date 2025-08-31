@@ -12,6 +12,9 @@ import {
     getTopLocalitiesWithCounts,
     getFeaturedListingsService,
     getRecentListingsService,
+    getListingAppreciationProjections,
+    getListingROIReportService,
+    getAIReportService,
 } from '../services/listings.service';
 import { uploadToS3 } from '../utils/s3Upload';
 import prisma from '../utils/prisma';
@@ -44,7 +47,11 @@ export const getFeaturedListings = async (req: Request, res: Response) => {
         const page = parseInt(req.body.page as string) || 1;
         const page_size = parseInt(req.body.page_size as string) || 10;
 
-        const result = await getFeaturedListingsService(page, page_size, filters);
+        const result = await getFeaturedListingsService(
+            page,
+            page_size,
+            filters
+        );
         res.json({
             status: 'success',
             message: 'Featured listings fetched successfully',
@@ -315,6 +322,86 @@ export const getPopularLocalities = async (req: Request, res: Response) => {
         return res.status(500).json({
             status: 'error',
             message: 'Failed to fetch popular localities',
+            error,
+        });
+    }
+};
+
+// Get listing appreciation projections
+export const getListingAppreciation = async (req: Request, res: Response) => {
+    const listingId = req.params.id;
+
+    try {
+        const propertyData = await getListingAppreciationProjections(listingId);
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Listing appreciation fetched successfully',
+            data: {
+                property_data: propertyData,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message:
+                (error as Error).message ||
+                'Failed to fetch listing appreciation',
+            error,
+        });
+    }
+};
+
+// Get listing ROI report
+export const getListingROIReport = async (req: Request, res: Response) => {
+    const listingId = req.params.id;
+    const {
+        user_preference: num_of_years,
+        goal,
+        mortgage,
+    }: {
+        user_preference: number;
+        goal: 'Rental' | 'Self Use';
+        mortgage: boolean;
+    } = req.body;
+
+    try {
+        const roiReport = await getListingROIReportService(listingId, {
+            num_of_years,
+            is_self_use: goal === 'Self Use',
+            is_self_paid: mortgage,
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Listing ROI report fetched successfully',
+            data: roiReport,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message:
+                (error as Error).message ||
+                'Failed to fetch listing ROI report',
+            error,
+        });
+    }
+};
+
+export const getAIReport = async (req: Request, res: Response) => {
+    const listingId = req.params.id;
+
+    try {
+        const aiReport = await getAIReportService(listingId);
+        return res.status(200).json({
+            status: 'success',
+            message: 'AI report fetched successfully',
+            data: aiReport,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message: (error as Error).message || 'Failed to fetch AI report',
             error,
         });
     }

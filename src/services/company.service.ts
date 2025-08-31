@@ -202,9 +202,24 @@ export const getCompanyByIdService = async (companyId: string) => {
 
 export const getAllCompanyPostsService = async () => {
     return await prisma.companyPost.findMany({
-        orderBy: {
-            created_at: 'desc',
+        where: {
+            OR: [
+                { is_sponsored: false },
+                { is_sponsored: null },
+                {
+                    AND: [
+                        { is_sponsored: true },
+                        { expiry_date: { gt: new Date() } },
+                    ],
+                },
+            ],
         },
+        orderBy: [
+            // Prioritize active sponsored posts
+            { is_sponsored: 'desc' },
+            // Then by creation date
+            { created_at: 'desc' },
+        ],
         include: {
             company: {
                 select: {

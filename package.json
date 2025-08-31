@@ -18,7 +18,8 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write src/**/*.ts",
     "format:check": "prettier --check src/**/*.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "rbac-seed": "ts-node src/scripts/rbac-demo-seed.ts"
   },
   "keywords": [],
   "author": "",

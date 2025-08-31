@@ -8,6 +8,7 @@ import {
     createProjectService,
     getCompanyByIdService,
     createCompanyPostService,
+    createSponsoredCompanyPostService,
     editCompanyPostService,
     getAllCompanyPostsService,
     getCompanyPostByIdService,
@@ -21,13 +22,19 @@ import {
     getBrokersService,
     createListingService,
     bulkInsertListingsAdminService,
+    deleteJobService,
+    getJobsWithRBACService,
+    getCompanyPostsWithRBACService,
+    getJobByIdWithRBACService,
+    getCompanyPostByIdWithRBACService,
 } from '../services/admin-user.service';
 import { Express } from 'express';
 import prisma from '../utils/prisma';
 import { Request, Response } from 'express';
 import { uploadToS3 } from '../utils/s3Upload';
+import { createSponsoredJobService } from '../services/job.service';
 import { AuthenticatedRequest } from '../utils/verifyToken';
-import { CompanyType, Listing } from '@prisma/client';
+import { CompanyType, Currency, Listing } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 export const signup = async (req: Request, res: Response) => {
@@ -81,12 +88,12 @@ export const changePassword = async (req: Request, res: Response) => {
         const user = (req as any).user;
         if (!user?.id) return res.status(401).json({ message: 'Unauthorized' });
 
-        const { oldPassword, newPassword } = req.body;
-        if (!oldPassword || !newPassword) {
+        const { old_password, new_password } = req.body;
+        if (!old_password || !new_password) {
             return res.status(400).json({ message: 'Missing passwords.' });
         }
 
-        await changeAdminPassword(user.id, oldPassword, newPassword);
+        await changeAdminPassword(user.id, old_password, new_password);
         res.status(200).json({ message: 'Password changed successfully.' });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
@@ -330,6 +337,12 @@ export const createProject = async (
             floor_plans: floorPlanUrls,
             file_url: fileUrl,
             developer_id: req.user.entityId,
+            currency: Currency.AED,
+            developer: {
+                connect: {
+                    id: req.user.entityId,
+                },
+            },
         };
 
         const project = await createProjectService(projectData);
@@ -506,13 +519,12 @@ export const getAllCompanyPosts = async (
     res: Response
 ) => {
     try {
-        const companyId = req.user?.companyId;
-        if (!companyId) {
-            return res
-                .status(400)
-                .json({ message: 'Company ID not found for user' });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
-        const posts = await getAllCompanyPostsService(companyId);
+
+        const posts = await getCompanyPostsWithRBACService(adminUserId);
         res.json({
             status: 'success',
             message: 'Company posts fetched successfully',
@@ -527,10 +539,22 @@ export const getAllCompanyPosts = async (
     }
 };
 
-export const getCompanyPostById = async (req: Request, res: Response) => {
+export const getCompanyPostById = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const postId = req.params.id;
-        const post = await getCompanyPostByIdService(postId);
+        const adminUserId = req.user?.id;
+
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
+        }
+
+        const post = await getCompanyPostByIdWithRBACService(
+            adminUserId,
+            postId
+        );
 
         if (!post) {
             return res.status(404).json({
@@ -569,7 +593,7 @@ export const createJobController = async (
 
         const jobData = {
             ...req.body,
-            adminUserId: userId,
+            admin_user_id: userId,
             companyId,
         };
 
@@ -582,7 +606,7 @@ export const createJobController = async (
     } catch (err) {
         return res.status(500).json({
             status: 'error',
-            message: 'Server Error',
+            message: err instanceof Error ? err.message : 'Server Error',
         });
     }
 };
@@ -592,14 +616,12 @@ export const getJobsForCompanyController = async (
     res: Response
 ) => {
     try {
-        const companyId = req.user?.companyId;
-        if (!companyId) {
-            return res
-                .status(400)
-                .json({ message: 'Company ID not found for user' });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
 
-        const jobs = await getJobsForCompanyService(companyId);
+        const jobs = await getJobsWithRBACService(adminUserId);
 
         res.status(200).json({
             status: 'success',
@@ -616,13 +638,12 @@ export const getJobByIdController = async (
 ) => {
     try {
         const jobId = req.params.id;
-        const companyId = req.user?.companyId;
-        if (!companyId) {
-            return res
-                .status(400)
-                .json({ message: 'Company ID not found for user' });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
-        const job = await getJobByIdService(jobId, companyId);
+
+        const job = await getJobByIdWithRBACService(adminUserId, jobId);
 
         if (!job) {
             return res
@@ -663,13 +684,38 @@ export const getJobApplicationsController = async (
     }
 };
 
+export const deleteJobController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const jobId = req.params.id;
+        const companyId = req.user?.companyId;
+
+        if (!companyId) {
+            return res
+                .status(400)
+                .json({ message: 'Company ID not found for user' });
+        }
+
+        const job = await deleteJobService(jobId, companyId);
+
+        res.status(200).json({
+            status: 'success',
+            data: job,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
 export const getBrokers = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const companyId = req.user?.companyId;
-        if (!companyId || req.user?.type !== CompanyType.Brokerage) {
-            return res.status(401).json({
+        if (!companyId) {
+            return res.status(400).json({
                 status: 'error',
-                message: 'Unauthorized',
+                message: 'Company ID not found for user',
             });
         }
         const users = await getBrokersService(companyId);
@@ -791,6 +837,117 @@ export const bulkInsertListingsAdmin = async (
             status: 'error',
             message: 'Failed to insert listings',
             error: error,
+        });
+    }
+};
+
+export const createSponsoredJobController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Unauthorized',
+            });
+        }
+
+        const { id: userId, companyId } = req.user;
+
+        if (!companyId) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'No company linked to user',
+            });
+        }
+
+        const { sponsor_duration_days, ...jobBody } = req.body;
+
+        const jobData = {
+            ...jobBody,
+            admin_user_id: userId,
+        };
+
+        const result = await createSponsoredJobService(
+            jobData,
+            companyId,
+            sponsor_duration_days
+        );
+
+        return res.status(201).json({
+            status: 'success',
+            message: 'Sponsored job created successfully',
+            data: result,
+        });
+    } catch (error: any) {
+        console.error('Create sponsored job error:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: error.message || 'Server Error',
+        });
+    }
+};
+
+export const createSponsoredCompanyPostController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const user = req.user;
+        if (!user?.companyId) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Unauthorized: No company linked.',
+            });
+        }
+
+        const { title, caption, position, sponsor_duration_days } = req.body;
+
+        const files = req.files as Express.Multer.File[];
+        if (!files || files.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'At least one image is required.',
+            });
+        }
+
+        const imageUrls: string[] = await Promise.all(
+            files.map(async (file) => {
+                const ext = file.originalname.split('.').pop();
+                const fileName = `company_posts/image_${Date.now()}_${Math.random()
+                    .toString(36)
+                    .substring(2)}.${ext}`;
+                return await uploadToS3(file.path, fileName);
+            })
+        );
+
+        // Get current count of posts to assign rank
+        const currentCount = await prisma.companyPost.count();
+        const rank = currentCount + 1;
+
+        const result = await createSponsoredCompanyPostService(
+            {
+                title,
+                caption,
+                images: imageUrls,
+                position,
+                rank,
+            },
+            user.companyId,
+            sponsor_duration_days
+        );
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Sponsored company post created successfully',
+            data: result,
+        });
+    } catch (error: any) {
+        console.error('Create sponsored company post error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message || 'Server Error',
         });
     }
 };

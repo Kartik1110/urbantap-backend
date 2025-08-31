@@ -24,19 +24,68 @@ export const getDevelopersService = async ({
               type: CompanyType.Developer,
           };
 
-    const [developers, totalCount] = await Promise.all([
+    const [developersRaw, totalCount] = await Promise.all([
         prisma.company.findMany({
             where: whereClause,
             skip,
             take: pageSize,
-            include: {
-                developer: true,
+            select: {
+                id: true,
+                name: true,
+                name_ar: true,
+                logo: true,
+                description: true,
+                phone: true,
+                email: true,
+                address: true,
+                website: true,
+                developer: {
+                    select: {
+                        id: true,
+                        cover_image: true,
+                        createdAt: true,
+                        projects: {
+                            select: {
+                                id: true,
+                            },
+                        },
+                        Broker: {
+                            select: {
+                                id: true,
+                            },
+                        },
+                    },
+                },
             },
         }),
         prisma.company.count({
             where: whereClause,
         }),
     ]);
+
+    const developers = developersRaw.map((developer) => {
+        const projectCount = developer.developer?.projects?.length || 0;
+        const brokerCount = developer.developer?.Broker?.length || 0;
+
+        return {
+            id: developer.developer?.id,
+            cover_image: developer.developer?.cover_image,
+            createdAt: developer.developer?.createdAt,
+            company: {
+                id: developer.id,
+                name: developer.name,
+                name_ar: developer.name_ar,
+                logo: developer.logo,
+                description: developer.description,
+                phone: developer.phone,
+                email: developer.email,
+                address: developer.address,
+                website: developer.website,
+            },
+            project_count: projectCount,
+            broker_count: brokerCount,
+        };
+    }).filter(developer => developer.id); // Filter out any entries where developer doesn't exist
 
     const pagination = {
         page,
