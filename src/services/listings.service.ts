@@ -47,7 +47,6 @@ let propertiesData: MergedPropertyData;
 
 import {
     calculateAppreciationDataPoints,
-    calculateBreakEvenPeriod,
     calculateBreakEvenPeriodByType,
     calculateCapitalGains,
     calculateCumulativeProfitPerYearByType,
@@ -59,7 +58,6 @@ import {
     getInvestmentGoalsWithROI,
     getPropertyData,
     PropertyDataPoint,
-    calculatePropertyROI,
     getListingAppreciationInYear,
     getRentalPriceInYear,
     MergedPropertyData,
@@ -1396,17 +1394,21 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
         listing.type
     );
 
-    const roiIn5Years = calculatePropertyROI(
+    const roiIn5Years = calculateCumulativeROIByType(
         propertyData,
         5,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        false, // is_self_use - assuming rental property
+        true // is_self_paid - assuming mortgage
     );
 
-    const breakEvenYear = calculateBreakEvenPeriod(
+    const breakEvenYear = calculateBreakEvenPeriodByType(
         propertyData,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        false, // is_self_use - assuming rental property
+        true // is_self_paid - assuming self-paid (no mortgage)
     );
 
     const increaseInRentalPrice = (year: number) => {

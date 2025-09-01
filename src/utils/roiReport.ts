@@ -806,7 +806,7 @@ export function calculateCumulativeROIByType(
     isSelfPaid: boolean,
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
     annualInterestRate: number = DEFFAULT_INTEREST_RATE
-): number | null {
+): number {
     if (years < 1 || years > 10) {
         throw new Error('Years must be between 1 and 10');
     }
@@ -825,7 +825,7 @@ export function calculateCumulativeROIByType(
     for (let year = 0; year < years; year++) {
         const yearData = propertyData[year];
         if (!yearData) {
-            return null; // Data not available for this year
+            throw new Error('Year data not found'); // Data not available for this year
         }
 
         // Calculate year-over-year appreciation
@@ -835,7 +835,7 @@ export function calculateCumulativeROIByType(
         } else {
             const previousYearData = propertyData[year - 1];
             if (!previousYearData) {
-                return null; // Previous year data not available
+                throw new Error('Previous year data not found'); // Previous year data not available
             }
             appreciationPercentage =
                 yearData.appreciation_perc - previousYearData.appreciation_perc;
