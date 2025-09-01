@@ -1497,7 +1497,7 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
             designation: listing.broker.designation,
             y_o_e: listing.broker.y_o_e,
             specialities: listing.broker.specialities,
-            company: listing.broker.company?.name,
+            company: { name: listing.broker.company?.name },
             profile_pic: listing.broker.profile_pic,
             country_code: listing.broker.country_code,
             w_number: listing.broker.w_number,
