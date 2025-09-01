@@ -1280,8 +1280,8 @@ export const getListingROIReportService = async (
             preference_year: Math.round(futureValue),
         },
         expected_rental: {
-            short_term: Math.round(expectedRental.today),
-            long_term: Math.round(expectedRental.long_term),
+            short_term: Math.round(expectedRental.today * 14),
+            long_term: Math.round(expectedRental.long_term * 14),
         },
         break_even_year: breakEvenYear,
         avg_roi_per_year: Math.round(avgRoiPerYear * 100) / 100, // Round to 2 decimal places
