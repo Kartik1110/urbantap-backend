@@ -429,9 +429,10 @@ export function calculateBreakEvenPeriod(
         }
     }
 
-    const message = 'Not breaking even within available data horizon';
-    logger.error(`calculateBreakEvenPeriod: ${message}`);
-    throw new Error(message);
+    logger.warn(
+        'Not breaking even within available data horizon, returning 10'
+    );
+    return 10;
 }
 
 /**
@@ -1440,9 +1441,10 @@ export function calculateBreakEvenPeriodByType(
         }
     }
 
-    const message = 'Not breaking even within available data horizon';
-    logger.error(`calculateBreakEvenPeriodByType: ${message}`);
-    throw new Error(message);
+    logger.warn(
+        'Not breaking even within available data horizon, returning 10'
+    );
+    return 10;
 }
 
 export function getListingAppreciationInYear(
