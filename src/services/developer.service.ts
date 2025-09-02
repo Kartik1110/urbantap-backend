@@ -115,20 +115,21 @@ export const getDeveloperDetailsService = async (developerId: string) => {
     const developer = await prisma.developer.findUnique({
         where: { id: developerId },
         include: {
-            projects: true,
-            Broker: {
-                include: {
-                    company: true, // include company data for each broker
-                },
+            projects: {
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    image: true,
+                    images: true,
+                    address: true,
+                }
             },
             company: {
                 select: {
                     name: true,
                     logo: true,
                     description: true,
-                    email: true,
-                    phone: true,
-                    address: true,
                 },
             },
         },
@@ -136,43 +137,13 @@ export const getDeveloperDetailsService = async (developerId: string) => {
 
     if (!developer) throw new Error('Developer not found');
 
-    const projectCount = developer.projects.length;
-
-    const groupedProjects = {
-        all: developer.projects,
-        off_plan: developer.projects.filter(
-            (p) => p.type === Category.Off_plan
-        ),
-        ready: developer.projects.filter(
-            (p) => p.type === Category.Ready_to_move
-        ),
-    };
-
-    const brokers = developer.Broker.map((broker) => ({
-        id: broker.id,
-        name: broker.name,
-        profile_pic: broker.profile_pic,
-        company: broker.company
-            ? {
-                  name: broker.company.name,
-                  logo: broker.company.logo,
-                  address: broker.company.address,
-              }
-            : null,
-    }));
-
     return {
         id: developer.id,
         name: developer.company?.name,
         logo: developer.company?.logo,
         cover_image: developer.cover_image,
         description: developer.company?.description,
-        project_count: projectCount,
-        contact: {
-            email: developer.company?.email,
-            phone: developer.company?.phone,
-        },
-        projects: groupedProjects,
-        brokers,
+        project_count: developer.projects.length,
+        projects: developer.projects,
     };
 };

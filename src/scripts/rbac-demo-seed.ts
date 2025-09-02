@@ -23,35 +23,35 @@ async function createRBACDemoData() {
             },
         });
 
-        const postManagerRole = await prisma.roleGroup.create({
-            data: {
-                name: 'Post Manager',
-                description: 'Can manage company posts',
-                permissions: [
-                    Permission.CREATE_COMPANY_POST,
-                    Permission.EDIT_COMPANY_POST,
-                    Permission.DELETE_COMPANY_POST,
-                    Permission.VIEW_COMPANY_POST,
-                ],
-            },
-        });
+        // const postManagerRole = await prisma.roleGroup.create({
+        //     data: {
+        //         name: 'Post Manager',
+        //         description: 'Can manage company posts',
+        //         permissions: [
+        //             Permission.CREATE_COMPANY_POST,
+        //             Permission.EDIT_COMPANY_POST,
+        //             Permission.DELETE_COMPANY_POST,
+        //             Permission.VIEW_COMPANY_POST,
+        //         ],
+        //     },
+        // });
 
-        const fullAccessRole = await prisma.roleGroup.create({
-            data: {
-                name: 'Full Access',
-                description: 'Can manage both jobs and company posts',
-                permissions: [
-                    Permission.CREATE_JOB,
-                    Permission.EDIT_JOB,
-                    Permission.DELETE_JOB,
-                    Permission.VIEW_JOB,
-                    Permission.CREATE_COMPANY_POST,
-                    Permission.EDIT_COMPANY_POST,
-                    Permission.DELETE_COMPANY_POST,
-                    Permission.VIEW_COMPANY_POST,
-                ],
-            },
-        });
+        // const fullAccessRole = await prisma.roleGroup.create({
+        //     data: {
+        //         name: 'Full Access',
+        //         description: 'Can manage both jobs and company posts',
+        //         permissions: [
+        //             Permission.CREATE_JOB,
+        //             Permission.EDIT_JOB,
+        //             Permission.DELETE_JOB,
+        //             Permission.VIEW_JOB,
+        //             Permission.CREATE_COMPANY_POST,
+        //             Permission.EDIT_COMPANY_POST,
+        //             Permission.DELETE_COMPANY_POST,
+        //             Permission.VIEW_COMPANY_POST,
+        //         ],
+        //     },
+        // });
 
         const readOnlyRole = await prisma.roleGroup.create({
             data: {
@@ -66,8 +66,8 @@ async function createRBACDemoData() {
 
         console.log('✅ Role groups created:', {
             jobManager: jobManagerRole.id,
-            postManager: postManagerRole.id,
-            fullAccess: fullAccessRole.id,
+            // postManager: postManagerRole.id,
+            // fullAccess: fullAccessRole.id,
             readOnly: readOnlyRole.id,
         });
 
@@ -123,22 +123,22 @@ async function createRBACDemoData() {
         });
 
         // Team member 2: Post Manager
-        const postManager = await prisma.adminUser.create({
-            data: {
-                email: 'post-manager@demo.com',
-                password: hashedPassword,
-                type: AdminUserType.MEMBER,
-                broker_id: company.brokers[1].id,
-                role_group_id: postManagerRole.id,
-                company_id: company.id,
-            },
-        });
+        // const postManager = await prisma.adminUser.create({
+        //     data: {
+        //         email: 'post-manager@demo.com',
+        //         password: hashedPassword,
+        //         type: AdminUserType.MEMBER,
+        //         broker_id: company.brokers[1].id,
+        //         role_group_id: postManagerRole.id,
+        //         company_id: company.id,
+        //     },
+        // });
 
         // Update broker to link to admin user
-        await prisma.broker.update({
-            where: { id: company.brokers[1].id },
-            data: { admin_user_id: postManager.id },
-        });
+        // await prisma.broker.update({
+        //     where: { id: company.brokers[1].id },
+        //     data: { admin_user_id: postManager.id },
+        // });
 
         // Team member 3: Read Only
         const readOnlyUser = await prisma.adminUser.create({
@@ -160,7 +160,7 @@ async function createRBACDemoData() {
 
         console.log('✅ Team members created:', {
             jobManager: { email: 'job-manager@demo.com', id: jobManager.id },
-            postManager: { email: 'post-manager@demo.com', id: postManager.id },
+            // postManager: { email: 'post-manager@demo.com', id: postManager.id },
             readOnly: { email: 'readonly@demo.com', id: readOnlyUser.id },
         });
 
@@ -184,36 +184,36 @@ async function createRBACDemoData() {
         });
 
         // Create a company post by the post manager
-        const demoPost = await prisma.companyPost.create({
-            data: {
-                title: 'New Office Opening',
-                caption:
-                    'We are excited to announce our new office in Dubai Marina!',
-                images: ['https://example.com/office.jpg'],
-                position: 'Home',
-                rank: 1,
-                company_id: company.id,
-                admin_user_id: postManager.id,
-            },
-        });
+        // const demoPost = await prisma.companyPost.create({
+        //     data: {
+        //         title: 'New Office Opening',
+        //         caption:
+        //             'We are excited to announce our new office in Dubai Marina!',
+        //         images: ['https://example.com/office.jpg'],
+        //         position: 'Home',
+        //         rank: 1,
+        //         company_id: company.id,
+        //         admin_user_id: postManager.id,
+        //     },
+        // });
 
-        console.log('✅ Demo content created:', {
-            job: { title: demoJob.title, id: demoJob.id },
-            post: { title: demoPost.title, id: demoPost.id },
-        });
+        // console.log('✅ Demo content created:', {
+        //     job: { title: demoJob.title, id: demoJob.id },
+        //     post: { title: demoPost.title, id: demoPost.id },
+        // });
 
         console.log('\n🎉 RBAC demo data created successfully!');
         console.log('\n📋 Test Credentials:');
         console.log('Job Manager: job-manager@demo.com / demo123');
-        console.log('Post Manager: post-manager@demo.com / demo123');
+        // console.log('Post Manager: post-manager@demo.com / demo123');
         console.log('Read Only: readonly@demo.com / demo123');
         console.log('\n🧪 Test Scenarios:');
         console.log(
             '1. Login as job-manager@demo.com - should be able to create/edit jobs only'
         );
-        console.log(
-            '2. Login as post-manager@demo.com - should be able to create/edit posts only'
-        );
+        // console.log(
+        //     '2. Login as post-manager@demo.com - should be able to create/edit posts only'
+        // );
         console.log(
             '3. Login as readonly@demo.com - should only be able to view content'
         );

@@ -47,7 +47,6 @@ let propertiesData: MergedPropertyData;
 
 import {
     calculateAppreciationDataPoints,
-    calculateBreakEvenPeriod,
     calculateBreakEvenPeriodByType,
     calculateCapitalGains,
     calculateCumulativeProfitPerYearByType,
@@ -59,7 +58,6 @@ import {
     getInvestmentGoalsWithROI,
     getPropertyData,
     PropertyDataPoint,
-    calculatePropertyROI,
     getListingAppreciationInYear,
     getRentalPriceInYear,
     MergedPropertyData,
@@ -1280,8 +1278,8 @@ export const getListingROIReportService = async (
             preference_year: Math.round(futureValue),
         },
         expected_rental: {
-            short_term: Math.round(expectedRental.today),
-            long_term: Math.round(expectedRental.long_term),
+            short_term: Math.round(expectedRental.today * 14),
+            long_term: Math.round(expectedRental.long_term * 14),
         },
         break_even_year: breakEvenYear,
         avg_roi_per_year: Math.round(avgRoiPerYear * 100) / 100, // Round to 2 decimal places
@@ -1396,17 +1394,21 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
         listing.type
     );
 
-    const roiIn5Years = calculatePropertyROI(
+    const roiIn5Years = calculateCumulativeROIByType(
         propertyData,
         5,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        false, // is_self_use - assuming rental property
+        true // is_self_paid - assuming mortgage
     );
 
-    const breakEvenYear = calculateBreakEvenPeriod(
+    const breakEvenYear = calculateBreakEvenPeriodByType(
         propertyData,
         listing.max_price,
-        listing.sq_ft
+        listing.sq_ft,
+        false, // is_self_use - assuming rental property
+        true // is_self_paid - assuming self-paid (no mortgage)
     );
 
     const increaseInRentalPrice = (year: number) => {
@@ -1518,7 +1520,7 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
             designation: listing.broker.designation,
             y_o_e: listing.broker.y_o_e,
             specialities: listing.broker.specialities,
-            company: listing.broker.company?.name,
+            company: { name: listing.broker.company?.name },
             profile_pic: listing.broker.profile_pic,
             country_code: listing.broker.country_code,
             w_number: listing.broker.w_number,
