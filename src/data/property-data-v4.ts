@@ -1528,1396 +1528,1396 @@ const propertyData: {
             },
         ],
     },
-'Jumeirah 3': {
-    Apartment: [
-        {
-            appreciation_perc: 10.52,
-            rent_per_sq_ft: 10,
-        },
-        {
-            appreciation_perc: 24.02,
-            rent_per_sq_ft: 10.8,
-        },
-        {
-            appreciation_perc: 37.52,
-            rent_per_sq_ft: 11.66,
-        },
-        {
-            appreciation_perc: 51.02,
-            rent_per_sq_ft: 12.59,
-        },
-        {
-            appreciation_perc: 64.52,
-            rent_per_sq_ft: 13.6,
-        },
-        {
-            appreciation_perc: 78.02,
-            rent_per_sq_ft: 14.69,
-        },
-        {
-            appreciation_perc: 91.52,
-            rent_per_sq_ft: 15.86,
-        },
-        {
-            appreciation_perc: 105.02,
-            rent_per_sq_ft: 17.13,
-        },
-        {
-            appreciation_perc: 128.52,
-            rent_per_sq_ft: 18.5,
-        },
-        {
-            appreciation_perc: 142.02,
-            rent_per_sq_ft: 19.98,
-        },
-    ],
-},
-'Al Sufouh 1': {
-    Apartment: [
-        {
-            appreciation_perc: 9.3,
-            rent_per_sq_ft: 8,
-        },
-        {
-            appreciation_perc: 22.8,
-            rent_per_sq_ft: 8.64,
-        },
-        {
-            appreciation_perc: 36.3,
-            rent_per_sq_ft: 9.33,
-        },
-        {
-            appreciation_perc: 49.8,
-            rent_per_sq_ft: 10.08,
-        },
-        {
-            appreciation_perc: 63.3,
-            rent_per_sq_ft: 10.89,
-        },
-        {
-            appreciation_perc: 76.8,
-            rent_per_sq_ft: 11.76,
-        },
-        {
-            appreciation_perc: 90.3,
-            rent_per_sq_ft: 12.7,
-        },
-        {
-            appreciation_perc: 103.8,
-            rent_per_sq_ft: 13.72,
-        },
-        {
-            appreciation_perc: 127.3,
-            rent_per_sq_ft: 14.81,
-        },
-        {
-            appreciation_perc: 150.8,
-            rent_per_sq_ft: 16,
-        },
-    ],
-},
-'Madinat Hind 4': {
-    Apartment: [
-        {
-            appreciation_perc: 8.32,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 20.82,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 32.32,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 47.82,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 57.32,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 69.82,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 78.32,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 91.82,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 105.32,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 138.82,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Dubai Marina': {
-    Apartment: [
-        {
-            appreciation_perc: 5.58,
-            rent_per_sq_ft: 12,
-        },
-        {
-            appreciation_perc: 15.08,
-            rent_per_sq_ft: 12.96,
-        },
-        {
-            appreciation_perc: 28.58,
-            rent_per_sq_ft: 14,
-        },
-        {
-            appreciation_perc: 42.08,
-            rent_per_sq_ft: 15.12,
-        },
-        {
-            appreciation_perc: 55.58,
-            rent_per_sq_ft: 16.33,
-        },
-        {
-            appreciation_perc: 69.08,
-            rent_per_sq_ft: 17.64,
-        },
-        {
-            appreciation_perc: 82.58,
-            rent_per_sq_ft: 19.05,
-        },
-        {
-            appreciation_perc: 96.08,
-            rent_per_sq_ft: 20.57,
-        },
-        {
-            appreciation_perc: 119.58,
-            rent_per_sq_ft: 22.22,
-        },
-        {
-            appreciation_perc: 143.08,
-            rent_per_sq_ft: 24,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 11.44,
-            rent_per_sq_ft: 12,
-        },
-        {
-            appreciation_perc: 26.94,
-            rent_per_sq_ft: 12.96,
-        },
-        {
-            appreciation_perc: 40.44,
-            rent_per_sq_ft: 14,
-        },
-        {
-            appreciation_perc: 53.94,
-            rent_per_sq_ft: 15.12,
-        },
-        {
-            appreciation_perc: 67.44,
-            rent_per_sq_ft: 16.33,
-        },
-        {
-            appreciation_perc: 80.94,
-            rent_per_sq_ft: 17.64,
-        },
-        {
-            appreciation_perc: 94.44,
-            rent_per_sq_ft: 19.05,
-        },
-        {
-            appreciation_perc: 117.94,
-            rent_per_sq_ft: 20.57,
-        },
-        {
-            appreciation_perc: 135.44,
-            rent_per_sq_ft: 22.22,
-        },
-        {
-            appreciation_perc: 154.94,
-            rent_per_sq_ft: 24,
-        },
-    ],
-},
-'Dubai Production City': {
-    Apartment: [
-        {
-            appreciation_perc: 11.13,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 19.63,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 26.13,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 33.63,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 39.13,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 49.63,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 63.13,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 76.63,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 90.13,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 103.63,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 8.41,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 17.91,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 21.41,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 31.91,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 43.41,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 51.91,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 65.41,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 78.91,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 89.41,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 105.91,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-Mirdif: {
-    Apartment: [
-        {
-            appreciation_perc: 5.84,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 10.34,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 17.84,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 25.34,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 33.84,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 39.34,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 44.84,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 59.34,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 67.84,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 78.34,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 6.21,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 13.71,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 19.21,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 27.71,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 38.21,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 51.71,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 65.21,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 68.71,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 75.21,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 85.71,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Muhaisnah 1': {
-    Apartment: [
-        {
-            appreciation_perc: 6.59,
-            rent_per_sq_ft: 8,
-        },
-        {
-            appreciation_perc: 17.09,
-            rent_per_sq_ft: 8.64,
-        },
-        {
-            appreciation_perc: 30.59,
-            rent_per_sq_ft: 9.33,
-        },
-        {
-            appreciation_perc: 41.09,
-            rent_per_sq_ft: 10.08,
-        },
-        {
-            appreciation_perc: 57.59,
-            rent_per_sq_ft: 10.89,
-        },
-        {
-            appreciation_perc: 62.09,
-            rent_per_sq_ft: 11.76,
-        },
-        {
-            appreciation_perc: 74.59,
-            rent_per_sq_ft: 12.7,
-        },
-        {
-            appreciation_perc: 88.09,
-            rent_per_sq_ft: 13.72,
-        },
-        {
-            appreciation_perc: 99.59,
-            rent_per_sq_ft: 14.81,
-        },
-        {
-            appreciation_perc: 115.09,
-            rent_per_sq_ft: 16,
-        },
-    ],
-},
-'Nadd Al Hamar': {
-    Apartment: [
-        {
-            appreciation_perc: 6.4,
-            rent_per_sq_ft: 10,
-        },
-        {
-            appreciation_perc: 12.3,
-            rent_per_sq_ft: 10.8,
-        },
-        {
-            appreciation_perc: 18.8,
-            rent_per_sq_ft: 11.66,
-        },
-        {
-            appreciation_perc: 29.3,
-            rent_per_sq_ft: 12.59,
-        },
-        {
-            appreciation_perc: 42.8,
-            rent_per_sq_ft: 13.6,
-        },
-        {
-            appreciation_perc: 56.3,
-            rent_per_sq_ft: 14.69,
-        },
-        {
-            appreciation_perc: 69.8,
-            rent_per_sq_ft: 15.86,
-        },
-        {
-            appreciation_perc: 73.3,
-            rent_per_sq_ft: 17.13,
-        },
-        {
-            appreciation_perc: 86.8,
-            rent_per_sq_ft: 18.5,
-        },
-        {
-            appreciation_perc: 100.3,
-            rent_per_sq_ft: 19.98,
-        },
-    ],
-},
-'Nad Al Sheba': {
-    Apartment: [
-        {
-            appreciation_perc: 5.18,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 11.68,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 18.18,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 26.68,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 37.18,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 51.68,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 64.18,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 77.68,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 91.18,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 104.68,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 6.72,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 12.22,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 19.72,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 29.22,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 42.72,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 56.22,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 69.72,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 78.22,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 96.72,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 109.22,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Nad Al Sheba 2': {
-    Apartment: [
-        {
-            appreciation_perc: 8.61,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 20.11,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 33.61,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 43.11,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 53.61,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 64.11,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 77.61,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 91.11,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 114.61,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 128.11,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 10.08,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 23.58,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 37.08,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 50.58,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 64.08,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 77.58,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 91.08,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 104.58,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 128.08,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 141.58,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Dubai Silicon Oasis': {
-    Apartment: [
-        {
-            appreciation_perc: 12.01,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 27.51,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 41.01,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 54.51,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 68.01,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 81.51,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 95.01,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 118.51,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 132.01,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 155.51,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Dubai Islands': {
-    Apartment: [
-        {
-            appreciation_perc: 6.46,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 14.96,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 21.46,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 33.96,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 43.46,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 60.96,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 74.46,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 87.96,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 101.46,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 124.96,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'The Palm Jumeirah': {
-    Apartment: [
-        {
-            appreciation_perc: 9.94,
-            rent_per_sq_ft: 12,
-        },
-        {
-            appreciation_perc: 23.44,
-            rent_per_sq_ft: 12.96,
-        },
-        {
-            appreciation_perc: 34.94,
-            rent_per_sq_ft: 14,
-        },
-        {
-            appreciation_perc: 48.44,
-            rent_per_sq_ft: 15.12,
-        },
-        {
-            appreciation_perc: 59.94,
-            rent_per_sq_ft: 16.33,
-        },
-        {
-            appreciation_perc: 72.44,
-            rent_per_sq_ft: 17.64,
-        },
-        {
-            appreciation_perc: 90.94,
-            rent_per_sq_ft: 19.05,
-        },
-        {
-            appreciation_perc: 104.44,
-            rent_per_sq_ft: 20.57,
-        },
-        {
-            appreciation_perc: 137.94,
-            rent_per_sq_ft: 22.22,
-        },
-        {
-            appreciation_perc: 159.44,
-            rent_per_sq_ft: 24,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 12.67,
-            rent_per_sq_ft: 12,
-        },
-        {
-            appreciation_perc: 28.17,
-            rent_per_sq_ft: 12.96,
-        },
-        {
-            appreciation_perc: 36.67,
-            rent_per_sq_ft: 14,
-        },
-        {
-            appreciation_perc: 49.17,
-            rent_per_sq_ft: 15.12,
-        },
-        {
-            appreciation_perc: 69.67,
-            rent_per_sq_ft: 16.33,
-        },
-        {
-            appreciation_perc: 83.17,
-            rent_per_sq_ft: 17.64,
-        },
-        {
-            appreciation_perc: 96.67,
-            rent_per_sq_ft: 19.05,
-        },
-        {
-            appreciation_perc: 110.17,
-            rent_per_sq_ft: 20.57,
-        },
-        {
-            appreciation_perc: 133.67,
-            rent_per_sq_ft: 22.22,
-        },
-        {
-            appreciation_perc: 157.17,
-            rent_per_sq_ft: 24,
-        },
-    ],
-},
-'Ras Al Khor Industrial Area 1': {
-    Apartment: [
-        {
-            appreciation_perc: 5.67,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 10.17,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 17.67,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 24.17,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 33.67,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 41.17,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 51.67,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 68.17,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 74.67,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 85.17,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-Deira: {
-    Apartment: [
-        {
-            appreciation_perc: 9.51,
-            rent_per_sq_ft: 7.25,
-        },
-        {
-            appreciation_perc: 23.01,
-            rent_per_sq_ft: 7.83,
-        },
-        {
-            appreciation_perc: 32.51,
-            rent_per_sq_ft: 8.46,
-        },
-        {
-            appreciation_perc: 40.01,
-            rent_per_sq_ft: 9.14,
-        },
-        {
-            appreciation_perc: 48.51,
-            rent_per_sq_ft: 9.87,
-        },
-        {
-            appreciation_perc: 57.01,
-            rent_per_sq_ft: 10.66,
-        },
-        {
-            appreciation_perc: 67.51,
-            rent_per_sq_ft: 11.51,
-        },
-        {
-            appreciation_perc: 77.01,
-            rent_per_sq_ft: 12.43,
-        },
-        {
-            appreciation_perc: 86.51,
-            rent_per_sq_ft: 13.42,
-        },
-        {
-            appreciation_perc: 101.01,
-            rent_per_sq_ft: 14.5,
-        },
-    ],
-},
-'Saih Shuaib 2': {
-    Apartment: [
-        {
-            appreciation_perc: 12.33,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 28.83,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 42.33,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 55.83,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 69.33,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 82.83,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 96.33,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 119.83,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 137.33,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 156.83,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 11.07,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 25.57,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 39.07,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 52.57,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 66.07,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 79.57,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 93.07,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 109.57,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 130.07,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 143.57,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Umm Suqeim 3': {
-    Apartment: [
-        {
-            appreciation_perc: 5.25,
-            rent_per_sq_ft: 16,
-        },
-        {
-            appreciation_perc: 12.75,
-            rent_per_sq_ft: 17.28,
-        },
-        {
-            appreciation_perc: 21.25,
-            rent_per_sq_ft: 18.66,
-        },
-        {
-            appreciation_perc: 26.75,
-            rent_per_sq_ft: 20.15,
-        },
-        {
-            appreciation_perc: 38.25,
-            rent_per_sq_ft: 21.76,
-        },
-        {
-            appreciation_perc: 51.75,
-            rent_per_sq_ft: 23.5,
-        },
-        {
-            appreciation_perc: 65.25,
-            rent_per_sq_ft: 25.38,
-        },
-        {
-            appreciation_perc: 78.75,
-            rent_per_sq_ft: 27.41,
-        },
-        {
-            appreciation_perc: 92.25,
-            rent_per_sq_ft: 29.6,
-        },
-        {
-            appreciation_perc: 105.75,
-            rent_per_sq_ft: 31.97,
-        },
-    ],
-},
-Liwan: {
-    Apartment: [
-        {
-            appreciation_perc: 12.66,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 27.16,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 42.66,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 56.16,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 69.66,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 83.16,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 96.66,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 110.16,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 133.66,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 157.16,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 5.33,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 12.83,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 18.33,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 24.83,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 32.33,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 41.83,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 55.33,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 68.83,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 82.33,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 95.83,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'City of Arabia': {
-    Apartment: [
-        {
-            appreciation_perc: 12.94,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 27.44,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 43.94,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 56.44,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 69.94,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 72.44,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 86.94,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 100.44,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 113.94,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 137.44,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-    Villa: [
-        {
-            appreciation_perc: 7.39,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 17.89,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 31.39,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 44.89,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 58.39,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 71.89,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 85.39,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 98.89,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 112.39,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 135.89,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Wadi Al Safa 5': {
-    Villa: [
-        {
-            appreciation_perc: 5.16,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 12.66,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 18.16,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 28.66,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 39.16,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 52.66,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 60.16,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 73.66,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 87.16,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 102.66,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'International City Phase(2)': {
-    Apartment: [
-        {
-            appreciation_perc: 11.37,
-            rent_per_sq_ft: 6,
-        },
-        {
-            appreciation_perc: 25.87,
-            rent_per_sq_ft: 6.48,
-        },
-        {
-            appreciation_perc: 39.37,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 52.87,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 66.37,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 79.87,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 83.37,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 96.87,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 110.37,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 133.87,
-            rent_per_sq_ft: 11.99,
-        },
-    ],
-},
-"Za'abeel 1": {
-    Apartment: [
-        {
-            appreciation_perc: 5.07,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 11.57,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 17.07,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 25.57,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 36.07,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 51.57,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 65.07,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 78.57,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 88.07,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 99.57,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
-'Emirates Hills': {
-    Villa: [
-        {
-            appreciation_perc: 10.59,
-            rent_per_sq_ft: 7,
-        },
-        {
-            appreciation_perc: 24.09,
-            rent_per_sq_ft: 7.56,
-        },
-        {
-            appreciation_perc: 37.59,
-            rent_per_sq_ft: 8.16,
-        },
-        {
-            appreciation_perc: 43.09,
-            rent_per_sq_ft: 8.81,
-        },
-        {
-            appreciation_perc: 54.59,
-            rent_per_sq_ft: 9.52,
-        },
-        {
-            appreciation_perc: 68.09,
-            rent_per_sq_ft: 10.28,
-        },
-        {
-            appreciation_perc: 79.59,
-            rent_per_sq_ft: 11.1,
-        },
-        {
-            appreciation_perc: 89.09,
-            rent_per_sq_ft: 11.99,
-        },
-        {
-            appreciation_perc: 108.59,
-            rent_per_sq_ft: 12.95,
-        },
-        {
-            appreciation_perc: 122.09,
-            rent_per_sq_ft: 13.99,
-        },
-    ],
-},
+    'Jumeirah 3': {
+        Apartment: [
+            {
+                appreciation_perc: 10.52,
+                rent_per_sq_ft: 10,
+            },
+            {
+                appreciation_perc: 24.02,
+                rent_per_sq_ft: 10.8,
+            },
+            {
+                appreciation_perc: 37.52,
+                rent_per_sq_ft: 11.66,
+            },
+            {
+                appreciation_perc: 51.02,
+                rent_per_sq_ft: 12.59,
+            },
+            {
+                appreciation_perc: 64.52,
+                rent_per_sq_ft: 13.6,
+            },
+            {
+                appreciation_perc: 78.02,
+                rent_per_sq_ft: 14.69,
+            },
+            {
+                appreciation_perc: 91.52,
+                rent_per_sq_ft: 15.86,
+            },
+            {
+                appreciation_perc: 105.02,
+                rent_per_sq_ft: 17.13,
+            },
+            {
+                appreciation_perc: 128.52,
+                rent_per_sq_ft: 18.5,
+            },
+            {
+                appreciation_perc: 142.02,
+                rent_per_sq_ft: 19.98,
+            },
+        ],
+    },
+    'Al Sufouh 1': {
+        Apartment: [
+            {
+                appreciation_perc: 9.3,
+                rent_per_sq_ft: 8,
+            },
+            {
+                appreciation_perc: 22.8,
+                rent_per_sq_ft: 8.64,
+            },
+            {
+                appreciation_perc: 36.3,
+                rent_per_sq_ft: 9.33,
+            },
+            {
+                appreciation_perc: 49.8,
+                rent_per_sq_ft: 10.08,
+            },
+            {
+                appreciation_perc: 63.3,
+                rent_per_sq_ft: 10.89,
+            },
+            {
+                appreciation_perc: 76.8,
+                rent_per_sq_ft: 11.76,
+            },
+            {
+                appreciation_perc: 90.3,
+                rent_per_sq_ft: 12.7,
+            },
+            {
+                appreciation_perc: 103.8,
+                rent_per_sq_ft: 13.72,
+            },
+            {
+                appreciation_perc: 127.3,
+                rent_per_sq_ft: 14.81,
+            },
+            {
+                appreciation_perc: 150.8,
+                rent_per_sq_ft: 16,
+            },
+        ],
+    },
+    'Madinat Hind 4': {
+        Apartment: [
+            {
+                appreciation_perc: 8.32,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 20.82,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 32.32,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 47.82,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 57.32,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 69.82,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 78.32,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 91.82,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 105.32,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 138.82,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Dubai Marina': {
+        Apartment: [
+            {
+                appreciation_perc: 5.58,
+                rent_per_sq_ft: 12,
+            },
+            {
+                appreciation_perc: 15.08,
+                rent_per_sq_ft: 12.96,
+            },
+            {
+                appreciation_perc: 28.58,
+                rent_per_sq_ft: 14,
+            },
+            {
+                appreciation_perc: 42.08,
+                rent_per_sq_ft: 15.12,
+            },
+            {
+                appreciation_perc: 55.58,
+                rent_per_sq_ft: 16.33,
+            },
+            {
+                appreciation_perc: 69.08,
+                rent_per_sq_ft: 17.64,
+            },
+            {
+                appreciation_perc: 82.58,
+                rent_per_sq_ft: 19.05,
+            },
+            {
+                appreciation_perc: 96.08,
+                rent_per_sq_ft: 20.57,
+            },
+            {
+                appreciation_perc: 119.58,
+                rent_per_sq_ft: 22.22,
+            },
+            {
+                appreciation_perc: 143.08,
+                rent_per_sq_ft: 24,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 11.44,
+                rent_per_sq_ft: 12,
+            },
+            {
+                appreciation_perc: 26.94,
+                rent_per_sq_ft: 12.96,
+            },
+            {
+                appreciation_perc: 40.44,
+                rent_per_sq_ft: 14,
+            },
+            {
+                appreciation_perc: 53.94,
+                rent_per_sq_ft: 15.12,
+            },
+            {
+                appreciation_perc: 67.44,
+                rent_per_sq_ft: 16.33,
+            },
+            {
+                appreciation_perc: 80.94,
+                rent_per_sq_ft: 17.64,
+            },
+            {
+                appreciation_perc: 94.44,
+                rent_per_sq_ft: 19.05,
+            },
+            {
+                appreciation_perc: 117.94,
+                rent_per_sq_ft: 20.57,
+            },
+            {
+                appreciation_perc: 135.44,
+                rent_per_sq_ft: 22.22,
+            },
+            {
+                appreciation_perc: 154.94,
+                rent_per_sq_ft: 24,
+            },
+        ],
+    },
+    'Dubai Production City': {
+        Apartment: [
+            {
+                appreciation_perc: 11.13,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 19.63,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 26.13,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 33.63,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 39.13,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 49.63,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 63.13,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 76.63,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 90.13,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 103.63,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 8.41,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 17.91,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 21.41,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 31.91,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 43.41,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 51.91,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 65.41,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 78.91,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 89.41,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 105.91,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    Mirdif: {
+        Apartment: [
+            {
+                appreciation_perc: 5.84,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 10.34,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 17.84,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 25.34,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 33.84,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 39.34,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 44.84,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 59.34,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 67.84,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 78.34,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 6.21,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 13.71,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 19.21,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 27.71,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 38.21,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 51.71,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 65.21,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 68.71,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 75.21,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 85.71,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Muhaisnah 1': {
+        Apartment: [
+            {
+                appreciation_perc: 6.59,
+                rent_per_sq_ft: 8,
+            },
+            {
+                appreciation_perc: 17.09,
+                rent_per_sq_ft: 8.64,
+            },
+            {
+                appreciation_perc: 30.59,
+                rent_per_sq_ft: 9.33,
+            },
+            {
+                appreciation_perc: 41.09,
+                rent_per_sq_ft: 10.08,
+            },
+            {
+                appreciation_perc: 57.59,
+                rent_per_sq_ft: 10.89,
+            },
+            {
+                appreciation_perc: 62.09,
+                rent_per_sq_ft: 11.76,
+            },
+            {
+                appreciation_perc: 74.59,
+                rent_per_sq_ft: 12.7,
+            },
+            {
+                appreciation_perc: 88.09,
+                rent_per_sq_ft: 13.72,
+            },
+            {
+                appreciation_perc: 99.59,
+                rent_per_sq_ft: 14.81,
+            },
+            {
+                appreciation_perc: 115.09,
+                rent_per_sq_ft: 16,
+            },
+        ],
+    },
+    'Nadd Al Hamar': {
+        Apartment: [
+            {
+                appreciation_perc: 6.4,
+                rent_per_sq_ft: 10,
+            },
+            {
+                appreciation_perc: 12.3,
+                rent_per_sq_ft: 10.8,
+            },
+            {
+                appreciation_perc: 18.8,
+                rent_per_sq_ft: 11.66,
+            },
+            {
+                appreciation_perc: 29.3,
+                rent_per_sq_ft: 12.59,
+            },
+            {
+                appreciation_perc: 42.8,
+                rent_per_sq_ft: 13.6,
+            },
+            {
+                appreciation_perc: 56.3,
+                rent_per_sq_ft: 14.69,
+            },
+            {
+                appreciation_perc: 69.8,
+                rent_per_sq_ft: 15.86,
+            },
+            {
+                appreciation_perc: 73.3,
+                rent_per_sq_ft: 17.13,
+            },
+            {
+                appreciation_perc: 86.8,
+                rent_per_sq_ft: 18.5,
+            },
+            {
+                appreciation_perc: 100.3,
+                rent_per_sq_ft: 19.98,
+            },
+        ],
+    },
+    'Nad Al Sheba': {
+        Apartment: [
+            {
+                appreciation_perc: 5.18,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 11.68,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 18.18,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 26.68,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 37.18,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 51.68,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 64.18,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 77.68,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 91.18,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 104.68,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 6.72,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 12.22,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 19.72,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 29.22,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 42.72,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 56.22,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 69.72,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 78.22,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 96.72,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 109.22,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Nad Al Sheba 2': {
+        Apartment: [
+            {
+                appreciation_perc: 8.61,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 20.11,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 33.61,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 43.11,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 53.61,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 64.11,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 77.61,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 91.11,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 114.61,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 128.11,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 10.08,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 23.58,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 37.08,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 50.58,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 64.08,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 77.58,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 91.08,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 104.58,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 128.08,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 141.58,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Dubai Silicon Oasis': {
+        Apartment: [
+            {
+                appreciation_perc: 12.01,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 27.51,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 41.01,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 54.51,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 68.01,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 81.51,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 95.01,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 118.51,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 132.01,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 155.51,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Dubai Islands': {
+        Apartment: [
+            {
+                appreciation_perc: 6.46,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 14.96,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 21.46,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 33.96,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 43.46,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 60.96,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 74.46,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 87.96,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 101.46,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 124.96,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'The Palm Jumeirah': {
+        Apartment: [
+            {
+                appreciation_perc: 9.94,
+                rent_per_sq_ft: 12,
+            },
+            {
+                appreciation_perc: 23.44,
+                rent_per_sq_ft: 12.96,
+            },
+            {
+                appreciation_perc: 34.94,
+                rent_per_sq_ft: 14,
+            },
+            {
+                appreciation_perc: 48.44,
+                rent_per_sq_ft: 15.12,
+            },
+            {
+                appreciation_perc: 59.94,
+                rent_per_sq_ft: 16.33,
+            },
+            {
+                appreciation_perc: 72.44,
+                rent_per_sq_ft: 17.64,
+            },
+            {
+                appreciation_perc: 90.94,
+                rent_per_sq_ft: 19.05,
+            },
+            {
+                appreciation_perc: 104.44,
+                rent_per_sq_ft: 20.57,
+            },
+            {
+                appreciation_perc: 137.94,
+                rent_per_sq_ft: 22.22,
+            },
+            {
+                appreciation_perc: 159.44,
+                rent_per_sq_ft: 24,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 12.67,
+                rent_per_sq_ft: 12,
+            },
+            {
+                appreciation_perc: 28.17,
+                rent_per_sq_ft: 12.96,
+            },
+            {
+                appreciation_perc: 36.67,
+                rent_per_sq_ft: 14,
+            },
+            {
+                appreciation_perc: 49.17,
+                rent_per_sq_ft: 15.12,
+            },
+            {
+                appreciation_perc: 69.67,
+                rent_per_sq_ft: 16.33,
+            },
+            {
+                appreciation_perc: 83.17,
+                rent_per_sq_ft: 17.64,
+            },
+            {
+                appreciation_perc: 96.67,
+                rent_per_sq_ft: 19.05,
+            },
+            {
+                appreciation_perc: 110.17,
+                rent_per_sq_ft: 20.57,
+            },
+            {
+                appreciation_perc: 133.67,
+                rent_per_sq_ft: 22.22,
+            },
+            {
+                appreciation_perc: 157.17,
+                rent_per_sq_ft: 24,
+            },
+        ],
+    },
+    'Ras Al Khor Industrial Area 1': {
+        Apartment: [
+            {
+                appreciation_perc: 5.67,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 10.17,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 17.67,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 24.17,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 33.67,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 41.17,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 51.67,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 68.17,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 74.67,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 85.17,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    Deira: {
+        Apartment: [
+            {
+                appreciation_perc: 9.51,
+                rent_per_sq_ft: 7.25,
+            },
+            {
+                appreciation_perc: 23.01,
+                rent_per_sq_ft: 7.83,
+            },
+            {
+                appreciation_perc: 32.51,
+                rent_per_sq_ft: 8.46,
+            },
+            {
+                appreciation_perc: 40.01,
+                rent_per_sq_ft: 9.14,
+            },
+            {
+                appreciation_perc: 48.51,
+                rent_per_sq_ft: 9.87,
+            },
+            {
+                appreciation_perc: 57.01,
+                rent_per_sq_ft: 10.66,
+            },
+            {
+                appreciation_perc: 67.51,
+                rent_per_sq_ft: 11.51,
+            },
+            {
+                appreciation_perc: 77.01,
+                rent_per_sq_ft: 12.43,
+            },
+            {
+                appreciation_perc: 86.51,
+                rent_per_sq_ft: 13.42,
+            },
+            {
+                appreciation_perc: 101.01,
+                rent_per_sq_ft: 14.5,
+            },
+        ],
+    },
+    'Saih Shuaib 2': {
+        Apartment: [
+            {
+                appreciation_perc: 12.33,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 28.83,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 42.33,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 55.83,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 69.33,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 82.83,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 96.33,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 119.83,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 137.33,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 156.83,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 11.07,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 25.57,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 39.07,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 52.57,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 66.07,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 79.57,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 93.07,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 109.57,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 130.07,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 143.57,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Umm Suqeim 3': {
+        Apartment: [
+            {
+                appreciation_perc: 5.25,
+                rent_per_sq_ft: 16,
+            },
+            {
+                appreciation_perc: 12.75,
+                rent_per_sq_ft: 17.28,
+            },
+            {
+                appreciation_perc: 21.25,
+                rent_per_sq_ft: 18.66,
+            },
+            {
+                appreciation_perc: 26.75,
+                rent_per_sq_ft: 20.15,
+            },
+            {
+                appreciation_perc: 38.25,
+                rent_per_sq_ft: 21.76,
+            },
+            {
+                appreciation_perc: 51.75,
+                rent_per_sq_ft: 23.5,
+            },
+            {
+                appreciation_perc: 65.25,
+                rent_per_sq_ft: 25.38,
+            },
+            {
+                appreciation_perc: 78.75,
+                rent_per_sq_ft: 27.41,
+            },
+            {
+                appreciation_perc: 92.25,
+                rent_per_sq_ft: 29.6,
+            },
+            {
+                appreciation_perc: 105.75,
+                rent_per_sq_ft: 31.97,
+            },
+        ],
+    },
+    Liwan: {
+        Apartment: [
+            {
+                appreciation_perc: 12.66,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 27.16,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 42.66,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 56.16,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 69.66,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 83.16,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 96.66,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 110.16,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 133.66,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 157.16,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 5.33,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 12.83,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 18.33,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 24.83,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 32.33,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 41.83,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 55.33,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 68.83,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 82.33,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 95.83,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'City of Arabia': {
+        Apartment: [
+            {
+                appreciation_perc: 12.94,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 27.44,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 43.94,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 56.44,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 69.94,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 72.44,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 86.94,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 100.44,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 113.94,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 137.44,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+        Villa: [
+            {
+                appreciation_perc: 7.39,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 17.89,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 31.39,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 44.89,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 58.39,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 71.89,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 85.39,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 98.89,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 112.39,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 135.89,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Wadi Al Safa 5': {
+        Villa: [
+            {
+                appreciation_perc: 5.16,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 12.66,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 18.16,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 28.66,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 39.16,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 52.66,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 60.16,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 73.66,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 87.16,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 102.66,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'International City Phase(2)': {
+        Apartment: [
+            {
+                appreciation_perc: 11.37,
+                rent_per_sq_ft: 6,
+            },
+            {
+                appreciation_perc: 25.87,
+                rent_per_sq_ft: 6.48,
+            },
+            {
+                appreciation_perc: 39.37,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 52.87,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 66.37,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 79.87,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 83.37,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 96.87,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 110.37,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 133.87,
+                rent_per_sq_ft: 11.99,
+            },
+        ],
+    },
+    "Za'abeel 1": {
+        Apartment: [
+            {
+                appreciation_perc: 5.07,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 11.57,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 17.07,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 25.57,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 36.07,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 51.57,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 65.07,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 78.57,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 88.07,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 99.57,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
+    'Emirates Hills': {
+        Villa: [
+            {
+                appreciation_perc: 10.59,
+                rent_per_sq_ft: 7,
+            },
+            {
+                appreciation_perc: 24.09,
+                rent_per_sq_ft: 7.56,
+            },
+            {
+                appreciation_perc: 37.59,
+                rent_per_sq_ft: 8.16,
+            },
+            {
+                appreciation_perc: 43.09,
+                rent_per_sq_ft: 8.81,
+            },
+            {
+                appreciation_perc: 54.59,
+                rent_per_sq_ft: 9.52,
+            },
+            {
+                appreciation_perc: 68.09,
+                rent_per_sq_ft: 10.28,
+            },
+            {
+                appreciation_perc: 79.59,
+                rent_per_sq_ft: 11.1,
+            },
+            {
+                appreciation_perc: 89.09,
+                rent_per_sq_ft: 11.99,
+            },
+            {
+                appreciation_perc: 108.59,
+                rent_per_sq_ft: 12.95,
+            },
+            {
+                appreciation_perc: 122.09,
+                rent_per_sq_ft: 13.99,
+            },
+        ],
+    },
 };
 
 export default propertyData;
