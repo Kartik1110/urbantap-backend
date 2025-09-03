@@ -1,11 +1,13 @@
 import { uploadToS3 } from '../utils/s3Upload';
 import { ApplyJobInput } from '../schema/job.schema';
-import { PrismaClient, Job, Prisma } from '@prisma/client';
+import { PrismaClient, Job, Prisma, OrderType } from '@prisma/client';
 import {
     createPaginationObject,
     getUserAppliedJobIds,
     transformBrokerageData,
 } from '../helper';
+import { CREDIT_CONFIG } from '../config/credit.config';
+import { deductCreditsAndCreateOrder } from './credit.service';
 
 const prisma = new PrismaClient();
 
@@ -67,27 +69,86 @@ export const createJobService = async (job: Job) => {
 };
 
 export const getJobsService = async (
-    body: { page?: number; page_size?: number; search?: string } = {},
+    body: {
+        page?: number;
+        page_size?: number;
+        search?: string;
+        show_expired_sponsored?: boolean;
+    } = {},
     userId?: string
 ) => {
-    const { page = 1, page_size = 10, search = '' } = body;
+    const {
+        page = 1,
+        page_size = 10,
+        search = '',
+        show_expired_sponsored = false,
+    } = body;
     const skip = (page - 1) * page_size;
 
-    const whereClause = search
-        ? {
-              title: {
-                  contains: search,
-                  mode: Prisma.QueryMode.insensitive,
-              },
-          }
-        : {};
+    let whereClause: any = {};
+
+    // Add search filter
+    if (search) {
+        whereClause.title = {
+            contains: search,
+            mode: Prisma.QueryMode.insensitive,
+        };
+    }
+
+    // Add expiry filter for sponsored content unless explicitly requested to show expired
+    if (!show_expired_sponsored) {
+        if (search) {
+            // If we have search, combine with AND
+            whereClause = {
+                AND: [
+                    {
+                        title: {
+                            contains: search,
+                            mode: Prisma.QueryMode.insensitive,
+                        },
+                    },
+                    {
+                        OR: [
+                            { is_sponsored: false },
+                            { is_sponsored: null },
+                            {
+                                AND: [
+                                    { is_sponsored: true },
+                                    { expiry_date: { gt: new Date() } },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            };
+        } else {
+            // No search, just expiry filter
+            whereClause.OR = [
+                { is_sponsored: false },
+                { is_sponsored: null },
+                {
+                    AND: [
+                        { is_sponsored: true },
+                        { expiry_date: { gt: new Date() } },
+                    ],
+                },
+            ];
+        }
+    }
 
     const [jobsRaw, totalJobs, appliedJobIds] = await Promise.all([
         prisma.job.findMany({
+            where: whereClause,
+            orderBy: [
+                // Prioritize active sponsored jobs
+                {
+                    is_sponsored: 'desc',
+                },
+                // Then by creation date
+                { created_at: 'desc' },
+            ],
             skip,
             take: page_size,
-            orderBy: { created_at: 'desc' },
-            where: whereClause,
             select: {
                 id: true,
                 title: true,
@@ -104,6 +165,7 @@ export const getJobsService = async (
                 max_experience: true,
                 userId: true,
                 is_sponsored: true,
+                expiry_date: true,
                 created_at: true,
                 updated_at: true,
                 company: {
@@ -122,32 +184,38 @@ export const getJobsService = async (
                         },
                     },
                 },
+                admin_user: {
+                    include: { broker: true },
+                },
             },
         }),
+
         prisma.job.count({ where: whereClause }),
         getUserAppliedJobIds(userId || ''),
     ]);
 
     const jobs = jobsRaw.map((job) => {
-        const { company, ...jobWithoutCompany } = job;
+        const { company, admin_user, ...jobWithoutCompany } = job;
+
         return {
             ...jobWithoutCompany,
             brokerage: transformBrokerageData(company),
             applied: appliedJobIds.has(job.id),
-            // broker: {
-            //     id: broker.id,
-            //     name: broker.name,
-            //     profile_pic: broker.profile_pic,
-            //     country_code: broker.country_code,
-            //     w_number: broker.w_number,
-            //     email: broker.email,
-            //     linkedin_link: broker.linkedin_link,
-            //     ig_link: broker.ig_link,
-            //     company: {
-            //          name: broker.company?.name || '',
-            // },
-            broker: null,
-            company: null,
+            broker: admin_user?.broker
+                ? {
+                      id: admin_user?.broker?.id,
+                      name: admin_user?.broker?.name,
+                      profile_pic: admin_user?.broker?.profile_pic,
+                      country_code: admin_user?.broker?.country_code,
+                      w_number: admin_user?.broker?.w_number,
+                      email: admin_user?.broker?.email,
+                      linkedin_link: admin_user?.broker?.linkedin_link,
+                      ig_link: admin_user?.broker?.ig_link,
+                      company: {
+                          name: company?.name || '',
+                      },
+                  }
+                : null,
         };
     });
 
@@ -203,6 +271,11 @@ export const getJobByIdService = async (id: string, userId?: string) => {
                     email: true,
                 },
             },
+            admin_user: {
+                select: {
+                    broker: true,
+                },
+            },
         },
     });
 
@@ -232,24 +305,26 @@ export const getJobByIdService = async (id: string, userId?: string) => {
           }
         : null;
 
+    const { admin_user, ...jobWithoutAdminUser } = job;
     const returnedJob = {
-        ...job,
+        ...jobWithoutAdminUser,
         brokerage: cleanedBrokerage,
         applied,
-        // broker: {
-        //     id: broker.id,
-        //     name: broker.name,
-        //     profile_pic: broker.profile_pic,
-        //     country_code: broker.country_code,
-        //     w_number: broker.w_number,
-        //     email: broker.email,
-        //     linkedin_link: broker.linkedin_link,
-        //     ig_link: broker.ig_link,
-        //     company: {
-        //          name: broker.company?.name || '',
-        // },
-        broker: null,
-        company: null,
+        broker: admin_user?.broker
+            ? {
+                  id: admin_user?.broker?.id,
+                  name: admin_user?.broker?.name,
+                  profile_pic: admin_user?.broker?.profile_pic,
+                  country_code: admin_user?.broker?.country_code,
+                  w_number: admin_user?.broker?.w_number,
+                  email: admin_user?.broker?.email,
+                  linkedin_link: admin_user?.broker?.linkedin_link,
+                  ig_link: admin_user?.broker?.ig_link,
+                  company: {
+                      name: job.company?.name || '',
+                  },
+              }
+            : null,
     };
 
     return returnedJob;
@@ -352,5 +427,82 @@ export const getJobsAppliedByBrokerService = async (brokerId: string) => {
             email: broker.email,
         },
         applications: applicationsWithJobs,
+    };
+};
+
+// Create sponsored job with credit deduction
+export const createSponsoredJobService = async (
+    jobData: Omit<Job, 'id' | 'created_at' | 'updated_at'>,
+    company_id: string,
+    sponsor_duration_days?: number
+) => {
+    // Validate company exists
+    const company = await prisma.company.findUnique({
+        where: { id: company_id },
+    });
+
+    if (!company) {
+        throw new Error('Company not found');
+    }
+
+    const creditsRequired = CREDIT_CONFIG.creditPricing.featuredJob;
+    const durationDays =
+        sponsor_duration_days || CREDIT_CONFIG.visibilityDuration.featuredJob;
+
+    // Calculate expiry date
+    const expiry_date = new Date();
+    expiry_date.setDate(expiry_date.getDate() + durationDays);
+
+    // Deduct credits and create order in transaction
+    const creditResult = await deductCreditsAndCreateOrder({
+        company_id,
+        credits: creditsRequired,
+        type: OrderType.JOB,
+        type_id: '', // Will be updated after job creation
+        user_id: jobData.admin_user_id || '',
+    });
+
+    const jobObj: any = {
+        ...jobData,
+        company_id,
+        is_sponsored: true,
+        expiry_date,
+    };
+
+    if (jobData.admin_user_id) {
+        const adminUser = await prisma.adminUser.findUnique({
+            where: { id: jobData.admin_user_id },
+            include: {
+                broker: {
+                    include: {
+                        user: {
+                            select: { id: true },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (adminUser?.broker?.user?.id) {
+            jobObj.userId = adminUser.broker?.user?.id;
+        }
+    }
+
+    // Create the sponsored job
+    const job = await prisma.job.create({
+        data: jobObj,
+    });
+
+    // Update the order with the actual job ID
+    await prisma.order.update({
+        where: { id: creditResult.order.id },
+        data: { type_id: job.id },
+    });
+
+    return {
+        job,
+        credits_deducted: creditsRequired,
+        remaining_balance: creditResult.remaining_balance,
+        expiry_date,
     };
 };

@@ -1,3 +1,5 @@
+import logger from './logger';
+
 // Types for the merged property data structure
 export interface PropertyDataPoint {
     appreciation_perc: number;
@@ -37,19 +39,27 @@ export function calculatePropertyROI(
 ): number {
     // Validate inputs
     if (year < 0 || year > 9) {
-        throw new Error('Year must be between 0 and 9');
+        const message = 'Year must be between 0 and 9';
+        logger.error(`calculatePropertyROI: ${message}`);
+        throw new Error(message);
     }
 
     if (initialInvestment <= 0) {
-        throw new Error('Initial investment must be positive');
+        const message = 'Initial investment must be positive';
+        logger.error(`calculatePropertyROI: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculatePropertyROI: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData[year]) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculatePropertyROI: ${message}`);
+        throw new Error(message);
     }
 
     const yearData = propertyData[year];
@@ -65,7 +75,9 @@ export function calculatePropertyROI(
         // Get previous year's cumulative appreciation
         const previousYearData = propertyData[year - 1];
         if (!previousYearData) {
-            throw new Error('Previous year data not found');
+            const message = 'Previous year data not found';
+            logger.error(`calculatePropertyROI: ${message}`);
+            throw new Error(message);
         }
 
         // Calculate year-over-year appreciation
@@ -113,11 +125,15 @@ export function calculateCumulativeROI(
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO
 ): number | null {
     if (years < 1 || years > 10) {
-        throw new Error('Years must be between 1 and 10');
+        const message = 'Years must be between 1 and 10';
+        logger.error(`calculateCumulativeROI: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || propertyData.length === 0) {
-        throw new Error('Property data not provided');
+        const message = 'Property data not provided';
+        logger.error(`calculateCumulativeROI: ${message}`);
+        throw new Error(message);
     }
 
     // Use explicit net return accumulation for clarity
@@ -164,11 +180,15 @@ export function calculateAverageROI(
     propertySize: number
 ): number {
     if (years < 1 || years > 10) {
-        throw new Error('Years must be between 1 and 10');
+        const message = 'Years must be between 1 and 10';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || propertyData.length === 0) {
-        throw new Error('Property data not provided');
+        const message = 'Property data not provided';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
     }
 
     const cumulativeROI = calculateCumulativeROI(
@@ -179,7 +199,9 @@ export function calculateAverageROI(
     );
 
     if (!cumulativeROI) {
-        throw new Error('Cumulative ROI not found');
+        const message = 'Cumulative ROI not found';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
     }
 
     return cumulativeROI / years;
@@ -198,20 +220,29 @@ export function calculateCapitalGains(
     currentValue: number
 ): { futureValue: number; capitalGains: number } {
     if (years < 1 || years > 10) {
-        throw new Error('Years must be between 1 and 10');
+        const message = 'Years must be between 1 and 10';
+        logger.error(`calculateCapitalGains: ${message}`);
+        throw new Error(message);
     }
+
     if (currentValue <= 0) {
-        throw new Error('Current value must be positive');
+        const message = 'Current value must be positive';
+        logger.error(`calculateCapitalGains: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateCapitalGains: ${message}`);
+        throw new Error(message);
     }
 
     const idx = years - 1; // cumulative appreciation index
     const yearData = propertyData[idx];
     if (!yearData) {
-        throw new Error('Year data not found');
+        const message = 'Year data not found';
+        logger.error(`calculateCapitalGains: ${message}`);
+        throw new Error(message);
     }
 
     const cumulativeAppreciationPerc = yearData.appreciation_perc;
@@ -265,30 +296,43 @@ export function calculateExpectedRental(
     period: 'annual' | 'monthly' = 'annual'
 ): { today: number; long_term: number } {
     if (year < 0 || year > 9) {
-        throw new Error('Year must be between 0 and 9');
-    }
-
-    if (!propertyData || propertyData.length === 0) {
-        throw new Error('Property data not provided');
+        const message = 'Year must be between 0 and 9';
+        logger.error(`calculateExpectedRental: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateExpectedRental: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData[year]) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateExpectedRental: ${message}`);
+        throw new Error(message);
     }
 
+    // Today's rent is always from year 0 (current year)
+    const todayData = propertyData[0];
+    const todayMonthlyRent = todayData.rent_per_sq_ft * propertySize;
+
+    // Long term rent is from the specified year
     const yearData = propertyData[year];
-    const monthlyRent = yearData.rent_per_sq_ft * propertySize;
+    const longTermMonthlyRent = yearData.rent_per_sq_ft * propertySize;
 
     if (period === 'monthly') {
-        return { today: monthlyRent, long_term: monthlyRent * 12 };
+        return {
+            today: todayMonthlyRent,
+            long_term: longTermMonthlyRent,
+        };
     }
 
-    // Default: annual expected rental (assuming monthly rates in data)
-    return { today: monthlyRent, long_term: monthlyRent * 12 };
+    // Default: annual expected rental (monthly rates * 12)
+    return {
+        today: todayMonthlyRent * 12,
+        long_term: longTermMonthlyRent * 12,
+    };
 }
 
 /**
@@ -319,15 +363,27 @@ export function calculateBreakEvenPeriod(
     monthlyRent?: number
 ): number {
     if (initialInvestment <= 0) {
-        throw new Error('Initial investment must be positive');
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateBreakEvenPeriod: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateBreakEvenPeriod: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    if (!propertyData || !propertyData.length) {
+        const message = 'Property data points not provided';
+        logger.error(`calculateBreakEvenPeriod: ${message}`);
+        throw new Error(message);
     }
 
     const downPayment = initialInvestment * downPaymentToLoanRatio;
@@ -338,7 +394,9 @@ export function calculateBreakEvenPeriod(
     for (let year = 0; year < propertyData.length; year++) {
         const yearData = propertyData[year];
         if (!yearData) {
-            throw new Error('Year data not found');
+            const message = 'Year data not found';
+            logger.error(`calculateBreakEvenPeriod: ${message}`);
+            throw new Error(message);
         }
 
         // Year-over-year appreciation percentage
@@ -348,7 +406,9 @@ export function calculateBreakEvenPeriod(
         } else {
             const prev = propertyData[year - 1];
             if (!prev) {
-                throw new Error('Previous year data not found');
+                const message = 'Previous year data not found';
+                logger.error(`calculateBreakEvenPeriod: ${message}`);
+                throw new Error(message);
             }
             yoyAppreciationPerc =
                 yearData.appreciation_perc - prev.appreciation_perc;
@@ -369,7 +429,10 @@ export function calculateBreakEvenPeriod(
         }
     }
 
-    throw new Error('Not breaking even within available data horizon');
+    logger.warn(
+        'Not breaking even within available data horizon, returning 10'
+    );
+    return 10;
 }
 
 /**
@@ -396,15 +459,21 @@ export function calculateCumulativeProfitPerYear(
     monthlyRent?: number
 ): number[] {
     if (initialInvestment <= 0) {
-        throw new Error('Initial investment must be positive');
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateCumulativeProfitPerYear: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateCumulativeProfitPerYear: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateCumulativeProfitPerYear: ${message}`);
+        throw new Error(message);
     }
 
     const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
@@ -416,7 +485,9 @@ export function calculateCumulativeProfitPerYear(
     for (let year = 0; year < propertyData.length; year++) {
         const yearData = propertyData[year];
         if (!yearData) {
-            throw new Error('Year data not found');
+            const message = 'Year data not found';
+            logger.error(`calculateCumulativeProfitPerYear: ${message}`);
+            throw new Error(message);
         }
 
         // Year-over-year appreciation percentage
@@ -427,7 +498,9 @@ export function calculateCumulativeProfitPerYear(
             const prev = propertyData[year - 1];
 
             if (!prev) {
-                throw new Error('Previous year data not found');
+                const message = 'Previous year data not found';
+                logger.error(`calculateCumulativeProfitPerYear: ${message}`);
+                throw new Error(message);
             }
 
             yoyAppreciationPerc =
@@ -474,24 +547,34 @@ export function calculateMonthlyProfitForYear(
     annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number {
     if (initialInvestment <= 0) {
-        throw new Error('Initial investment must be positive');
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateMonthlyProfitForYear: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateMonthlyProfitForYear: ${message}`);
+        throw new Error(message);
     }
 
     if (year < 0) {
-        throw new Error('Year must be non-negative');
+        const message = 'Year must be non-negative';
+        logger.error(`calculateMonthlyProfitForYear: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length || year >= propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateMonthlyProfitForYear: ${message}`);
+        throw new Error(message);
     }
 
     const yearData = propertyData[year];
     if (!yearData) {
-        throw new Error('Year data not found');
+        const message = 'Year data not found';
+        logger.error(`calculateMonthlyProfitForYear: ${message}`);
+        throw new Error(message);
     }
 
     // Calculate the same components as the original method
@@ -505,8 +588,11 @@ export function calculateMonthlyProfitForYear(
     } else {
         const prev = propertyData[year - 1];
         if (!prev) {
-            throw new Error('Previous year data not found');
+            const message = 'Previous year data not found';
+            logger.error(`calculateMonthlyProfitForYear: ${message}`);
+            throw new Error(message);
         }
+
         yoyAppreciationPerc =
             yearData.appreciation_perc - prev.appreciation_perc;
     }
@@ -537,7 +623,9 @@ export function calculateRoiDataPoints(
     propertySize: number
 ): { year: number; roi: number }[] {
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data not provided');
+        const message = 'Property data not provided';
+        logger.error(`calculateRoiDataPoints: ${message}`);
+        throw new Error(message);
     }
 
     const cumulative = calculateCumulativeProfitPerYear(
@@ -547,7 +635,9 @@ export function calculateRoiDataPoints(
     );
 
     if (!cumulative) {
-        throw new Error('Cumulative ROI not found');
+        const message = 'Cumulative ROI not found';
+        logger.error(`calculateRoiDataPoints: ${message}`);
+        throw new Error(message);
     }
 
     const datapoints: { year: number; roi: number }[] = [];
@@ -582,11 +672,15 @@ export function calculateAppreciationDataPoints(
     years: number
 ): { year: number; appreciation_perc: number }[] {
     if (years < 1) {
-        throw new Error('Years must be at least 1');
+        const message = 'Years must be at least 1';
+        logger.error(`calculateAppreciationDataPoints: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateAppreciationDataPoints: ${message}`);
+        throw new Error(message);
     }
 
     const limit = Math.min(years, propertyData.length);
@@ -769,7 +863,9 @@ export function getInvestmentGoalsWithROI(
         ];
     }
 
-    throw new Error('Invalid goal combination');
+    const message = 'Invalid goal combination';
+    logger.error(`getInvestmentGoalsWithROI: ${message}`);
+    throw new Error(message);
 }
 
 /**
@@ -793,13 +889,17 @@ export function calculateCumulativeROIByType(
     isSelfPaid: boolean,
     downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
     annualInterestRate: number = DEFFAULT_INTEREST_RATE
-): number | null {
+): number {
     if (years < 1 || years > 10) {
-        throw new Error('Years must be between 1 and 10');
+        const message = 'Years must be between 1 and 10';
+        logger.error(`calculateCumulativeROIByType: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || propertyData.length === 0) {
-        throw new Error('Property data not provided');
+        const message = 'Property data not provided';
+        logger.error(`calculateCumulativeROIByType: ${message}`);
+        throw new Error(message);
     }
 
     // For self-paid investments, the initial investment is the full amount
@@ -812,7 +912,9 @@ export function calculateCumulativeROIByType(
     for (let year = 0; year < years; year++) {
         const yearData = propertyData[year];
         if (!yearData) {
-            return null; // Data not available for this year
+            const message = 'Year data not found';
+            logger.error(`calculateCumulativeROIByType: ${message}`);
+            throw new Error(message);
         }
 
         // Calculate year-over-year appreciation
@@ -822,8 +924,11 @@ export function calculateCumulativeROIByType(
         } else {
             const previousYearData = propertyData[year - 1];
             if (!previousYearData) {
-                return null; // Previous year data not available
+                const message = 'Previous year data not found';
+                logger.error(`calculateCumulativeROIByType: ${message}`);
+                throw new Error(message);
             }
+
             appreciationPercentage =
                 yearData.appreciation_perc - previousYearData.appreciation_perc;
         }
@@ -871,15 +976,21 @@ export function calculateRentalDemandIncrease(
     propertySize: number
 ): number {
     if (years < 1 || years > 10) {
-        throw new Error('Years must be between 1 and 10');
+        const message = 'Years must be between 1 and 10';
+        logger.error(`calculateRentalDemandIncrease: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateRentalDemandIncrease: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property type not found');
+        const message = 'Property type not found';
+        logger.error(`calculateRentalDemandIncrease: ${message}`);
+        throw new Error(message);
     }
 
     const limit = Math.min(years, propertyData.length);
@@ -887,7 +998,9 @@ export function calculateRentalDemandIncrease(
     // Get today's rent (year 0)
     const todayData = propertyData[0];
     if (!todayData) {
-        throw new Error('Today data not found');
+        const message = 'Today data not found';
+        logger.error(`calculateRentalDemandIncrease: ${message}`);
+        throw new Error(message);
     }
 
     const todayRent = todayData.rent_per_sq_ft * propertySize * 12;
@@ -895,7 +1008,9 @@ export function calculateRentalDemandIncrease(
     // Get future rent (year X)
     const futureData = propertyData[limit - 1];
     if (!futureData) {
-        throw new Error('Future data not found');
+        const message = 'Future data not found';
+        logger.error(`calculateRentalDemandIncrease: ${message}`);
+        throw new Error(message);
     }
 
     const futureRent = futureData.rent_per_sq_ft * propertySize * 12;
@@ -918,17 +1033,23 @@ export function getCurrentRentalPrice(
     period: 'annual' | 'monthly' = 'annual'
 ): number {
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`getCurrentRentalPrice: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property type not found');
+        const message = 'Property type not found';
+        logger.error(`getCurrentRentalPrice: ${message}`);
+        throw new Error(message);
     }
 
     // Get today's data (year 0)
     const todayData = propertyData[0];
     if (!todayData) {
-        throw new Error('Today data not found');
+        const message = 'Today data not found';
+        logger.error(`getCurrentRentalPrice: ${message}`);
+        throw new Error(message);
     }
 
     // Calculate monthly rent
@@ -959,11 +1080,15 @@ export function getRentalPriceInYear(
     period: 'annual' | 'monthly' = 'annual'
 ): number {
     if (year < 0 || year > 9) {
-        throw new Error('Year must be between 0 and 9');
+        const message = 'Year must be between 0 and 9';
+        logger.error(`getRentalPriceInYear: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property type not found');
+        const message = 'Property type not found';
+        logger.error(`getRentalPriceInYear: ${message}`);
+        throw new Error(message);
     }
 
     const monthlyRent = propertyData[year].rent_per_sq_ft * propertySize;
@@ -976,6 +1101,50 @@ export function getRentalPriceInYear(
     return monthlyRent * 12;
 }
 
+const DEFAULT_PROPERTY_DATA = [
+    //edit
+    {
+        appreciation_perc: 8, // Starting at 8%
+        rent_per_sq_ft: 5, // Starting at 5
+    },
+    {
+        appreciation_perc: 16.64, // 8 + (8 * 0.08) = 16.64
+        rent_per_sq_ft: 5.25, // 5 + (5 * 0.05) = 5.25
+    },
+    {
+        appreciation_perc: 25.97, // 16.64 + (16.64 * 0.08) = 25.97
+        rent_per_sq_ft: 5.51, // 5.25 + (5.25 * 0.05) = 5.51
+    },
+    {
+        appreciation_perc: 36.05, // 25.97 + (25.97 * 0.08) = 36.05
+        rent_per_sq_ft: 5.79, // 5.51 + (5.51 * 0.05) = 5.79
+    },
+    {
+        appreciation_perc: 46.93, // 36.05 + (36.05 * 0.08) = 46.93
+        rent_per_sq_ft: 6.08, // 5.79 + (5.79 * 0.05) = 6.08
+    },
+    {
+        appreciation_perc: 58.68, // 46.93 + (46.93 * 0.08) = 58.68
+        rent_per_sq_ft: 6.38, // 6.08 + (6.08 * 0.05) = 6.38
+    },
+    {
+        appreciation_perc: 71.37, // 58.68 + (58.68 * 0.08) = 71.37
+        rent_per_sq_ft: 6.7, // 6.38 + (6.38 * 0.05) = 6.70
+    },
+    {
+        appreciation_perc: 85.08, // 71.37 + (71.37 * 0.08) = 85.08
+        rent_per_sq_ft: 7.04, // 6.70 + (6.70 * 0.05) = 7.04
+    },
+    {
+        appreciation_perc: 99.89, // 85.08 + (85.08 * 0.08) = 99.89
+        rent_per_sq_ft: 7.39, // 7.04 + (7.04 * 0.05) = 7.39
+    },
+    {
+        appreciation_perc: 115.88, // 99.89 + (99.89 * 0.08) = 115.88
+        rent_per_sq_ft: 7.76, // 7.39 + (7.39 * 0.05) = 7.76
+    },
+];
+
 /**
  * Gets property data for a given location, property type, and years.
  *
@@ -987,23 +1156,32 @@ export function getRentalPriceInYear(
 export function getPropertyData(
     propertiesData: MergedPropertyData,
     location: string,
-    propertyType: string
+    propertyType: string,
+    defaultPropertyData: PropertyDataPoint[] = DEFAULT_PROPERTY_DATA
 ): PropertyDataPoint[] {
-    if (!propertiesData) {
-        throw new Error('Property data not provided');
-    }
+    try {
+        if (!propertiesData) {
+            throw new Error('Property data not provided');
+        }
 
-    const locationData = propertiesData[location];
-    if (!locationData) {
-        throw new Error('Location not found');
-    }
+        const locationData = propertiesData[location];
+        if (!locationData) {
+            throw new Error('Location not found');
+        }
 
-    const propertyData = locationData[propertyType];
-    if (!propertyData || propertyData.length === 0) {
-        throw new Error('Property type not found');
-    }
+        const propertyData = locationData[propertyType];
+        if (!propertyData || propertyData.length === 0) {
+            throw new Error('Property type not found');
+        }
 
-    return propertyData;
+        return propertyData;
+    } catch (error) {
+        logger.warn(
+            (error as Error).message + ', returning default property data'
+        );
+
+        return defaultPropertyData;
+    }
 }
 
 /**
@@ -1030,15 +1208,21 @@ export function calculateCumulativeProfitPerYearByType(
     annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number[] {
     if (initialInvestment <= 0) {
-        throw new Error('Initial investment must be positive');
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateCumulativeProfitPerYearByType: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateCumulativeProfitPerYearByType: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateCumulativeProfitPerYearByType: ${message}`);
+        throw new Error(message);
     }
 
     // Calculate mortgage costs only if not self-paid
@@ -1054,7 +1238,9 @@ export function calculateCumulativeProfitPerYearByType(
     for (let year = 0; year < propertyData.length; year++) {
         const yearData = propertyData[year];
         if (!yearData) {
-            throw new Error('Year data not found');
+            const message = 'Year data not found';
+            logger.error(`calculateCumulativeProfitPerYearByType: ${message}`);
+            throw new Error(message);
         }
 
         // Year-over-year appreciation percentage
@@ -1064,8 +1250,13 @@ export function calculateCumulativeProfitPerYearByType(
         } else {
             const prev = propertyData[year - 1];
             if (!prev) {
-                throw new Error('Previous year data not found');
+                const message = 'Previous year data not found';
+                logger.error(
+                    `calculateCumulativeProfitPerYearByType: ${message}`
+                );
+                throw new Error(message);
             }
+
             yoyAppreciationPerc =
                 yearData.appreciation_perc - prev.appreciation_perc;
         }
@@ -1109,7 +1300,9 @@ export function calculateRoiDataPointsByType(
     isSelfPaid: boolean
 ): { year: number; roi: number }[] {
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data not provided');
+        const message = 'Property data not provided';
+        logger.error(`calculateRoiDataPointsByType: ${message}`);
+        throw new Error(message);
     }
 
     const cumulative = calculateCumulativeProfitPerYearByType(
@@ -1121,7 +1314,9 @@ export function calculateRoiDataPointsByType(
     );
 
     if (!cumulative) {
-        throw new Error('Cumulative ROI not found');
+        const message = 'Cumulative ROI not found';
+        logger.error(`calculateRoiDataPointsByType: ${message}`);
+        throw new Error(message);
     }
 
     const datapoints: { year: number; roi: number }[] = [];
@@ -1172,15 +1367,21 @@ export function calculateBreakEvenPeriodByType(
     annualInterestRate: number = DEFFAULT_INTEREST_RATE
 ): number {
     if (initialInvestment <= 0) {
-        throw new Error('Initial investment must be positive');
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateBreakEvenPeriodByType: ${message}`);
+        throw new Error(message);
     }
 
     if (propertySize <= 0) {
-        throw new Error('Property size must be positive');
+        const message = 'Property size must be positive';
+        logger.error(`calculateBreakEvenPeriodByType: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data points not provided');
+        const message = 'Property data points not provided';
+        logger.error(`calculateBreakEvenPeriodByType: ${message}`);
+        throw new Error(message);
     }
 
     // For self-paid investments, the break-even point is when cumulative returns >= full investment
@@ -1201,7 +1402,9 @@ export function calculateBreakEvenPeriodByType(
     for (let year = 0; year < propertyData.length; year++) {
         const yearData = propertyData[year];
         if (!yearData) {
-            throw new Error('Year data not found');
+            const message = 'Year data not found';
+            logger.error(`calculateBreakEvenPeriodByType: ${message}`);
+            throw new Error(message);
         }
 
         // Year-over-year appreciation percentage
@@ -1211,8 +1414,11 @@ export function calculateBreakEvenPeriodByType(
         } else {
             const prev = propertyData[year - 1];
             if (!prev) {
-                throw new Error('Previous year data not found');
+                const message = 'Previous year data not found';
+                logger.error(`calculateBreakEvenPeriodByType: ${message}`);
+                throw new Error(message);
             }
+
             yoyAppreciationPerc =
                 yearData.appreciation_perc - prev.appreciation_perc;
         }
@@ -1235,7 +1441,10 @@ export function calculateBreakEvenPeriodByType(
         }
     }
 
-    throw new Error('Not breaking even within available data horizon');
+    logger.warn(
+        'Not breaking even within available data horizon, returning 10'
+    );
+    return 10;
 }
 
 export function getListingAppreciationInYear(
@@ -1248,11 +1457,15 @@ export function getListingAppreciationInYear(
     }
 
     if (year > 10) {
-        throw new Error('Year must be between 1 and 10');
+        const message = 'Year must be between 1 and 10';
+        logger.error(`getListingAppreciationInYear: ${message}`);
+        throw new Error(message);
     }
 
     if (!propertyData || !propertyData.length) {
-        throw new Error('Property data not provided');
+        const message = 'Property data not provided';
+        logger.error(`getListingAppreciationInYear: ${message}`);
+        throw new Error(message);
     }
 
     return listingPrice * (propertyData[year - 1].appreciation_perc / 100);
