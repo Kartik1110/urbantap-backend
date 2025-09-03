@@ -111,10 +111,10 @@ function extractCoordinates(listing: OffPlanListing): { latitude: number | null;
         const lng = parseFloat(coords[1].trim());
         
         if (!isNaN(lat) && !isNaN(lng)) {
-            console.log(`📍 Coordinates extracted: ${lat}, ${lng}`);
+            console.log(`Coordinates extracted: ${lat}, ${lng}`);
             return { latitude: lat, longitude: lng };
         } else {
-            console.log(`⚠️ Failed to parse coordinates: "${coords[0]}" and "${coords[1]}"`);
+            console.log(`Failed to parse coordinates: "${coords[0]}" and "${coords[1]}"`);
         }
     }
     
@@ -124,23 +124,23 @@ function extractCoordinates(listing: OffPlanListing): { latitude: number | null;
 // Function to get locality from coordinates using proximity-based assignment
 async function getLocalityFromCoordinates(latitude: number | null, longitude: number | null): Promise<string | null> {
     if (!latitude || !longitude) {
-        console.log('   📍 No coordinates available for locality lookup');
+        console.log('   No coordinates available for locality lookup');
         return null;
     }
 
-    console.log(`   📍 Looking up locality for coordinates: ${latitude}, ${longitude}`);
+    console.log(`   Looking up locality for coordinates: ${latitude}, ${longitude}`);
     
     try {
         const result = assignLocalityFromCoordinates(latitude, longitude);
         if (result && result.locality) {
-            console.log(`   ✅ Found locality: ${result.locality} (${result.distance.toFixed(2)}km away)`);
+            console.log(`   Found locality: ${result.locality} (${result.distance.toFixed(2)}km away)`);
             return result.locality;
         } else {
-            console.log(`   ⚠️ No locality found from coordinates`);
+            console.log(`   No locality found from coordinates`);
             return null;
         }
     } catch (error) {
-        console.error(`   ❌ Error getting locality from coordinates:`, error);
+        console.error(`   Error getting locality from coordinates:`, error);
         return null;
     }
 }
@@ -167,47 +167,66 @@ function generateFallbackLocalityForProject(index: number): string {
 }
 
 // Function to find or create developer for a company
-async function findOrCreateDeveloper(companyId: string): Promise<string> {
+async function findOrCreateDeveloper(companyName: string): Promise<string> {
+    // First find the company by name to get its ID
+    const company = await prisma.company.findFirst({
+        where: { 
+            name: {
+                equals: companyName,
+                mode: 'insensitive'
+            }
+        }
+    });
+
+    if (!company) {
+        throw new Error(`Company not found with name: ${companyName}`);
+    }
+
     let developer = await prisma.developer.findFirst({
-        where: { company_id: companyId }
+        where: { company_id: company.id }
     });
 
     if (!developer) {
         developer = await prisma.developer.create({
             data: {
-                company_id: companyId,
+                company_id: company.id,
                 cover_image: faker.image.avatar(),
                 total_projects: 0,
                 years_in_business: faker.number.int({ min: 1, max: 20 })
             }
         });
-        console.log(`      🆕 Created new developer: ${developer.id} for company: ${companyId}`);
+        console.log(`      Created new developer: ${developer.id} for company: ${companyName} (ID: ${company.id})`);
     } else {
-        console.log(`      🔄 Using existing developer: ${developer.id}`);
+        console.log(`      Using existing developer: ${developer.id} for company: ${companyName}`);
     }
 
     return developer.id;
 }
 
 // Function to update company logo if empty
-async function updateCompanyLogoIfEmpty(companyId: string, logoUrl: string) {
+async function updateCompanyLogoIfEmpty(companyName: string, logoUrl: string) {
     if (!logoUrl) return;
     
-    const company = await prisma.company.findUnique({
-        where: { id: companyId },
-        select: { logo: true }
+    const company = await prisma.company.findFirst({
+        where: { 
+            name: {
+                equals: companyName,
+                mode: 'insensitive'
+            }
+        },
+        select: { id: true, logo: true, name: true }
     });
     
     if (company && (!company.logo || company.logo === "")) {
         await prisma.company.update({
-            where: { id: companyId },
+            where: { id: company.id },
             data: { logo: logoUrl }
         });
-        console.log(`      🖼️ Updated company logo for: ${companyId} with: ${logoUrl}`);
+        console.log(`      Updated company logo for: ${companyName} (ID: ${company.id}) with: ${logoUrl}`);
     } else if (company && company.logo && company.logo !== "") {
-        console.log(`      🖼️ Company ${companyId} already has a logo: ${company.logo}`);
+        console.log(`      Company ${companyName} already has a logo: ${company.logo}`);
     } else {
-        console.log(`      ⚠️ Company ${companyId} not found`);
+        console.log(`      Company ${companyName} not found`);
     }
 }
 
@@ -215,17 +234,17 @@ async function updateCompanyLogoIfEmpty(companyId: string, logoUrl: string) {
 async function createFloorPlans(projectId: string, floorPlans: FloorPlan[], projectPrice?: number): Promise<number> {
     if (!floorPlans || floorPlans.length === 0) return 0;
     
-    console.log(`      🏠 Creating ${floorPlans.length} floor plans for project ${projectId}`);
+    console.log(`      Creating ${floorPlans.length} floor plans for project ${projectId}`);
     let createdCount = 0;
     
     for (const floorPlan of floorPlans) {
         try {
-            console.log(`         📋 Processing floor plan: ${floorPlan.title}`);
+            console.log(`         Processing floor plan: ${floorPlan.title}`);
             
             // Extract bedroom info from name field
             const bedroomName = floorPlan.name || "Studio";
             const mappedBedrooms = BEDROOM_MAPPING[bedroomName] || "Studio";
-            console.log(`            🛏️ Bedroom mapping: "${bedroomName}" -> "${mappedBedrooms}"`);
+            console.log(`            Bedroom mapping: "${bedroomName}" -> "${mappedBedrooms}"`);
             
             // Process price - handle empty strings and use project price as fallback
             let price: number | null = null;
@@ -243,16 +262,16 @@ async function createFloorPlans(projectId: string, floorPlans: FloorPlan[], proj
                     // Estimate price based on area ratio (larger units cost more)
                     const basePricePerSqFt = projectPrice / 1000; // Assume 1000 sq ft as base
                     price = Math.round(floorPlan.area * basePricePerSqFt);
-                    console.log(`            💰 Using estimated price: ${price} (based on project price and area)`);
+                    console.log(`            Using estimated price: ${price} (based on project price and area)`);
                 } else {
-                    console.log(`            ⚠️ Skipping floor plan due to no price available and no project price fallback`);
+                    console.log(`            Skipping floor plan due to no price available and no project price fallback`);
                     continue;
                 }
             } else {
-                console.log(`            💰 Using floor plan price: ${price}`);
+                console.log(`            Using floor plan price: ${price}`);
             }
             
-            console.log(`            📏 Area: ${floorPlan.area} sq ft`);
+            console.log(`            Area: ${floorPlan.area} sq ft`);
             
             // Handle imgUrl - it's an array, so we need to extract the first image or use empty array
             const images = Array.isArray(floorPlan.imgUrl) ? floorPlan.imgUrl : [floorPlan.imgUrl];
@@ -269,22 +288,22 @@ async function createFloorPlans(projectId: string, floorPlans: FloorPlan[], proj
                 }
             });
             
-            console.log(`            ✅ Created floor plan: ${floorPlan.title}`);
+            console.log(`            Created floor plan: ${floorPlan.title}`);
             createdCount++;
         } catch (error) {
-            console.error(`         ❌ Error creating floor plan:`, error);
+            console.error(`         Error creating floor plan:`, error);
         }
     }
     
-    console.log(`      🎉 Successfully created ${createdCount} floor plans`);
+    console.log(`      Successfully created ${createdCount} floor plans`);
     return createdCount;
 }
 
 async function seedOffPlanProjects() {
-    console.log("🚀 Starting Off-Plan Projects Seeding Process...");
+    console.log("Starting Off-Plan Projects Seeding Process...");
     
     // Log locality assignment configuration
-    console.log("📍 Using proximity-based locality assignment from predefined list of 46 Dubai localities");
+    console.log("Using proximity-based locality assignment from predefined list of 46 Dubai localities");
     console.log("   • Coordinates will be matched to closest locality from your approved list");
     console.log("   • Fallback localities will also use the same 46 predefined localities");
 
@@ -305,15 +324,15 @@ async function seedOffPlanProjects() {
             }
         });
 
-        console.log(`📊 Found ${companyMappings.length} company mappings`);
-        console.log(`📊 Mapped ${developerToCompanyMap.size} developers to companies`);
+        console.log(`Found ${companyMappings.length} company mappings`);
+        console.log(`Mapped ${developerToCompanyMap.size} developers to companies`);
 
         // Read offplan listings data
         const dataPath = path.join(__dirname, 'offPlanListingsWithS3.json');
         const rawData = fs.readFileSync(dataPath, 'utf8');
         const listings: OffPlanListing[] = JSON.parse(rawData);
 
-        console.log(`📊 Found ${listings.length} listings to process`);
+        console.log(`Found ${listings.length} listings to process`);
 
         // Filter listings to only include those with exact company matches
         const eligibleListings = listings.filter(listing => {
@@ -323,19 +342,19 @@ async function seedOffPlanProjects() {
             return developerToCompanyMap.has(listing.developer.trim());
         });
 
-        console.log(`📊 Found ${eligibleListings.length} eligible listings with exact company matches`);
+        console.log(`Found ${eligibleListings.length} eligible listings with exact company matches`);
         
         // Show which developers are missing from the mapping
         const allDevelopers = new Set(listings.map(l => l.developer?.trim()).filter(Boolean));
         const mappedDevelopers = new Set(developerToCompanyMap.keys());
         const missingDevelopers = Array.from(allDevelopers).filter(dev => !mappedDevelopers.has(dev));
         
-        console.log(`📊 Total unique developers in listings: ${allDevelopers.size}`);
-        console.log(`📊 Developers with company mappings: ${mappedDevelopers.size}`);
-        console.log(`📊 Developers missing mappings: ${missingDevelopers.length}`);
+        console.log(`Total unique developers in listings: ${allDevelopers.size}`);
+        console.log(`Developers with company mappings: ${mappedDevelopers.size}`);
+        console.log(`Developers missing mappings: ${missingDevelopers.length}`);
         
         if (missingDevelopers.length > 0) {
-            console.log(`\n⚠️ Sample of developers missing company mappings:`);
+            console.log(`\nSample of developers missing company mappings:`);
             missingDevelopers.slice(0, 10).forEach(dev => {
                 console.log(`   • ${dev}`);
             });
@@ -345,7 +364,7 @@ async function seedOffPlanProjects() {
         }
 
         // Process eligible listings
-        console.log(`🏠 Processing eligible listings...`);
+        console.log(`Processing eligible listings...`);
         let successCount = 0;
         let errorCount = 0;
         let skippedCount = 0;
@@ -360,7 +379,7 @@ async function seedOffPlanProjects() {
             try {
                 // Skip if essential data is missing
                 if (!listing.title || !listing.developer || !listing.price || listing.price === "") {
-                    console.log(`⚠️ Skipping listing ${i + 1}: Missing essential data`);
+                    console.log(`Skipping listing ${i + 1}: Missing essential data`);
                     skippedCount++;
                     continue;
                 }
@@ -369,48 +388,48 @@ async function seedOffPlanProjects() {
                 const companyInfo = developerToCompanyMap.get(developerName);
 
                 if (!companyInfo) {
-                    console.log(`⚠️ Skipping listing ${i + 1}: No company match found for "${developerName}"`);
+                    console.log(`Skipping listing ${i + 1}: No company match found for "${developerName}"`);
                     skippedCount++;
                     continue;
                 }
 
-                console.log(`🔍 Processing listing ${i + 1}: "${listing.title}" (Developer: ${developerName})`);
+                console.log(`Processing listing ${i + 1}: "${listing.title}" (Developer: ${developerName})`);
                 
                 // Debug: Log available fields for first few listings
                 if (i < 3) {
-                    console.log(`   🔍 Available fields: ${Object.keys(listing).join(', ')}`);
+                    console.log(`   Available fields: ${Object.keys(listing).join(', ')}`);
                 }
                 
                 // Get payment plan from either root level or newParam
                 const paymentPlan = listing.paymentPlan || listing.newParam?.paymentPlan;
                 if (paymentPlan) {
-                    console.log(`   💰 Payment Plan: ${paymentPlan} -> mapped to payment_plan2`);
+                    console.log(`   Payment Plan: ${paymentPlan} -> mapped to payment_plan2`);
                 } else {
-                    console.log(`   💰 Payment Plan: Not available`);
+                    console.log(`   Payment Plan: Not available`);
                 }
                 
                 // Debug: Check if paymentPlan field exists in either location
                 if (listing.hasOwnProperty('paymentPlan') || listing.newParam?.hasOwnProperty('paymentPlan')) {
-                    console.log(`   🔍 Payment Plan field found in listing object`);
+                    console.log(`   Payment Plan field found in listing object`);
                 } else {
-                    console.log(`   🔍 Payment Plan field NOT found in listing object`);
+                    console.log(`   Payment Plan field NOT found in listing object`);
                 }
 
                 // Find or create developer for this company
-                const developerId = await findOrCreateDeveloper(companyInfo.companyId);
+                const developerId = await findOrCreateDeveloper(companyInfo.companyName);
                 
                 // Update company logo with developer logo if available
                 if (listing.developerLogo) {
-                    console.log(`   🖼️ Found developer logo: ${listing.developerLogo}`);
-                    await updateCompanyLogoIfEmpty(companyInfo.companyId, listing.developerLogo);
+                    console.log(`   Found developer logo: ${listing.developerLogo}`);
+                    await updateCompanyLogoIfEmpty(companyInfo.companyName, listing.developerLogo);
                 } else {
-                    console.log(`   🖼️ No developer logo available`);
+                    console.log(`   No developer logo available`);
                 }
 
                 // Process price
                 const price = typeof listing.price === 'string' ? parseFloat(listing.price) : listing.price;
                 if (isNaN(price) || price <= 0) {
-                    console.log(`⚠️ Skipping listing ${i + 1}: Invalid price ${listing.price}`);
+                    console.log(`Skipping listing ${i + 1}: Invalid price ${listing.price}`);
                     skippedCount++;
                     continue;
                 }
@@ -428,7 +447,7 @@ async function seedOffPlanProjects() {
                 // Fallback to generated locality if coordinates are not available
                 if (!locality) {
                     locality = generateFallbackLocalityForProject(i);
-                    console.log(`   🏠 Using fallback locality: ${locality}`);
+                    console.log(`   Using fallback locality: ${locality}`);
                     localityFallbackCount++;
                 } else {
                     localityLookupSuccessCount++;
@@ -442,20 +461,20 @@ async function seedOffPlanProjects() {
                 const handoverTimeValue = listing.handoverTime || listing.newParam?.handoverTime;
                 
                 if (handoverTimeValue) {
-                    console.log(`   📅 Handover Time: ${handoverTimeValue}`);
+                    console.log(`   Handover Time: ${handoverTimeValue}`);
                     const parsedDate = new Date(handoverTimeValue);
                     if (!isNaN(parsedDate.getTime())) {
                         handoverTime = parsedDate;
-                        console.log(`   ✅ Parsed handover date: ${handoverTime.toISOString()}`);
+                        console.log(`   Parsed handover date: ${handoverTime.toISOString()}`);
                     } else {
-                        console.log(`   ⚠️ Failed to parse handover date: ${handoverTimeValue}`);
+                        console.log(`   Failed to parse handover date: ${handoverTimeValue}`);
                     }
                 } else {
-                    console.log(`   📅 Handover Time: Not available`);
+                    console.log(`   Handover Time: Not available`);
                 }
 
                 // Log what will be set for payment_plan2
-                console.log(`   💳 Setting payment_plan2 to: ${paymentPlan || 'null'}`);
+                console.log(`   Setting payment_plan2 to: ${paymentPlan || 'null'}`);
                 
                 // Create the project
                 const project = await prisma.project.create({
@@ -493,9 +512,9 @@ async function seedOffPlanProjects() {
                 // Create floor plans - check both root level and newParam level
                 const floorPlans = listing.floorPlan || listing.newParam?.floorPlan || [];
                 if (floorPlans.length > 0) {
-                    console.log(`   🏠 Found ${floorPlans.length} floor plans to process`);
+                    console.log(`   Found ${floorPlans.length} floor plans to process`);
                 } else {
-                    console.log(`   🏠 No floor plans found for this listing`);
+                    console.log(`   No floor plans found for this listing`);
                 }
                 const floorPlansCount = await createFloorPlans(project.id, floorPlans, price);
 
@@ -533,8 +552,8 @@ async function seedOffPlanProjects() {
                 }
 
                 // Update or create seeding record
-                if (!processedCompanies.has(companyInfo.companyId)) {
-                    processedCompanies.set(companyInfo.companyId, {
+                if (!processedCompanies.has(companyInfo.companyName)) {
+                    processedCompanies.set(companyInfo.companyName, {
                         developerName: developerName,
                         companyId: companyInfo.companyId,
                         companyName: companyInfo.companyName,
@@ -543,7 +562,7 @@ async function seedOffPlanProjects() {
                     });
                 }
 
-                const record = processedCompanies.get(companyInfo.companyId)!;
+                const record = processedCompanies.get(companyInfo.companyName)!;
                 record.projectsCreated++;
                 record.projects.push({
                     title: listing.title,
@@ -553,13 +572,13 @@ async function seedOffPlanProjects() {
 
                 successCount++;
                 if (successCount % 10 === 0) {
-                    console.log(`✅ Processed ${successCount} projects...`);
+                    console.log(`Processed ${successCount} projects...`);
                 }
 
                 // No API rate limiting needed since we're using local proximity calculations
 
             } catch (error) {
-                console.error(`❌ Error processing listing ${i + 1}:`, error);
+                console.error(`Error processing listing ${i + 1}:`, error);
                 errorCount++;
             }
         }
@@ -567,7 +586,7 @@ async function seedOffPlanProjects() {
         // Convert processed companies to seeding records
         seedingRecords.push(...Array.from(processedCompanies.values()));
 
-        console.log(`\n📈 Seeding Summary:`);
+        console.log(`\nSeeding Summary:`);
         console.log(`   • Successfully created: ${successCount} projects`);
         console.log(`   • Errors encountered: ${errorCount} projects`);
         console.log(`   • Skipped: ${skippedCount} listings`);
@@ -578,28 +597,28 @@ async function seedOffPlanProjects() {
         console.log(`   • Developers missing mappings: ${missingDevelopers.length}`);
         
         // Locality assignment statistics
-        console.log(`\n📍 Locality Assignment Statistics:`);
+        console.log(`\nLocality Assignment Statistics:`);
         console.log(`   • Successful proximity-based assignments: ${localityLookupSuccessCount}`);
         console.log(`   • Fallback locality used: ${localityFallbackCount}`);
         console.log(`   • Assignment success rate: ${((localityLookupSuccessCount / (localityLookupSuccessCount + localityFallbackCount)) * 100).toFixed(1)}%`);
         console.log(`   • All localities assigned from predefined list of 46 Dubai localities`);
 
         // Show sample of processed companies
-        console.log(`\n🏢 Sample Processed Companies:`);
+        console.log(`\nSample Processed Companies:`);
         const sampleCompanies = Array.from(processedCompanies.values()).slice(0, 10);
         for (const record of sampleCompanies) {
-            console.log(`   ✅ ${record.companyName} (${record.projectsCreated} projects)`);
+            console.log(`   ${record.companyName} (${record.projectsCreated} projects)`);
         }
 
         // Save seeding records to JSON file
         const recordsPath = path.join(__dirname, 'seeding-records.json');
         fs.writeFileSync(recordsPath, JSON.stringify(seedingRecords, null, 2));
-        console.log(`\n📝 Seeding records saved to: seeding-records.json`);
+        console.log(`\nSeeding records saved to: seeding-records.json`);
 
-        console.log(`\n✅ Off-Plan Projects seeded successfully!`);
+        console.log(`\nOff-Plan Projects seeded successfully!`);
 
     } catch (error) {
-        console.error('❌ Error during seeding:', error);
+        console.error('Error during seeding:', error);
         throw error;
     } finally {
         await prisma.$disconnect();
@@ -609,7 +628,7 @@ async function seedOffPlanProjects() {
 // Run the script
 if (require.main === module) {
     seedOffPlanProjects().catch((error) => {
-        console.error('❌ Script failed:', error);
+        console.error('Script failed:', error);
         process.exit(1);
     });
 }

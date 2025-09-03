@@ -1,143 +1,144 @@
-[  {
-  "offplanDeveloper": "Emaar",
-  "matchedCompanyName": "Emaar Properties (P.J.S.C.)",
-  "matchedCompanyId": "fa310ca4-431c-43a0-a8bb-f585c2f2bfb7",
-  "confidence": "exact",
-  "similarity": 0.35
-},
-{
-  "offplanDeveloper": "Damac",
-  "matchedCompanyName": "Damac Properties Dubai Co P.S.C.",
-  "matchedCompanyId": "0c6a83bd-8679-421f-933d-591d337c1610",
-  "confidence": "exact",
-  "similarity": 0.33
-},
-{
-  "offplanDeveloper": "Aldar",
-  "matchedCompanyName": "Aldar Properties P.J.S.C.",
-  "matchedCompanyId": "5c05df7a-55cc-4b97-a8ed-5487fc15c6c7",
-  "confidence": "exact",
-  "similarity": 0.37
-},
-{
-  "offplanDeveloper": "Ellington",
-  "matchedCompanyName": "Ellington Properties Development L.L.C",
-  "matchedCompanyId": "6f5fa009-7f06-4a43-a9e1-53eaf83e1a39",
-  "confidence": "exact",
-  "similarity": 0.39
-},
-{
-  "offplanDeveloper": "Meraas",
-  "matchedCompanyName": "Meraas Holding L.L.C",
-  "matchedCompanyId": "a15b05c9-60bb-4e02-a180-1b5a63e30b09",
-  "confidence": "exact",
-  "similarity": 0.36
-},
-{
-  "offplanDeveloper": "Samana",
-  "matchedCompanyName": "Samana Developers L.L.C",
-  "matchedCompanyId": "9d6af30c-43a8-41dc-9f44-9a4fd2204d2f",
-  "confidence": "exact",
-  "similarity": 0.40
-},
-{
-  "offplanDeveloper": "Nshama",
-  "matchedCompanyName": "Nshama Properties L.L.C",
-  "matchedCompanyId": "50a882b6-bd42-4f22-8591-36c74de05dd7",
-  "confidence": "exact",
-  "similarity": 0.37
-},
-{
-  "offplanDeveloper": "Imtiaz Developments",
-  "matchedCompanyName": "Imtiaz Developments L.L.C",
-  "matchedCompanyId": "4af0fdb0-2f8f-4ad0-9c68-9b59a7695487",
-  "confidence": "exact",
-  "similarity": 0.38
-},
-{
-  "offplanDeveloper": "Reportage Properties",
-  "matchedCompanyName": "Reportage Properties L.L.C",
-  "matchedCompanyId": "bc9ff189-0f43-4897-bb11-99a4731bfa8d",
-  "confidence": "exact",
-  "similarity": 0.39
-},
-{
-  "offplanDeveloper": "Arada",
-  "matchedCompanyName": "Arada Developments L.L.C",
-  "matchedCompanyId": "f266d1b1-7589-4d08-bc28-cc2b40640e42",
-  "confidence": "exact",
-  "similarity": 0.36
-},
-{
-  "offplanDeveloper": "RAK Properties",
-  "matchedCompanyName": "RAK Properties P.J.S.C",
-  "matchedCompanyId": "c99f8c65-940f-4d84-b74a-9d171a1c8c7d",
-  "confidence": "exact",
-  "similarity": 0.37
-},
-{
-  "offplanDeveloper": "Danube",
-  "matchedCompanyName": "Danube Properties Development L.L.C",
-  "matchedCompanyId": "7fd85c4d-2e2f-48d1-8429-3d5c34a44e13",
-  "confidence": "exact",
-  "similarity": 0.38
-},
-{
-  "offplanDeveloper": "Azizi",
-  "matchedCompanyName": "Azizi Developments L.L.C",
-  "matchedCompanyId": "9c4ad0fa-16aa-43a2-b30e-d4b23c9f729b",
-  "confidence": "exact",
-  "similarity": 0.38
-},
-{
-  "offplanDeveloper": "Nakheel",
-  "matchedCompanyName": "Nakheel P.J.S.C.",
-  "matchedCompanyId": "a77ddfd3-c9c1-44b8-a38f-b8702d6881d2",
-  "confidence": "exact",
-  "similarity": 0.36
-},
-{
-  "offplanDeveloper": "Eagle Hills",
-  "matchedCompanyName": "Eagle Hills Properties L.L.C",
-  "matchedCompanyId": "ec9a3217-260f-4ac8-95a6-d0c9e27a5a2b",
-  "confidence": "exact",
-  "similarity": 0.35
-},
-{
-  "offplanDeveloper": "Omniyat",
-  "matchedCompanyName": "Omniyat Properties L.L.C",
-  "matchedCompanyId": "29a83cc1-51c6-4c54-943f-5f627fbf57db",
-  "confidence": "exact",
-  "similarity": 0.37
-},
-{
-  "offplanDeveloper": "Deyaar",
-  "matchedCompanyName": "Deyaar Development P.J.S.C.",
-  "matchedCompanyId": "7e4b0db7-6e83-4dd7-b1cd-5bde967d544a",
-  "confidence": "exact",
-  "similarity": 0.36
-},
-{
-  "offplanDeveloper": "Modon",
-  "matchedCompanyName": "Modon Properties P.J.S.C.",
-  "matchedCompanyId": "77ef81df-25f2-4724-b9d7-743387f105f0",
-  "confidence": "exact",
-  "similarity": 0.37
-},
-{
-  "offplanDeveloper": "DarGlobal",
-  "matchedCompanyName": "DarGlobal Properties L.L.C",
-  "matchedCompanyId": "cf1d87c7-1f25-4aeb-b7aa-f26edc51329f",
-  "confidence": "exact",
-  "similarity": 0.37
-},
-{
-  "offplanDeveloper": "HRE Development",
-  "matchedCompanyName": "HRE Properties Development L.L.C",
-  "matchedCompanyId": "69df6cb6-8738-4963-b381-f29f780f72b5",
-  "confidence": "exact",
-  "similarity": 0.35
-},
+[
+  {
+    "offplanDeveloper": "Emaar",
+    "matchedCompanyName": "Emaar Properties (P.J.S.C.)",
+    "matchedCompanyId": "fa310ca4-431c-43a0-a8bb-f585c2f2bfb7",
+    "confidence": "exact",
+    "similarity": 0.35
+  },
+  {
+    "offplanDeveloper": "Damac",
+    "matchedCompanyName": "Damac Properties Dubai Co P.S.C.",
+    "matchedCompanyId": "0c6a83bd-8679-421f-933d-591d337c1610",
+    "confidence": "exact",
+    "similarity": 0.33
+  },
+  {
+    "offplanDeveloper": "Aldar",
+    "matchedCompanyName": "Aldar Properties P J S C - Dubai Branch",
+    "matchedCompanyId": "5c05df7a-55cc-4b97-a8ed-5487fc15c6c7",
+    "confidence": "exact",
+    "similarity": 0.37
+  },
+  {
+    "offplanDeveloper": "Ellington",
+    "matchedCompanyName": "Ellington Properties Development L.L.C",
+    "matchedCompanyId": "6f5fa009-7f06-4a43-a9e1-53eaf83e1a39",
+    "confidence": "exact",
+    "similarity": 0.39
+  },
+  {
+    "offplanDeveloper": "Meraas",
+    "matchedCompanyName": "Meraas Real Estates L.L.C",
+    "matchedCompanyId": "a15b05c9-60bb-4e02-a180-1b5a63e30b09",
+    "confidence": "exact",
+    "similarity": 0.36
+  },
+  {
+    "offplanDeveloper": "Samana",
+    "matchedCompanyName": "Samana Si Holding Limited Dubai Branch",
+    "matchedCompanyId": "9d6af30c-43a8-41dc-9f44-9a4fd2204d2f",
+    "confidence": "exact",
+    "similarity": 0.40
+  },
+  {
+    "offplanDeveloper": "Nshama",
+    "matchedCompanyName": "Nshama Development L.L.C",
+    "matchedCompanyId": "50a882b6-bd42-4f22-8591-36c74de05dd7",
+    "confidence": "exact",
+    "similarity": 0.37
+  },
+  {
+    "offplanDeveloper": "Imtiaz Developments",
+    "matchedCompanyName": "Imtiaz Real Estate Investment & Development L.L.C",
+    "matchedCompanyId": "4af0fdb0-2f8f-4ad0-9c68-9b59a7695487",
+    "confidence": "exact",
+    "similarity": 0.38
+  },
+  {
+    "offplanDeveloper": "Reportage Properties",
+    "matchedCompanyName": "Reportage Prime Properties L.L.C",
+    "matchedCompanyId": "bc9ff189-0f43-4897-bb11-99a4731bfa8d",
+    "confidence": "exact",
+    "similarity": 0.39
+  },
+  {
+    "offplanDeveloper": "Arada",
+    "matchedCompanyName": "Arada Developments Llc - Dubai Branch",
+    "matchedCompanyId": "f266d1b1-7589-4d08-bc28-cc2b40640e42",
+    "confidence": "exact",
+    "similarity": 0.36
+  },
+  {
+    "offplanDeveloper": "RAK Properties",
+    "matchedCompanyName": "RAK Properties P.J.S.C",
+    "matchedCompanyId": "c99f8c65-940f-4d84-b74a-9d171a1c8c7d",
+    "confidence": "exact",
+    "similarity": 0.37
+  },
+  {
+    "offplanDeveloper": "Danube",
+    "matchedCompanyName": "Danube Properties Development L.L.",
+    "matchedCompanyId": "7fd85c4d-2e2f-48d1-8429-3d5c34a44e13",
+    "confidence": "exact",
+    "similarity": 0.38
+  },
+  {
+    "offplanDeveloper": "Azizi",
+    "matchedCompanyName": "Azizi Developments L.L.C",
+    "matchedCompanyId": "9c4ad0fa-16aa-43a2-b30e-d4b23c9f729b",
+    "confidence": "exact",
+    "similarity": 0.38
+  },
+  {
+    "offplanDeveloper": "Nakheel",
+    "matchedCompanyName": "Nakheel .(P J S C)",
+    "matchedCompanyId": "a77ddfd3-c9c1-44b8-a38f-b8702d6881d2",
+    "confidence": "exact",
+    "similarity": 0.36
+  },
+  {
+    "offplanDeveloper": "Eagle Hills",
+    "matchedCompanyName": "Eagle Properties L.L.C",
+    "matchedCompanyId": "ec9a3217-260f-4ac8-95a6-d0c9e27a5a2b",
+    "confidence": "exact",
+    "similarity": 0.35
+  },
+  {
+    "offplanDeveloper": "Omniyat",
+    "matchedCompanyName": "Omniyat Properties Development Corporation",
+    "matchedCompanyId": "29a83cc1-51c6-4c54-943f-5f627fbf57db",
+    "confidence": "exact",
+    "similarity": 0.37
+  },
+  {
+    "offplanDeveloper": "Deyaar",
+    "matchedCompanyName": "Deyaar Development (P.J.S.C)",
+    "matchedCompanyId": "7e4b0db7-6e83-4dd7-b1cd-5bde967d544a",
+    "confidence": "exact",
+    "similarity": 0.36
+  },
+  {
+    "offplanDeveloper": "Modon",
+    "matchedCompanyName": "Modon Properties P.J.S.C.",
+    "matchedCompanyId": "77ef81df-25f2-4724-b9d7-743387f105f0",
+    "confidence": "exact",
+    "similarity": 0.37
+  },
+  {
+    "offplanDeveloper": "DarGlobal",
+    "matchedCompanyName": "Dar Global Properties L.L.C",
+    "matchedCompanyId": "cf1d87c7-1f25-4aeb-b7aa-f26edc51329f",
+    "confidence": "exact",
+    "similarity": 0.37
+  },
+  {
+    "offplanDeveloper": "HRE Development",
+    "matchedCompanyName": "HHre Real Estate Development L.L.C",
+    "matchedCompanyId": "69df6cb6-8738-4963-b381-f29f780f72b5",
+    "confidence": "exact",
+    "similarity": 0.35
+  },
   {
     "offplanDeveloper": "Damac",
     "matchedCompanyName": "Damac Properties Dubai Co P.S.C.",
@@ -152,7 +153,7 @@
     "confidence": "exact",
     "similarity": 0.3333333333333333
   },
-{
+  {
     "offplanDeveloper": "Al Tareq Star Real Estate Development",
     "matchedCompanyName": "Al Tareq Star Real Estate Development L.L.C",
     "matchedCompanyId": "8509b2ee-fa46-45ed-b3c3-2a1c84732a5a",
