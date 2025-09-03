@@ -1,4 +1,5 @@
 import prisma from '../utils/prisma';
+import { assignLocalityFromCoordinates } from '../utils/locality-assignment';
 
 interface GeocodeResult {
     formatted_address: string;
@@ -216,21 +217,21 @@ async function populateListingsLocality(options: PopulateOptions = {}) {
                     let locality: string | null = null;
                     let shouldUpdate = false;
 
-                    // Strategy 1: Use coordinates if available (reverse geocoding)
+                    // Strategy 1: Use coordinates if available (proximity-based assignment)
                     if (listing.latitude && listing.longitude) {
                         console.log(
                             `   📍 Using coordinates: ${listing.latitude}, ${listing.longitude}`
                         );
 
-                        const reverseResult = await reverseGeocode(
+                        const localityResult = assignLocalityFromCoordinates(
                             listing.latitude,
                             listing.longitude
                         );
-                        if (reverseResult && reverseResult.locality) {
-                            locality = reverseResult.locality;
+                        if (localityResult && localityResult.locality) {
+                            locality = localityResult.locality;
                             shouldUpdate = true;
                             console.log(
-                                `   ✅ Found locality from coordinates: ${locality}`
+                                `   ✅ Found locality from coordinates: ${locality} (${localityResult.distance.toFixed(2)}km away)`
                             );
                         } else {
                             console.log(
@@ -335,12 +336,12 @@ async function populateListingsLocality(options: PopulateOptions = {}) {
 
                     // Same logic as before to determine locality
                     if (listing.latitude && listing.longitude) {
-                        const reverseResult = await reverseGeocode(
+                        const localityResult = assignLocalityFromCoordinates(
                             listing.latitude,
                             listing.longitude
                         );
-                        if (reverseResult && reverseResult.locality) {
-                            locality = reverseResult.locality;
+                        if (localityResult && localityResult.locality) {
+                            locality = localityResult.locality;
                         }
                     }
 

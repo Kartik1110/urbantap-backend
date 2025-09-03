@@ -2,8 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import fs from 'fs';
 import path from 'path';
+import { assignLocalityFromCoordinates } from '../utils/locality-assignment';
 
 const prisma = new PrismaClient();
+
+// Locality assignment using proximity-based calculation
 
 interface OffPlanListing {
     title: string;
@@ -118,17 +121,45 @@ function extractCoordinates(listing: OffPlanListing): { latitude: number | null;
     return { latitude: null, longitude: null };
 }
 
-// Function to generate locality for project
-function generateLocalityForProject(index: number): string {
+// Function to get locality from coordinates using proximity-based assignment
+async function getLocalityFromCoordinates(latitude: number | null, longitude: number | null): Promise<string | null> {
+    if (!latitude || !longitude) {
+        console.log('   📍 No coordinates available for locality lookup');
+        return null;
+    }
+
+    console.log(`   📍 Looking up locality for coordinates: ${latitude}, ${longitude}`);
+    
+    try {
+        const result = assignLocalityFromCoordinates(latitude, longitude);
+        if (result && result.locality) {
+            console.log(`   ✅ Found locality: ${result.locality} (${result.distance.toFixed(2)}km away)`);
+            return result.locality;
+        } else {
+            console.log(`   ⚠️ No locality found from coordinates`);
+            return null;
+        }
+    } catch (error) {
+        console.error(`   ❌ Error getting locality from coordinates:`, error);
+        return null;
+    }
+}
+
+// Function to generate fallback locality for project (used when coordinates are not available)
+function generateFallbackLocalityForProject(index: number): string {
+    // Use the same 46 localities from our predefined list
     const dubaiLocalities = [
-        'Jumeirah Village Circle', 'Dubai Hills Estate', 'Dubai Marina', 'Palm Jumeirah',
-        'Downtown Dubai', 'Business Bay', 'Al Barsha', 'Al Quoz', 'Al Furjan',
-        'Discovery Gardens', 'International City', 'Silicon Oasis', 'Sports City',
-        'Motor City', 'Al Marjan Island', 'Jumeirah Heights', 'Warsan',
-        'Dubai Creek Harbour', 'Meydan City', 'Nad Al Sheba', 'Dubai Silicon Oasis',
-        'Dubai Production City', 'Dubai Studio City', 'Dubai Media City', 'Dubai Internet City',
-        'Dubai Knowledge Park', 'Dubai Academic City', 'Dubai Healthcare City',
-        'Dubai World Central', 'Dubai South', 'Dubai Investment Park', 'Dubai Techno Park'
+        "Al Barsha 1", "Al Barsha South", "Al Jaddaf", "Al Kifaf", "Al Quoz 1",
+        "Al Satwa", "Al Sufouh", "Al Sufouh 1", "Al Sufouh 2", "Al Wasl",
+        "Barsha Heights", "Business Bay", "City of Arabia", "Downtown Dubai",
+        "Dubai Festival City", "Dubai Investments Park", "Dubai Islands", "Dubai Marina",
+        "Dubai Production City", "Dubai Silicon Oasis", "Emirates Hills", "Golf City",
+        "Green Community Village", "Jabal Ali Industrial First", "Jabal Ali Industrial Second",
+        "Jumeirah 2", "Jumeirah 3", "Jumeirah Lake Towers", "Jumeirah Village Circle",
+        "Madinat Hind 4", "Mina Jebel Ali", "Muhaisnah 1", "Muhaisnah 3",
+        "Nad Al Sheba", "Nad Al Sheba 1", "Nad Al Sheba 2", "Nadd Al Hamar",
+        "Ras Al Khor", "Ras Al Khor Industrial Area 1", "Saih Shuaib 2", "The Palm Jumeirah",
+        "Umm Suqeim 3", "Wadi Al Safa 5", "Mirdif", "Deira", "Liwan"
     ];
     
     const localityIndex = index % dubaiLocalities.length;
@@ -251,6 +282,11 @@ async function createFloorPlans(projectId: string, floorPlans: FloorPlan[], proj
 
 async function seedOffPlanProjects() {
     console.log("🚀 Starting Off-Plan Projects Seeding Process...");
+    
+    // Log locality assignment configuration
+    console.log("📍 Using proximity-based locality assignment from predefined list of 46 Dubai localities");
+    console.log("   • Coordinates will be matched to closest locality from your approved list");
+    console.log("   • Fallback localities will also use the same 46 predefined localities");
 
     try {
         // Read company mappings
@@ -313,6 +349,8 @@ async function seedOffPlanProjects() {
         let successCount = 0;
         let errorCount = 0;
         let skippedCount = 0;
+        let localityLookupSuccessCount = 0;
+        let localityFallbackCount = 0;
         const seedingRecords: SeedingRecord[] = [];
         const processedCompanies = new Map<string, SeedingRecord>();
 
@@ -384,8 +422,17 @@ async function seedOffPlanProjects() {
                 // Extract coordinates
                 const { latitude, longitude } = extractCoordinates(listing);
 
-                // Generate locality
-                const locality = generateLocalityForProject(i);
+                // Get locality from coordinates using proximity-based assignment
+                let locality = await getLocalityFromCoordinates(latitude, longitude);
+                
+                // Fallback to generated locality if coordinates are not available
+                if (!locality) {
+                    locality = generateFallbackLocalityForProject(i);
+                    console.log(`   🏠 Using fallback locality: ${locality}`);
+                    localityFallbackCount++;
+                } else {
+                    localityLookupSuccessCount++;
+                }
 
                 // Process amenities
                 const amenities = listing.amenities || ["Pool", "Gym", "Parking", "Garden", "Security", "Elevator"];
@@ -460,15 +507,22 @@ async function seedOffPlanProjects() {
                     });
 
                     if (floorPlans.length > 0) {
-                        const bedrooms = floorPlans.map(fp => fp.bedrooms).filter(Boolean);
+                        const bedrooms = floorPlans.map(fp => fp.bedrooms).filter(Boolean) as string[];
                         const sizes = floorPlans.map(fp => fp.unit_size).filter(Boolean);
                         const prices = floorPlans.flatMap(fp => [fp.min_price, fp.max_price]).filter(Boolean);
+
+                        // Sort bedrooms by bedroom count (Studio < One < Two < Three, etc.)
+                        const bedroomOrder = ['Studio', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'];
+                        const sortedBedrooms = bedrooms.sort((a, b) => {
+                            return bedroomOrder.indexOf(a) - bedroomOrder.indexOf(b);
+                        });
 
                         await prisma.project.update({
                             where: { id: project.id },
                             data: {
-                                min_bedrooms: bedrooms.length > 0 ? bedrooms[0] : null,
-                                max_bedrooms: bedrooms.length > 0 ? bedrooms[bedrooms.length - 1] : null,
+                                min_bedrooms: sortedBedrooms.length > 0 ? sortedBedrooms[0] as any : null,
+                                max_bedrooms: sortedBedrooms.length > 0 ? sortedBedrooms[sortedBedrooms.length - 1] as any : null,
+                                unit_types: sortedBedrooms, // Store all bedroom types in unit_types array
                                 min_sq_ft: sizes.length > 0 ? Math.min(...sizes as number[]) : null,
                                 max_sq_ft: sizes.length > 0 ? Math.max(...sizes as number[]) : null,
                                 min_price: prices.length > 0 ? Math.min(...prices as number[]) : null,
@@ -502,6 +556,8 @@ async function seedOffPlanProjects() {
                     console.log(`✅ Processed ${successCount} projects...`);
                 }
 
+                // No API rate limiting needed since we're using local proximity calculations
+
             } catch (error) {
                 console.error(`❌ Error processing listing ${i + 1}:`, error);
                 errorCount++;
@@ -520,6 +576,13 @@ async function seedOffPlanProjects() {
         console.log(`   • Companies processed: ${processedCompanies.size}`);
         console.log(`   • Developers with mappings: ${mappedDevelopers.size}`);
         console.log(`   • Developers missing mappings: ${missingDevelopers.length}`);
+        
+        // Locality assignment statistics
+        console.log(`\n📍 Locality Assignment Statistics:`);
+        console.log(`   • Successful proximity-based assignments: ${localityLookupSuccessCount}`);
+        console.log(`   • Fallback locality used: ${localityFallbackCount}`);
+        console.log(`   • Assignment success rate: ${((localityLookupSuccessCount / (localityLookupSuccessCount + localityFallbackCount)) * 100).toFixed(1)}%`);
+        console.log(`   • All localities assigned from predefined list of 46 Dubai localities`);
 
         // Show sample of processed companies
         console.log(`\n🏢 Sample Processed Companies:`);

@@ -1,4 +1,5 @@
 import prisma from '../utils/prisma';
+import { assignLocalityFromCoordinates } from '../utils/locality-assignment';
 
 interface GeocodeResult {
     formatted_address: string;
@@ -10,6 +11,7 @@ interface GeocodeResult {
 interface ReverseGeocodeResult {
     formatted_address: string;
     locality: string | null;
+    locality_distance?: number;
 }
 
 interface AddressComponent {
@@ -161,12 +163,19 @@ async function updateListingLocality() {
                 console.log(`🔍 Forward geocoding for listing ${listing.id}`);
                 result = await geocodeAddress(rawAddress);
             } else if (hasLatitude && hasLongitude && !hasLocality) {
-                // Has coordinates but missing locality: reverse geocode
-                console.log(`🔍 Reverse geocoding for listing ${listing.id}`);
-                result = await reverseGeocode(
+                // Has coordinates but missing locality: use proximity-based assignment
+                console.log(`🔍 Assigning locality from coordinates for listing ${listing.id}`);
+                const localityResult = assignLocalityFromCoordinates(
                     listing.latitude!,
                     listing.longitude!
                 );
+                if (localityResult && localityResult.locality) {
+                    result = {
+                        formatted_address: listing.address || '',
+                        locality: localityResult.locality,
+                        locality_distance: localityResult.distance
+                    };
+                }
             } else {
                 // Has coordinates and locality: skip
                 continue;
@@ -182,7 +191,7 @@ async function updateListingLocality() {
                     updateData.longitude = result.lng;
                     updateData.locality = result.locality;
                 } else {
-                    // Reverse geocode result
+                    // Proximity-based assignment result
                     updateData.locality = result.locality;
                 }
 
