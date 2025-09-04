@@ -90,7 +90,9 @@ export const getProjectsService = async ({
 export const getProjectByIdService = async (id: string) => {
     return await prisma.project.findUnique({
         where: { id },
-        include: { developer: true },
+        include:{ developer: true,
+                    floor_plans: true
+                },
     });
 };
 

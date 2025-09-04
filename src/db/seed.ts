@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role, CompanyType, BrokerType, Speciality, Category, Type, Bedrooms, Bathrooms, Furnished, Payment_Plan, City, Rental_frequency, Admin_Status, Type_of_use, DealType, CurrentStatus, Views, Market, Sale_Type, Quarter, WorkplaceType, JobType, Currency, NotificationType } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
@@ -41,7 +41,7 @@ async function main() {
             name: 'Admin',
             email: 'admin@example.com',
             password: 'password123',
-            role: 'ADMIN',
+            role: Role.ADMIN,
         },
     });
 
@@ -50,7 +50,7 @@ async function main() {
             name: 'HR Manager',
             email: 'hr@example.com',
             password: 'password123',
-            role: 'HR',
+            role: Role.HR,
         },
     });
 
@@ -71,7 +71,7 @@ async function main() {
         const company = await prisma.company.create({
             data: {
                 name: companyData.name,
-                type: 'Developer',
+                type: CompanyType.Developer,
                 logo: companyData.logo,
                 description: 'No description provided',
             },
@@ -96,7 +96,7 @@ async function main() {
                 name: faker.person.fullName(),
                 email: faker.internet.email(),
                 password: 'password123',
-                role: 'BROKER',
+                role: Role.BROKER,
             },
         });
 
@@ -123,12 +123,12 @@ async function main() {
                 company_id: company.id,
                 developerId: developer.id,
                 type: faker.helpers.arrayElement([
-                    'Off_plan',
-                    'Ready_to_move',
-                    'Both',
+                    BrokerType.Off_plan,
+                    BrokerType.Ready_to_move,
+                    BrokerType.Both,
                 ]),
                 specialities: faker.helpers.arrayElements(
-                    ['Villa', 'Apartment', 'Townhouse', 'Office', 'Shop'],
+                    [Speciality.Villa, Speciality.Apartment, Speciality.Townhouse, Speciality.Office, Speciality.Shop],
                     2
                 ),
             },
@@ -150,23 +150,22 @@ async function main() {
                     description: faker.lorem.paragraph(),
                     image: projectImages[0],
                     images: projectImages,
-                    floor_plans: projectImages,
-                    price: faker.number.float({ min: 100000, max: 5000000 }),
+                    min_price: faker.number.float({ min: 100000, max: 5000000 }),
                     address: faker.location.streetAddress(),
-                    city: 'Dubai',
+                    city: City.Dubai,
                     file_url: faker.internet.url(),
-                    type: 'Off_plan',
+                    type: Category.Off_plan,
                     project_name: faker.company.name(),
                     project_age: String(faker.number.int({ min: 1, max: 10 })),
-                    no_of_bedrooms: 'Two',
-                    no_of_bathrooms: 'Two',
-                    furnished: 'Semi_furnished',
+                    min_bedrooms: Bedrooms.Two,
+                    min_bathrooms: Bathrooms.Two,
+                    furnished: Furnished.Semi_furnished,
                     property_size: faker.number.float({ min: 500, max: 5000 }),
-                    payment_plan: 'Payment_Pending',
+                    payment_plan: Payment_Plan.Payment_Pending,
                     unit_types: ['1BHK', '2BHK'],
                     amenities: ['Pool', 'Gym', 'Parking'],
                     developer_id: developer.id,
-                    currency: 'AED',
+                    currency: Currency.AED,
                 },
             });
         }
@@ -182,7 +181,7 @@ async function main() {
         const company = await prisma.company.create({
             data: {
                 name: companyData.name,
-                type: 'Brokerage',
+                type: CompanyType.Brokerage,
                 logo: companyData.logo,
                 description: 'No description provided',
             },
@@ -211,7 +210,7 @@ async function main() {
                 name: faker.person.fullName(),
                 email: faker.internet.email(),
                 password: 'password123',
-                role: 'BROKER',
+                role: Role.BROKER,
             },
         });
 
@@ -238,12 +237,12 @@ async function main() {
                 company_id: company.id,
                 brokerageId: brokerage.id,
                 type: faker.helpers.arrayElement([
-                    'Off_plan',
-                    'Ready_to_move',
-                    'Both',
+                    BrokerType.Off_plan,
+                    BrokerType.Ready_to_move,
+                    BrokerType.Both,
                 ]),
                 specialities: faker.helpers.arrayElements(
-                    ['Villa', 'Apartment', 'Townhouse', 'Office', 'Shop'],
+                    [Speciality.Villa, Speciality.Apartment, Speciality.Townhouse, Speciality.Office, Speciality.Shop],
                     2
                 ),
             },
@@ -256,12 +255,12 @@ async function main() {
             data: {
                 title: faker.person.jobTitle(),
                 description: `${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}\n- ${faker.lorem.sentence()}`,
-                workplace_type: 'On_site',
+                workplace_type: WorkplaceType.On_site,
                 location: 'Dubai',
-                job_type: 'Full_time',
+                job_type: JobType.Full_time,
                 min_salary: 15000,
                 max_salary: 30000,
-                currency: 'AED',
+                currency: Currency.AED,
                 min_experience: 2,
                 max_experience: 10,
                 company_id: company.id,
@@ -289,70 +288,70 @@ async function main() {
                 max_price: faker.number.float({ min: 5000000, max: 10000000 }),
                 sq_ft: faker.number.float({ min: 500, max: 6000 }),
                 address: faker.location.streetAddress(),
-                city: 'Dubai',
+                city: City.Dubai,
                 type: faker.helpers.arrayElement([
-                    'Apartment',
-                    'Villa',
-                    'Office',
+                    Type.Apartment,
+                    Type.Villa,
+                    Type.Office,
                 ]),
                 category: faker.helpers.arrayElement([
-                    'Ready_to_move',
-                    'Off_plan',
-                    'Rent',
+                    Category.Ready_to_move,
+                    Category.Off_plan,
+                    Category.Rent,
                 ]),
                 no_of_bedrooms: faker.helpers.arrayElement([
-                    'Studio',
-                    'One',
-                    'Two',
+                    Bedrooms.Studio,
+                    Bedrooms.One,
+                    Bedrooms.Two,
                 ]),
-                no_of_bathrooms: faker.helpers.arrayElement(['One', 'Two']),
+                no_of_bathrooms: faker.helpers.arrayElement([Bathrooms.One, Bathrooms.Two]),
                 broker_id: broker.id,
                 amenities: faker.helpers.arrayElements(
                     ['Pool', 'Gym', 'Parking'],
                     3
                 ),
                 looking_for: faker.datatype.boolean(),
-                rental_frequency: 'Yearly',
+                rental_frequency: Rental_frequency.Yearly,
                 furnished: faker.helpers.arrayElement([
-                    'Furnished',
-                    'Unfurnished',
+                    Furnished.Furnished,
+                    Furnished.Unfurnished,
                 ]),
                 project_age: faker.number.int({ min: 1, max: 10 }),
                 payment_plan: faker.helpers.arrayElement([
-                    'Payment_done',
-                    'Payment_Pending',
+                    Payment_Plan.Payment_done,
+                    Payment_Plan.Payment_Pending,
                 ]),
-                sale_type: faker.helpers.arrayElement(['Direct', 'Resale']),
-                admin_status: 'Approved',
+                sale_type: faker.helpers.arrayElement([Sale_Type.Direct, Sale_Type.Resale]),
+                admin_status: Admin_Status.Approved,
                 handover_year: faker.number.int({ min: 2024, max: 2030 }),
                 handover_quarter: faker.helpers.arrayElement([
-                    'Q1',
-                    'Q2',
-                    'Q3',
-                    'Q4',
+                    Quarter.Q1,
+                    Quarter.Q2,
+                    Quarter.Q3,
+                    Quarter.Q4,
                 ]),
                 type_of_use: faker.helpers.arrayElement([
-                    'Residential',
-                    'Commercial',
-                    'Mixed',
+                    Type_of_use.Residential,
+                    Type_of_use.Commercial,
+                    Type_of_use.Mixed,
                 ]),
-                deal_type: faker.helpers.arrayElement(['Rental', 'Selling']),
+                deal_type: faker.helpers.arrayElement([DealType.Rental, DealType.Selling]),
                 current_status: faker.helpers.arrayElement([
-                    'Occupied',
-                    'Vacant',
+                    CurrentStatus.Occupied,
+                    CurrentStatus.Vacant,
                 ]),
-                views: [faker.helpers.arrayElement(['Sea', 'City', 'Lagoon'])] as any,
-                market: faker.helpers.arrayElement(['Primary', 'Secondary']),
+                views: [faker.helpers.arrayElement([Views.Sea, Views.City, Views.Lagoon])] as any,
+                market: faker.helpers.arrayElement([Market.Primary, Market.Secondary]),
                 brokerage_id: broker.brokerageId ?? undefined,
             },
         });
 
         // Create notifications for the listing
         for (const type of [
-            'General',
-            'Inquiries',
-            'Network',
-            'Broadcast',
+            NotificationType.General,
+            NotificationType.Inquiries,
+            NotificationType.Network,
+            NotificationType.Broadcast,
         ] as const) {
             await prisma.notification.create({
                 data: {
