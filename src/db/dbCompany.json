@@ -140,6 +140,300 @@
     "similarity": 0
   },
   {
+    "offplanDeveloper": "Mr Eight Development",
+    "matchedCompanyName": "Mr Eight Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Tabeer Real Estate",
+    "matchedCompanyName": "Tabeer Real Estate Development L.L.C",
+    "matchedCompanyId": "7a4b22d2-801f-451a-8823-a54c479a50aa",
+    "confidence": "partial",
+    "similarity": 0.6666666666666666
+  },
+  {
+    "offplanDeveloper": "Acube",
+    "matchedCompanyName": "Acube Real Estate Development L L C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Al Habtoor Group",
+    "matchedCompanyName": "Al Habtoor Property Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Arista Properties",
+    "matchedCompanyName": "Arista Heights Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Bam Development",
+    "matchedCompanyName": "Bam Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Citi Developers",
+    "matchedCompanyName": "Citi Developers Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Condor Group",
+    "matchedCompanyName": "Condor Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Continental Investments",
+    "matchedCompanyName": "Continental Investment L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Durar Group",
+    "matchedCompanyName": "Durar Properties (L.L.C)",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Empire Development",
+    "matchedCompanyName": "Empire Real Estate Developments L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "MAG",
+    "matchedCompanyName": "Mag Property Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Mashriq Elite",
+    "matchedCompanyName": "Mashriq Elite Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Metac",
+    "matchedCompanyName": "Metac Properties L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Meteora",
+    "matchedCompanyName": "Meteora Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Range Developments",
+    "matchedCompanyName": "Range 4 Developments L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "The Luxe Developers",
+    "matchedCompanyName": "The Luxe Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "TownX",
+    "matchedCompanyName": "Townx Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "4Direction Developers",
+    "matchedCompanyName": "4 DIRECTION REAL ESTATE BROKER L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+    {
+    "offplanDeveloper": "ARIB Developments",
+    "matchedCompanyName": "Arib Properties For Real Estate Development   Est.",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "ARTE Developments",
+    "matchedCompanyName": "ARTE EXTREME PROPERTIES L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Ahmadyar Developments",
+    "matchedCompanyName": "Ahmadyar Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Al Barari Development",
+    "matchedCompanyName": "Al Barari Real Estate L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Alta Real Estate Developments",
+    "matchedCompanyName": "Alta Real Estate Development L.L.C",
+    "matchedCompanyId": "6f5765c2-a701-4a46-9c09-ba4458884598",
+    "confidence": "partial",
+    "similarity": 0.6
+  },
+  {
+    "offplanDeveloper": "Amirah Developments",
+    "matchedCompanyName": "Amirah Living Developer L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "BT Properties",
+    "matchedCompanyName": "Bt Properties Dwc Llc",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "City View Developments",
+    "matchedCompanyName": "City View Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Elysian Developments",
+    "matchedCompanyName": "Elysian Luxury Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Ever Glory Developments",
+    "matchedCompanyName": "Ever Glory Real Estate Development L.L.",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Fortimo",
+    "matchedCompanyName": "Fortimo Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Green Group",
+    "matchedCompanyName": "Green Properties Development Co",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Heilbronn Properties Ltd",
+    "matchedCompanyName": "Heilbronn Properties Development L.L.C",
+    "matchedCompanyId": "20999e5d-1ebb-4de4-9b59-5be891d2bce9",
+    "confidence": "partial",
+    "similarity": 0.6666666666666666
+  },
+  {
+    "offplanDeveloper": "JRP Development",
+    "matchedCompanyName": "J R P Properties L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Kamdar Developments",
+    "matchedCompanyName": "Kamdar Property Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Lacasa Living",
+    "matchedCompanyName": "Lacasa Living Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "MIRFA",
+    "matchedCompanyName": "Mirfa Ibc Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Mada'in",
+    "matchedCompanyName": "MADA PROPERTIES L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Major Developers",
+    "matchedCompanyName": "MAJOR PROPERTIES",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Meraki Developers",
+    "matchedCompanyName": "Meraki Real Estate Development One Person L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Mered",
+    "matchedCompanyName": "Mered Residences Real Estate L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Muraba",
+    "matchedCompanyName": "Muraba Properties L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
+    "offplanDeveloper": "Nexus Developer",
+    "matchedCompanyName": "NEXUS ELITE PROPERTIES L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
     "offplanDeveloper": "DarGlobal",
     "matchedCompanyName": "Dar Global Properties L.L.C",
     "matchedCompanyId": "cf1d87c7-1f25-4aeb-b7aa-f26edc51329f",
@@ -335,13 +629,13 @@
     "confidence": "exact",
     "similarity": 0.6666666666666666
   },
-   {
-      "offplanDeveloper": "Prestige One",
-      "matchedCompanyName": "Prestige One Luxury Real Estate L.L.C",
-      "matchedCompanyId": null,
-      "confidence": "none",
-      "similarity": 0
-    },
+  {
+    "offplanDeveloper": "Prestige One",
+    "matchedCompanyName": "Prestige One Luxury Real Estate L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
   {
     "offplanDeveloper": "OKSA Developer",
     "matchedCompanyName": "Oksa Developer L.L.C",
@@ -372,7 +666,7 @@
   },
   {
     "offplanDeveloper": "Dubai Properties",
-    "matchedCompanyName": "DUBAI WATERFRONT PROPERTIES",
+    "matchedCompanyName": "Dubai Properties(L.L.C)",
     "matchedCompanyId": "92309fe6-b85e-412c-867d-7de731dda451",
     "confidence": "exact",
     "similarity": 0.6666666666666666
