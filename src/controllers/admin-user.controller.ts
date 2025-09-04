@@ -334,7 +334,6 @@ export const createProject = async (
             amenities: JSON.parse(amenities), // expects JSON string
             image: mainImageUrl,
             images: galleryImageUrls,
-            floor_plans: floorPlanUrls,
             file_url: fileUrl,
             developer_id: req.user.entityId,
             currency: Currency.AED,
