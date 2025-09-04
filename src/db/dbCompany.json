@@ -6,6 +6,13 @@
     "confidence": "exact",
     "similarity": 0.35
   },
+   {
+      "offplanDeveloper": "Sobha",
+      "matchedCompanyName": "Sobha Developers L.L.C (Branch)",
+      "matchedCompanyId": null,
+      "confidence": "none",
+      "similarity": 0
+    },
   {
     "offplanDeveloper": "Damac",
     "matchedCompanyName": "Damac Properties Dubai Co P.S.C.",
@@ -126,6 +133,13 @@
     "similarity": 0.37
   },
   {
+    "offplanDeveloper": "Esnaad",
+    "matchedCompanyName": "Esnaad Real Estate Development L.L.C",
+    "matchedCompanyId": null,
+    "confidence": "none",
+    "similarity": 0
+  },
+  {
     "offplanDeveloper": "DarGlobal",
     "matchedCompanyName": "Dar Global Properties L.L.C",
     "matchedCompanyId": "cf1d87c7-1f25-4aeb-b7aa-f26edc51329f",
@@ -133,8 +147,15 @@
     "similarity": 0.37
   },
   {
+      "offplanDeveloper": "Pantheon Properties Limited",
+      "matchedCompanyName": "Panther Real Estate Development L.L.C",
+      "matchedCompanyId": "dfcd663d-29d3-4f48-b5c8-80252364b094",
+      "confidence": "partial",
+      "similarity": 0.6666666666666666
+    },
+  {
     "offplanDeveloper": "HRE Development",
-    "matchedCompanyName": "HHre Real Estate Development L.L.C",
+    "matchedCompanyName": "Hre Real Estate Development L.L.C",
     "matchedCompanyId": "69df6cb6-8738-4963-b381-f29f780f72b5",
     "confidence": "exact",
     "similarity": 0.35
@@ -314,6 +335,13 @@
     "confidence": "exact",
     "similarity": 0.6666666666666666
   },
+   {
+      "offplanDeveloper": "Prestige One",
+      "matchedCompanyName": "Prestige One Luxury Real Estate L.L.C",
+      "matchedCompanyId": null,
+      "confidence": "none",
+      "similarity": 0
+    },
   {
     "offplanDeveloper": "OKSA Developer",
     "matchedCompanyName": "Oksa Developer L.L.C",
@@ -349,6 +377,13 @@
     "confidence": "exact",
     "similarity": 0.6666666666666666
   },
+  {
+      "offplanDeveloper": "Dugasta",
+      "matchedCompanyName": "Dugasta Properties Development L.L.C",
+      "matchedCompanyId": null,
+      "confidence": "none",
+      "similarity": 0
+    },
   {
     "offplanDeveloper": "Aqua Properties",
     "matchedCompanyName": "AQUA PLUS PROPERTIES",
