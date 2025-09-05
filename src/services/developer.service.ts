@@ -120,7 +120,6 @@ export const getDeveloperDetailsService = async (developerId: string) => {
                     id: true,
                     title: true,
                     description: true,
-                    image: true,
                     images: true,
                     address: true,
                 }

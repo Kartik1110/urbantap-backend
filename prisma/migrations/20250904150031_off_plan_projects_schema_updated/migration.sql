@@ -25,6 +25,7 @@ ALTER TABLE "Developer" ADD COLUMN     "total_projects" INTEGER;
 
 -- AlterTable
 ALTER TABLE "Project" DROP COLUMN "floor_plans",
+DROP COLUMN "image",
 DROP COLUMN "no_of_bathrooms",
 DROP COLUMN "no_of_bedrooms",
 DROP COLUMN "price",

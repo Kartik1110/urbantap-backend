@@ -71,7 +71,7 @@ export const getProjectsService = async ({
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
         type: proj.type,
-        image: proj.image,
+        images: proj.images,
         title: proj.title,
         description: proj.description,
         developer: proj.developer,
@@ -127,42 +127,55 @@ export const getProjectByIdService = async (id: string) => {
         }
     };
 
-    // Process and format unit_types data
-    const processUnitTypes = (unitTypes: any) => {
-        if (!unitTypes || !Array.isArray(unitTypes)) return [];
+    // Process and format unit_types data with properties count
+    const processUnitTypes = (floorPlans: any[]) => {
+        if (!floorPlans || !Array.isArray(floorPlans)) return [];
         
-        // Remove duplicates and convert to proper format
-        const uniqueTypes = [...new Set(unitTypes)];
+        // Count floor plans by bedroom type
+        const unitTypeCounts: { [key: string]: number } = {};
         
+        floorPlans.forEach(floorPlan => {
+            if (floorPlan.bedrooms) {
+                const bedroomType = floorPlan.bedrooms;
+                unitTypeCounts[bedroomType] = (unitTypeCounts[bedroomType] || 0) + 1;
+            }
+        });
+        
+        // Map bedroom types to display names
         const typeMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
             'One': '1Bhk',
             'Two': '2Bhk', 
             'Three': '3Bhk',
             'Four': '4Bhk',
             'Five': '5Bhk',
             'Six': '6Bhk',
-            'Studio': 'Studio',
-            'Penthouse': 'Penthouse',
-            'Villa': 'Villa',
-            'Townhouse': 'Townhouse'
+            'Seven': '7Bhk',
+            'Four_Plus': '4+Bhk'
         };
         
-        return uniqueTypes
-            .map(type => typeMapping[type] || type)
+        // Convert to array of objects with name and properties_count
+        const unitTypes = Object.entries(unitTypeCounts)
+            .map(([bedroomType, count]) => ({
+                name: typeMapping[bedroomType] || bedroomType,
+                properties_count: count
+            }))
             .sort((a, b) => {
                 // Custom sorting: Studio first, then by number, then others
-                if (a === 'Studio') return -1;
-                if (b === 'Studio') return 1;
+                if (a.name === 'Studio') return -1;
+                if (b.name === 'Studio') return 1;
                 
-                const aNum = parseInt(a.match(/\d+/)?.[0] || '999');
-                const bNum = parseInt(b.match(/\d+/)?.[0] || '999');
+                const aNum = parseInt(a.name.match(/\d+/)?.[0] || '999');
+                const bNum = parseInt(b.name.match(/\d+/)?.[0] || '999');
                 
                 if (aNum !== 999 && bNum !== 999) return aNum - bNum;
                 if (aNum !== 999) return -1;
                 if (bNum !== 999) return 1;
                 
-                return a.localeCompare(b);
+                return a.name.localeCompare(b.name);
             });
+        
+        return unitTypes;
     };
 
     return {
@@ -181,12 +194,15 @@ export const getProjectByIdService = async (id: string) => {
         furnished: project.furnished,
         max_sq_ft: project.max_sq_ft,
         payment_plan2: parsePaymentPlan(project.payment_plan2),
-        unit_types: processUnitTypes(project.unit_types),
+        unit_types: processUnitTypes(project.floor_plans),
         locality: project.locality,
         latitude: project.latitude,
         longitude: project.longitude,
         amenities: project.amenities,
-        floor_plans: project.floor_plans
+        floor_plans: project.floor_plans.map(floorPlan => {
+            const { project_id, ...floorPlanWithoutProjectId } = floorPlan;
+            return floorPlanWithoutProjectId;
+        })
     };
 };
 
