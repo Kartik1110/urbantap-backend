@@ -28,7 +28,7 @@ router.get('/listings/:id', getListingById);
 
 router.get('/listings/:id/appreciation', getListingAppreciation);
 
-router.post('/listings/:id/roi-report', getListingROIReport);
+router.get('/listings/:id/roi-report', getListingROIReport);
 
 router.get('/listings/:id/ai-report', getAIReport);
 
