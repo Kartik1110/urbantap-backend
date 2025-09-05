@@ -17,6 +17,9 @@ export interface MergedPropertyData {
 const DEFFAULT_DP_RATIO = 0.4;
 const DEFFAULT_INTEREST_RATE = 0.0399;
 
+// Short-term rent is base rent + 4% increase
+const SHORT_TERM_RENT_MULTIPLIER = 1.04;
+
 /**
  * Calculates the property ROI for a given year based on appreciation rate, rental income, and mortgage costs
  * @param propertyData - The property data from the JSON file
@@ -162,22 +165,21 @@ export function calculateCumulativeROI(
 
 /**
  * Calculates the average annual ROI percentage over a given number of years.
- * Arithmetic mean of yearly ROI%, where each year's ROI% is computed as
- * netReturnThisYear / downPayment.
+ * ROI is calculated as rental yield using the average of short-term and long-term rents.
  *
  * @param propertyData - The property data from the JSON file
  * @param years - The number of years to average over (>=1)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
- * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
- * @param annualInterestRate - The annual interest rate (default: 0.0399)
- * @returns The average ROI percentage per year, or null if data is not available
+ * @param rentMultiplier - The multiplier to apply to the rent (default: 1)
+ * @returns The average ROI percentage per year based on rental yield
  */
 export function calculateAverageROI(
     propertyData: PropertyDataPoint[],
     years: number,
     initialInvestment: number,
-    propertySize: number
+    propertySize: number,
+    rentMultiplier: number = 1
 ): number {
     if (years < 1 || years > 10) {
         const message = 'Years must be between 1 and 10';
@@ -191,20 +193,103 @@ export function calculateAverageROI(
         throw new Error(message);
     }
 
-    const cumulativeROI = calculateCumulativeROI(
-        propertyData,
-        years,
-        initialInvestment,
-        propertySize
-    );
-
-    if (!cumulativeROI) {
-        const message = 'Cumulative ROI not found';
+    if (initialInvestment <= 0) {
+        const message = 'Initial investment must be positive';
         logger.error(`calculateAverageROI: ${message}`);
         throw new Error(message);
     }
 
-    return cumulativeROI / years;
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
+    }
+
+    let totalRentalYield = 0;
+
+    for (let year = 0; year < years; year++) {
+        const yearData = propertyData[year];
+        if (!yearData) {
+            const message = `Year data not found for year ${year + 1}`;
+            logger.error(`calculateAverageROI: ${message}`);
+            throw new Error(message);
+        }
+
+        // Calculate short-term rental income (with rent multiplier)
+        const shortTermRentPerSqFt = yearData.rent_per_sq_ft * rentMultiplier;
+        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
+
+        // Calculate long-term rental income (standard rate)
+        const longTermAnnualIncome =
+            yearData.rent_per_sq_ft * propertySize * 12;
+
+        // Average of short-term and long-term rental income
+        const averageAnnualIncome =
+            (shortTermAnnualIncome + longTermAnnualIncome) / 2;
+
+        // Calculate rental yield as percentage of initial investment
+        const rentalYield = (averageAnnualIncome / initialInvestment) * 100;
+        totalRentalYield += rentalYield;
+    }
+
+    return totalRentalYield / years;
+}
+
+/**
+ * Calculates the average annual rent per year over a given number of years.
+ * Uses the average of short-term and long-term rental strategies.
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param years - The number of years to average over (>=1)
+ * @param propertySize - The property size in square feet
+ * @param rentMultiplier - The multiplier to apply to the rent for short-term strategy (default: 1)
+ * @returns The average annual rent per year
+ */
+export function calculateAverageRentPerYear(
+    propertyData: PropertyDataPoint[],
+    years: number,
+    propertySize: number,
+    rentMultiplier: number = 1
+): number {
+    if (years < 1 || years > 10) {
+        const message = 'Years must be between 1 and 10';
+        logger.error(`calculateAverageRentPerYear: ${message}`);
+        throw new Error(message);
+    }
+
+    if (!propertyData || propertyData.length === 0) {
+        const message = 'Property data not provided';
+        logger.error(`calculateAverageRentPerYear: ${message}`);
+        throw new Error(message);
+    }
+
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateAverageRentPerYear: ${message}`);
+        throw new Error(message);
+    }
+
+    let totalAnnualRent = 0;
+
+    for (let year = 0; year < years; year++) {
+        const yearData = propertyData[year];
+
+        // Calculate short-term rental income (with rent multiplier)
+        const shortTermRentPerSqFt = yearData.rent_per_sq_ft * rentMultiplier;
+        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
+
+        // Calculate long-term rental income (standard rate)
+        const longTermAnnualIncome =
+            yearData.rent_per_sq_ft * propertySize * 12;
+
+        // Average of short-term and long-term rental income
+        const averageAnnualIncome =
+            (shortTermAnnualIncome + longTermAnnualIncome) / 2;
+
+        totalAnnualRent += averageAnnualIncome;
+    }
+
+    return totalAnnualRent / years;
 }
 
 /**
@@ -1281,58 +1366,76 @@ export function calculateCumulativeProfitPerYearByType(
 }
 
 /**
- * Builds datapoints to plot cumulative ROI (amount) for years 1, 3, and 5 based on investment type.
- * Each point is { year: 1|3|5, roi: cumulative net return amount }.
- * Net return uses the same logic: YoY appreciation + annual rent (if rental) − annual interest (if mortgage).
+ * Builds datapoints to plot cumulative ROI (amount) for years based on investment type.
+ * Each point is { year: 1|3|5, roi: cumulative rental income accrued till that year }.
+ * ROI is calculated as the total rental income accumulated from year 0 to the specified year.
+ * For rental properties, this includes rent per sq ft * property size * 12 months * years.
+ * For self-use properties, ROI will be 0 as no rental income is generated.
  *
  * @param propertyData - The property data from the JSON file
- * @param initialInvestment - Total property value today
+ * @param initialInvestment - The initial investment amount for ROI calculation base
  * @param propertySize - Property size in square feet
- * @param isSelfUse - Boolean: true for self-use, false for rental
- * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
- * @returns Array of { year, roi } for years 1, 3, and 5, or null if data missing
+ * @returns Array of { year, roi } for years with cumulative rental income as ROI
  */
 export function calculateRoiDataPointsByType(
     propertyData: PropertyDataPoint[],
     initialInvestment: number,
     propertySize: number,
-    isSelfUse: boolean,
-    isSelfPaid: boolean
-): { year: number; roi: number }[] {
+    shortTermRentMultiplier: number = 1
+): { year: string; roi: number }[] {
     if (!propertyData || !propertyData.length) {
         const message = 'Property data not provided';
         logger.error(`calculateRoiDataPointsByType: ${message}`);
         throw new Error(message);
     }
 
-    const cumulative = calculateCumulativeProfitPerYearByType(
-        propertyData,
-        initialInvestment,
-        propertySize,
-        isSelfUse,
-        isSelfPaid
-    );
-
-    if (!cumulative) {
-        const message = 'Cumulative ROI not found';
+    if (initialInvestment <= 0) {
+        const message = 'Initial investment must be positive';
         logger.error(`calculateRoiDataPointsByType: ${message}`);
         throw new Error(message);
     }
 
-    const datapoints: { year: number; roi: number }[] = [];
-
-    // Always return years 1, 3, and 5
-    const targetYears = [1, 3, 5];
-    const targetIndices = [0, 2, 4];
-
-    for (let i = 0; i < targetYears.length; i++) {
-        const year = targetYears[i];
-        const index = targetIndices[i];
-
-        if (index < cumulative.length) {
-            datapoints.push({ year, roi: cumulative[index] });
-        }
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateRoiDataPointsByType: ${message}`);
+        throw new Error(message);
     }
+
+    const yearlyRentalIncome: number[] = [];
+    for (let i = 0; i < propertyData.length; i++) {
+        const yearData = propertyData[i];
+        if (!yearData) {
+            const message = `Year data not found for year ${i}`;
+            logger.error(`calculateRoiDataPointsByType: ${message}`);
+            throw new Error(message);
+        }
+
+        // Calculate annual rental income for this year
+        const annualRentalIncome = yearData.rent_per_sq_ft * propertySize * 12;
+
+        // Calculate cumulative rental income till this year
+        const cumulativeRentTillPrevYear =
+            i === 0 ? 0 : yearlyRentalIncome[i - 1];
+
+        const avgRentalIncomeThisYear =
+            (annualRentalIncome +
+                annualRentalIncome * shortTermRentMultiplier) /
+            2;
+
+        // Summing up the average of short term and long term rental income
+        yearlyRentalIncome.push(
+            cumulativeRentTillPrevYear + avgRentalIncomeThisYear
+        );
+    }
+
+    const datapoints = yearlyRentalIncome.map((roi, ind) => ({
+        year: String(
+            ind === 0
+                ? new Date().getFullYear()
+                : new Date().getFullYear() + ind
+        ),
+        roi,
+    }));
 
     return datapoints;
 }
@@ -1469,4 +1572,67 @@ export function getListingAppreciationInYear(
     }
 
     return listingPrice * (propertyData[year - 1].appreciation_perc / 100);
+}
+
+/**
+ * Calculates the break-even period (in years) for a property investment based on listing price
+ * and rental income accumulated over time. The break-even occurs when total rental income
+ * equals the initial investment (listing price).
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param listingPrice - The initial investment amount (listing price of the property)
+ * @param propertySize - The property size in square feet
+ * @param rentMultiplier - Multiplier to apply to the rent (default: 1.0, use 1.04 for 4% increase)
+ * @returns The break-even period in years (1-10), or 11 if not breaking even within available data
+ */
+export function calculateListingRentalBreakEvenPeriod(
+    propertyData: PropertyDataPoint[],
+    listingPrice: number,
+    propertySize: number,
+    rentMultiplier: number = 1
+): number {
+    if (listingPrice <= 0) {
+        const message = 'Listing price must be positive';
+        logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    if (!propertyData || !propertyData.length) {
+        const message = 'Property data points not provided';
+        logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    let cumulativeRentalIncome = 0;
+
+    for (let year = 0; year < propertyData.length; year++) {
+        const yearData = propertyData[year];
+        if (!yearData) {
+            const message = 'Year data not found';
+            logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+            throw new Error(message);
+        }
+
+        // Calculate annual rental income for this year
+        const rentPerSqFt = yearData.rent_per_sq_ft * rentMultiplier;
+        const annualRentalIncome = rentPerSqFt * propertySize * 12;
+        cumulativeRentalIncome += annualRentalIncome;
+
+        // Check if cumulative rental income has reached the initial investment
+        if (cumulativeRentalIncome >= listingPrice) {
+            return year + 1; // convert 0-based index to 1-based years
+        }
+    }
+
+    // If not breaking even within available data horizon, return 11
+    logger.warn(
+        'Not breaking even within available data horizon, returning 11'
+    );
+    return 11;
 }

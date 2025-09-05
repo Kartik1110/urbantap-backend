@@ -355,22 +355,9 @@ export const getListingAppreciation = async (req: Request, res: Response) => {
 // Get listing ROI report
 export const getListingROIReport = async (req: Request, res: Response) => {
     const listingId = req.params.id;
-    const {
-        user_preference: num_of_years,
-        goal,
-        mortgage,
-    }: {
-        user_preference: number;
-        goal: 'Rental' | 'Self Use';
-        mortgage: boolean;
-    } = req.body;
 
     try {
-        const roiReport = await getListingROIReportService(listingId, {
-            num_of_years,
-            is_self_use: goal === 'Self Use',
-            is_self_paid: mortgage,
-        });
+        const roiReport = await getListingROIReportService(listingId);
 
         return res.status(200).json({
             status: 'success',
