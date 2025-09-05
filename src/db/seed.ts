@@ -148,7 +148,7 @@ async function main() {
                 data: {
                     title: faker.company.catchPhrase(),
                     description: faker.lorem.paragraph(),
-                    images: projectImages,
+                    image_urls: projectImages,
                     min_price: faker.number.float({ min: 100000, max: 5000000 }),
                     address: faker.location.streetAddress(),
                     city: City.Dubai,
