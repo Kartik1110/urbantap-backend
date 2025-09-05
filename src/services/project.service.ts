@@ -71,7 +71,7 @@ export const getProjectsService = async ({
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
         type: proj.type,
-        image: proj.image,
+        images: proj.image_urls,
         title: proj.title,
         description: proj.description,
         developer: proj.developer,
@@ -88,12 +88,122 @@ export const getProjectsService = async ({
 };
 
 export const getProjectByIdService = async (id: string) => {
-    return await prisma.project.findUnique({
+    const project = await prisma.project.findUnique({
         where: { id },
-        include:{ developer: true,
-                    floor_plans: true
-                },
+        include: { 
+            developer: true,
+            floor_plans: true
+        },
     });
+
+    if (!project) {
+        return null;
+    }
+
+    // Parse and structure payment_plan2 data as list of objects
+    const parsePaymentPlan = (paymentPlanString: string | null) => {
+        if (!paymentPlanString) return [];
+        
+        try {
+            const parsed = JSON.parse(paymentPlanString);
+            const paymentStages = [
+                { stage: 'one', label: 'Booking', percentage: parsed.one },
+                { stage: 'two', label: 'During Construction', percentage: parsed.two },
+                { stage: 'three', label: 'On Completion', percentage: parsed.three },
+                { stage: 'four', label: 'Handover', percentage: parsed.four }
+            ];
+            
+            // Filter out stages with 0% and return as list of objects
+            return paymentStages
+                .filter(stage => stage.percentage > 0)
+                .map(stage => ({
+                    stage: stage.stage,
+                    label: stage.label,
+                    percentage: parseInt(stage.percentage.toString())
+                }));
+        } catch (error) {
+            console.error('Error parsing payment_plan2:', error);
+            return [];
+        }
+    };
+
+    // Process and format unit_types data with properties count
+    const processUnitTypes = (floorPlans: any[]) => {
+        if (!floorPlans || !Array.isArray(floorPlans)) return [];
+        
+        // Count floor plans by bedroom type
+        const unitTypeCounts: { [key: string]: number } = {};
+        
+        floorPlans.forEach(floorPlan => {
+            if (floorPlan.bedrooms) {
+                const bedroomType = floorPlan.bedrooms;
+                unitTypeCounts[bedroomType] = (unitTypeCounts[bedroomType] || 0) + 1;
+            }
+        });
+        
+        // Map bedroom types to display names
+        const typeMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
+            'One': '1Bhk',
+            'Two': '2Bhk', 
+            'Three': '3Bhk',
+            'Four': '4Bhk',
+            'Five': '5Bhk',
+            'Six': '6Bhk',
+            'Seven': '7Bhk',
+            'Four_Plus': '4+Bhk'
+        };
+        
+        // Convert to array of objects with name and properties_count
+        const unitTypes = Object.entries(unitTypeCounts)
+            .map(([bedroomType, count]) => ({
+                name: typeMapping[bedroomType] || bedroomType,
+                properties_count: count
+            }))
+            .sort((a, b) => {
+                // Custom sorting: Studio first, then by number, then others
+                if (a.name === 'Studio') return -1;
+                if (b.name === 'Studio') return 1;
+                
+                const aNum = parseInt(a.name.match(/\d+/)?.[0] || '999');
+                const bNum = parseInt(b.name.match(/\d+/)?.[0] || '999');
+                
+                if (aNum !== 999 && bNum !== 999) return aNum - bNum;
+                if (aNum !== 999) return -1;
+                if (bNum !== 999) return 1;
+                
+                return a.name.localeCompare(b.name);
+            });
+        
+        return unitTypes;
+    };
+
+    return {
+        id: project.id,
+        project_name: project.project_name,
+        description: project.description,
+        image_urls: project.image_urls,
+        currency: project.currency,
+        min_price: project.min_price,
+        max_price: project.max_price,
+        address: project.address,
+        city: project.city,
+        file_url: project.file_url,
+        type: project.type,
+        project_age: project.project_age,
+        furnished: project.furnished,
+        max_sq_ft: project.max_sq_ft,
+        payment_structure: parsePaymentPlan(project.payment_structure),
+        unit_types: processUnitTypes(project.floor_plans),
+        locality: project.locality,
+        latitude: project.latitude,
+        longitude: project.longitude,
+        amenities: project.amenities,
+        floor_plans: project.floor_plans.map(floorPlan => {
+            const { project_id, ...floorPlanWithoutProjectId } = floorPlan;
+            return floorPlanWithoutProjectId;
+        })
+    };
 };
 
 export const createProjectService = async (data: any) => {

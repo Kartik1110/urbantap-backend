@@ -355,8 +355,7 @@ model Project {
   id              String       @id @default(uuid())
   title           String
   description     String
-  image           String
-  images          String[] // gallery images
+  image_urls      String[] // gallery images
   currency        Currency
   min_price       Float?
   max_price       Float?
@@ -375,7 +374,7 @@ model Project {
   max_sq_ft   Float?  
   property_size       Float?
   payment_plan    Payment_Plan?
-  payment_plan2   String?
+  payment_structure   String?
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
   locality        String? //function
   latitude        Float?
@@ -392,7 +391,7 @@ model Project {
 model FloorPlan {
   id         String   @id @default(uuid())
   title       String?
-  images      String[]  @default([])
+  image_urls  String[]  @default([])
   min_price   Float?
   max_price   Float?
   unit_size   Float?
