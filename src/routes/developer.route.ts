@@ -3,6 +3,7 @@ import {
     getDevelopers,
     createDeveloper,
     getDeveloperDetails,
+    getDeveloperProjects,
 } from '../controllers/developer.controller';
 
 const router = Router();
@@ -15,5 +16,8 @@ router.post('/developers', createDeveloper);
 
 /* Get developer details by ID */
 router.get('/developers/:id', getDeveloperDetails);
+
+/* Get all projects for a specific developer */
+router.get('/developers/:id/projects', getDeveloperProjects);
 
 export default router;
