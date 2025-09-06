@@ -50,7 +50,6 @@ import {
     calculateCapitalGains,
     calculateRoiDataPointsByType,
     calculateCumulativeROIByType,
-    getCurrentRentalPrice,
     getPropertyData,
     PropertyDataPoint,
     getListingAppreciationInYear,
@@ -59,6 +58,7 @@ import {
     calculateListingRentalBreakEvenPeriod,
     calculateAverageROI,
     calculateAverageRentPerYear,
+    calculateAppreciationDataPoints,
 } from '../utils/roiReport';
 
 declare const fetch: typeof globalThis.fetch;
@@ -1126,6 +1126,12 @@ export const getListingROIReportService = async (
         short_term_rental: number;
         long_term_rental: number;
     }[];
+    avg_area_appreciation_per_year: number;
+    area_appreciation_graph: { year: string; roi: number }[];
+    rental_yield: {
+        year: 3;
+        percentage: number;
+    };
 }> => {
     const listing = await prisma.listing.findFirst({
         where: {
@@ -1273,6 +1279,46 @@ export const getListingROIReportService = async (
         },
     ];
 
+    const areaAppreciationGraphAll =
+        calculateAppreciationDataPoints(propertyData);
+
+    const areaAppreciationGraph = [
+        areaAppreciationGraphAll[0],
+        areaAppreciationGraphAll[3],
+        areaAppreciationGraphAll[5],
+    ].map((item) => ({
+        year: item.year,
+        roi: Math.round(item.appreciation_perc),
+    }));
+
+    const increaseInRentalYield = (year: number) => {
+        const currentYear = getRentalPriceInYear(
+            propertyData,
+            sq_ft,
+            0,
+            'monthly'
+        );
+
+        const yearRental = getRentalPriceInYear(
+            propertyData,
+            sq_ft,
+            year,
+            'monthly'
+        );
+
+        return ((yearRental - currentYear) / currentYear) * 100;
+    };
+
+    const avgAreaAppreciationPerYear =
+        areaAppreciationGraphAll
+            .map((item, i) =>
+                i === 0
+                    ? item.appreciation_perc
+                    : item.appreciation_perc -
+                      areaAppreciationGraphAll[i - 1].appreciation_perc
+            )
+            .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
+
     return {
         capital_gains: {
             today: Math.round(max_price),
@@ -1297,6 +1343,13 @@ export const getListingROIReportService = async (
         avg_rent_per_year: Math.round(avgRentPerYear),
         roi_graph: roiGraph,
         growth_table: growthTable,
+        avg_area_appreciation_per_year:
+            Math.round(avgAreaAppreciationPerYear * 100) / 100,
+        area_appreciation_graph: areaAppreciationGraph,
+        rental_yield: {
+            year: 3,
+            percentage: Math.round(increaseInRentalYield(3) * 100) / 100,
+        },
     };
 };
 
