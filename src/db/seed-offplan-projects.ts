@@ -483,8 +483,8 @@ async function seedOffPlanProjects() {
                         description: listing.description || 'No description available',
                         image_urls: listing.photos || [],
                         currency: "AED",
-                        max_price: price , // 10% variation
-                        // max_price: price * 1.1, // 10% variation
+                        min_price: null, // Keep min_price as null
+                        max_price: price, // Use actual price from data as max_price
                         address: listing.region || 'Dubai',
                         city: mappedCity as any,
                         type: "Off_plan" as any,
@@ -543,8 +543,8 @@ async function seedOffPlanProjects() {
                                 unit_types: sortedBedrooms, // Store all bedroom types in unit_types array
                                 min_sq_ft: sizes.length > 0 ? Math.min(...sizes as number[]) : null,
                                 max_sq_ft: sizes.length > 0 ? Math.max(...sizes as number[]) : null,
-                                min_price: prices.length > 0 ? Math.min(...prices as number[]) : null,
-                                // max_price: prices.length > 0 ? Math.max(...prices as number[]) : null
+                                // Keep min_price as null and max_price as the original price from data
+                                // Don't override the max_price that was set during project creation
                             }
                         });
                     }

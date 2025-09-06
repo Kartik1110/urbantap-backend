@@ -3,6 +3,7 @@ import {
     getProjectsService,
     getProjectByIdService,
     createProjectService,
+    getProjectFloorPlansService,
 } from '../services/project.service';
 
 // GET /projects
@@ -74,6 +75,26 @@ export const createProject = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to create project',
+            error,
+        });
+    }
+};
+
+// GET /projects/:id/floorplans
+export const getProjectFloorPlans = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const floorPlans = await getProjectFloorPlansService(id);
+
+        res.json({
+            status: 'success',
+            message: 'Floor plans fetched successfully',
+            data: floorPlans,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch floor plans',
             error,
         });
     }

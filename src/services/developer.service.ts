@@ -118,9 +118,9 @@ export const getDeveloperDetailsService = async (developerId: string) => {
             projects: {
                 select: {
                     id: true,
-                    title: true,
-                    description: true,
+                    type: true,
                     image_urls: true,
+                    project_name: true,
                     address: true,
                 }
             },
@@ -136,6 +136,15 @@ export const getDeveloperDetailsService = async (developerId: string) => {
 
     if (!developer) throw new Error('Developer not found');
 
+    // Format projects to match the required structure
+    const formattedProjects = developer.projects.map(project => ({
+        id: project.id,
+        type: project.type,
+        image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
+        project_name: project.project_name,
+        address: project.address,
+    }));
+
     return {
         id: developer.id,
         name: developer.company?.name,
@@ -143,6 +152,6 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         cover_image: developer.cover_image,
         description: developer.company?.description,
         project_count: developer.projects.length,
-        projects: developer.projects,
+        projects: formattedProjects,
     };
 };

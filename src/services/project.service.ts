@@ -71,10 +71,9 @@ export const getProjectsService = async ({
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
         type: proj.type,
-        images: proj.image_urls,
-        title: proj.title,
-        description: proj.description,
-        developer: proj.developer,
+        image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
+        project_name: proj.project_name,
+        address: proj.address,
     }));
 
     const pagination = {
@@ -210,4 +209,27 @@ export const createProjectService = async (data: any) => {
     return await prisma.project.create({
         data,
     });
+};
+
+export const getProjectFloorPlansService = async (projectId: string) => {
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: {
+            project_id: projectId,
+        },
+        select: {
+            id: true,
+            title: true,
+            image_urls: true,
+            min_price: true,
+            max_price: true,
+            unit_size: true,
+            bedrooms: true,
+            bathrooms: true,
+        },
+        orderBy: {
+            title: 'asc',
+        },
+    });
+
+    return floorPlans;
 };
