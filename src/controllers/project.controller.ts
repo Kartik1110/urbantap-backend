@@ -3,6 +3,8 @@ import {
     getProjectsService,
     getProjectByIdService,
     createProjectService,
+    getProjectFloorPlansService,
+    getProjectsByDeveloperService,
 } from '../services/project.service';
 
 // GET /projects
@@ -74,6 +76,53 @@ export const createProject = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to create project',
+            error,
+        });
+    }
+};
+
+// GET /projects/:id/floorplans
+export const getProjectFloorPlans = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const floorPlans = await getProjectFloorPlansService(id);
+
+        res.json({
+            status: 'success',
+            message: 'Floor plans fetched successfully',
+            data: floorPlans,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch floor plans',
+            error,
+        });
+    }
+};
+
+// GET /projects/developer/:id
+export const getProjectsByDeveloper = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = parseInt(req.query.pageSize as string) || 10;
+        
+        const { projects, pagination } = await getProjectsByDeveloperService(id, {
+            page,
+            pageSize,
+        });
+
+        res.json({
+            status: 'success',
+            message: 'Developer projects fetched successfully',
+            data: projects,
+            pagination,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch developer projects',
             error,
         });
     }

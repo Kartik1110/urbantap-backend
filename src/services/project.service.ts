@@ -71,10 +71,9 @@ export const getProjectsService = async ({
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
         type: proj.type,
-        images: proj.image_urls,
-        title: proj.title,
-        description: proj.description,
-        developer: proj.developer,
+        image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
+        project_name: proj.project_name,
+        address: proj.address,
     }));
 
     const pagination = {
@@ -210,4 +209,84 @@ export const createProjectService = async (data: any) => {
     return await prisma.project.create({
         data,
     });
+};
+
+export const getProjectFloorPlansService = async (projectId: string) => {
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: {
+            project_id: projectId,
+        },
+        select: {
+            id: true,
+            title: true,
+            image_urls: true,
+            min_price: true,
+            max_price: true,
+            unit_size: true,
+            bedrooms: true,
+            bathrooms: true,
+        },
+        orderBy: {
+            title: 'asc',
+        },
+    });
+
+    return floorPlans;
+};
+
+export const getProjectsByDeveloperService = async (developerId: string, { page, pageSize }: { page: number; pageSize: number }) => {
+    const skip = (page - 1) * pageSize;
+
+    // First check if developer exists
+    const developer = await prisma.developer.findUnique({
+        where: { id: developerId },
+        select: { id: true }
+    });
+
+    if (!developer) {
+        throw new Error('Developer not found');
+    }
+
+    const [projectsRaw, totalCount] = await Promise.all([
+        prisma.project.findMany({
+            where: {
+                developer_id: developerId,
+            },
+            select: {
+                id: true,
+                type: true,
+                image_urls: true,
+                project_name: true,
+                address: true,
+            },
+            skip,
+            take: pageSize,
+            orderBy: {
+                created_at: 'desc',
+            },
+        }),
+        prisma.project.count({
+            where: {
+                developer_id: developerId,
+            },
+        }),
+    ]);
+
+    // Format projects to match the required structure
+    const projects = projectsRaw.map(project => ({
+        id: project.id,
+        type: project.type,
+        image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
+        project_name: project.project_name,
+        address: project.address,
+    }));
+
+    const pagination = {
+        page,
+        pageSize,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
+    };
+
+    return { projects, pagination };
 };
