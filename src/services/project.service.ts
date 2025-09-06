@@ -96,6 +96,7 @@ export const getProjectsService = async ({
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
+        views: proj.views,
     }));
 
     const pagination = {
@@ -109,6 +110,7 @@ export const getProjectsService = async ({
 };
 
 export const getProjectByIdService = async (id: string) => {
+    // First check if project exists
     const project = await prisma.project.findUnique({
         where: { id },
         include: { 
@@ -120,6 +122,16 @@ export const getProjectByIdService = async (id: string) => {
     if (!project) {
         return null;
     }
+
+    // Increment the views count only if project exists
+    await prisma.project.update({
+        where: { id },
+        data: {
+            views: {
+                increment: 1
+            }
+        }
+    });
 
     // Parse and structure payment_plan2 data as list of objects
     const parsePaymentPlan = (paymentPlanString: string | null) => {
@@ -220,6 +232,7 @@ export const getProjectByIdService = async (id: string) => {
         latitude: project.latitude,
         longitude: project.longitude,
         amenities: project.amenities,
+        views: project.views,
         floor_plans: project.floor_plans.map(floorPlan => {
             const { project_id, ...floorPlanWithoutProjectId } = floorPlan;
             return floorPlanWithoutProjectId;
@@ -307,6 +320,64 @@ export const getProjectsByDeveloperService = async (developerId: string, { page,
         image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
         project_name: project.project_name,
         address: project.address,
+    }));
+
+    const pagination = {
+        page,
+        pageSize,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
+    };
+
+    return { projects, pagination };
+};
+
+export const getFeaturedProjectsService = async ({ page, pageSize }: { page: number; pageSize: number }) => {
+    const skip = (page - 1) * pageSize;
+
+    const whereClause = {
+        views: {
+            gte: 1  // Only projects with at least 1 view
+        }
+    };
+
+    const [projectsRaw, totalCount] = await Promise.all([
+        prisma.project.findMany({
+            where: whereClause,
+            skip,
+            take: pageSize,
+            orderBy: {
+                views: 'desc'  // Most viewed first
+            },
+            include: {
+                developer: {
+                    select: {
+                        id: true,
+                        company: {
+                            select: {
+                                name: true,
+                                logo: true,
+                                description: true,
+                                email: true,
+                                phone: true,
+                            },
+                        },
+                    },
+                },
+            },
+        }),
+        prisma.project.count({ where: whereClause }),
+    ]);
+
+    console.log(`Found ${totalCount} total projects with views >= 1, returning ${projectsRaw.length} for page ${page}`);
+
+    const projects = projectsRaw.map((proj) => ({
+        id: proj.id,
+        type: proj.type,
+        image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
+        project_name: proj.project_name,
+        address: proj.address,
+        views: proj.views,
     }));
 
     const pagination = {

@@ -380,6 +380,7 @@ model Project {
   latitude        Float?
   longitude       Float?
   amenities       String[] @default([])
+  views           Int         @default(0)
   developer_id    String
   handover_time   DateTime?
   developer       Developer    @relation(fields: [developer_id], references: [id])
