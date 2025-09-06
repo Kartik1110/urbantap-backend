@@ -744,59 +744,44 @@ export function calculateRoiDataPoints(
 }
 
 /**
- * Builds datapoints to plot cumulative appreciation percentage over years.
- * Each point is { year: 1..years, appreciation: percentage }.
- * Uses the cumulative appreciation_perc values directly from the data.
+ * Builds datapoints to plot area appreciation percentage for each year.
+ * Each point is { year: "2025"|"2026"|..., appreciation_perc: appreciation percentage expected at end of year }.
+ * For the current year (2025), uses yearData[0] appreciation_perc.
+ * For subsequent years, uses the cumulative appreciation percentage from property data.
  *
  * @param propertyData - The property data from the JSON file
  * @param years - Number of years to include (>=1)
- * @returns Array of { year, appreciation } where appreciation is percentage, or null if data missing
+ * @returns Array of { year, appreciation_perc } where year is string like "2025" and appreciation_perc is percentage
  */
 export function calculateAppreciationDataPoints(
-    propertyData: PropertyDataPoint[],
-    years: number
-): { year: number; appreciation_perc: number }[] {
-    if (years < 1) {
-        const message = 'Years must be at least 1';
-        logger.error(`calculateAppreciationDataPoints: ${message}`);
-        throw new Error(message);
-    }
-
+    propertyData: PropertyDataPoint[]
+): { year: string; appreciation_perc: number }[] {
     if (!propertyData || !propertyData.length) {
         const message = 'Property data points not provided';
         logger.error(`calculateAppreciationDataPoints: ${message}`);
         throw new Error(message);
     }
 
-    const limit = Math.min(years, propertyData.length);
+    const currentYear = new Date().getFullYear();
+    const datapoints: { year: string; appreciation_perc: number }[] = [];
 
-    // Return three specific data points: today, mid-point, and final year
-    const datapoints: { year: number; appreciation_perc: number }[] = [];
-
-    // Today (year 0) - always 0% appreciation
-    datapoints.push({
-        year: 0,
-        appreciation_perc: 0,
-    });
-
-    // Mid-point year
-    const midYear = Math.ceil(limit / 2);
-    if (midYear > 0) {
-        const midYearData = propertyData[midYear - 1]; // Convert to 0-based index
-        if (midYearData) {
-            datapoints.push({
-                year: midYear,
-                appreciation_perc: midYearData.appreciation_perc,
-            });
+    for (let i = 0; i < propertyData.length; i++) {
+        const yearData = propertyData[i];
+        if (!yearData) {
+            const message = `Year data not found for year ${i}`;
+            logger.error(`calculateAppreciationDataPoints: ${message}`);
+            throw new Error(message);
         }
-    }
 
-    // Final year
-    const finalYearData = propertyData[limit - 1]; // Convert to 0-based index
-    if (finalYearData) {
+        // Calculate the year string
+        const yearString = String(currentYear + i);
+
+        // Use the cumulative appreciation percentage from property data
+        const appreciationPercentage = yearData.appreciation_perc;
+
         datapoints.push({
-            year: limit,
-            appreciation_perc: finalYearData.appreciation_perc,
+            year: yearString,
+            appreciation_perc: appreciationPercentage,
         });
     }
 
