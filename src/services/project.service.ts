@@ -369,7 +369,6 @@ export const getFeaturedProjectsService = async ({ page, pageSize }: { page: num
         prisma.project.count({ where: whereClause }),
     ]);
 
-    console.log(`Found ${totalCount} total projects with views >= 1, returning ${projectsRaw.length} for page ${page}`);
 
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
@@ -378,6 +377,8 @@ export const getFeaturedProjectsService = async ({ page, pageSize }: { page: num
         project_name: proj.project_name,
         address: proj.address,
         views: proj.views,
+        company_name: proj.developer?.company?.name || null,
+        max_price: proj.max_price,
     }));
 
     const pagination = {
