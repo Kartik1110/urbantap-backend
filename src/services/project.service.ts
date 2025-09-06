@@ -8,6 +8,7 @@ export const getProjectsService = async ({
     location,
     type,
     developer,
+    search,
 }: {
     page: number;
     pageSize: number;
@@ -15,6 +16,7 @@ export const getProjectsService = async ({
     location?: string;
     type?: string;
     developer?: string;
+    search?: string;
 }) => {
     const skip = (page - 1) * pageSize;
 
@@ -40,6 +42,26 @@ export const getProjectsService = async ({
                     },
                 },
             },
+        }),
+        ...(search && {
+            OR: [
+                {
+                    project_name: {
+                        contains: search,
+                        mode: 'insensitive' as Prisma.QueryMode,
+                    },
+                },
+                {
+                    developer: {
+                        company: {
+                            name: {
+                                contains: search,
+                                mode: 'insensitive' as Prisma.QueryMode,
+                            },
+                        },
+                    },
+                },
+            ],
         }),
     };
 
@@ -234,7 +256,7 @@ export const getProjectFloorPlansService = async (projectId: string) => {
     return floorPlans;
 };
 
-export const getProjectsByDeveloperService = async (developerId: string, { page, pageSize }: { page: number; pageSize: number }) => {
+export const getProjectsByDeveloperService = async (developerId: string, { page, pageSize, search }: { page: number; pageSize: number; search?: string }) => {
     const skip = (page - 1) * pageSize;
 
     // First check if developer exists
@@ -247,11 +269,19 @@ export const getProjectsByDeveloperService = async (developerId: string, { page,
         throw new Error('Developer not found');
     }
 
+    const whereClause: Prisma.ProjectWhereInput = {
+        developer_id: developerId,
+        ...(search && {
+            project_name: {
+                contains: search,
+                mode: 'insensitive' as Prisma.QueryMode,
+            },
+        }),
+    };
+
     const [projectsRaw, totalCount] = await Promise.all([
         prisma.project.findMany({
-            where: {
-                developer_id: developerId,
-            },
+            where: whereClause,
             select: {
                 id: true,
                 type: true,
@@ -266,9 +296,7 @@ export const getProjectsByDeveloperService = async (developerId: string, { page,
             },
         }),
         prisma.project.count({
-            where: {
-                developer_id: developerId,
-            },
+            where: whereClause,
         }),
     ]);
 
