@@ -17,6 +17,7 @@ export const getProjects = async (req: Request, res: Response) => {
         const location = req.query.location as string;
         const type = req.query.type as string;
         const developer = req.query.developer as string;
+        const search = req.query.search as string;
 
         const { projects, pagination } = await getProjectsService({
             page,
@@ -25,6 +26,7 @@ export const getProjects = async (req: Request, res: Response) => {
             location,
             type,
             developer,
+            search,
         });
 
         res.json({
@@ -107,10 +109,12 @@ export const getProjectsByDeveloper = async (req: Request, res: Response) => {
         const { id } = req.params;
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
+        const search = req.query.search as string;
         
         const { projects, pagination } = await getProjectsByDeveloperService(id, {
             page,
             pageSize,
+            search,
         });
 
         res.json({
