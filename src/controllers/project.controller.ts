@@ -5,6 +5,7 @@ import {
     createProjectService,
     getProjectFloorPlansService,
     getProjectsByDeveloperService,
+    getFeaturedProjectsService,
 } from '../services/project.service';
 
 // GET /projects
@@ -49,6 +50,13 @@ export const getProjectById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const project = await getProjectByIdService(id);
+
+        if (!project) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Project not found',
+            });
+        }
 
         res.json({
             status: 'success',
@@ -128,6 +136,32 @@ export const getProjectsByDeveloper = async (req: Request, res: Response) => {
             status: 'error',
             message: 'Failed to fetch developer projects',
             error,
+        });
+    }
+};
+
+// GET /projects/featured
+export const getFeaturedProjects = async (req: Request, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = parseInt(req.query.pageSize as string) || 10;
+
+        const { projects, pagination } = await getFeaturedProjectsService({
+            page,
+            pageSize,
+        });
+
+        res.json({
+            status: 'success',
+            message: 'Featured projects fetched successfully',
+            data: projects,
+            pagination,
+        });
+    } catch (error) {
+        console.error('Error fetching featured projects:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch featured projects',
         });
     }
 };
