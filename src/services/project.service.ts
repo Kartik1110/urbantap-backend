@@ -246,11 +246,37 @@ export const createProjectService = async (data: any) => {
     });
 };
 
-export const getProjectFloorPlansService = async (projectId: string) => {
+export const getProjectFloorPlansService = async (projectId: string, bhk?: string) => {
+    // Map BHK query parameter to Bedrooms enum values
+    const mapBhkToBedrooms = (bhk: string): string | undefined => {
+        const bhkMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
+            'One': 'One',
+            'Two': 'Two', 
+            'Three': 'Three',
+            'Four': 'Four',
+            'Four_Plus': 'Four_Plus',
+            'Five': 'Five',
+            'Six': 'Six',
+            'Seven': 'Seven'
+        };
+        return bhkMapping[bhk];
+    };
+
+    const whereClause: any = {
+        project_id: projectId,
+    };
+
+    // Add BHK filtering if provided
+    if (bhk) {
+        const bedroomFilter = mapBhkToBedrooms(bhk);
+        if (bedroomFilter) {
+            whereClause.bedrooms = bedroomFilter;
+        }
+    }
+
     const floorPlans = await prisma.floorPlan.findMany({
-        where: {
-            project_id: projectId,
-        },
+        where: whereClause,
         select: {
             id: true,
             title: true,
