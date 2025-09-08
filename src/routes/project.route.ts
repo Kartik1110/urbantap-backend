@@ -25,7 +25,7 @@ router.get('/projects/:id', getProjectById);
 /* Create a new project */
 router.post('/projects', createProject);
 
-/* Get floor plans for a specific project */
+/* Get floor plans for a specific project with optional BHK filtering */
 router.get('/projects/:id/floorplans', getProjectFloorPlans);
 
 export default router;
