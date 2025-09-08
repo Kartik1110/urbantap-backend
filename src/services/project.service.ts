@@ -233,10 +233,7 @@ export const getProjectByIdService = async (id: string) => {
         longitude: project.longitude,
         amenities: project.amenities,
         views: project.views,
-        floor_plans: project.floor_plans.map(floorPlan => {
-            const { project_id, ...floorPlanWithoutProjectId } = floorPlan;
-            return floorPlanWithoutProjectId;
-        })
+        floor_plans: project.floor_plans.flatMap(floorPlan => floorPlan.image_urls || [])
     };
 };
 
@@ -248,17 +245,18 @@ export const createProjectService = async (data: any) => {
 
 export const getProjectFloorPlansService = async (projectId: string, bhk?: string) => {
     // Map BHK query parameter to Bedrooms enum values
+    // This matches the format used in unit_types from project details API
     const mapBhkToBedrooms = (bhk: string): string | undefined => {
         const bhkMapping: { [key: string]: string } = {
             'Studio': 'Studio',
-            'One': 'One',
-            'Two': 'Two', 
-            'Three': 'Three',
-            'Four': 'Four',
-            'Four_Plus': 'Four_Plus',
-            'Five': 'Five',
-            'Six': 'Six',
-            'Seven': 'Seven'
+            '1Bhk': 'One',
+            '2Bhk': 'Two', 
+            '3Bhk': 'Three',
+            '4Bhk': 'Four',
+            '4+Bhk': 'Four_Plus',
+            '5Bhk': 'Five',
+            '6Bhk': 'Six',
+            '7Bhk': 'Seven'
         };
         return bhkMapping[bhk];
     };

@@ -95,7 +95,7 @@ export const createProject = async (req: Request, res: Response) => {
 export const getProjectFloorPlans = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const bhk = req.query.bhk as string; // BHK filter parameter (e.g., "One", "Two", "Three", "Studio")
+        const bhk = req.query.bhk as string; // BHK filter parameter (e.g., "1Bhk", "2Bhk", "3Bhk", "Studio")
         
         const floorPlans = await getProjectFloorPlansService(id, bhk);
 
