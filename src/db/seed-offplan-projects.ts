@@ -246,29 +246,24 @@ async function createFloorPlans(projectId: string, floorPlans: FloorPlan[], proj
             const mappedBedrooms = BEDROOM_MAPPING[bedroomName] || "Studio";
             console.log(`            Bedroom mapping: "${bedroomName}" -> "${mappedBedrooms}"`);
             
-            // Process price - handle empty strings and use project price as fallback
+            // Process price - only use price from JSON data, keep null if not available
             let price: number | null = null;
             if (typeof floorPlan.price === 'string') {
                 if (floorPlan.price.trim() !== '') {
-                    price = parseFloat(floorPlan.price);
+                    const parsedPrice = parseFloat(floorPlan.price);
+                    if (!isNaN(parsedPrice) && parsedPrice > 0) {
+                        price = parsedPrice;
+                        console.log(`            Using floor plan price from JSON: ${price}`);
+                    }
                 }
-            } else if (typeof floorPlan.price === 'number') {
+            } else if (typeof floorPlan.price === 'number' && floorPlan.price > 0) {
                 price = floorPlan.price;
+                console.log(`            Using floor plan price from JSON: ${price}`);
             }
             
-            // If floor plan price is not available, use project price with some variation based on area
-            if (!price || isNaN(price) || price <= 0) {
-                if (projectPrice && floorPlan.area) {
-                    // Estimate price based on area ratio (larger units cost more)
-                    const basePricePerSqFt = projectPrice / 1000; // Assume 1000 sq ft as base
-                    price = Math.round(floorPlan.area * basePricePerSqFt);
-                    console.log(`            Using estimated price: ${price} (based on project price and area)`);
-                } else {
-                    console.log(`            Skipping floor plan due to no price available and no project price fallback`);
-                    continue;
-                }
-            } else {
-                console.log(`            Using floor plan price: ${price}`);
+            // If no valid price available, keep it null
+            if (!price) {
+                console.log(`            No valid price in JSON data, keeping price as null`);
             }
             
             console.log(`            Area: ${floorPlan.area} sq ft`);
@@ -280,8 +275,8 @@ async function createFloorPlans(projectId: string, floorPlans: FloorPlan[], proj
                 data: {
                     title: floorPlan.title || `Floor Plan ${createdCount + 1}`,
                     image_urls: images,
-                    min_price: price, // Use calculated price
-                    // max_price: price, // Use calculated price for now
+                    min_price: price, // Use price from JSON or null
+                    max_price: price, // Use same price for both min and max
                     unit_size: floorPlan.area || 1000,
                     bedrooms: mappedBedrooms as any,
                     project_id: projectId
@@ -483,8 +478,8 @@ async function seedOffPlanProjects() {
                         description: listing.description || 'No description available',
                         image_urls: listing.photos || [],
                         currency: "AED",
-                        min_price: null, // Keep min_price as null
-                        max_price: price, // Use actual price from data as max_price
+                        min_price: price, // Use actual price from data as min_price
+                        max_price: null, // Keep max_price as null
                         address: listing.region || 'Dubai',
                         city: mappedCity as any,
                         type: "Off_plan" as any,
@@ -543,8 +538,8 @@ async function seedOffPlanProjects() {
                                 unit_types: sortedBedrooms, // Store all bedroom types in unit_types array
                                 min_sq_ft: sizes.length > 0 ? Math.min(...sizes as number[]) : null,
                                 max_sq_ft: sizes.length > 0 ? Math.max(...sizes as number[]) : null,
-                                // Keep min_price as null and max_price as the original price from data
-                                // Don't override the max_price that was set during project creation
+                                // Keep min_price as the original price from data and max_price as null
+                                // Don't override the min_price that was set during project creation
                             }
                         });
                     }

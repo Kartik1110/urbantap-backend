@@ -160,38 +160,46 @@ export const getProjectByIdService = async (id: string) => {
         }
     };
 
-    // Process and format unit_types data with properties count
+    // Process and format unit_types data with properties count and floor plan details
     const processUnitTypes = (floorPlans: any[]) => {
         if (!floorPlans || !Array.isArray(floorPlans)) return [];
         
-        // Count floor plans by bedroom type
-        const unitTypeCounts: { [key: string]: number } = {};
+        // Group floor plans by bedroom type
+        const unitTypeGroups: { [key: string]: any[] } = {};
         
         floorPlans.forEach(floorPlan => {
             if (floorPlan.bedrooms) {
                 const bedroomType = floorPlan.bedrooms;
-                unitTypeCounts[bedroomType] = (unitTypeCounts[bedroomType] || 0) + 1;
+                if (!unitTypeGroups[bedroomType]) {
+                    unitTypeGroups[bedroomType] = [];
+                }
+                unitTypeGroups[bedroomType].push(floorPlan);
             }
         });
         
         // Map bedroom types to display names
         const typeMapping: { [key: string]: string } = {
             'Studio': 'Studio',
-            'One': '1Bhk',
-            'Two': '2Bhk', 
-            'Three': '3Bhk',
-            'Four': '4Bhk',
-            'Five': '5Bhk',
-            'Six': '6Bhk',
-            'Seven': '7Bhk',
-            'Four_Plus': '4+Bhk'
+            'One': 'One',
+            'Two': 'Two', 
+            'Three': 'Three',
+            'Four': 'Four',
+            'Five': 'Five',
+            'Six': 'Six',
+            'Seven': 'Seven',
+            'Four_Plus': 'Four_Plus'
         };
         
-        // Convert to array of objects with name and properties_count
-        const unitTypes = Object.entries(unitTypeCounts)
-            .map(([bedroomType, count]) => ({
+        // Convert to array of objects with name, properties_count, and floor-plans
+        const unitTypes = Object.entries(unitTypeGroups)
+            .map(([bedroomType, floorPlansForType]) => ({
                 name: typeMapping[bedroomType] || bedroomType,
-                properties_count: count
+                properties_count: floorPlansForType.length,
+                "floor-plans": floorPlansForType.map(floorPlan => ({
+                    min_price: floorPlan.min_price,
+                    bedrooms: floorPlan.bedrooms,
+                    unit_size: floorPlan.unit_size
+                }))
             }))
             .sort((a, b) => {
                 // Custom sorting: Studio first, then by number, then others
