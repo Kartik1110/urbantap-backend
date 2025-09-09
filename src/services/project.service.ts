@@ -2,8 +2,12 @@ import prisma from '../utils/prisma';
 import { Prisma, City, Category } from '@prisma/client';
 import {
     calculateAppreciationDataPoints,
+    calculateAverageRentPerYearAfterHandover,
+    calculateAverageROIAfterHandover,
+    calculateBreakEvenAfterHandover,
     calculateHandoverPrice,
     calculatePriceAfterHandover,
+    calculateRoiDataPointsByTypeAfterHandover,
     getPropertyData,
     getRentalPriceInYear,
     MergedPropertyData,
@@ -514,8 +518,6 @@ export const generateProjectROIReportService = async (
         where: { id: projectId },
     });
 
-    // console.log({ project });
-
     if (!project) {
         throw new Error('Project not found');
     }
@@ -523,8 +525,6 @@ export const generateProjectROIReportService = async (
     const floorPlan = await prisma.floorPlan.findUnique({
         where: { id: floorPlanId, project_id: projectId },
     });
-
-    // console.log({ floorPlan });
 
     if (!floorPlan) {
         throw new Error('Floor plan not found');
@@ -586,6 +586,56 @@ export const generateProjectROIReportService = async (
     const shortTermRentAtHandoverPlus5 =
         longTermRentAtHandoverPlus5 * shortTermRentMultiplier;
 
+    const shortTermBreakEvenYear = calculateBreakEvenAfterHandover(
+        propertyData,
+        min_price,
+        unit_size,
+        handoverYear,
+        shortTermRentMultiplier
+    );
+
+    const longTermBreakEvenYear = calculateBreakEvenAfterHandover(
+        propertyData,
+        min_price,
+        unit_size,
+        handoverYear
+    );
+
+    const avgRoiPerYear = calculateAverageROIAfterHandover(
+        propertyData,
+        handoverYear,
+        5,
+        min_price,
+        unit_size,
+        1.04
+    );
+
+    const avgRentPerYear = calculateAverageRentPerYearAfterHandover(
+        propertyData,
+        handoverYear,
+        5,
+        unit_size,
+        1.04
+    );
+
+    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
+        propertyData,
+        min_price,
+        unit_size,
+        handoverYear,
+        6,
+        shortTermRentMultiplier
+    );
+
+    const roiGraph = [
+        roiGraphPoints[0],
+        roiGraphPoints[3],
+        roiGraphPoints[5],
+    ].map((item) => ({
+        year: item.year,
+        roi: Math.round(item.roi),
+    }));
+
     const areaAppreciationGraphAll =
         calculateAppreciationDataPoints(propertyData);
 
@@ -609,21 +659,22 @@ export const generateProjectROIReportService = async (
             .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
 
     const increaseInRentalYield = (year: number) => {
-        const currentYear = getRentalPriceInYear(
+        const yearDiff = handoverYear - currentYear;
+        const currentYearRental = getRentalPriceInYear(
             propertyData,
             unit_size,
-            0,
+            yearDiff,
             'monthly'
         );
 
         const yearRental = getRentalPriceInYear(
             propertyData,
             unit_size,
-            year,
+            yearDiff + year,
             'monthly'
         );
 
-        return ((yearRental - currentYear) / currentYear) * 100;
+        return ((yearRental - currentYearRental) / currentYearRental) * 100;
     };
 
     return {
@@ -641,30 +692,17 @@ export const generateProjectROIReportService = async (
         expected_rental: {
             short_term: Math.round(shortTermRent),
             short_term_percentage:
-                Math.round(shortTermAppreciation * 100) / 100,
+                Math.round(shortTermAppreciation * 100) / 100, // Round to 2 decimal places
             long_term: Math.round(longTermRent),
-            long_term_percentage: Math.round(longTermAppreciation * 100) / 100,
+            long_term_percentage: Math.round(longTermAppreciation * 100) / 100, // Round to 2 decimal places
         },
         break_even_year: {
-            short_term: 11,
-            long_term: 11,
+            short_term: shortTermBreakEvenYear,
+            long_term: longTermBreakEvenYear,
         },
-        avg_roi_percentage_per_year: 4.76,
-        avg_rent_per_year: 643139,
-        roi_graph: [
-            {
-                year: '2025',
-                roi: 548352,
-            },
-            {
-                year: '2028',
-                roi: 2469934,
-            },
-            {
-                year: '2030',
-                roi: 4020987,
-            },
-        ],
+        avg_roi_percentage_per_year: Math.round(avgRoiPerYear * 100) / 100, // Round to 2 decimal places
+        avg_rent_per_year: Math.round(avgRentPerYear),
+        roi_graph: roiGraph,
         growth_table: [
             {
                 year: String(currentYear),
@@ -689,11 +727,8 @@ export const generateProjectROIReportService = async (
             Math.round(avgAreaAppreciationPerYear * 100) / 100,
         area_appreciation_graph: areaAppreciationGraph,
         rental_yield: {
-            year: handoverYear - currentYear,
-            percentage:
-                Math.round(
-                    increaseInRentalYield(handoverYear - currentYear) * 100
-                ) / 100,
+            year: 3,
+            percentage: Math.round(increaseInRentalYield(3) * 100) / 100,
         },
     };
 };

@@ -17,9 +17,6 @@ export interface MergedPropertyData {
 const DEFFAULT_DP_RATIO = 0.4;
 const DEFFAULT_INTEREST_RATE = 0.0399;
 
-// Short-term rent is base rent + 4% increase
-const SHORT_TERM_RENT_MULTIPLIER = 1.04;
-
 /**
  * Calculates the property ROI for a given year based on appreciation rate, rental income, and mortgage costs
  * @param propertyData - The property data from the JSON file
@@ -1622,6 +1619,14 @@ export function calculateListingRentalBreakEvenPeriod(
     return 11;
 }
 
+/**
+ * Calculates the price of the property at handover.
+ *
+ * @param listingPrice - The initial investment amount (listing price of the property)
+ * @param handoverYear - The year of handover
+ * @param percIncreaseTillHandover - The percentage increase till handover (default: 10)
+ * @returns The price of the property at handover
+ */
 export function calculateHandoverPrice(
     listingPrice: number,
     handoverYear: number,
@@ -1640,6 +1645,15 @@ export function calculateHandoverPrice(
     return value;
 }
 
+/**
+ * Calculates the price of the property after handover.
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param listingPriceAtHandover - The initial investment amount (listing price of the property at handover)
+ * @param handoverYear - The year of handover
+ * @param yearsAfterHandover - The number of years after handover (default: 5)
+ * @returns The price of the property after handover
+ */
 export function calculatePriceAfterHandover(
     propertyData: PropertyDataPoint[],
     listingPriceAtHandover: number,
@@ -1656,4 +1670,285 @@ export function calculatePriceAfterHandover(
         listingPriceAtHandover +
         listingPriceAtHandover * (percIncAfterHandover / 100)
     );
+}
+
+/**
+ * Calculates the break-even period (in years) for a property investment after handover.
+ * The break-even occurs when the cumulative rental income equals the listing price.
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param listingPrice - The initial investment amount (listing price of the property)
+ * @param propertySize - The property size in square feet
+ * @param handoverYear - The year of handover
+ * @param rentMultiplier - Multiplier to apply to the rent (default: 1.0, use 1.04 for 4% increase)
+ * @returns The break-even period in years (1-10), or 11 if not breaking even within available data
+ */
+export function calculateBreakEvenAfterHandover(
+    propertyData: PropertyDataPoint[],
+    listingPrice: number,
+    propertySize: number,
+    handoverYear: number,
+    rentMultiplier: number = 1
+): number {
+    if (listingPrice <= 0) {
+        const message = 'Listing price must be positive';
+        logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    if (!propertyData || !propertyData.length) {
+        const message = 'Property data points not provided';
+        logger.error(`calculateListingRentalBreakEvenPeriod: ${message}`);
+        throw new Error(message);
+    }
+
+    const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
+
+    let year = 0;
+    let cumulativeRentalIncome = 0;
+
+    while (cumulativeRentalIncome < listingPrice) {
+        let rentPerSqFt = 0;
+
+        if (yearDiff + year >= 10) {
+            const baseRent = propertyData[9].rent_per_sq_ft * rentMultiplier;
+            const extraYears = yearDiff + year - 10;
+
+            // 5% increase compounded for every extra year
+            rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
+        } else {
+            rentPerSqFt =
+                propertyData[yearDiff + year].rent_per_sq_ft * rentMultiplier;
+        }
+
+        // Calculate annual rental income for this year
+        const annualRentalIncome = rentPerSqFt * propertySize * 12;
+        cumulativeRentalIncome += annualRentalIncome;
+
+        year++;
+    }
+
+    return year;
+}
+
+/**
+ * Calculates the average annual ROI percentage over a given number of years after handover.
+ * ROI is calculated as rental yield using the average of short-term and long-term rents.
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param years - The number of years to average over (>=1)
+ * @param initialInvestment - The initial investment amount in the base currency
+ * @param propertySize - The property size in square feet
+ * @param rentMultiplier - The multiplier to apply to the rent (default: 1)
+ * @returns The average ROI percentage per year based on rental yield
+ */
+export function calculateAverageROIAfterHandover(
+    propertyData: PropertyDataPoint[],
+    handoverYear: number,
+    years: number,
+    initialInvestment: number,
+    propertySize: number,
+    rentMultiplier: number = 1
+): number {
+    if (!propertyData || propertyData.length === 0) {
+        const message = 'Property data not provided';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
+    }
+
+    if (initialInvestment <= 0) {
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
+    }
+
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateAverageROI: ${message}`);
+        throw new Error(message);
+    }
+
+    const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
+
+    let totalRentalYield = 0;
+
+    for (let year = yearDiff; year < yearDiff + years; year++) {
+        let rentPerSqFt = 0;
+
+        if (yearDiff + year >= 10) {
+            const baseRent = propertyData[9].rent_per_sq_ft * rentMultiplier;
+            const extraYears = yearDiff + year - 10;
+
+            // 5% increase compounded for every extra year
+            rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
+        } else {
+            rentPerSqFt =
+                propertyData[yearDiff + year].rent_per_sq_ft * rentMultiplier;
+        }
+
+        // Calculate short-term rental income (with rent multiplier)
+        const shortTermRentPerSqFt = rentPerSqFt * rentMultiplier;
+        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
+
+        // Calculate long-term rental income (standard rate)
+        const longTermAnnualIncome = rentPerSqFt * propertySize * 12;
+
+        // Average of short-term and long-term rental income
+        const averageAnnualIncome =
+            (shortTermAnnualIncome + longTermAnnualIncome) / 2;
+
+        // Calculate rental yield as percentage of initial investment
+        const rentalYield = (averageAnnualIncome / initialInvestment) * 100;
+        totalRentalYield += rentalYield;
+    }
+
+    return totalRentalYield / years;
+}
+
+export function calculateAverageRentPerYearAfterHandover(
+    propertyData: PropertyDataPoint[],
+    handoverYear: number,
+    years: number,
+    propertySize: number,
+    rentMultiplier: number = 1
+) {
+    if (!propertyData || propertyData.length === 0) {
+        const message = 'Property data not provided';
+        logger.error(`calculateAverageRentPerYear: ${message}`);
+        throw new Error(message);
+    }
+
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateAverageRentPerYear: ${message}`);
+        throw new Error(message);
+    }
+
+    const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
+
+    let totalAnnualRent = 0;
+
+    for (let year = yearDiff; year < yearDiff + years; year++) {
+        let rentPerSqFt = 0;
+
+        if (yearDiff + year >= 10) {
+            const baseRent = propertyData[9].rent_per_sq_ft * rentMultiplier;
+            const extraYears = yearDiff + year - 10;
+
+            // 5% increase compounded for every extra year
+            rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
+        } else {
+            rentPerSqFt =
+                propertyData[yearDiff + year].rent_per_sq_ft * rentMultiplier;
+        }
+
+        // Calculate short-term rental income (with rent multiplier)
+        const shortTermRentPerSqFt = rentPerSqFt * rentMultiplier;
+        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
+
+        // Calculate long-term rental income (standard rate)
+        const longTermAnnualIncome = rentPerSqFt * propertySize * 12;
+
+        // Average of short-term and long-term rental income
+        const averageAnnualIncome =
+            (shortTermAnnualIncome + longTermAnnualIncome) / 2;
+
+        totalAnnualRent += averageAnnualIncome;
+    }
+
+    return totalAnnualRent / years;
+}
+
+/**
+ * Builds datapoints to plot cumulative ROI (amount) for years based on investment type.
+ * Each point is { year: 1|3|5, roi: cumulative rental income accrued till that year }.
+ * ROI is calculated as the total rental income accumulated from year 0 to the specified year.
+ * For rental properties, this includes rent per sq ft * property size * 12 months * years.
+ * For self-use properties, ROI will be 0 as no rental income is generated.
+ *
+ * @param propertyData - The property data from the JSON file
+ * @param initialInvestment - The initial investment amount for ROI calculation base
+ * @param propertySize - Property size in square feet
+ * @returns Array of { year, roi } for years with cumulative rental income as ROI
+ */
+export function calculateRoiDataPointsByTypeAfterHandover(
+    propertyData: PropertyDataPoint[],
+    initialInvestment: number,
+    propertySize: number,
+    handoverYear: number,
+    years: number,
+    shortTermRentMultiplier: number = 1
+): { year: string; roi: number }[] {
+    if (!propertyData || !propertyData.length) {
+        const message = 'Property data not provided';
+        logger.error(`calculateRoiDataPointsByTypeAfterHandover: ${message}`);
+        throw new Error(message);
+    }
+
+    if (initialInvestment <= 0) {
+        const message = 'Initial investment must be positive';
+        logger.error(`calculateRoiDataPointsByTypeAfterHandover: ${message}`);
+        throw new Error(message);
+    }
+
+    if (propertySize <= 0) {
+        const message = 'Property size must be positive';
+        logger.error(`calculateRoiDataPointsByTypeAfterHandover: ${message}`);
+        throw new Error(message);
+    }
+
+    const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
+
+    const yearlyRentalIncome: number[] = [];
+    for (let year = yearDiff; year < yearDiff + years; year++) {
+        let rentPerSqFt = 0;
+
+        if (yearDiff + year >= 10) {
+            const baseRent = propertyData[9].rent_per_sq_ft;
+            const extraYears = yearDiff + year - 10;
+
+            // 5% increase compounded for every extra year
+            rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
+        } else {
+            rentPerSqFt = propertyData[yearDiff + year].rent_per_sq_ft;
+        }
+
+        // Calculate annual rental income for this year
+        const annualRentalIncome = rentPerSqFt * propertySize * 12;
+
+        // Calculate cumulative rental income till this year
+        const cumulativeRentTillPrevYear =
+            year === yearDiff ? 0 : yearlyRentalIncome[year - yearDiff - 1];
+
+        const avgRentalIncomeThisYear =
+            (annualRentalIncome +
+                annualRentalIncome * shortTermRentMultiplier) /
+            2;
+
+        // Summing up the average of short term and long term rental income
+        yearlyRentalIncome.push(
+            cumulativeRentTillPrevYear + avgRentalIncomeThisYear
+        );
+    }
+
+    const datapoints = yearlyRentalIncome.map((roi, ind) => ({
+        year: String(
+            ind === 0
+                ? new Date().getFullYear() + yearDiff
+                : new Date().getFullYear() + yearDiff + ind
+        ),
+        roi,
+    }));
+
+    return datapoints;
 }

@@ -191,7 +191,9 @@ export const generateProjectROIReport = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({
             status: 'error',
-            message: 'Failed to generate project ROI report',
+            message:
+                (error as Error).message ||
+                'Failed to generate project ROI report',
             error,
         });
     }
