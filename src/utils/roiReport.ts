@@ -1621,3 +1621,39 @@ export function calculateListingRentalBreakEvenPeriod(
     );
     return 11;
 }
+
+export function calculateHandoverPrice(
+    listingPrice: number,
+    handoverYear: number,
+    percIncreaseTillHandover: number = 10
+): number {
+    let value = listingPrice;
+    const currentYear = new Date().getFullYear();
+    for (let i = currentYear; i < handoverYear; i++) {
+        if (i === handoverYear - 1) {
+            value = value + value * (20 / 100);
+        } else {
+            value = value + value * (percIncreaseTillHandover / 100);
+        }
+    }
+
+    return value;
+}
+
+export function calculatePriceAfterHandover(
+    propertyData: PropertyDataPoint[],
+    listingPriceAtHandover: number,
+    handoverYear: number,
+    yearsAfterHandover: number = 5
+): number {
+    const currentIndex = handoverYear - new Date().getFullYear();
+    const yearDataAtHandover = propertyData[currentIndex];
+    const percIncAfterHandover =
+        propertyData[currentIndex + yearsAfterHandover].appreciation_perc -
+        yearDataAtHandover.appreciation_perc;
+
+    return (
+        listingPriceAtHandover +
+        listingPriceAtHandover * (percIncAfterHandover / 100)
+    );
+}
