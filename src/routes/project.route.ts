@@ -7,6 +7,7 @@ import {
     getProjectsByDeveloper,
     getFeaturedProjects,
     generateProjectROIReport,
+    getAIReport,
 } from '../controllers/project.controller';
 
 const router = Router();
@@ -28,6 +29,8 @@ router.post('/projects', createProject);
 
 /* Generate ROI report for project */
 router.get('/projects/:id/roi-report', generateProjectROIReport);
+
+router.get('/projects/:id/ai-report', getAIReport);
 
 /* Get floor plans for a specific project with optional BHK filtering
  * Query parameters:

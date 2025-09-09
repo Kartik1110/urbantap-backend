@@ -7,6 +7,7 @@ import {
     getProjectsByDeveloperService,
     getFeaturedProjectsService,
     generateProjectROIReportService,
+    getProjectAIReportService,
 } from '../services/project.service';
 
 // GET /projects
@@ -178,6 +179,10 @@ export const generateProjectROIReport = async (req: Request, res: Response) => {
         const projectId = req.params.id;
         const floorPlanId = req.query.floor_plan_id as string;
 
+        if (!floorPlanId) {
+            throw new Error('floor_plan_id is required');
+        }
+
         const roiReport = await generateProjectROIReportService(
             projectId,
             floorPlanId
@@ -194,6 +199,35 @@ export const generateProjectROIReport = async (req: Request, res: Response) => {
             message:
                 (error as Error).message ||
                 'Failed to generate project ROI report',
+            error,
+        });
+    }
+};
+
+// GET AI Report for a project
+export const getAIReport = async (req: Request, res: Response) => {
+    try {
+        const projectId = req.params.id;
+        const floorPlanId = req.query.floor_plan_id as string;
+
+        if (!floorPlanId) {
+            throw new Error('floor_plan_id is required');
+        }
+
+        const aiReport = await getProjectAIReportService(
+            projectId,
+            floorPlanId
+        );
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'AI report fetched successfully',
+            data: aiReport,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: (error as Error).message || 'Failed to fetch AI report',
             error,
         });
     }

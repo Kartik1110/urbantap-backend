@@ -8,11 +8,14 @@ import {
     calculateHandoverPrice,
     calculatePriceAfterHandover,
     calculateRoiDataPointsByTypeAfterHandover,
+    getListingAppreciationInYear,
     getPropertyData,
     getRentalPriceInYear,
     MergedPropertyData,
 } from '../utils/roiReport';
 import logger from '../utils/logger';
+
+declare const fetch: typeof globalThis.fetch;
 
 // Dynamic import based on environment variable
 const PROPERTY_DATA_PATH = process.env.PROPERTY_DATA_PATH || 'v1';
@@ -732,3 +735,249 @@ export const generateProjectROIReportService = async (
         },
     };
 };
+
+export const getProjectAIReportService = async (
+    projectId: string,
+    floorPlanId: string
+): Promise<any> => {
+    const project = await prisma.project.findUnique({
+        where: { id: projectId },
+    });
+
+    if (!project) {
+        throw new Error('Project not found');
+    }
+
+    const floorPlan = await prisma.floorPlan.findUnique({
+        where: { id: floorPlanId, project_id: projectId },
+    });
+
+    if (!floorPlan) {
+        throw new Error('Floor plan not found');
+    }
+
+    const { min_price, locality, handover_time } = project;
+    const { unit_size } = floorPlan;
+
+    if (!min_price || !handover_time || !locality || !unit_size) {
+        if (!min_price) {
+            throw new Error('Price not found');
+        }
+
+        if (!handover_time) {
+            throw new Error('Handover year not found');
+        }
+
+        if (!locality) {
+            throw new Error('Locality not found');
+        }
+
+        if (!unit_size) {
+            throw new Error('Unit size not found');
+        }
+    }
+
+    const listingType = 'Apartment'; // TODO: figure this out
+    const propertyData = getPropertyData(propertiesData, locality, listingType);
+
+    const handoverYear = handover_time.getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    const listingPriceAtHandover = calculateHandoverPrice(
+        min_price,
+        handoverYear
+    );
+
+    const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
+    const longTermRent = getRentalPriceInYear(
+        propertyData,
+        unit_size,
+        handoverYear - currentYear
+    );
+    const shortTermRent = longTermRent * shortTermRentMultiplier;
+
+    return {
+        listing: {
+            title: project.title,
+            images: project.image_urls,
+            price: Math.round(min_price),
+            locality: locality,
+            price_after_handover: Math.round(listingPriceAtHandover),
+            yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
+            roi_percentage: 9,
+        },
+        growth_graph: [
+            {
+                year: String(currentYear),
+                appreciation: Math.round(
+                    getListingAppreciationInYear(propertyData, min_price, 1)
+                ),
+            },
+            {
+                year: String(handoverYear),
+                appreciation: Math.round(
+                    getListingAppreciationInYear(
+                        propertyData,
+                        min_price,
+                        handoverYear - currentYear + 1
+                    )
+                ),
+            },
+            {
+                year: String(handoverYear + 2),
+                appreciation: Math.round(
+                    getListingAppreciationInYear(
+                        propertyData,
+                        min_price,
+                        handoverYear - currentYear + 3
+                    )
+                ),
+            },
+        ],
+        rental_graph: [
+            {
+                year: String(handoverYear),
+                rental: Math.round(
+                    getRentalPriceInYear(
+                        propertyData,
+                        unit_size,
+                        handoverYear - currentYear
+                    )
+                ),
+            },
+            {
+                year: String(handoverYear + 2),
+                rental: Math.round(
+                    getRentalPriceInYear(
+                        propertyData,
+                        unit_size,
+                        handoverYear - currentYear + 2
+                    )
+                ),
+            },
+            {
+                year: String(handoverYear + 4),
+                rental: Math.round(
+                    getRentalPriceInYear(
+                        propertyData,
+                        unit_size,
+                        handoverYear - currentYear + 4
+                    )
+                ),
+            },
+        ],
+        growth_projection: {
+            appreciation: 87,
+            rental: 71,
+        },
+        rent: {
+            short_term: 9996,
+            long_term: 14685,
+        },
+        developer: {
+            name: 'Emaar Properties',
+            logo_url: 'https://avatars.githubusercontent.com/u/4608063',
+            floor_plan_image_urls: [
+                'https://urbantap-bucket-prod.s3.me-central-1.amazonaws.com/offplan-722-floorplan-1-0-1756224608953-10yi50p9dhwq.jpg',
+            ],
+        },
+        nearby: {
+            metro: '700m walk',
+            grocery: '550m walk',
+            school: '350m walk',
+            restaurant: '600m walk',
+        },
+        // nearby: await getNearbySummary({
+        //     lat: project.latitude!,
+        //     lng: project.longitude!,
+        // }),
+        // amenities: project.amenities,
+        amenities: ['Gym', 'Pool', 'Parking'],
+        broker: {
+            id: '0ec378d9-abd7-494d-a291-21ed14df826b',
+            name: 'Irma Ankunding',
+            designation: 'Broker',
+            y_o_e: 20,
+            specialities: ['Shop', 'Apartment'],
+            company: {
+                name: 'providentestate',
+            },
+            profile_pic: 'https://avatars.githubusercontent.com/u/4033837',
+            country_code: '+971',
+            w_number: '572073703',
+            email: 'Ara.Zulauf97@yahoo.com',
+            linkedin_link: 'https://moist-bowler.biz/',
+            ig_link: 'Laurence.Hyatt',
+        },
+    };
+};
+
+type LatLng = { lat: number; lng: number };
+
+type NearbyCategories = 'metro' | 'grocery' | 'school' | 'restaurant';
+
+const CATEGORY_TYPES: Record<NearbyCategories, string> = {
+    metro: 'subway_station', // metro = subway station
+    grocery: 'supermarket', // grocery/supermarket
+    school: 'school',
+    restaurant: 'restaurant',
+};
+
+function haversineDistance(a: LatLng, b: LatLng): number {
+    const R = 6371000; // meters
+    const toRad = (x: number) => (x * Math.PI) / 180;
+
+    const dLat = toRad(b.lat - a.lat);
+    const dLon = toRad(b.lng - a.lng);
+
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+
+    const h =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+
+    return 2 * R * Math.asin(Math.sqrt(h)); // meters
+}
+
+/**
+ * Fetch nearest metro, grocery, school, restaurant
+ * Returns distance in "Xm walk" format
+ */
+export async function getNearbySummary(center: LatLng) {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) throw new Error('Missing GOOGLE_MAPS_API_KEY');
+
+    const nearby: Record<NearbyCategories, string> = {
+        metro: 'N/A',
+        grocery: 'N/A',
+        school: 'N/A',
+        restaurant: 'N/A',
+    };
+
+    for (const [cat, type] of Object.entries(CATEGORY_TYPES) as [
+        NearbyCategories,
+        string,
+    ][]) {
+        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${center.lat},${center.lng}&radius=1500&type=${type}&key=${apiKey}`;
+
+        const res = await fetch(url);
+        const data = (await res.json()) as {
+            results: { geometry: { location: { lat: number; lng: number } } }[];
+        };
+
+        if (data.results?.length > 0) {
+            const loc = data.results[0].geometry.location;
+            const distMeters = haversineDistance(center, {
+                lat: loc.lat,
+                lng: loc.lng,
+            });
+
+            // Approx walking distance (round to nearest 50m)
+            const rounded = Math.round(distMeters / 50) * 50;
+            nearby[cat] = `${rounded}m walk`;
+        }
+    }
+
+    return nearby;
+}
