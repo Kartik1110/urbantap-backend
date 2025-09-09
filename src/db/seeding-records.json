@@ -1,0 +1,3809 @@
+[
+  {
+    "developerName": "Al Tareq Star Real Estate Development",
+    "companyId": "8509b2ee-fa46-45ed-b3c3-2a1c84732a5a",
+    "companyName": "Al Tareq Star Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Norah Residence",
+        "projectId": "5bceb279-faec-411a-8d68-ef6496b3f2dd",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Object One Real Estate Development",
+    "companyId": "a1e2d09d-1ff9-46a8-85ad-a4151c294f3a",
+    "companyName": "Object One Real Estate Development L.L.C",
+    "projectsCreated": 15,
+    "projects": [
+      {
+        "title": "ALTA V1EW",
+        "projectId": "d19aa99d-e71f-4055-9b28-2f5dfb108e7f",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "VERDAN1A 4",
+        "projectId": "100a3e74-8c18-4709-8cb1-818738be5b6b",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "IR1DIAN Park 2",
+        "projectId": "aa99599b-8d15-4cd4-8433-143ad182779a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "AUREL1A Residence",
+        "projectId": "1f951139-1707-4587-a568-1e32b648a006",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "TETR1S Tower",
+        "projectId": "ccd7bd45-efd2-4603-ba00-e1772de74717",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "IR1DIAN Park",
+        "projectId": "0ad0abbc-7e24-4c2d-b3c5-66e82a6ead28",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "VERDAN1A",
+        "projectId": "f5502536-ea70-42ff-a010-d150068c7039",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "EVERGR1N House",
+        "projectId": "7bdacb10-02df-45f0-8ae8-8fd1d01076aa",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "V1STARA House",
+        "projectId": "d353d89c-7e2a-4097-866e-2babace07ac6",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "V1VID Residence at JVT",
+        "projectId": "914fbefd-7752-4ca8-864f-f7543b49bf0b",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "1Wood Residence",
+        "projectId": "8dafaac2-d824-467a-94b1-710c6268e6ae",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Ozone1 Residences",
+        "projectId": "31528bdc-56c2-422d-866f-ccad306a4e26",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "W1NNER Tower ",
+        "projectId": "b5a5581c-7240-488a-83a7-c3ad9d97bad3",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Lum1nar Tower 1 ",
+        "projectId": "1e736411-ee8d-46ba-981b-8c944e8ecb10",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Fifth Tower ",
+        "projectId": "b1e063ca-0b0d-47bd-b39a-d297c149d2a0",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Ellington",
+    "companyId": "6f5fa009-7f06-4a43-a9e1-53eaf83e1a39",
+    "companyName": "Ellington Properties Development L.L.C",
+    "projectsCreated": 20,
+    "projects": [
+      {
+        "title": "Altiera Heights",
+        "projectId": "5e4d9905-45f8-46cd-a03c-9b32b0e26b3e",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Costa Mare",
+        "projectId": "a1f7bf8b-724c-4ea3-bf21-b2abe9baa378",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Belgravia Gardens",
+        "projectId": "c5654aba-bab5-4c04-bd33-e23c9f6d6fc4",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ellington Cove",
+        "projectId": "9ae2b873-2e1e-4e9a-884d-569fc425e6bb",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "The Hillgate by Ellington ",
+        "projectId": "143b23a2-3298-46c6-b02c-d51d0f666080",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "The Watercrest by Ellington ",
+        "projectId": "4252032a-d512-4f4e-8154-e82547004ed9",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Ellington Arbor View",
+        "projectId": "00fe7946-c694-480c-9f57-63390aea4b5d",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ellington Ocean House",
+        "projectId": "14b32d75-28bd-4923-a2ba-433337f7d50f",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Cala Del Mar",
+        "projectId": "1c05825b-9569-4fa2-a994-e85f0063c4c9",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ellington Hillmont Residences",
+        "projectId": "86939ca4-8894-4455-94dd-272d51914b4e",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Lakeshore at The Sanctuary",
+        "projectId": "b4baaf4f-a93e-4b12-bff3-46aa9dbef16c",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Ellington Rosemont Residences",
+        "projectId": "3bf1c88c-25f2-488d-b7be-656a519bbdf1",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Ellington Claydon House",
+        "projectId": "571e5ec4-fc31-42e2-9cf8-801faebc5543",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Art Bay",
+        "projectId": "ffec8bcb-2680-4ce0-8248-fdab0faf48e1",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ocean House",
+        "projectId": "f9e81d18-ed97-44bf-a5e5-d790d6d8f309",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Upper House",
+        "projectId": "84942b7b-885b-4557-bba5-4137ce637753",
+        "floorPlansCount": 7
+      },
+      {
+        "title": "The Quayside",
+        "projectId": "b32d422c-7a75-48ed-871e-cfc5f080025d",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "The Crestmark",
+        "projectId": "5f4d1b9d-aa79-4c36-bb8d-27bba0f8f045",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "One River Point",
+        "projectId": "43c946c8-a316-4935-9bb9-12325fcfd6e7",
+        "floorPlansCount": 9
+      },
+      {
+        "title": "Mercer House",
+        "projectId": "a91c0aa8-8532-4990-b311-9a3809166d77",
+        "floorPlansCount": 9
+      }
+    ]
+  },
+  {
+    "developerName": "Emaar",
+    "companyId": "1df52b06-ddaf-4b64-9fa8-28438530f25e",
+    "companyName": "Emaar Properties (P.J.S.C)",
+    "projectsCreated": 89,
+    "projects": [
+      {
+        "title": "Silva Dubai Creek Harbour",
+        "projectId": "b3f6d688-0102-4713-b165-b3cd92ac898c",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Vida Residences Hillside",
+        "projectId": "48603bc3-79f6-4e20-8c26-2852519ff462",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Arlo",
+        "projectId": "4558a4b1-3725-41f3-8ddc-dfc44bec88da",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Altan",
+        "projectId": "29d7c1c4-f50a-4664-975c-1b7ddfa5a2fb",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Greenspoint",
+        "projectId": "be1dd2ad-428a-41b2-a6c6-436a3f46f26d",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Rivera The Valley",
+        "projectId": "63d9dbee-6871-483a-a54a-6aad0ee64901",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Albero ",
+        "projectId": "802eadfa-2d06-4d3f-bd48-20a082eb4bf4",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Parkwood by Emaar",
+        "projectId": "dbce785e-4bdc-4c3f-951f-c5243ef857e1",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Golf Meadow",
+        "projectId": "9f07be52-a9d0-40a5-91a6-ad2fe4fd753a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Golf Verge",
+        "projectId": "4fcee0a2-2653-4a27-bc04-ae4293b3b073",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Oasis Address",
+        "projectId": "85245e22-faa4-4660-bea3-c41ba9dabc1d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Terra Heights",
+        "projectId": "914c201b-beab-4a8c-b762-4c2b4a4329cc",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Hillsedge at Dubai Hills Estate",
+        "projectId": "6779e03b-157f-46cb-b0a9-c22093f7777c",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Golf Dale at Emaar South",
+        "projectId": "9e4c05d1-2f98-45f4-bb78-c71d70df7cc0",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Golf Acres",
+        "projectId": "c2a44d3b-475e-4c1e-9d82-c6960b4403ff",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Golf Edge at Emaar South",
+        "projectId": "2712b881-6e38-4c4b-ab47-3d22bd472732",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Farm Grove at The Valley",
+        "projectId": "25a1c3ef-add4-4ab8-a5be-2532f34d6f2f",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Greenville at Emaar South",
+        "projectId": "bbacda8b-e897-474c-a3bc-4066d6ab58cc",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Emaar Marina Cove",
+        "projectId": "47b3686c-d8b8-4ad5-951f-a28357a1f792",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Vida Residences Club Point",
+        "projectId": "4b71a51a-94d8-4a25-ba9f-7ca441231033",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Velora 2 at The Valley Phase 2",
+        "projectId": "98a70910-53af-4ced-882e-2a1b4611c137",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Emaar Porto View Mina Rashid",
+        "projectId": "9de7070d-4785-4472-bd54-e74e274da343",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Emaar Ocean Views Mina Rashid",
+        "projectId": "8fba13bf-9a0e-4675-a2fd-c9ab48012eec",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Greenridge at Emaar South",
+        "projectId": "cc990a97-b127-410d-b80a-ed71ed4f6185",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Lavita at The Oasis",
+        "projectId": "43534514-8c77-4cb3-baee-2c08ed6e38e3",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Address Residences at Dubai Hills Estate",
+        "projectId": "0892cf8d-d238-410a-873c-55b650efd2c1",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Palmiera 3 at The Oasis",
+        "projectId": "a757ea0b-cd1f-4f3e-aaa0-dd24b9159c2c",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Marina Views ",
+        "projectId": "c69bbf90-c1a3-4190-8838-a284ec07a4f7",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Parkland at Dubai Hills Estate",
+        "projectId": "525118d4-5b37-4648-95c8-a65a5aa423a9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Golf Point at Emaar South Dubai",
+        "projectId": "11d17440-a661-47e9-bcbd-cf56c2646d0d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Club Place at Dubai Hills Estate",
+        "projectId": "5fde8e2e-0c2b-4653-8a1c-429f1ad2a827",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Altus at Dubai Creek Harbour",
+        "projectId": "f801536a-f595-42c4-9e2d-6e7423e5f344",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Avena at The Valley Phase 2",
+        "projectId": "8884adb5-6d0a-4d61-8be1-a67073d25f0e",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Emaar Ocean Cove Mina Rashid",
+        "projectId": "dd218f9e-7347-44c4-bda1-a5f4aef90620",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Moor at Creek Beach",
+        "projectId": "0991b9fc-49c6-4670-ae98-97c2284f9d67",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Velora at The Valley Phase 2",
+        "projectId": "e1aa8e12-6a98-41fa-ba1f-ea76befd23b1",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Venera at The Valley Phase 2",
+        "projectId": "eff6e321-73da-41ff-916f-483cdc634e5b",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Palace Residences Creek Blue",
+        "projectId": "a56bc44b-c6f1-410b-9ad3-42896ceb2dc3",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Greenway 2",
+        "projectId": "258e80dc-e6ba-464a-960e-0a90dfbdaf5b",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Palace Residences on The Beach ",
+        "projectId": "85df5445-5da8-4362-965b-da6c18793168",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Golf Lane",
+        "projectId": "7d2f9b1c-2114-4822-9328-e0370ccc1c9c",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "ARLO",
+        "projectId": "67c84a28-7baa-40a4-bc28-563e890569c9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Heights Country Club and Wellness ",
+        "projectId": "48d6ef44-280b-43a8-8d32-a40946031f19",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Palace Residences ",
+        "projectId": "f2ce75f8-7cb4-4bcb-89c7-df29e78a84a3",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Palmiera 2 at The Oasis",
+        "projectId": "ada5bb3a-3c4f-41be-9968-b15330578860",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Mangrove at Creek Beach",
+        "projectId": "46a751b7-2c6a-4c9a-8011-e40f5fd0e761",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Address Residences Phase 2 ",
+        "projectId": "62fc2337-8528-4c2b-8879-c73fecc6bf31",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Golf Place Terraces",
+        "projectId": "9dc3ff53-1308-4eb5-88b5-cec0fadfbdf4",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Greenway",
+        "projectId": "f77b345d-6fc9-472d-bcea-628930ad5055",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Address Residences",
+        "projectId": "a6e15578-1f84-44c5-81c4-de0c9010c337",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Palmiera",
+        "projectId": "58b2f03b-f1a1-4c24-a620-d42ea57e7a31",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Valo",
+        "projectId": "12659847-5f20-44ad-b7b5-3084f193b67d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Mirage The Oasis ",
+        "projectId": "8733c510-09d4-48ce-9b31-c577a78c6eb1",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Oasis",
+        "projectId": "0b3cd6e5-6338-4842-9d0a-9fb37f73af6b",
+        "floorPlansCount": 2
+      },
+      {
+        "title": " Ocean Star",
+        "projectId": "9254ff1f-ec09-48ac-ad1a-93d3b4322cb4",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Lillia ",
+        "projectId": "9dfd011e-8251-4f37-b3da-1362ddec372c",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Emaar Park Lane Interiors by VIDA",
+        "projectId": "8e89b5fb-349e-4bcb-bb9a-55f4617c47b0",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Vida Residences",
+        "projectId": "fec03dc3-0fcf-4616-bb7f-69d62f7e5241",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Ocean Point ",
+        "projectId": "410cb77f-d0a1-4248-a36a-93c5ee47a61a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Address Residences Zabeel",
+        "projectId": "2b659492-b82a-4646-95a2-d9eed5fba4cb",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Fairway Villas 3",
+        "projectId": "4280aa43-9f29-42bd-8c4b-8de955b3d0c8",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Emaar Parkside Hills",
+        "projectId": "0a71c390-fb19-472c-9261-8b31f7c6b4b8",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Oria by Emaar",
+        "projectId": "c84b06ee-7447-4dcc-b934-38026aced107",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Farm Gardens Phase 2",
+        "projectId": "ec3769c8-70a9-43be-9b6b-184f7551aec2",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Aeon",
+        "projectId": "cbd527d1-d46c-4584-850c-73564606f1c6",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "May",
+        "projectId": "54a73973-444f-4c5b-b726-0b4be1023531",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Seascape",
+        "projectId": "b0f1573c-e817-46d5-8892-5387ed830910",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Elora The Valley",
+        "projectId": "8053b94d-f1e6-4833-8c07-23678ef2b4c6",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Elvira",
+        "projectId": "6fe00084-b01b-4aaf-b732-d445b1a6f30a",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Palace Residences - North",
+        "projectId": "f4d92d91-e84d-4a21-9007-5490d72e1ab4",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Address Residences The Bay",
+        "projectId": "2dcef949-83e3-4e5e-8b08-38f57cab3c3b",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Savanna",
+        "projectId": "f4ca63f2-600b-452b-b3e6-dc446260a122",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Cedar",
+        "projectId": "08793081-f8e4-4a86-8ac1-f9c5d4e9742d",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Golf Grand",
+        "projectId": "e2147691-db42-4fd9-a1fd-2cac752431c7",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Seapoint Tower 1",
+        "projectId": "7e25c9b0-8a5b-496c-b245-07c72c3f0eb9",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Creek Waters 2",
+        "projectId": "50e738c2-db57-4cb3-8aff-589d1588f8ae",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Greenside Residences",
+        "projectId": "3567e0b4-13d8-48cc-b0c3-f34d95fbd9ca",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Rivana The Valley",
+        "projectId": "08ab68bf-acb4-4dc5-9927-cc1d1b513084",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Sunridge",
+        "projectId": "ca5115e1-2bdc-46a1-9a32-971cd28d5bc7",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Fairway Villas",
+        "projectId": "de5d6bd7-3d06-4793-9610-af0039b5a05c",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Clearpoint",
+        "projectId": "a3d92746-4a99-4b4b-838a-d0b90cea1d1f",
+        "floorPlansCount": 9
+      },
+      {
+        "title": "Parkside Views",
+        "projectId": "ba40160b-3352-4729-85fd-9bb5608c56ae",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Club Drive",
+        "projectId": "68e04fcb-5d29-410a-b732-dc9b229fbbb1",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Alana The Valley",
+        "projectId": "7bc2d533-1c59-49be-9d23-78cab360de40",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Nima The Valley",
+        "projectId": "c7e98baa-6b3a-48ce-98a1-908f4cdec0c3",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Avonlea",
+        "projectId": "c0949b83-7e69-4a7a-8c5e-79db14159aa3",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Bayline",
+        "projectId": "0e4e7faa-2760-409b-a00b-351553521beb",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Bayview",
+        "projectId": "a9553a15-2363-4111-815c-197ba9ea1073",
+        "floorPlansCount": 34
+      },
+      {
+        "title": "Park Gate by Emaar",
+        "projectId": "de3d556b-97c1-48df-8621-714bf6041fa0",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Deyaar",
+    "companyId": "7e4b0db7-6e83-4dd7-b1cd-5bde967d544a",
+    "companyName": "Deyaar Development (P.J.S.C)",
+    "projectsCreated": 6,
+    "projects": [
+      {
+        "title": "DWTN Residences",
+        "projectId": "d180546c-799f-40c9-85c9-fbe4169cf9f7",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Ember Park Five by Deyaar",
+        "projectId": "69bf74b9-bc9e-49ba-b0cd-49d3414a66b4",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Park Five",
+        "projectId": "4621ffd0-f48a-498c-9b3b-54b7619e873c",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Rosalia Residences",
+        "projectId": "e083e091-e2b3-436e-99dc-0b9270058c4a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Eleve by Deyaar",
+        "projectId": "78f23640-1695-4502-9ab1-e3d1f70a9d7c",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Mar Casa",
+        "projectId": "d0fc868b-3671-47bf-8391-6cc2b5ec0070",
+        "floorPlansCount": 8
+      }
+    ]
+  },
+  {
+    "developerName": "Citi Developers",
+    "companyId": null,
+    "companyName": "Citi Developers Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Arya Residences",
+        "projectId": "f6b2f72c-78a5-4f5f-a478-e7f9c57b0de5",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Aveline Residences",
+        "projectId": "44f3ae24-2da2-4695-904a-fa5eaf6ad504",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Sobha",
+    "companyId": null,
+    "companyName": "Sobha Developers L.L.C (Branch)",
+    "projectsCreated": 25,
+    "projects": [
+      {
+        "title": "The Eden at Sobha Central",
+        "projectId": "2d9c103d-b43f-4022-957f-38aa0546b973",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Sobha Aquamont",
+        "projectId": "8f2638a8-0323-440a-9075-d9076a642a76",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Horizon at Sobha Central",
+        "projectId": "2deb1896-d596-40c6-b618-f5504c02b178",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "340 Riverside Crescent",
+        "projectId": "1678c83a-771b-4c4e-9a69-bbfefb373765",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "330 Riverside Crescent",
+        "projectId": "d0abe61a-f498-4e2f-9803-a3e0a5a08ad0",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "320 Riverside Crescent",
+        "projectId": "3d4b751c-2226-460e-b598-10c15c759fee",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "310 Riverside Crescent",
+        "projectId": "f5eba76b-298d-414f-99f5-b4bb0d05febd",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Skyvue Stellar",
+        "projectId": "b9506359-038f-4921-a4a8-950ff5ff4182",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Pierside Marina Residences",
+        "projectId": "35d69fac-4fc7-4990-a00b-1cec1976a54b",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Element at Sobha One",
+        "projectId": "e4cf3c3e-0d7c-4c1c-bfa5-051a783ecf0e",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Sobha Solis",
+        "projectId": "c2e93d36-f5d9-45c1-97f2-71de300a69d6",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sobha Coral Beach Villas",
+        "projectId": "9d6856c7-ff55-4e77-ba98-d9ee4b4c6576",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Sobha Coraline Beach Residences",
+        "projectId": "9749f81a-feb2-4777-b03d-0938c5ad4138",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sobha Elwood at Dubailand",
+        "projectId": "f2ce2824-557c-437b-a1ad-318be2330881",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sobha Selene Beach Residences",
+        "projectId": "281cc4b4-1080-4fca-a496-c1134cd16bca",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sobha Siniya Island",
+        "projectId": "775d2fc8-873c-42ff-9ea7-5473b611e57f",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sobha Skyscape Altius",
+        "projectId": "33571f9d-268f-44db-9e01-645f298e7d0e",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Sobha Skyscape Aura",
+        "projectId": "81e1c3a8-5ae8-44fa-87a7-d06c8e341636",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Sobha Skyscape Avenue ",
+        "projectId": "08bbd968-a163-4ac6-9ddf-44e5203e5cad",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sobha Green Vistas",
+        "projectId": "ec8d3a24-a7e5-439c-85d4-fb613154df09",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Sobha Orbis",
+        "projectId": "1078ff98-8e10-4b5a-836e-6b682ffeaf32",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Golf Ridges ",
+        "projectId": "5ca33bcf-1ef0-4130-8b0d-281368cf0813",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Sobha Seahaven",
+        "projectId": "11d73b7a-fa2f-411b-b26e-a99078b24d4c",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Verde by Sobha",
+        "projectId": "f0d687b9-4b4c-4495-9300-d1cdd51d75f6",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "360 Riverside Crescent",
+        "projectId": "12a65944-1c38-4c29-98e9-b9b75675930c",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Samana",
+    "companyId": "9d6af30c-43a8-41dc-9f44-9a4fd2204d2f",
+    "companyName": "Samana Si Holding Limited Dubai Branch",
+    "projectsCreated": 17,
+    "projects": [
+      {
+        "title": "Samana Hills South",
+        "projectId": "19cdc9d8-da52-410a-adec-614ef94c72a9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Samana Barari Heights",
+        "projectId": "2b214746-2537-4d4d-a1cb-3b25f415d865",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Samana Parkville",
+        "projectId": "904f3ed2-7ac4-45a8-b378-29c98dba40a7",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Samana Golf Views",
+        "projectId": "dc7cb953-9479-4f1b-a227-8261444f5c0b",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Samana Resorts",
+        "projectId": "87888920-5c70-47c0-8694-adf545b7742d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Samana Rome",
+        "projectId": "11a2261d-cfd0-4cff-bcf4-9ba4b254e437",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Samana Ibiza",
+        "projectId": "d49141c5-ee46-4df3-acc1-910fa19e33d7",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Samana Park Meadows",
+        "projectId": "39bd0af4-1f56-49c3-a8b6-84349dffcf26",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Samana Ocean Pearl",
+        "projectId": "ff2191c2-a827-42b5-a945-612b60504360",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Samana Avenue",
+        "projectId": "a0a1aee8-fc2a-473d-8a7a-8ce0b7741aa9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Samana IVY Gardens 2",
+        "projectId": "9ee07a9b-3776-4229-9edd-6f3d8b72a8b7",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Samana Lake Views 2",
+        "projectId": "d5aaeba2-cefe-41cc-a0df-8cdebdc54237",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Samana Lake Views",
+        "projectId": "bea7ef6a-67fe-4fc6-9b71-5d11a37c3422",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Samana Manhattan 2 ",
+        "projectId": "f08555bf-01eb-4b03-ab16-fa6a69c2d14a",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Samana Barari Views 2 ",
+        "projectId": "5f8c813e-4bcf-46c1-8b85-242791a3c53a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "IVY Gardens",
+        "projectId": "8d0886a7-8ca4-461a-8b22-11a9c564c489",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "SAMANA Barari Views",
+        "projectId": "f4e5de90-c59a-4f47-b7f6-87961fdcf2d8",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Deca Properties",
+    "companyId": "32b5846d-73a1-4a42-ad5c-baf45cd367f1",
+    "companyName": "DECA PROPERTIES L.L.C",
+    "projectsCreated": 6,
+    "projects": [
+      {
+        "title": "Avana Residences",
+        "projectId": "7cb9a8f5-b731-4285-9dff-8c541b7b5b85",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Park Beach Residence 2",
+        "projectId": "db56a226-4618-4865-b37a-3b31b1c72bfa",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Park Beach Residences ",
+        "projectId": "93e91bda-cf73-440c-9f6a-b6a7e9e4121c",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Milos Residences ",
+        "projectId": "8c7a5f16-e7b6-4497-acb7-ed1f19117afa",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Arabian Hills Estate",
+        "projectId": "c4cb4db1-1b48-47ad-b12c-4cd334e9c9e7",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Trinity at Arjan",
+        "projectId": "822918dd-3023-4653-84d4-5088ae798a81",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Arada",
+    "companyId": "f266d1b1-7589-4d08-bc28-cc2b40640e42",
+    "companyName": "Arada Developments Llc - Dubai Branch",
+    "projectsCreated": 14,
+    "projects": [
+      {
+        "title": "Akala Hotels and Residences",
+        "projectId": "a4ad3391-7356-4aa2-821a-b37e838ff363",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "W Residences at Dubai Harbour",
+        "projectId": "1d9b72ac-5fe1-44be-8620-c4c2f2f98526",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Arada IL Teatro Residences 2",
+        "projectId": "68a55a90-9f51-420c-a130-b4b5e6da9825",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Nesba 3 at Aljada",
+        "projectId": "5efda517-062e-415c-a9c8-70b5ddb83cc8",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "W The Residences",
+        "projectId": "ceda29c7-ee48-4004-afee-b72dd685cfa4",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Anantara Sharjah Residences",
+        "projectId": "44f552e5-d0c6-42e0-93c9-5583e201c9dd",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Nesba 2",
+        "projectId": "0bc23476-f155-4f92-bdda-4a71b0b8c41a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Arada CBD Building 5",
+        "projectId": "33fe8cfb-6a83-4d4c-9111-bb792290a455",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Sokoon 5",
+        "projectId": "2173e3a5-841f-4a19-80fc-803fa3d084fe",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Nasaq 6",
+        "projectId": "680ef52a-8c8b-4c80-aaba-1820e50fa45e",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Masaar Saro",
+        "projectId": "c8bec8af-ef01-4b37-94ad-bf80513d7d6f",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Rove Home",
+        "projectId": "14b55d38-aada-4d0a-bec4-e4ad6a7014ce",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sarai",
+        "projectId": "f67268a6-c6d7-4876-984f-0ef25544ac1f",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Armani Beach Residences",
+        "projectId": "34577cfc-339d-465f-a46c-e6dd378d5de0",
+        "floorPlansCount": 8
+      }
+    ]
+  },
+  {
+    "developerName": "Imtiaz Developments",
+    "companyId": "4af0fdb0-2f8f-4ad0-9c68-9b59a7695487",
+    "companyName": "Imtiaz Real Estate Investment & Development L.L.C",
+    "projectsCreated": 17,
+    "projects": [
+      {
+        "title": "Wynwood by Imtiaz",
+        "projectId": "d23b56eb-87b8-41c2-8649-ae9749423c12",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Cove Edition 5",
+        "projectId": "732922a9-8f3c-42d6-be1e-18be089daff9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sunset Bay 4",
+        "projectId": "33fa085c-8509-45b5-9d63-deb7ebdc3893",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sunset Bay 3",
+        "projectId": "457fa19c-1be0-487b-b76c-29befe846b00",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Cotier House",
+        "projectId": "21a15ad5-3dd3-476b-b831-4268b1794a0e",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Cove Edition 4",
+        "projectId": "c26163df-16f5-4d63-a3e0-e7b501625e65",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Cove Edition 3 by Imtiaz",
+        "projectId": "90bf2aad-2c29-448e-9b86-db63ec8454e9",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Beach Walk Grand",
+        "projectId": "6571e421-7d9c-4609-885f-6b311789af0c",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Sunset Bay by Imtiaz",
+        "projectId": "2a9189ca-030b-4bba-b995-93ad742bb478",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Beach Walk Residence 3",
+        "projectId": "6d308bed-cbae-4bdc-a192-fbd013b6f2e8",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Cove Edition 2",
+        "projectId": "4b917c86-f033-42e1-874e-6818c9754ee2",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Cove Edition One",
+        "projectId": "8000feda-9d99-4129-8ecc-c8d0e11f7e5c",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Beach Walk Residence 2",
+        "projectId": "eec93c17-cab1-4337-80ed-a3a97787a975",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Beach Walk",
+        "projectId": "7cdee964-9679-4b38-a690-8b0012716722",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Cove by Imtiaz",
+        "projectId": "63883b15-bddf-4400-bd69-7145eace9b5c",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Pearl House",
+        "projectId": "5e706bc7-ac40-4b67-bbf9-5a746cb33050",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Luxor",
+        "projectId": "b43417e7-49c9-4c49-94d0-42994a1e00f9",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Tiger Properties",
+    "companyId": "ed35392c-cde4-435e-a293-ff4e88bd6b4f",
+    "companyName": "Tiger Properties",
+    "projectsCreated": 8,
+    "projects": [
+      {
+        "title": "Auresta Tower",
+        "projectId": "eb26689b-da9e-4d70-b71c-7a58fe8b0976",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Guzel Tower",
+        "projectId": "ab45d854-919b-449c-9aae-331dcd1dec7e",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Tiger Sky Tower",
+        "projectId": "f8c9c932-67de-457e-8273-be870b7eb347",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Majan Tower",
+        "projectId": "e746450f-eae0-406e-a742-4f223e79d105",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Jade Tower",
+        "projectId": "22f6592d-375b-431e-8e25-5a8486f777a5",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Red Square Tower",
+        "projectId": "05e91b0f-4aeb-41ab-b6c6-a5e23879dac5",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Tiger Faradis Tower",
+        "projectId": "6a375897-a199-47c3-aba7-0ebdfb8798c3",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Altai Tower",
+        "projectId": "ccbd205b-1951-484b-8d5f-08081bad7ba1",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "BnW Developments",
+    "companyId": "b40fe271-3fbf-4969-bb4a-537272a23890",
+    "companyName": "BNW Developments",
+    "projectsCreated": 5,
+    "projects": [
+      {
+        "title": "Acacia",
+        "projectId": "b0288943-5e1c-4b85-b591-4e00b3e17aaf",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Aquino",
+        "projectId": "18d96ba9-c011-43df-ba82-6b7a436a199f",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Taj Wellington Mews",
+        "projectId": "0ee0f44f-5e90-4b9c-b73d-c0f0aedb9b83",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Pelagia",
+        "projectId": "c7d3ff62-1a60-4d41-b041-31aaa7605e39",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Aqua Arc at Al Marjan",
+        "projectId": "6c97d6a1-e482-4b72-9db9-03450ab703af",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "4Direction Developers",
+    "companyId": null,
+    "companyName": "4 DIRECTION REAL ESTATE BROKER L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Heaven Views",
+        "projectId": "2090fc74-146a-4fca-a9cc-93c775d9de1d",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Ginco Properties",
+    "companyId": "2e1f95a2-1b28-4973-883f-bbfbb3a7171c",
+    "companyName": "Ginco Properties L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Velor Penthouses",
+        "projectId": "57b1587a-a6bc-4290-bc67-d36b9b900885",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "VYB at Business Bay",
+        "projectId": "0777a50d-e9e8-4daf-939f-0a2b7202bba4",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "One Residence at Downtown Dubai",
+        "projectId": "424aec1e-85e5-4e69-9b5d-f4d9af3cefe3",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "TownX",
+    "companyId": null,
+    "companyName": "Townx Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Luma Park Views",
+        "projectId": "5f3c49b4-c924-424c-94f9-34ce3fb5ebed",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "11 Park Hills",
+        "projectId": "e744de45-13c0-4947-b5fb-6ce6dcba1f8a",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "BT Properties",
+    "companyId": null,
+    "companyName": "Bt Properties Dwc Llc",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Waada",
+        "projectId": "3d424948-8702-4c9c-8b06-f04c639b0d61",
+        "floorPlansCount": 6
+      }
+    ]
+  },
+  {
+    "developerName": "Bam Development",
+    "companyId": null,
+    "companyName": "Bam Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "311 Boulevard",
+        "projectId": "7c9655db-8bd5-45f8-b339-15c2157e3274",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "77 Boulevard",
+        "projectId": "e7524c01-077d-400e-a27e-50eb8250c217",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "DarGlobal",
+    "companyId": "cf1d87c7-1f25-4aeb-b7aa-f26edc51329f",
+    "companyName": "Dar Global Properties L.L.C",
+    "projectsCreated": 5,
+    "projects": [
+      {
+        "title": "The Astera by Aston Martin",
+        "projectId": "93040a22-54e5-4f67-bb41-08b32faa8a86",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Trump International Hotel and Tower",
+        "projectId": "53919d8c-d4ab-4d2a-a8f8-e70275dd80be",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "D Villas",
+        "projectId": "cc1f5a54-5396-4191-a8c4-a9840e39ea3d",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Astera at Al Marjan",
+        "projectId": "2d66c706-f3ee-46ef-9d70-6222fede4975",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "DG1 Living",
+        "projectId": "7c911171-3ebd-4f62-b2a9-31fbd0c37e95",
+        "floorPlansCount": 1
+      }
+    ]
+  },
+  {
+    "developerName": "Meraas",
+    "companyId": "a15b05c9-60bb-4e02-a180-1b5a63e30b09",
+    "companyName": "Meraas Real Estates L.L.C",
+    "projectsCreated": 18,
+    "projects": [
+      {
+        "title": "Jumeirah Residences Emirates Towers",
+        "projectId": "a4e3ea26-7f4a-4b81-b54b-0b2c1d8015b8",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Atelis",
+        "projectId": "ba087428-517d-4931-8e56-9d5ba438e34d",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Jumeirah Asora Bay",
+        "projectId": "2631a90e-5120-4d33-99f5-9312d2ce070c",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "City Walk Crestlane",
+        "projectId": "6eca4d6e-210e-42df-8add-b556bf409667",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Nad Al Sheba Gardens Phase 7",
+        "projectId": "61376e7c-d0ea-4e7c-944a-990d3b3dad98",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Verve City Walk ",
+        "projectId": "d525a972-5acc-42b0-8d96-ac2a037f4e24",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Nad Al Sheba Gardens Phase 6",
+        "projectId": "4e9c8e31-6a74-49f7-b8ec-c122332304ce",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Nad Al Sheba Gardens Phase 5",
+        "projectId": "156897b5-a56e-47a9-86c7-6ffb36017758",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Design Quarter at D3 ",
+        "projectId": "9634f8b4-1c73-4ac0-9e90-1a94d0d95c09",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Riwa at MJL",
+        "projectId": "795c64e6-e7b8-4a65-a088-9cd1bd6ef444",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "City Walk Northline",
+        "projectId": "fa80ac3c-2682-484f-bb2f-41ad8e5b26e3",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Bluewaters Bay",
+        "projectId": "25db1a3f-ef57-4251-9390-fc762eacac69",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Central Park - Erin",
+        "projectId": "d404fe29-4709-469e-943b-213a8e6d4423",
+        "floorPlansCount": 9
+      },
+      {
+        "title": "Madinat Jumeirah Living - Jomana",
+        "projectId": "62fcc30b-7fff-44dc-8f4c-40cdab8f71d5",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Design Quarter at d3",
+        "projectId": "02e8f55c-7db1-437a-9072-1ac8b8b5bbd0",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Central Park - Plaza",
+        "projectId": "a00d8fd8-1f27-4d69-bf49-32cea5a78a41",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Nad Al Sheba Gardens",
+        "projectId": "db35dd9d-9291-40cf-aa86-bcdd086d4080",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "The Acres",
+        "projectId": "8712d477-894a-4d16-a540-378f714ffbdf",
+        "floorPlansCount": 6
+      }
+    ]
+  },
+  {
+    "developerName": "Nshama",
+    "companyId": "50a882b6-bd42-4f22-8591-36c74de05dd7",
+    "companyName": "Nshama Development L.L.C",
+    "projectsCreated": 17,
+    "projects": [
+      {
+        "title": "Alton",
+        "projectId": "192a082c-cb27-4d47-a7e6-babb446746e3",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Augusta",
+        "projectId": "32046b6b-d5e3-4b2f-b30f-2e1bd7ff07bf",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Odessa",
+        "projectId": "3cce321f-e2d4-4ee8-8901-1f9ff3eef306",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Ellison",
+        "projectId": "fb7c1ccd-c95a-44cc-a2df-7afaa2e131b8",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Maha Townhouses",
+        "projectId": "fb646691-bcd5-495d-9595-d5d20a21b25d",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Baltimore",
+        "projectId": "74e90760-9080-4848-9623-20d4221f097d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Haya at Town Square",
+        "projectId": "ca362aef-0a78-43bc-8bc0-c44d34305657",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Savannah at Town Square",
+        "projectId": "c1c582f7-a189-46dc-a14b-c025d6ff9b73",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Lana",
+        "projectId": "07b6f2ad-3d9d-465d-90d5-5a2813d94d11",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "ORA",
+        "projectId": "641a27e3-02c5-43e7-8dd3-1360cea96a03",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "FIA",
+        "projectId": "9dd8e9a9-4ea6-4ba7-a82d-3acf812381dd",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Kaya",
+        "projectId": "b30365a5-005a-4a89-a474-b84928cad5f2",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Elaya",
+        "projectId": "7932bc9c-2789-4eef-ba37-5957b2b22b2a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Grove on the Park",
+        "projectId": "42cbaef5-e1fb-4e2e-84fd-4da8fe184dce",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Regent Residences",
+        "projectId": "de9e4c19-9569-4765-ae46-a57cc3f77069",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Holland Gardens",
+        "projectId": "68610d8a-b9b4-4135-b15f-2c0962bcd0db",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ayala on the Park",
+        "projectId": "856e410a-5ddb-4fe2-9302-b4d47c533522",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Damac",
+    "companyId": "0c6a83bd-8679-421f-933d-591d337c1610",
+    "companyName": "Damac Properties Dubai Co P.S.C.",
+    "projectsCreated": 40,
+    "projects": [
+      {
+        "title": "Damac Bay 2",
+        "projectId": "d1886cc3-81b0-4ee5-861d-7a2bfcce9e2f",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Chelsea Residences",
+        "projectId": "0220c613-2363-48da-adf7-66244c34b0e6",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "SeaCrest",
+        "projectId": "0db60368-7276-4f44-8189-a83f9f236fea",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "FIJI at Damac Islands",
+        "projectId": "3bfa74af-ab77-40ea-bb32-57170090e495",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Damac Riverside Views",
+        "projectId": "5e818062-4f42-4999-9aa6-b7cda2685e13",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Damac Safa Gate",
+        "projectId": "43e65c45-de67-4785-b15d-09008efce12d",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Damac Islands Dubai",
+        "projectId": "3f2d0a1e-12b5-408b-be5f-0745e871c71d",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Damac Nice",
+        "projectId": "46229124-465c-45d2-90d7-e63f71cf52b4",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Morocco at Damac Lagoons",
+        "projectId": "4a336693-7a4f-476f-a388-a2bed785a6ab",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Violet Phase 4 at Damac Hills 2",
+        "projectId": "f2b4af09-fce1-42f1-be91-150e16de03dd",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Damac Sun City",
+        "projectId": "612043ea-6f15-40bf-a5c8-63abb1784dd8",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Shoreline By Damac",
+        "projectId": "5f239e3f-0193-4eb4-8ef5-6dc0ed32ccb3",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Violet Phase 3 at Damac Hills 2",
+        "projectId": "2a3575a2-dcda-4cc6-add8-aeb9bdc04487",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Damac Lagoon Views 3",
+        "projectId": "07b3cbf3-28bf-4d0a-ad29-1d1fc0457780",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Violet at Damac Hills 2",
+        "projectId": "911bdfb3-0b02-4f65-b533-9d8d8cc1b1c6",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "ELO 3 at Damac Hills 2",
+        "projectId": "168fd71f-12fa-408a-80a1-5dab1ebe11d5",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Damac Water Vein",
+        "projectId": "2d60aebf-7476-42df-8b6d-81f48706dd7d",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Damac Green Vein ",
+        "projectId": "9937e6f6-313a-446c-8876-d410e9c3cee3",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Damac Riverside",
+        "projectId": "7a3b5472-181c-432f-a562-e1d780b642ca",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Damac Lagoon Views 2",
+        "projectId": "456b1d31-99ed-4d3d-854b-11a3c5d521ad",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "ELO 2",
+        "projectId": "c64235b7-68ae-41d1-8491-03d75334991b",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Natura",
+        "projectId": "bba2d163-fd86-4d84-ae9f-cb52cf9eaf6f",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Evergreens",
+        "projectId": "f165cd5b-ecb6-4b0c-8286-e3965d117455",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Autograph Collection ",
+        "projectId": "efe682b5-62d8-4599-a463-a317111cf95a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "ELO",
+        "projectId": "650625bf-100d-4c89-825d-35d07950da1b",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Golf Greens Tower 2",
+        "projectId": "634e85f3-dfb3-4393-a709-91d79ab69fae",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Damac The Sapphire",
+        "projectId": "87493d98-8c6c-4f5c-ad44-d0619976e262",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Altitude Tower",
+        "projectId": "6157846d-e339-4c36-8406-bf55f75747ff",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Cavalli Estates",
+        "projectId": "fc925293-9b09-40ab-a635-6355eac3862b",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "DAMAC Lagoon Views",
+        "projectId": "8d5520e4-dfbb-41b0-ad11-7bc21d386696",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Canal Heights",
+        "projectId": "37abab5d-7e45-424c-921a-70320e5122d3",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Canal Crown",
+        "projectId": "1f80acac-416d-434a-b201-b4fcdfdbd1ed",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Harbour Lights",
+        "projectId": "b850998b-1afb-4dd4-b0d1-b005678f2046",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Verona",
+        "projectId": "85ebf7bb-f300-447b-bbbe-d999d18167d1",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "DAMAC Bay by Cavalli",
+        "projectId": "05c72113-1571-4a21-b324-411ffbdd318a",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Coral Reef",
+        "projectId": "27820757-e512-48ae-bc17-f008972ef976",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Volta",
+        "projectId": "73517b5d-13c5-4a1e-b131-d23be2dd0156",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "DAMAC Casa Tower",
+        "projectId": "5ce244e6-dc35-4209-b292-81cf554f9a3b",
+        "floorPlansCount": 10
+      },
+      {
+        "title": "Park Greens",
+        "projectId": "699aa0a7-a28f-4d75-93f5-d674687bee35",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Utopia",
+        "projectId": "ab251e97-a1af-44c9-a0cf-e9b543ea1952",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Majid Developments",
+    "companyId": "00f960cb-7a13-4f74-90a0-34b758983a67",
+    "companyName": "Majid Developments L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Arlington Park",
+        "projectId": "b5ad9aa3-4b06-4c2e-a4e7-3784e8f780df",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Mayfair Gardens by Majid",
+        "projectId": "1ada8558-8c16-48f6-a94c-ea0385ff2a4e",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Pantheon Properties Limited",
+    "companyId": "dfcd663d-29d3-4f48-b5c8-80252364b094",
+    "companyName": "Panther Real Estate Development L.L.C",
+    "projectsCreated": 4,
+    "projects": [
+      {
+        "title": "Voxa by Pantheon",
+        "projectId": "28c54b29-9bd9-4281-bfe6-9d655a8fe332",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Maison Elysee 3",
+        "projectId": "71a4cd7f-ae62-4703-8674-442e4b4b1f57",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "One Central at RAK",
+        "projectId": "04d422cc-30e3-493c-bac7-e08e412ee1c5",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Maison Elysee 2",
+        "projectId": "c299bf20-2a8a-4c8f-8cc0-635d7b54f818",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Mr Eight Development",
+    "companyId": null,
+    "companyName": "Mr Eight Real Estate Development L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Villa Del Gavi",
+        "projectId": "ea348cea-8d1e-4af5-a3f3-ccf1fe4b77e9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Villa del DIVOS",
+        "projectId": "4a4b7e36-6521-47c0-8698-fa4089db0323",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Interstellar Tower at JVT",
+        "projectId": "6679c834-00d9-4c59-bba9-510495fb7955",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Danube",
+    "companyId": "7fd85c4d-2e2f-48d1-8429-3d5c34a44e13",
+    "companyName": "Danube Properties Development L.L.",
+    "projectsCreated": 12,
+    "projects": [
+      {
+        "title": "Sparklz by Danube",
+        "projectId": "1993ad32-8391-49f6-9538-ee6e36dbc613",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Timez by Danube",
+        "projectId": "7cb80cf6-85ed-4377-a29d-a857017630d2",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Oasiz by Danube",
+        "projectId": "04f294aa-8a30-4306-bfde-91a7adfd49a9",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Oasiz 2 by Danube",
+        "projectId": "e1e9143d-88f0-44f8-8b7b-4452ed92d1a3",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "BAYZ 102 by Danube",
+        "projectId": "7fbafc3b-b266-46eb-b640-9385e205ef71",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Oceanz",
+        "projectId": "a237c389-79b4-47fd-8fc0-0729b2e81b86",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Diamondz",
+        "projectId": "112b6de1-f860-48e3-acdf-bf037cd5fc69",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Fashionz by Danube",
+        "projectId": "ed03a2a8-c25b-4be9-9c8c-6b90649a3d8f",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Sportz by Danube",
+        "projectId": "01df880e-f689-47cf-b474-4da5c2ba309a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "BAYZ 101 BY DANUBE",
+        "projectId": "9228e49e-4869-4d02-ba32-d95a4cac2d60",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Viewz",
+        "projectId": "f6d44757-a0cc-44e9-ab42-7e03e8ad2d70",
+        "floorPlansCount": 11
+      },
+      {
+        "title": "Oceanz 3",
+        "projectId": "32ecb6f4-d1d6-4e4d-a14e-f6f772c23802",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Seven Mayfair Real Estate Development",
+    "companyId": "696b78e5-a063-44f9-87a8-1dba8197f700",
+    "companyName": "Seven Mayfair Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Mayfair Vista",
+        "projectId": "dc9ff913-8466-486c-a3f4-bdd2c69d3956",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Durar Group",
+    "companyId": null,
+    "companyName": "Durar Properties (L.L.C)",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Trio Isle",
+        "projectId": "7cd9ed8f-8b05-424f-93d8-f97f0ecdc2b8",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Masa Residence",
+        "projectId": "7827348d-4642-4761-b5d7-f197e6645348",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Azizi",
+    "companyId": "9c4ad0fa-16aa-43a2-b30e-d4b23c9f729b",
+    "companyName": "Azizi Developments L.L.C",
+    "projectsCreated": 12,
+    "projects": [
+      {
+        "title": "Azizi Milan",
+        "projectId": "e4b3d976-43c9-43e9-9b5b-935bb9a415c1",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Azizi Wasel",
+        "projectId": "2cae6c1b-c9b8-47c9-b202-d3be4635e40b",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Azizi Aryan",
+        "projectId": "34db81bf-685d-4272-85fb-9e439b94ed32",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Azizi Ruby",
+        "projectId": "e0a44aae-9bcf-4dc5-80b3-19212925d72d",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Azizi Riviera Reve",
+        "projectId": "06999b79-e7a1-4929-b62b-c5f2d638361d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Azizi Vista",
+        "projectId": "879d0a8c-e058-43e4-bec5-4d35a272f3f2",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Azizi Neila",
+        "projectId": "aab23103-aed4-4c6e-8df9-0daa6f0ddc5b",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Adeba Azizi",
+        "projectId": "e205d5ea-c56e-4221-873d-1ca2fd50d421",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Azizi Zain",
+        "projectId": "ca65a153-787b-4d9f-9ff0-5ebf698ac20e",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Azizi Venice ",
+        "projectId": "6cdcd0f3-479b-4d36-b4d5-dc1aa8089f1f",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Azizi Beach Oasis 2",
+        "projectId": "4dc099c8-c214-4da5-ae33-d088165f704f",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Azizi Jewel ",
+        "projectId": "a9b2886a-5ad1-4899-ac97-df05bcf55fdb",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Dugasta",
+    "companyId": null,
+    "companyName": "Dugasta Properties Development L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Moonsa Residences 2",
+        "projectId": "1fc646c9-4b92-4f9c-a107-d5d64d0f0bf4",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Al Haseen Residence",
+        "projectId": "c3341e60-6072-4788-a1fd-b8f5cb650827",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Terra Tower",
+        "projectId": "717d141a-c6bc-4bac-8a8f-c84b8f81d557",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Condor Group",
+    "companyId": null,
+    "companyName": "Condor Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Condor Golf Links 18",
+        "projectId": "ce698ea6-14fe-480c-92e0-398b96d1abb7",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Condor Sonate Residences",
+        "projectId": "239f2008-6664-497f-acf8-a97b10301337",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Octa Properties",
+    "companyId": "1fe41814-37a6-4c35-b763-41448e16a94e",
+    "companyName": "OCTA PROPERTIES L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Sola Residences",
+        "projectId": "0c12a4d3-27bb-429d-aba9-287519caa575",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Flora Isle Beachfront Residences",
+        "projectId": "331a1b41-136d-457a-88fc-c607f1a89460",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Moon Stone",
+        "projectId": "6ac03d74-27a5-45a3-a1d1-31bef1529c97",
+        "floorPlansCount": 10
+      }
+    ]
+  },
+  {
+    "developerName": "Range Developments",
+    "companyId": null,
+    "companyName": "Range 4 Developments L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Island Height",
+        "projectId": "6f88bcbd-242d-401a-a96b-1621b05afeed",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Beach House",
+        "projectId": "782153c6-e93c-4ef1-82b9-c5cf4b9bf0ee",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Al Helal Al Zahaby Real Estate",
+    "companyId": "58a1c123-f791-4642-be69-e085bced8300",
+    "companyName": "Al Helal Al Zahaby Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Forest City",
+        "projectId": "c03f5a8a-0667-4079-b2ce-dfe1bb1f48f8",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Sports View Residence",
+        "projectId": "fd745994-998f-4297-a8a4-2bb091689415",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Metac",
+    "companyId": null,
+    "companyName": "Metac Properties L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Haven Bay",
+        "projectId": "5f788f2e-f718-4d8a-b245-dcdd115e8877",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Haven Living",
+        "projectId": "2a234757-a38f-4d32-8f14-b8d8c7753403",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Me Do Re",
+    "companyId": "36db587f-664b-459a-87df-9a8ecb8f4769",
+    "companyName": "Me Do Re Developments Dmcc",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Me Do Re 2",
+        "projectId": "35192b4e-fcac-41da-a3b1-3e3710c6e577",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Nexus Developer",
+    "companyId": null,
+    "companyName": "NEXUS ELITE PROPERTIES L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Estrella By Nexus",
+        "projectId": "48303a9b-438f-42af-8122-42e1ea2bc959",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Aldar",
+    "companyId": "5c05df7a-55cc-4b97-a8ed-5487fc15c6c7",
+    "companyName": "Aldar Properties P J S C - Dubai Branch",
+    "projectsCreated": 23,
+    "projects": [
+      {
+        "title": "Mamsha Palm",
+        "projectId": "2b4f42f2-99c0-4714-9f7b-6bdd77dba862",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Arthouse",
+        "projectId": "307f839f-4b49-4c29-9341-50abcfa7397e",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Nikki Beach Residences",
+        "projectId": "36150a78-2841-4528-ad4e-67bb56c29410",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "The Wilds",
+        "projectId": "7f9df6eb-51d4-43df-ac99-91eba5297279",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Mandarin Oriental Residences",
+        "projectId": "a38f210c-2433-4800-adf4-40bb92e9923a",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Aldar Verdes by Haven ",
+        "projectId": "2b4b1ef3-b319-4993-9ded-15657e12f523",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Athlon",
+        "projectId": "3be24986-3f36-4d91-8af9-464cb9db1445",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Aldar Nouran Living ",
+        "projectId": "d1ecbff1-b719-4557-9ad2-93cb837511b1",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Sama Yas by Aldar",
+        "projectId": "28914311-ba08-4c0d-9149-5f15b1b06d5c",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Sustainable City",
+        "projectId": "48463094-f3ba-41cb-8e06-76bc8834f8ae",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Yas Park Gate",
+        "projectId": "79cffb96-b529-49f5-a425-f17118447c04",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Alkaser",
+        "projectId": "b8c09c67-8fa6-405a-867e-33f54e9ab792",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "The Source 2",
+        "projectId": "77ee72cb-b997-48ee-ac86-d8587d53fb24",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Source",
+        "projectId": "6e448e42-802b-4e45-b6df-6e3fe619a5c0",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Nobu Residences",
+        "projectId": "636892b6-7fba-4b82-b4f7-ed839df93650",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Yas Golf Collection",
+        "projectId": "625effa0-5b71-4569-820a-8ca32aa2856b",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Saadiyat Lagoons",
+        "projectId": "b7755f9d-eae7-4496-b9f3-2a7740b98cb5",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Yas Park Views",
+        "projectId": "002e894a-b439-43f1-b379-e4d49a5373ed",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Manarat Living",
+        "projectId": "47185678-1d17-47e3-a89a-57fffc11ac53",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Fay Al Reeman 2",
+        "projectId": "aefe4ebc-3117-4035-a1df-8e14af505375",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Gardenia Bay",
+        "projectId": "dbabdc9b-cd9b-4152-ba07-278e5d206ad5",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Rosso Bay Residences",
+        "projectId": "a94d9176-b8af-49f4-80ea-b58f9c5bbd68",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Haven",
+        "projectId": "7e9279dc-c53f-416b-84e6-2eefd7b93fd5",
+        "floorPlansCount": 8
+      }
+    ]
+  },
+  {
+    "developerName": "Amirah Developments",
+    "companyId": null,
+    "companyName": "Amirah Living Developer L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Bonds Avenue Residences",
+        "projectId": "14ced60b-ad26-4fe9-90b9-392bf8a885a9",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Hamrk Real Estate Development",
+    "companyId": "a7f11a48-2c60-4906-9cd8-d9540d4edfa1",
+    "companyName": "Hamrk Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Affini",
+        "projectId": "03b8b8bb-91ae-449d-8f9a-fa984d50aa37",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Alaia Developments",
+    "companyId": "3abc0db8-a385-46fe-b031-218ec6424ba6",
+    "companyName": "Alaia Developments L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Chelsea Gardens",
+        "projectId": "1459d21c-6743-4a55-9ba8-b28ccde4036b",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "S and S",
+    "companyId": "21db48ce-869c-4e0d-a4d7-efa3205a7fda",
+    "companyName": "S TREE",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Lume Residences",
+        "projectId": "651881a2-235a-406f-852d-ae109e1b69eb",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Elysian Developments",
+    "companyId": null,
+    "companyName": "Elysian Luxury Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Esme Beach Residences",
+        "projectId": "8d544b30-5045-4498-98b8-2c2819e0966f",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Prestige One",
+    "companyId": null,
+    "companyName": "Prestige One Luxury Real Estate L.L.C",
+    "projectsCreated": 5,
+    "projects": [
+      {
+        "title": "Coastal Haven",
+        "projectId": "764c439d-5ee5-4b03-91e9-362825c7fdd8",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Boulevard by Prestige One",
+        "projectId": "87c8efbd-3891-4af2-93bf-4762665f7721",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "The Place",
+        "projectId": "48cb4e45-a993-4522-8546-3b9a9529a3ed",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Seaside ",
+        "projectId": "638e780a-f753-40e4-bbee-dcc91b961318",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Waterway ",
+        "projectId": "0cc83d8e-026c-4912-9749-c5fdffd00c3c",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Al Seeb Real Estate Development",
+    "companyId": "6840a1a6-b511-4546-bfa5-f7f26d532108",
+    "companyName": "Al Iltizam Real Estate Development",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "The Chedi Private Residences",
+        "projectId": "9ade76eb-c586-4979-80c7-3447d3d4c339",
+        "floorPlansCount": 6
+      }
+    ]
+  },
+  {
+    "developerName": "HRE Development",
+    "companyId": "69df6cb6-8738-4963-b381-f29f780f72b5",
+    "companyName": "Hre Real Estate Development L.L.C",
+    "projectsCreated": 5,
+    "projects": [
+      {
+        "title": "Sky Hills Astra",
+        "projectId": "f41616ef-4758-496e-8ada-ef6c4523da31",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Skyhills Residences 3",
+        "projectId": "e8018eac-7f53-455b-90a9-05e5ff55b987",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Sky Hills Residence 3",
+        "projectId": "ef27aeab-978b-4109-b2b0-f1f6527140b8",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Sky Hills Residence 2",
+        "projectId": "51ccdd80-8348-4805-94e8-a19eb63a926a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Skyhills Residences",
+        "projectId": "8d765b2c-6e2e-44d7-96e2-cb262bc3de5e",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Kamdar Developments",
+    "companyId": null,
+    "companyName": "Kamdar Property Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "105 Residences",
+        "projectId": "913ef011-9ed3-492b-8702-3161031940c3",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Mashriq Elite",
+    "companyId": null,
+    "companyName": "Mashriq Elite Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Floarea Grande",
+        "projectId": "efd6d182-f5ce-4ebb-a1cc-a7808bb81532",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Floarea Vista ",
+        "projectId": "b7b7fa28-61c9-4a5c-9c26-f908f09a6acb",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Taraf Properties DMCC",
+    "companyId": "352647c3-afc4-4801-b7d2-3f4eb66ffff0",
+    "companyName": "Taraf Properties Dmcc",
+    "projectsCreated": 6,
+    "projects": [
+      {
+        "title": "Solea by Taraf Holding",
+        "projectId": "765ab246-ed3f-41b3-b2a0-75328360de6a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Karl Lagerfeld Villas",
+        "projectId": "71437112-fbec-44bd-998f-b529ac733d8f",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Cello by Taraf",
+        "projectId": "7bfb3c6e-92cd-43a3-b387-f8e1ed2bb040",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Luce",
+        "projectId": "52049875-efee-4992-b021-6406c18eedc9",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Terrazzo",
+        "projectId": "a3344876-4e1a-467a-8f1e-b8e44dac41ed",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Terra Golf Collection",
+        "projectId": "bfe54a67-89f1-411b-9921-7e1dc0f4d452",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Arabian Gulf Properties",
+    "companyId": "f3c4282a-7077-44ca-8b4b-bd70d5345e9d",
+    "companyName": "Arabian Gulf Properties",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "The Corner",
+        "projectId": "82ea4f28-0664-4df3-9e1a-9f4885552e41",
+        "floorPlansCount": 4
+      },
+      {
+        "title": " Ghaff Land Residence",
+        "projectId": "aa80e06e-12b5-411b-a6e7-d38354ca89b6",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Empire Development",
+    "companyId": null,
+    "companyName": "Empire Real Estate Developments L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Empire Lakeviews",
+        "projectId": "1b844929-f534-4ae3-a6f1-d7b4f93cc77f",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Empire Livings",
+        "projectId": "35c715c8-59f5-4943-8a38-6dd5fc492433",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Saba Properties JLT",
+    "companyId": "bd1af939-634b-4278-a3d3-d276cf029749",
+    "companyName": "Saba  Properties Dmcc",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Marriott Residences JLT",
+        "projectId": "778d88fa-dd49-4a4a-ab2a-777cb0465fa6",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Amaal Emirates",
+    "companyId": "0f0c89e9-9356-4547-953c-63dd09d63ee9",
+    "companyName": "Amaal Emirates L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Amaal 8",
+        "projectId": "a6dddc66-0299-4e8d-905f-2faf3218b12f",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Dubai South Properties",
+    "companyId": "92309fe6-b85e-412c-867d-7de731dda451",
+    "companyName": "DUBAI WATERFRONT PROPERTIES",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Beachfront Gates",
+        "projectId": "16c2ce0e-1bb3-497c-bbbd-f699e03ca3d0",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "South Living",
+        "projectId": "b9a89750-815e-4cb0-9fb9-d01ee3154593",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "South Bay 6",
+        "projectId": "cf94ddb7-5ed7-46bb-a23e-5b58a50ff9f6",
+        "floorPlansCount": 5
+      }
+    ]
+  },
+  {
+    "developerName": "Mill Hill Riviera Development",
+    "companyId": "e8eca183-2cf7-4418-97ff-a989f1e96749",
+    "companyName": "Mill Hill Riviera Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Allegro Residences",
+        "projectId": "1c6663ae-03c8-4920-bcb4-488c9c874ed8",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Arsenal East Real Estate Development",
+    "companyId": "3f80d17f-477d-4929-b8eb-bb120ff1e4ee",
+    "companyName": "Arsenal East Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Zephyra Residences",
+        "projectId": "89cc2764-515f-44aa-8b3c-b2f78f77ba15",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Lacasa Living",
+    "companyId": null,
+    "companyName": "Lacasa Living Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Ola Residences",
+        "projectId": "3c5e3605-9236-41db-ab47-c64fdbdf7749",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "MAG",
+    "companyId": null,
+    "companyName": "Mag Property Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "MAG 777",
+        "projectId": "21a33484-a61b-4367-b6a9-b38ef5e60eae",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "MBL Signature JLT",
+        "projectId": "b77bf8e8-c432-4c6a-9b63-3b799ae8ad0d",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Reportage Properties",
+    "companyId": "bc9ff189-0f43-4897-bb11-99a4731bfa8d",
+    "companyName": "Reportage Prime Properties L.L.C",
+    "projectsCreated": 17,
+    "projects": [
+      {
+        "title": "Reportage Hills",
+        "projectId": "489869be-6364-4db9-ab43-86930cf6498d",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Verdana Residence 10",
+        "projectId": "f76ddbfa-1be6-47eb-91d8-3a396caaf92a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Reportage Village ",
+        "projectId": "16936f20-f7b4-4957-8db5-8848c892a955",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Verdana Phase 6",
+        "projectId": "1b3e0b80-ea0b-4ed4-ad51-cc839beb5617",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Verdana Phase 5",
+        "projectId": "b8104402-4205-46e3-aa16-cf3eaf93700f",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Reportage Tower",
+        "projectId": "f46a3764-ee8d-45da-95a9-c32a1550b309",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Verdana Phase 4",
+        "projectId": "44e6b15c-144f-4d55-9dcc-986b6352d29c",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Rukan Lofts Phase 3",
+        "projectId": "7e372c5b-d6d1-4a02-810f-9f7d26a47bd2",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Taormina Village",
+        "projectId": "f2c26f2c-1e47-4272-a7fb-697d4f518b69",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Verdana Phase 3",
+        "projectId": "c86a0637-30f9-4d52-a220-c019db99e181",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Reportage Plaza 2 ",
+        "projectId": "ba1a6a26-735a-4df2-9be9-c50a7e6fa02b",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Reportage Marlin",
+        "projectId": "8a07442c-eca1-4042-b145-b98da93bf71e",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Selina Bay by Reportage",
+        "projectId": "84067f76-d9e6-45bb-b89e-13885501041a",
+        "floorPlansCount": 7
+      },
+      {
+        "title": "Royal Park",
+        "projectId": "f26ab597-8e5b-48ec-84ac-e50ab10f91c9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Perla 3",
+        "projectId": "5ea1fccb-3c5a-467d-a91b-4012c6301c5d",
+        "floorPlansCount": 10
+      },
+      {
+        "title": "Vista 3",
+        "projectId": "c2bd05fc-9b86-45df-9de7-fa12bf96b408",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Bianca",
+        "projectId": "bf89aae7-4e73-48f5-a135-92fc9ac06a4c",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Prescott Developers",
+    "companyId": "0af98d03-c230-4177-b977-00d0374dc8fb",
+    "companyName": "Prescott Developers Limited",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Verano at Dubai Studio City",
+        "projectId": "8963a64e-eace-4371-9516-3d6bbc9a18c5",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "OKSA Developer",
+    "companyId": "46e729a3-3855-4d43-b808-0bd4ef505ae0",
+    "companyName": "Oksa Developer L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "The Eighty Three",
+        "projectId": "e3d23d72-cf39-4412-8044-d633dc379df9",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "The Luxe Developers",
+    "companyId": null,
+    "companyName": "The Luxe Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "La Mazzoni",
+        "projectId": "4d72a686-91e2-40c6-85ad-a08e99f9f856",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Oceano",
+        "projectId": "538597a1-1aef-464e-85ff-240139ea22e7",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Acube",
+    "companyId": null,
+    "companyName": "Acube Real Estate Development L L C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Vega",
+        "projectId": "7b110c32-ae35-4c7a-9509-3bc5168328dd",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Electra ",
+        "projectId": "4ffdead3-0c1c-42b4-83b9-b6b4400b9fa4",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Nakheel",
+    "companyId": "a77ddfd3-c9c1-44b8-a38f-b8702d6881d2",
+    "companyName": "Nakheel .(P J S C)",
+    "projectsCreated": 11,
+    "projects": [
+      {
+        "title": "Bay Grove Residences 2",
+        "projectId": "6fc362d0-4263-4572-8a0a-5880ad51e9a7",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "The Beach Collection Villas 2",
+        "projectId": "866fa0f6-6fb6-4543-ac65-c8f67bf6b063",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Bay Grove Residences at Dubai Islands",
+        "projectId": "5d4f3ab6-6a05-4ae5-937c-37076ee2d1be",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Coral Collection",
+        "projectId": "5fe1efd3-19db-438c-940f-186c3151c76b",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Nakheel Rixos Phase 2",
+        "projectId": "108a28cd-25c9-4927-80da-9783de592b12",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "The Beach Collection Villas",
+        "projectId": "28901670-78cf-4683-8c20-3a9ee3bd194a",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Bay Villas Dubai Islands",
+        "projectId": "2b73fd1c-0e71-4858-bd11-a9e4574b5f7b",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Como Residences",
+        "projectId": "d3925175-6b0b-4344-b06f-8837f0f55e65",
+        "floorPlansCount": 9
+      },
+      {
+        "title": "The Coral Collection Villas",
+        "projectId": "d3d5b16e-cb62-43b8-9548-171d5456b449",
+        "floorPlansCount": 8
+      },
+      {
+        "title": "Naya",
+        "projectId": "56219c8d-3517-4a5b-8112-84cfb37a4b6b",
+        "floorPlansCount": 6
+      },
+      {
+        "title": "Rixos Dubai Islands Hotel & Residences",
+        "projectId": "fa05e2ad-a37b-4495-9721-e5a5ffb13c88",
+        "floorPlansCount": 6
+      }
+    ]
+  },
+  {
+    "developerName": "Meraki Developers",
+    "companyId": null,
+    "companyName": "Meraki Real Estate Development One Person L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "The Haven 2",
+        "projectId": "70b70cc5-d493-4d47-94c3-791a4932a9d8",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Eagle Hills",
+    "companyId": "ec9a3217-260f-4ac8-95a6-d0c9e27a5a2b",
+    "companyName": "Eagle Properties L.L.C",
+    "projectsCreated": 11,
+    "projects": [
+      {
+        "title": "GEM Residences",
+        "projectId": "3b0fcb30-fff5-44a5-9ac2-43f1d1270e56",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Citrine Residences at Maryam Island",
+        "projectId": "9f1a5d3b-0800-4fcd-ab7b-cfd72b25fe7a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Topaz Residences",
+        "projectId": "00b4c223-485d-42ce-a7fc-abc3694dd4dd",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Anbar Residences",
+        "projectId": "36ae7edc-0f0e-41a5-aa14-a48a39a31fff",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Oud Residences ",
+        "projectId": "c3faa4cc-92e0-465f-a91d-5089a1deb25c",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ramhan Island Villas Phase 3 ",
+        "projectId": "04387e77-be51-4e8f-a013-e217cc444212",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Rehan Residences",
+        "projectId": "ac91b84d-325a-4916-b324-87e582aee7bc",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Ramhan Island Villas Phase 2 ",
+        "projectId": "b15221f3-9428-4dd5-a16a-eb303d822e04",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Jawaher Residences",
+        "projectId": "5555a64e-0214-40ad-a6a7-74700951d689",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Mesk Residences",
+        "projectId": "21a7d433-c243-4971-a0e3-a12bcf724fb8",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Ramhan Island",
+        "projectId": "c66ff719-ab7a-4beb-be32-24b1de5ff7d9",
+        "floorPlansCount": 8
+      }
+    ]
+  },
+  {
+    "developerName": "Irth Development",
+    "companyId": "5559d03a-dc3f-4b41-94a9-012ada5922ca",
+    "companyName": "Irth Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Rove Home Dubai Marina",
+        "projectId": "3413de4e-9838-446d-8a32-29c0b373d0a4",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Rove Home Marasi Drive",
+        "projectId": "ebd70d65-daa5-4abe-ab77-862e8747b5b2",
+        "floorPlansCount": 1
+      }
+    ]
+  },
+  {
+    "developerName": "Omniyat",
+    "companyId": "29a83cc1-51c6-4c54-943f-5f627fbf57db",
+    "companyName": "Omniyat Properties Development Corporation",
+    "projectsCreated": 8,
+    "projects": [
+      {
+        "title": "Ava at Palm",
+        "projectId": "d4bb7a26-983c-458d-b81d-2567e5e4d10d",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "The Alba Residences",
+        "projectId": "d672c151-556e-4877-9c4d-393e586279ee",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Omniyat Vela Viento",
+        "projectId": "c55c733b-896f-453e-89f4-43bfe692963a",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Saria by Beyond",
+        "projectId": "d99d9e2c-f9bc-4fb5-b9d5-a3fe17609642",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "ELA Residences Dorchester Collection",
+        "projectId": "b00a1049-72f8-457c-9b8e-95f5eb02346a",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "The Lana Dorchester Collection",
+        "projectId": "81f66244-2d38-4aa5-94a5-97998b605e86",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Anwa Aria",
+        "projectId": "f1d24239-fe71-43f6-b017-b0e942488ad9",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Vela Viento",
+        "projectId": "63072d9b-ddea-433d-8162-5989b15d6f72",
+        "floorPlansCount": 6
+      }
+    ]
+  },
+  {
+    "developerName": "Leos Development",
+    "companyId": "23822458-fb52-4c09-a431-ae2a34f16405",
+    "companyName": "Leos Development L.L.C",
+    "projectsCreated": 6,
+    "projects": [
+      {
+        "title": "Hadley Heights JVC",
+        "projectId": "53250233-938b-49ec-8a80-2eaf39aed98b",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Kensington Gardens",
+        "projectId": "6b638bfe-1675-4e10-9392-128d1c8db6f7",
+        "floorPlansCount": 5
+      },
+      {
+        "title": "Knightsbridge at Meydan",
+        "projectId": "c178b6e9-aa00-4c78-8a4d-b12f2f3dd81e",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Weybridge Gardens 3",
+        "projectId": "e1223427-5edf-41a0-9829-6ef6a39242b2",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Weybridge Gardens",
+        "projectId": "aaa1df5a-7e4c-44b1-957c-ffd656c89ca5",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "Weybridge Gardens 2",
+        "projectId": "d7f3f71e-95c3-4f6a-96c4-2b2b5c6423b5",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "QUBE Development",
+    "companyId": "645dad80-ca3e-4123-adea-66ee0ae3bd57",
+    "companyName": "Qube Development L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Arisha Terraces",
+        "projectId": "cd82233d-8c59-43e7-aba0-7398cf8aed39",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Midora Residences at JVC",
+        "projectId": "9342f29a-fd5b-4d61-9fd1-d79f8456dfe0",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Cubix Residences at JVC",
+        "projectId": "d3e665c0-5091-49ef-8388-431260904d2f",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Dubai Properties",
+    "companyId": "92309fe6-b85e-412c-867d-7de731dda451",
+    "companyName": "Dubai Properties(L.L.C)",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "La Tilia at Villanova",
+        "projectId": "7a0a2cda-263c-4ff6-b641-1b8d68fef541",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Aqua Properties",
+    "companyId": "bf00bfb6-c8fe-451a-ae9c-57621c7ad73e",
+    "companyName": "AQUA PLUS PROPERTIES",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "The Community Sports Arena",
+        "projectId": "cc23365a-b87a-4c4a-bb0f-2c5b78c692e6",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "The Central Downtown",
+        "projectId": "9da2633c-a27b-4bf6-b038-9556acb2e0d4",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "ARTE Developments",
+    "companyId": null,
+    "companyName": "ARTE EXTREME PROPERTIES L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "La Mer by ELIE SAAB",
+        "projectId": "bde994e7-b543-4eca-9891-6429864a3a70",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Union Properties",
+    "companyId": "23f559f4-fc2b-4273-95b4-5380f41c548d",
+    "companyName": "Union Properties (P.J.S.C)",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Takaya Symphony at Motor City",
+        "projectId": "159af96e-aede-4921-850c-80594f69fc66",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Pure Gold Real Estate Development",
+    "companyId": "5c5ec9bc-9fae-4439-8c68-5978910305fe",
+    "companyName": "Pure Gold Real Estate Development",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "PG Maison at Al Furjan",
+        "projectId": "f2d2af76-8c69-4ce2-b544-01d0226301b4",
+        "floorPlansCount": 1
+      }
+    ]
+  },
+  {
+    "developerName": "Signature Developers",
+    "companyId": "46d54ca0-c3b0-4eaf-8ef7-1a5869bfd351",
+    "companyName": "Signature Avenue Developers",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "W Residences at JLT",
+        "projectId": "1b89a3cc-ab4e-4f09-9519-e9c7ee461eb3",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "MAK Developers",
+    "companyId": "ca1a88bd-d8ef-4264-8977-5b9d37f1f10d",
+    "companyName": "Mak Developers L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "MAK Isola Bella",
+        "projectId": "8501a486-c432-4735-ace8-81ff46dd07fa",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Takmeel Real Estate Development",
+    "companyId": "38689da6-cdff-412c-92dd-0b60cc8a3619",
+    "companyName": "Takmeel Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Divine Residencia",
+        "projectId": "f98ea40c-e342-45eb-bb64-dccad526fe41",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Riviera Properties Development",
+    "companyId": "2b43c5e6-8db9-476c-83e5-77f1ce1e15a2",
+    "companyName": "Riviera Properties Development",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Nineteen Riviera Lagoon",
+        "projectId": "33dec0e3-a1e5-43ba-b2be-03225a57b1e3",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Vincitore Real Estate Development",
+    "companyId": "86da6929-a343-4221-b04f-a9bb5b91d0ce",
+    "companyName": "Vincitore Real Estate Development L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Vincitore Dolce Vita Suites",
+        "projectId": "5efb994c-0e07-44f3-8e7e-1caabcd1c0d1",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Vincitore Aqua Flora",
+        "projectId": "ad788190-6816-408e-8287-2280e9674338",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Vincitore Aqua Dimore Phase 2",
+        "projectId": "9a09ab35-a806-48e7-a3cb-ae60745f8106",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Amaya Properties",
+    "companyId": "948d5806-0b60-48b3-ab3e-a93791cce1d0",
+    "companyName": "Amaya Properties L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Alba Residences",
+        "projectId": "c2bb8e10-dd90-462c-a0df-edb6aec164a7",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Iman Developers",
+    "companyId": "aa44c308-db92-46b1-99b8-febdc7307811",
+    "companyName": "Iman Developers L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "One Sky Park by Iman",
+        "projectId": "875e51f8-ae9f-45c3-b70c-205faeadd25e",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "One Park Central by Iman",
+        "projectId": "08cf988a-13a0-425e-b311-17ea5191ff40",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Galaxy Realty",
+    "companyId": "215ae300-cecc-4367-ba0d-52d4ccc3b222",
+    "companyName": "Galaxy Realty L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Galaxy Jardin Astral",
+        "projectId": "1b09ae17-56d5-4c90-92f2-761b5f85035a",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Zimaya Properties",
+    "companyId": "b60363d0-f9f4-4226-8a31-9979086cc504",
+    "companyName": "Zimaya Properties Llc",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Belle Reve",
+        "projectId": "fdf1fb03-af75-4b58-b4aa-a619859f5106",
+        "floorPlansCount": 6
+      }
+    ]
+  },
+  {
+    "developerName": "City View Developments",
+    "companyId": null,
+    "companyName": "City View Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Hyde Residences at Dubai Hills Estate",
+        "projectId": "b60bbbfd-b25d-4b70-b7a9-1653a6948263",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Enso Development",
+    "companyId": "34c6c21c-0af3-4c8a-a89b-196e1a3d3a46",
+    "companyName": "Enso Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Enso Jade",
+        "projectId": "5a10c711-69be-4113-89d5-af6b7d91ed8f",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Century 7 Properties",
+    "companyId": "4b62898a-8a45-41bd-a91f-adf3ff430435",
+    "companyName": "Century 7 Properties L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Alba Tower at Al Satwa",
+        "projectId": "d71fef21-a203-46ad-b798-70d36e49d74c",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Prescott Real Estate Development",
+    "companyId": "55a16e77-413d-474b-9e3e-fd81e48d36c1",
+    "companyName": "Prescott Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Fairway Residences",
+        "projectId": "b75cac15-a6ab-4937-bbcd-e002afb24774",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Ahmadyar Developments",
+    "companyId": null,
+    "companyName": "Ahmadyar Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Palatium Residences",
+        "projectId": "462630f9-22c9-4ef1-9d84-a3218cedf82d",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Meteora",
+    "companyId": null,
+    "companyName": "Meteora Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Park Boulevard at JVC",
+        "projectId": "c1bf77d6-ca3c-4ecb-836c-e8888de3533a",
+        "floorPlansCount": 0
+      },
+      {
+        "title": "Alta by Meteora",
+        "projectId": "85290832-522f-4fea-9690-1c6bdb93d910",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Continental Investments",
+    "companyId": null,
+    "companyName": "Continental Investment L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Boutique 23 ",
+        "projectId": "69096432-c6a7-4fe6-a546-d0f6cea066b8",
+        "floorPlansCount": 2
+      },
+      {
+        "title": "La Boutique by LMD",
+        "projectId": "108402b5-f3e7-49b4-b888-6a4f7c46fe98",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Tabeer Real Estate",
+    "companyId": "7a4b22d2-801f-451a-8823-a54c479a50aa",
+    "companyName": "Tabeer Real Estate Development L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "48 ParkSide",
+        "projectId": "ca7b4cad-ae0c-41aa-92aa-68a1dfb9932c",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Parkside Boulevard",
+        "projectId": "4fd77171-4cf4-49f3-9189-bbf52b581f8c",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "99 Parkplace",
+        "projectId": "04da0360-6787-4bd8-8a18-6772db343acf",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Aura Infinite Real Estate Development",
+    "companyId": "71a70ddd-ce28-4bdd-856c-18141afeedb7",
+    "companyName": "Aura Infinite Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Aura Elegance ",
+        "projectId": "a896b634-087f-4b49-ad30-a8993b684924",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Aura Elegance",
+        "projectId": "75e69e3e-8489-430b-9102-3b5ba71d9e6b",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Crystal Bay Development",
+    "companyId": "9d5ac96f-2449-4ec0-8714-f5d2c04d1445",
+    "companyName": "Crystal Bay Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Vue by Crystal Bay ",
+        "projectId": "d7e7f1b3-812f-4cd9-afe7-0d2b4638c713",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Esnaad",
+    "companyId": null,
+    "companyName": "Esnaad Real Estate Development L.L.C",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Vista Del Mar",
+        "projectId": "975bc75a-11f1-4afd-838a-9af1b2ec18a6",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Cresswell Residences",
+        "projectId": "b2880fd7-f56e-4525-ae53-52ded6a67810",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "The Spark ",
+        "projectId": "5fdca98f-10da-4b2f-b942-4e1affba2161",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Soho Development",
+    "companyId": "b4aa0735-a969-4a37-83e6-f7ca7d4c2f3f",
+    "companyName": "Soho Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Berkeley ",
+        "projectId": "03be74f0-4532-4e80-adee-e0e1a16dbf3e",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "MIRFA",
+    "companyId": null,
+    "companyName": "Mirfa Ibc Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Ashton Park Residences",
+        "projectId": "5ba7173f-ba4f-400d-8d30-50009e58975f",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Gulf Land Property Developers",
+    "companyId": "2c831bf6-f2bc-4005-aebd-b3dc0e778190",
+    "companyName": "Gulf Land Property Developers",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Tonino Lamborghini Residences ",
+        "projectId": "636c2f30-6ae2-4908-9788-3a80ac9cb128",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Heilbronn Properties Ltd",
+    "companyId": "20999e5d-1ebb-4de4-9b59-5be891d2bce9",
+    "companyName": "Heilbronn Properties Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Park Lane by Heilbronn",
+        "projectId": "675f7b1c-5eec-443a-b267-97ddcfb7887b",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "IGO Property Development",
+    "companyId": "6fa7a741-365c-42d7-afcc-4eae0e7794ec",
+    "companyName": "Igo Property Development L.L.C - Fz",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Azura Residences ",
+        "projectId": "49d7d5c3-0182-4dfe-9ec9-a53260e10d7b",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "ARIB Developments",
+    "companyId": null,
+    "companyName": "Arib Properties For Real Estate Development   Est.",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Lumina Vista",
+        "projectId": "c82533b2-0911-4d4e-8422-d4579d86d13c",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Amali Properties",
+    "companyId": "a49b4395-72b9-4da4-bf50-260e9ff7aca9",
+    "companyName": "Amali Properties L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Villa Amaya",
+        "projectId": "a043bd2a-3799-481d-94c8-c0d652123dd2",
+        "floorPlansCount": 1
+      },
+      {
+        "title": "Amali Island",
+        "projectId": "6e52e6e8-e195-4be9-8303-e5ddac61a44b",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Mada'in",
+    "companyId": null,
+    "companyName": "MADA PROPERTIES L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Mada’in Tower",
+        "projectId": "27744fa5-7f31-4a78-89b7-77d24d0aa22c",
+        "floorPlansCount": 5
+      }
+    ]
+  },
+  {
+    "developerName": "Urban Properties Development (UPD)",
+    "companyId": "b95aa331-b2a8-48c7-b3a0-b39363e1a079",
+    "companyName": "Urban Properties Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Urban Life",
+        "projectId": "20266d43-6de0-4d01-9071-df10366a5f29",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Muraba",
+    "companyId": null,
+    "companyName": "Muraba Properties L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Muraba Veil",
+        "projectId": "71de4501-617c-47d3-9f8d-f8136916c081",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Deviate For Real Estate Development",
+    "companyId": "3c29891e-f7df-4248-bc30-8a1f567cad10",
+    "companyName": "Deviate For Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Enaya Residences",
+        "projectId": "d9c9590d-f9a2-46b9-b9ff-4d9a519bcb7c",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Vakson Real Estate",
+    "companyId": "bde30c81-8e7f-4b93-b5d1-9a4c44a0962d",
+    "companyName": "VAKSON REAL ESTATE (L.L.C)",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Riva Residence",
+        "projectId": "4ec36535-212b-46fb-8057-07efd6ebf134",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Aark Developers",
+    "companyId": "1afb5472-3ab9-47e3-a5bd-cdb1598275c3",
+    "companyName": "Aark Developers L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Sora Beach Residences ",
+        "projectId": "dce9c31c-9f87-4146-b4a5-b94d2e65c852",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Arista Properties",
+    "companyId": null,
+    "companyName": "Arista Heights Real Estate Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Arista Wadi Villas ",
+        "projectId": "e2aac549-1196-46f6-a11d-e69e33f888cb",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Wadi Villas",
+        "projectId": "397794d9-f8cd-4d57-88d0-d595986a8902",
+        "floorPlansCount": 2
+      }
+    ]
+  },
+  {
+    "developerName": "Lucky Aeon Real Estate Development",
+    "companyId": "054102f6-752f-4baf-a47e-79eeb1eedaae",
+    "companyName": "Lucky Aeon Real Estate Development",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Lucky Oasis Residence ",
+        "projectId": "c7b40924-cb57-4c7a-a771-b00a5c71488f",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Major Developers",
+    "companyId": null,
+    "companyName": "MAJOR PROPERTIES",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Manta Bay",
+        "projectId": "23da527a-fad6-4ee4-81a8-28ae51cc4af5",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Vision Avenue Homes",
+    "companyId": "f50e09b7-6840-4d78-b70f-bf459361fe92",
+    "companyName": "Vision Avenue Homes (Fzc)",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Emerald Vision Tower",
+        "projectId": "d5b8fe67-0982-43d6-b734-67b250a5b047",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Al Hamra Real Estate",
+    "companyId": "7f6dacba-eb71-4261-bf5e-e75a038e3228",
+    "companyName": "AL BISHRI REAL ESTATE",
+    "projectsCreated": 3,
+    "projects": [
+      {
+        "title": "Al Hamra Waterfront",
+        "projectId": "1265bfdf-23d4-438f-8ebe-fc624658b00d",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Falcon Island",
+        "projectId": "96c0d804-e3b1-4b06-bb01-ec78b4605ef6",
+        "floorPlansCount": 4
+      },
+      {
+        "title": "Falcon Island",
+        "projectId": "c60ec242-fb60-4173-b259-20cba439a2a4",
+        "floorPlansCount": 5
+      }
+    ]
+  },
+  {
+    "developerName": "Segrex Development LLC",
+    "companyId": "ae62bc27-a71c-4508-94e2-6d89bc4b67f3",
+    "companyName": "Segrex Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Vitality Residence ",
+        "projectId": "5c36cae3-f7c7-453f-98e9-2c541116ebe5",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Skyline Builders Real Estate",
+    "companyId": "e9c4a7f7-1528-4028-b5e7-e372af6be204",
+    "companyName": "Skyline Builders Real Estate L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Avant Garde Residences",
+        "projectId": "75bae7ba-c006-4bf9-8a48-a8c7dd6b2d74",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Forum Group",
+    "companyId": "baf71e2c-9bf6-4863-8a93-75a22b826de9",
+    "companyName": "Forum Group Dmcc",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "FH Residency",
+        "projectId": "ff0b0c78-069d-4234-b821-8101338da0cc",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "Al Barari Development",
+    "companyId": null,
+    "companyName": "Al Barari Real Estate L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Altissima",
+        "projectId": "aec57583-2e83-4063-9783-51b86db99842",
+        "floorPlansCount": 1
+      }
+    ]
+  },
+  {
+    "developerName": "JRP Development",
+    "companyId": null,
+    "companyName": "J R P Properties L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Roma Residences",
+        "projectId": "2c8c4d6d-2739-473d-9ccd-990ea04afb70",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Al Habtoor Group",
+    "companyId": null,
+    "companyName": "Al Habtoor Property Development L.L.C",
+    "projectsCreated": 2,
+    "projects": [
+      {
+        "title": "Habtoor Grand Residences",
+        "projectId": "0b718639-980d-483a-81c4-51cba609b847",
+        "floorPlansCount": 3
+      },
+      {
+        "title": "Al Habtoor Tower",
+        "projectId": "b9c69e18-2039-44ed-803e-93af2fac1dba",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Alta Real Estate Developments",
+    "companyId": "6f5765c2-a701-4a46-9c09-ba4458884598",
+    "companyName": "Alta Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Aire Dubai",
+        "projectId": "50de256f-9c1c-4520-87b7-8f527b0b2db7",
+        "floorPlansCount": 0
+      }
+    ]
+  },
+  {
+    "developerName": "Fortimo",
+    "companyId": null,
+    "companyName": "Fortimo Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "The Golf Residences",
+        "projectId": "b0513f71-8f94-491e-96c7-66efc68fd376",
+        "floorPlansCount": 4
+      }
+    ]
+  },
+  {
+    "developerName": "East and West Properties",
+    "companyId": "aaa16c48-b2ce-4a61-a7b6-6002593f8c93",
+    "companyName": "East & West Properties L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "25H Heimat",
+        "projectId": "f4e091ff-807a-4075-8ae7-dcfe7cd64906",
+        "floorPlansCount": 7
+      }
+    ]
+  },
+  {
+    "developerName": "Mered",
+    "companyId": null,
+    "companyName": "Mered Residences Real Estate L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "Iconic Tower",
+        "projectId": "54e73a8f-3440-4c14-af7a-aed275a84b07",
+        "floorPlansCount": 3
+      }
+    ]
+  },
+  {
+    "developerName": "Peak Summit Real Estate Development",
+    "companyId": "3c9d706c-a5f1-4fcd-aa99-832a87199025",
+    "companyName": "Peak Summit Real Estate Development L.L.C",
+    "projectsCreated": 1,
+    "projects": [
+      {
+        "title": "The Orchard Place",
+        "projectId": "8711cd91-44c7-4169-ada5-42063b4c5ce3",
+        "floorPlansCount": 10
+      }
+    ]
+  }
+]
