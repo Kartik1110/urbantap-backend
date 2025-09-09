@@ -410,7 +410,7 @@ export const getFeaturedProjectsService = async ({ page, pageSize }: { page: num
         address: proj.address,
         views: proj.views,
         company_name: proj.developer?.company?.name || null,
-        max_price: proj.max_price,
+        min_price: proj.min_price,
     }));
 
     const pagination = {
