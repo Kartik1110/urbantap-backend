@@ -177,9 +177,22 @@ export const getProjectByIdService = async (id: string) => {
             }
         });
         
-        // Map bedroom types to numeric display names
-        const typeMapping: { [key: string]: string } = {
-            'Studio': '0',
+        // Map bedroom types to display names for unit_types name field
+        const nameMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
+            'One': '1Bhk',
+            'Two': '2Bhk', 
+            'Three': '3Bhk',
+            'Four': '4Bhk',
+            'Five': '5Bhk',
+            'Six': '6Bhk',
+            'Seven': '7Bhk',
+            'Four_Plus': '4+Bhk'
+        };
+
+        // Map bedroom types to numeric values for floor-plans bedrooms field
+        const bedroomMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
             'One': '1',
             'Two': '2', 
             'Three': '3',
@@ -193,18 +206,18 @@ export const getProjectByIdService = async (id: string) => {
         // Convert to array of objects with name, properties_count, and floor-plans
         const unitTypes = Object.entries(unitTypeGroups)
             .map(([bedroomType, floorPlansForType]) => ({
-                name: typeMapping[bedroomType] || bedroomType,
+                name: nameMapping[bedroomType] || bedroomType,
                 properties_count: floorPlansForType.length,
                 "floor-plans": floorPlansForType.map(floorPlan => ({
                     min_price: floorPlan.min_price,
-                    bedrooms: typeMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
+                    bedrooms: bedroomMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
                     unit_size: floorPlan.unit_size
                 }))
             }))
             .sort((a, b) => {
-                // Custom sorting: Studio (0) first, then by number, then others
-                if (a.name === '0') return -1;
-                if (b.name === '0') return 1;
+                // Custom sorting: Studio first, then by number, then others
+                if (a.name === 'Studio') return -1;
+                if (b.name === 'Studio') return 1;
                 
                 const aNum = parseInt(a.name.match(/\d+/)?.[0] || '999');
                 const bNum = parseInt(b.name.match(/\d+/)?.[0] || '999');
