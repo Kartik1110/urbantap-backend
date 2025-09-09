@@ -295,9 +295,7 @@ export const getBrokerListService = async ({
                 },
             },
             orderBy: {
-                user: {
-                    createdAt: 'desc',
-                },
+                name: 'asc',
             },
         });
 
