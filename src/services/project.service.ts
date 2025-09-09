@@ -177,17 +177,17 @@ export const getProjectByIdService = async (id: string) => {
             }
         });
         
-        // Map bedroom types to display names
+        // Map bedroom types to numeric display names
         const typeMapping: { [key: string]: string } = {
-            'Studio': 'Studio',
-            'One': 'One',
-            'Two': 'Two', 
-            'Three': 'Three',
-            'Four': 'Four',
-            'Five': 'Five',
-            'Six': 'Six',
-            'Seven': 'Seven',
-            'Four_Plus': 'Four_Plus'
+            'Studio': '0',
+            'One': '1',
+            'Two': '2', 
+            'Three': '3',
+            'Four': '4',
+            'Five': '5',
+            'Six': '6',
+            'Seven': '7',
+            'Four_Plus': '4+'
         };
         
         // Convert to array of objects with name, properties_count, and floor-plans
@@ -197,14 +197,14 @@ export const getProjectByIdService = async (id: string) => {
                 properties_count: floorPlansForType.length,
                 "floor-plans": floorPlansForType.map(floorPlan => ({
                     min_price: floorPlan.min_price,
-                    bedrooms: floorPlan.bedrooms,
+                    bedrooms: typeMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
                     unit_size: floorPlan.unit_size
                 }))
             }))
             .sort((a, b) => {
-                // Custom sorting: Studio first, then by number, then others
-                if (a.name === 'Studio') return -1;
-                if (b.name === 'Studio') return 1;
+                // Custom sorting: Studio (0) first, then by number, then others
+                if (a.name === '0') return -1;
+                if (b.name === '0') return 1;
                 
                 const aNum = parseInt(a.name.match(/\d+/)?.[0] || '999');
                 const bNum = parseInt(b.name.match(/\d+/)?.[0] || '999');
