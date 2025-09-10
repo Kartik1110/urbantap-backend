@@ -6,6 +6,8 @@ import {
     getProjectFloorPlansService,
     getProjectsByDeveloperService,
     getFeaturedProjectsService,
+    generateProjectROIReportService,
+    getProjectAIReportService,
 } from '../services/project.service';
 
 // GET /projects
@@ -96,7 +98,7 @@ export const getProjectFloorPlans = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const bhk = req.query.bhk as string; // BHK filter parameter (e.g., "1Bhk", "2Bhk", "3Bhk", "Studio")
-        
+
         const floorPlans = await getProjectFloorPlansService(id, bhk);
 
         res.json({
@@ -120,12 +122,15 @@ export const getProjectsByDeveloper = async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
         const search = req.query.search as string;
-        
-        const { projects, pagination } = await getProjectsByDeveloperService(id, {
-            page,
-            pageSize,
-            search,
-        });
+
+        const { projects, pagination } = await getProjectsByDeveloperService(
+            id,
+            {
+                page,
+                pageSize,
+                search,
+            }
+        );
 
         res.json({
             status: 'success',
@@ -164,6 +169,66 @@ export const getFeaturedProjects = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch featured projects',
+        });
+    }
+};
+
+// GET ROI Report for a project
+export const generateProjectROIReport = async (req: Request, res: Response) => {
+    try {
+        const projectId = req.params.id;
+        const floorPlanId = req.query.floor_plan_id as string;
+
+        if (!floorPlanId) {
+            throw new Error('floor_plan_id is required');
+        }
+
+        const roiReport = await generateProjectROIReportService(
+            projectId,
+            floorPlanId
+        );
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Project ROI report generated successfully',
+            data: roiReport,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message:
+                (error as Error).message ||
+                'Failed to generate project ROI report',
+            error,
+        });
+    }
+};
+
+// GET AI Report for a project
+export const getAIReport = async (req: Request, res: Response) => {
+    try {
+        const projectId = req.params.id;
+        const floorPlanId = req.query.floor_plan_id as string;
+
+        if (!floorPlanId) {
+            throw new Error('floor_plan_id is required');
+        }
+
+        const aiReport = await getProjectAIReportService(
+            projectId,
+            floorPlanId
+        );
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'AI report fetched successfully',
+            data: aiReport,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: (error as Error).message || 'Failed to fetch AI report',
+            error,
         });
     }
 };
