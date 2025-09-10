@@ -621,12 +621,13 @@ enum OrderType {
 enum Amenities {
   Pets_Allowed
   Swimming_Pool
-  Gymnasium
+  Gym
   Parking
   Security
   Balcony
   Garden
   Air_Conditioning
+  Furnished
   Heating
   Jaccuzi
   Play_Area

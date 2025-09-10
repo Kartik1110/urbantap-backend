@@ -1,6 +1,40 @@
 import prisma from '../utils/prisma';
 import { Prisma, City, Category } from '@prisma/client';
 
+// Approved amenities list - only these will be returned in responses
+const APPROVED_AMENITIES = [
+    'Pets_Allowed',
+    'Swimming_Pool',
+    'Gym',
+    'Parking',
+    'Security',
+    'Balcony',
+    'Garden',
+    'Air_Conditioning',
+    'Furnished',
+    'Heating',
+    'Jaccuzi'
+];
+
+// Function to filter amenities to only include approved ones and format specific ones
+const filterApprovedAmenities = (amenities: string[]): string[] => {
+    return amenities
+        .filter(amenity => APPROVED_AMENITIES.includes(amenity))
+        .map(amenity => {
+            // Format specific amenities to replace underscores with spaces
+            switch (amenity) {
+                case 'Swimming_Pool':
+                    return 'Swimming Pool';
+                case 'Pets_Allowed':
+                    return 'Pets Allowed';
+                case 'Air_Conditioning':
+                    return 'Air Conditioning';
+                default:
+                    return amenity;
+            }
+        });
+};
+
 export const getProjectsService = async ({
     page,
     pageSize,
@@ -180,14 +214,14 @@ export const getProjectByIdService = async (id: string) => {
         // Map bedroom types to display names for unit_types name field
         const nameMapping: { [key: string]: string } = {
             'Studio': 'Studio',
-            'One': '1Bhk',
-            'Two': '2Bhk', 
-            'Three': '3Bhk',
-            'Four': '4Bhk',
-            'Five': '5Bhk',
-            'Six': '6Bhk',
-            'Seven': '7Bhk',
-            'Four_Plus': '4+Bhk'
+            'One': '1BHK',
+            'Two': '2BHK', 
+            'Three': '3BHK',
+            'Four': '4BHK',
+            'Five': '5BHK',
+            'Six': '6BHK',
+            'Seven': '7BHK',
+            'Four_Plus': '4+BHK'
         };
 
         // Map bedroom types to numeric values for floor-plans bedrooms field
@@ -209,6 +243,7 @@ export const getProjectByIdService = async (id: string) => {
                 name: nameMapping[bedroomType] || bedroomType,
                 properties_count: floorPlansForType.length,
                 "floor_plans": floorPlansForType.map(floorPlan => ({
+                    id: floorPlan.id,
                     min_price: floorPlan.min_price,
                     bedrooms: bedroomMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
                     unit_size: floorPlan.unit_size
@@ -252,7 +287,7 @@ export const getProjectByIdService = async (id: string) => {
         locality: project.locality,
         latitude: project.latitude,
         longitude: project.longitude,
-        amenities: project.amenities,
+        amenities: filterApprovedAmenities(project.amenities),
         views: project.views,
         floor_plans: project.floor_plans.flatMap(floorPlan => floorPlan.image_urls || [])
     };

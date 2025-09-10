@@ -124,7 +124,7 @@ function mapPropertyTypesToEnum(propertyTypes: string[]): string[] {
 // Amenity mapping from JSON data to enum values
 const AMENITY_MAPPING: { [key: string]: string } = {
     "Children's Pool": "Swimming_Pool",
-    "Shared Gym": "Gymnasium", 
+    "Shared Gym": "Gym", 
     "Balcony": "Balcony",
     "Security": "Security",
     "Children's Play Area": "Play_Area",
@@ -142,7 +142,7 @@ const AMENITY_MAPPING: { [key: string]: string } = {
     "Concierge Service": "Concierge_Service",
     // Additional common amenities that might appear in the data
     "Pool": "Swimming_Pool",
-    "Gym": "Gymnasium",
+    "Gym": "Gym",
     "Parking": "Parking",
     "Garden": "Garden",
     "Elevator": "Elevator",
