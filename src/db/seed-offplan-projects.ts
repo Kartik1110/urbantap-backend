@@ -22,6 +22,7 @@ interface OffPlanListing {
     floorPlan?: FloorPlan[]; // Root level floor plans (if any)
     position?: string;
     paymentPlan?: string;
+    propertyType?: string[]; // Property types from JSON data
     newParam?: {
         position?: string;
         floorPlan?: FloorPlan[]; // Floor plans in newParam
@@ -91,6 +92,34 @@ const BEDROOM_MAPPING: { [key: string]: string } = {
     "6 BR": "Six",
     "7 BR": "Seven"
 };
+
+// Property type mapping from JSON data to Prisma Type enum values
+const PROPERTY_TYPE_MAPPING: { [key: string]: string } = {
+    "APARTMENT": "Apartment",
+    "DUPLEX": "Duplex", 
+    "PENTHOUSE": "Penthouse",
+    "RESIDENTIAL_BUILDING": "Residential_Building",
+    "TOWNHOUSE": "Townhouse",
+    "VILLA": "Villa"
+    // Note: COMMERCIAL_BUILDING, HOTEL, etc. are intentionally excluded
+};
+
+// Function to map property types to enum values
+function mapPropertyTypesToEnum(propertyTypes: string[]): string[] {
+    const mappedTypes = propertyTypes
+        .map(type => {
+            const mappedType = PROPERTY_TYPE_MAPPING[type];
+            if (!mappedType) {
+                console.warn(`Dropping unmapped property type: ${type}`);
+                return null; // Return null for unmapped types
+            }
+            return mappedType;
+        })
+        .filter(type => type !== null) // Remove null values (unmapped types)
+        .filter((type, index, arr) => arr.indexOf(type) === index); // Remove duplicates
+    
+    return mappedTypes;
+}
 
 // Amenity mapping from JSON data to enum values
 const AMENITY_MAPPING: { [key: string]: string } = {
@@ -509,6 +538,12 @@ async function seedOffPlanProjects() {
                     localityLookupSuccessCount++;
                 }
 
+                // Process property types - map to enum values
+                const rawPropertyTypes = listing.propertyType || ["APARTMENT"];
+                const propertyTypes = mapPropertyTypesToEnum(rawPropertyTypes);
+                console.log(`   Raw property types: ${rawPropertyTypes.join(', ')}`);
+                console.log(`   Mapped property types: ${propertyTypes.join(', ')}`);
+
                 // Process amenities - map to enum values
                 const rawAmenities = listing.amenities || ["Pool", "Gym", "Parking", "Garden", "Security", "Elevator"];
                 const amenities = mapAmenitiesToEnum(rawAmenities);
@@ -546,7 +581,8 @@ async function seedOffPlanProjects() {
                         max_price: null, // Keep max_price as null
                         address: listing.region || 'Dubai',
                         city: mappedCity as any,
-                        type: "Off_plan" as any,
+                        category: "Off_plan" as any,
+                        type: propertyTypes as any, // Use mapped property types array
                         project_name: listing.title,
                         project_age: "0", // Off-plan properties are new
                         min_bedrooms: null, // Will be set from floor plans
@@ -557,7 +593,7 @@ async function seedOffPlanProjects() {
                         unit_types: [], // Will be populated from floor plans
                         amenities: amenities as any,
                         developer_id: developerId,
-                        handover_time: handoverTime,
+                        handover_year: handoverTime ? handoverTime.getFullYear() : null,
                         latitude: latitude,
                         longitude: longitude,
                         locality: locality,

@@ -241,6 +241,9 @@ enum Type {
   Plot
   Retail
   Warehouse
+  Duplex
+  Penthouse
+  Residential_Building
 }
 
 enum Rental_frequency {
@@ -362,7 +365,8 @@ model Project {
   address         String
   city            City
   file_url        String? // optional downloadable file
-  type            Category
+  type            Type[]   @default([])
+  category        Category
   project_name    String
   project_age     String
   min_bedrooms    Bedrooms?  
@@ -382,7 +386,7 @@ model Project {
   amenities       Amenities[] @default([])
   views           Int         @default(0)
   developer_id    String
-  handover_time   DateTime?
+  handover_year   Int? // e.g., 2025
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt

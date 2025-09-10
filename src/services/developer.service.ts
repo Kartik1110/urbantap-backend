@@ -118,7 +118,7 @@ export const getDeveloperDetailsService = async (developerId: string) => {
             projects: {
                 select: {
                     id: true,
-                    type: true,
+                    category: true,
                     image_urls: true,
                     project_name: true,
                     address: true,
@@ -139,7 +139,7 @@ export const getDeveloperDetailsService = async (developerId: string) => {
     // Format projects to match the required structure
     const formattedProjects = developer.projects.map(project => ({
         id: project.id,
-        type: project.type,
+        category: project.category,
         image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
         project_name: project.project_name,
         address: project.address,

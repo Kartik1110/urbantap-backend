@@ -31,7 +31,7 @@ export const getProjectsService = async ({
             city: location as City,
         }),
         ...(type && {
-            type: type as Category,
+            category: type as Category,
         }),
         ...(developer && {
             developer: {
@@ -92,7 +92,7 @@ export const getProjectsService = async ({
 
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
-        type: proj.type,
+        category: proj.category,
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
@@ -208,7 +208,7 @@ export const getProjectByIdService = async (id: string) => {
             .map(([bedroomType, floorPlansForType]) => ({
                 name: nameMapping[bedroomType] || bedroomType,
                 properties_count: floorPlansForType.length,
-                "floor-plans": floorPlansForType.map(floorPlan => ({
+                "floor_plans": floorPlansForType.map(floorPlan => ({
                     min_price: floorPlan.min_price,
                     bedrooms: bedroomMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
                     unit_size: floorPlan.unit_size
@@ -243,7 +243,7 @@ export const getProjectByIdService = async (id: string) => {
         address: project.address,
         city: project.city,
         file_url: project.file_url,
-        type: project.type,
+        category: project.category,
         project_age: project.project_age,
         furnished: project.furnished,
         max_sq_ft: project.max_sq_ft,
@@ -342,7 +342,7 @@ export const getProjectsByDeveloperService = async (developerId: string, { page,
             where: whereClause,
             select: {
                 id: true,
-                type: true,
+                category: true,
                 image_urls: true,
                 project_name: true,
                 address: true,
@@ -361,7 +361,7 @@ export const getProjectsByDeveloperService = async (developerId: string, { page,
     // Format projects to match the required structure
     const projects = projectsRaw.map(project => ({
         id: project.id,
-        type: project.type,
+        category: project.category,
         image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
         project_name: project.project_name,
         address: project.address,
@@ -417,7 +417,7 @@ export const getFeaturedProjectsService = async ({ page, pageSize }: { page: num
 
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
-        type: proj.type,
+        category: proj.category,
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,

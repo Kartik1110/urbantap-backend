@@ -333,10 +333,10 @@ export const getDeveloperDetailsService = async (developerId: string) => {
     const groupedProjects = {
         all: developer.projects,
         off_plan: developer.projects.filter(
-            (p) => p.type === Category.Off_plan
+            (p) => p.category === Category.Off_plan
         ),
         ready: developer.projects.filter(
-            (p) => p.type === Category.Ready_to_move
+            (p) => p.category === Category.Ready_to_move
         ),
     };
 

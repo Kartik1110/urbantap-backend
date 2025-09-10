@@ -153,7 +153,7 @@ async function main() {
                     address: faker.location.streetAddress(),
                     city: City.Dubai,
                     file_url: faker.internet.url(),
-                    type: Category.Off_plan,
+                    category: Category.Off_plan,
                     project_name: faker.company.name(),
                     project_age: String(faker.number.int({ min: 1, max: 10 })),
                     min_bedrooms: Bedrooms.Two,
