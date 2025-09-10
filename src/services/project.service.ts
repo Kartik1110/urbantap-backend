@@ -878,21 +878,15 @@ export const getProjectAIReportService = async (
         rental_graph: [
             {
                 year: String(handoverYear),
-                rental: Math.round(
-                    getRentalPriceInYear(propertyData, unit_size, yearDiff)
-                ),
+                rental: increaseInRentalPriceAfterHandOver(1),
             },
             {
                 year: String(handoverYear + 2),
-                rental: Math.round(
-                    getRentalPriceInYear(propertyData, unit_size, yearDiff + 2)
-                ),
+                rental: increaseInRentalPriceAfterHandOver(3),
             },
             {
                 year: String(handoverYear + 4),
-                rental: Math.round(
-                    getRentalPriceInYear(propertyData, unit_size, yearDiff + 4)
-                ),
+                rental: increaseInRentalPriceAfterHandOver(5),
             },
         ],
         growth_projection: {
