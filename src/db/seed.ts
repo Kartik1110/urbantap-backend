@@ -153,7 +153,7 @@ async function main() {
                     address: faker.location.streetAddress(),
                     city: City.Dubai,
                     file_url: faker.internet.url(),
-                    type: Category.Off_plan,
+                    category: Category.Off_plan,
                     project_name: faker.company.name(),
                     project_age: String(faker.number.int({ min: 1, max: 10 })),
                     min_bedrooms: Bedrooms.Two,
@@ -162,7 +162,7 @@ async function main() {
                     property_size: faker.number.float({ min: 500, max: 5000 }),
                     payment_plan: Payment_Plan.Payment_Pending,
                     unit_types: ['1BHK', '2BHK'],
-                    amenities: ['Pool', 'Gym', 'Parking'],
+                    amenities: ['Pool', 'Gym', 'Parking'] as any,
                     developer_id: developer.id,
                     currency: Currency.AED,
                 },
@@ -308,7 +308,7 @@ async function main() {
                 amenities: faker.helpers.arrayElements(
                     ['Pool', 'Gym', 'Parking'],
                     3
-                ),
+                ) as any,
                 looking_for: faker.datatype.boolean(),
                 rental_frequency: Rental_frequency.Yearly,
                 furnished: faker.helpers.arrayElement([

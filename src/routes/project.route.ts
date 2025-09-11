@@ -32,14 +32,7 @@ router.get('/projects/:id/roi-report', generateProjectROIReport);
 
 router.get('/projects/:id/ai-report', getAIReport);
 
-/* Get floor plans for a specific project with optional BHK filtering
- * Query parameters:
- * - bhk: Filter by bedroom count (e.g., "1Bhk", "2Bhk", "3Bhk", "Studio", "4+Bhk")
- * Examples:
- * - GET /projects/123/floorplans - Get all floorplans
- * - GET /projects/123/floorplans?bhk=1Bhk - Get only 1BHK floorplans
- * - GET /projects/123/floorplans?bhk=Studio - Get only Studio floorplans
- */
+/* Get floor plans for a specific project with optional BHK filtering */
 router.get('/projects/:id/floorplans', getProjectFloorPlans);
 
 export default router;

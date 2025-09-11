@@ -22,6 +22,7 @@ interface OffPlanListing {
     floorPlan?: FloorPlan[]; // Root level floor plans (if any)
     position?: string;
     paymentPlan?: string;
+    propertyType?: string[]; // Property types from JSON data
     newParam?: {
         position?: string;
         floorPlan?: FloorPlan[]; // Floor plans in newParam
@@ -91,6 +92,95 @@ const BEDROOM_MAPPING: { [key: string]: string } = {
     "6 BR": "Six",
     "7 BR": "Seven"
 };
+
+// Property type mapping from JSON data to Prisma Type enum values
+const PROPERTY_TYPE_MAPPING: { [key: string]: string } = {
+    "APARTMENT": "Apartment",
+    "DUPLEX": "Duplex", 
+    "PENTHOUSE": "Penthouse",
+    "RESIDENTIAL_BUILDING": "Residential_Building",
+    "TOWNHOUSE": "Townhouse",
+    "VILLA": "Villa"
+    // Note: COMMERCIAL_BUILDING, HOTEL, etc. are intentionally excluded
+};
+
+// Function to map property types to enum values
+function mapPropertyTypesToEnum(propertyTypes: string[]): string[] {
+    const mappedTypes = propertyTypes
+        .map(type => {
+            const mappedType = PROPERTY_TYPE_MAPPING[type];
+            if (!mappedType) {
+                console.warn(`Dropping unmapped property type: ${type}`);
+                return null; // Return null for unmapped types
+            }
+            return mappedType;
+        })
+        .filter(type => type !== null) // Remove null values (unmapped types)
+        .filter((type, index, arr) => arr.indexOf(type) === index); // Remove duplicates
+    
+    return mappedTypes;
+}
+
+// Amenity mapping from JSON data to enum values
+const AMENITY_MAPPING: { [key: string]: string } = {
+    "Children's Pool": "Swimming_Pool",
+    "Shared Gym": "Gym", 
+    "Balcony": "Balcony",
+    "Security": "Security",
+    "Children's Play Area": "Play_Area",
+    "Shared Pool": "Swimming_Pool",
+    "Covered Parking": "Parking",
+    "Lobby in Building": "Lobby",
+    "View of Landmark": "Scenic_View",
+    "View of Water": "Scenic_View",
+    "Built-in Wardrobes": "Wardrobes",
+    "CentralA/C": "Air_Conditioning",
+    "Shared Spa": "Spa",
+    "Built-in Kitchen Appliances": "Kitchen_Appliances",
+    "Barbecue Area": "Barbecue_Area",
+    "Study": "Study",
+    "Concierge Service": "Concierge_Service",
+    // Additional common amenities that might appear in the data
+    "Pool": "Swimming_Pool",
+    "Gym": "Gym",
+    "Parking": "Parking",
+    "Garden": "Garden",
+    "Elevator": "Elevator",
+    "AC": "Air_Conditioning",
+    "Air Conditioning": "Air_Conditioning",
+    "Spa": "Spa",
+    "Playground": "Play_Area",
+    "Kids Play Area": "Play_Area",
+    "Wardrobe": "Wardrobes",
+    "Kitchen": "Kitchen_Appliances",
+    "BBQ": "Barbecue_Area",
+    "Barbecue": "Barbecue_Area",
+    "Study Room": "Study",
+    "Concierge": "Concierge_Service",
+    "24/7 Security": "Security",
+    "CCTV": "Security",
+    "Jacuzzi": "Jaccuzi",
+    "Heating": "Heating",
+    "Pets Allowed": "Pets_Allowed"
+};
+
+// Track unmapped amenities for future mapping extension
+const unmappedAmenities = new Map<string, number>();
+
+// Function to map amenities to enum values
+function mapAmenitiesToEnum(amenities: string[]): string[] {
+    return amenities
+        .map(amenity => {
+            const mappedAmenity = AMENITY_MAPPING[amenity];
+            if (!mappedAmenity) {
+                // Track unmapped amenities
+                const currentCount = unmappedAmenities.get(amenity) || 0;
+                unmappedAmenities.set(amenity, currentCount + 1);
+            }
+            return mappedAmenity || amenity;
+        })
+        .filter((amenity, index, arr) => arr.indexOf(amenity) === index); // Remove duplicates
+}
 
 // Function to extract coordinates from position string
 function extractCoordinates(listing: OffPlanListing): { latitude: number | null; longitude: number | null } {
@@ -448,8 +538,17 @@ async function seedOffPlanProjects() {
                     localityLookupSuccessCount++;
                 }
 
-                // Process amenities
-                const amenities = listing.amenities || ["Pool", "Gym", "Parking", "Garden", "Security", "Elevator"];
+                // Process property types - map to enum values
+                const rawPropertyTypes = listing.propertyType || ["APARTMENT"];
+                const propertyTypes = mapPropertyTypesToEnum(rawPropertyTypes);
+                console.log(`   Raw property types: ${rawPropertyTypes.join(', ')}`);
+                console.log(`   Mapped property types: ${propertyTypes.join(', ')}`);
+
+                // Process amenities - map to enum values
+                const rawAmenities = listing.amenities || ["Pool", "Gym", "Parking", "Garden", "Security", "Elevator"];
+                const amenities = mapAmenitiesToEnum(rawAmenities);
+                console.log(`   Raw amenities: ${rawAmenities.join(', ')}`);
+                console.log(`   Mapped amenities: ${amenities.join(', ')}`);
 
                 // Process handover time - check both root level and newParam
                 let handoverTime: Date | null = null;
@@ -482,7 +581,8 @@ async function seedOffPlanProjects() {
                         max_price: null, // Keep max_price as null
                         address: listing.region || 'Dubai',
                         city: mappedCity as any,
-                        type: "Off_plan" as any,
+                        category: "Off_plan" as any,
+                        type: propertyTypes as any, // Use mapped property types array
                         project_name: listing.title,
                         project_age: "0", // Off-plan properties are new
                         min_bedrooms: null, // Will be set from floor plans
@@ -491,9 +591,9 @@ async function seedOffPlanProjects() {
                         property_size: null, // Will be set from floor plans
                         payment_plan: "Payment_Pending" as any,
                         unit_types: [], // Will be populated from floor plans
-                        amenities: amenities,
+                        amenities: amenities as any,
                         developer_id: developerId,
-                        handover_time: handoverTime,
+                        handover_year: handoverTime ? handoverTime.getFullYear() : null,
                         latitude: latitude,
                         longitude: longitude,
                         locality: locality,
@@ -608,6 +708,36 @@ async function seedOffPlanProjects() {
         const recordsPath = path.join(__dirname, 'seeding-records.json');
         fs.writeFileSync(recordsPath, JSON.stringify(seedingRecords, null, 2));
         console.log(`\nSeeding records saved to: seeding-records.json`);
+
+        // Report unmapped amenities
+        console.log(`\nUnmapped Amenities Report:`);
+        console.log(`   Total unique unmapped amenities: ${unmappedAmenities.size}`);
+        
+        if (unmappedAmenities.size > 0) {
+            // Sort by frequency (most common first)
+            const sortedUnmapped = Array.from(unmappedAmenities.entries())
+                .sort((a, b) => b[1] - a[1]);
+            
+            console.log(`\n   Top unmapped amenities (by frequency):`);
+            sortedUnmapped.slice(0, 20).forEach(([amenity, count]) => {
+                console.log(`   • "${amenity}" (${count} occurrences)`);
+            });
+            
+            if (unmappedAmenities.size > 20) {
+                console.log(`   ... and ${unmappedAmenities.size - 20} more unmapped amenities`);
+            }
+            
+            // Save unmapped amenities to JSON file for easy reference
+            const unmappedPath = path.join(__dirname, 'unmapped-amenities.json');
+            const unmappedData = {
+                totalUnmapped: unmappedAmenities.size,
+                amenities: Object.fromEntries(sortedUnmapped)
+            };
+            fs.writeFileSync(unmappedPath, JSON.stringify(unmappedData, null, 2));
+            console.log(`\n   Unmapped amenities saved to: unmapped-amenities.json`);
+        } else {
+            console.log(`   All amenities were successfully mapped! 🎉`);
+        }
 
         console.log(`\nOff-Plan Projects seeded successfully!`);
 

@@ -39,6 +39,40 @@ let propertiesData: MergedPropertyData;
     }
 })();
 
+// Approved amenities list - only these will be returned in responses
+const APPROVED_AMENITIES = [
+    'Pets_Allowed',
+    'Swimming_Pool',
+    'Gym',
+    'Parking',
+    'Security',
+    'Balcony',
+    'Garden',
+    'Air_Conditioning',
+    'Furnished',
+    'Heating',
+    'Jaccuzi'
+];
+
+// Function to filter amenities to only include approved ones and format specific ones
+const filterApprovedAmenities = (amenities: string[]): string[] => {
+    return amenities
+        .filter(amenity => APPROVED_AMENITIES.includes(amenity))
+        .map(amenity => {
+            // Format specific amenities to replace underscores with spaces
+            switch (amenity) {
+                case 'Swimming_Pool':
+                    return 'Swimming Pool';
+                case 'Pets_Allowed':
+                    return 'Pets Allowed';
+                case 'Air_Conditioning':
+                    return 'Air Conditioning';
+                default:
+                    return amenity;
+            }
+        });
+};
+
 export const getProjectsService = async ({
     page,
     pageSize,
@@ -69,7 +103,7 @@ export const getProjectsService = async ({
             city: location as City,
         }),
         ...(type && {
-            type: type as Category,
+            category: type as Category,
         }),
         ...(developer && {
             developer: {
@@ -130,7 +164,7 @@ export const getProjectsService = async ({
 
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
-        type: proj.type,
+        category: proj.category,
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
@@ -211,34 +245,55 @@ export const getProjectByIdService = async (id: string) => {
         if (!floorPlans || !Array.isArray(floorPlans)) return [];
 
         // Count floor plans by bedroom type
-        const unitTypeCounts: { [key: string]: number } = {};
+        const unitTypeGroups: { [key: string]: any[] } = {};
 
         floorPlans.forEach((floorPlan) => {
             if (floorPlan.bedrooms) {
                 const bedroomType = floorPlan.bedrooms;
-                unitTypeCounts[bedroomType] =
-                    (unitTypeCounts[bedroomType] || 0) + 1;
+                if (!unitTypeGroups[bedroomType]) {
+                    unitTypeGroups[bedroomType] = [];
+                }
+                unitTypeGroups[bedroomType].push(floorPlan);
             }
         });
-
-        // Map bedroom types to display names
-        const typeMapping: { [key: string]: string } = {
-            Studio: 'Studio',
-            One: '1Bhk',
-            Two: '2Bhk',
-            Three: '3Bhk',
-            Four: '4Bhk',
-            Five: '5Bhk',
-            Six: '6Bhk',
-            Seven: '7Bhk',
-            Four_Plus: '4+Bhk',
+        
+        // Map bedroom types to display names for unit_types name field
+        const nameMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
+            'One': '1BHK',
+            'Two': '2BHK', 
+            'Three': '3BHK',
+            'Four': '4BHK',
+            'Five': '5BHK',
+            'Six': '6BHK',
+            'Seven': '7BHK',
+            'Four_Plus': '4+BHK'
         };
 
-        // Convert to array of objects with name and properties_count
-        const unitTypes = Object.entries(unitTypeCounts)
-            .map(([bedroomType, count]) => ({
-                name: typeMapping[bedroomType] || bedroomType,
-                properties_count: count,
+        // Map bedroom types to numeric values for floor-plans bedrooms field
+        const bedroomMapping: { [key: string]: string } = {
+            'Studio': 'Studio',
+            'One': '1',
+            'Two': '2', 
+            'Three': '3',
+            'Four': '4',
+            'Five': '5',
+            'Six': '6',
+            'Seven': '7',
+            'Four_Plus': '4+'
+        };
+        
+        // Convert to array of objects with name, properties_count, and floor-plans
+        const unitTypes = Object.entries(unitTypeGroups)
+            .map(([bedroomType, floorPlansForType]) => ({
+                name: nameMapping[bedroomType] || bedroomType,
+                properties_count: floorPlansForType.length,
+                "floor_plans": floorPlansForType.map(floorPlan => ({
+                    id: floorPlan.id,
+                    min_price: floorPlan.min_price,
+                    bedrooms: bedroomMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
+                    unit_size: floorPlan.unit_size
+                }))
             }))
             .sort((a, b) => {
                 // Custom sorting: Studio first, then by number, then others
@@ -269,7 +324,7 @@ export const getProjectByIdService = async (id: string) => {
         address: project.address,
         city: project.city,
         file_url: project.file_url,
-        type: project.type,
+        category: project.category,
         project_age: project.project_age,
         furnished: project.furnished,
         max_sq_ft: project.max_sq_ft,
@@ -278,7 +333,7 @@ export const getProjectByIdService = async (id: string) => {
         locality: project.locality,
         latitude: project.latitude,
         longitude: project.longitude,
-        amenities: project.amenities,
+        amenities: filterApprovedAmenities(project.amenities),
         views: project.views,
         floor_plans: project.floor_plans.flatMap(
             (floorPlan) => floorPlan.image_urls || []
@@ -380,7 +435,7 @@ export const getProjectsByDeveloperService = async (
             where: whereClause,
             select: {
                 id: true,
-                type: true,
+                category: true,
                 image_urls: true,
                 project_name: true,
                 address: true,
@@ -399,7 +454,7 @@ export const getProjectsByDeveloperService = async (
     // Format projects to match the required structure
     const projects = projectsRaw.map((project) => ({
         id: project.id,
-        type: project.type,
+        category: project.category,
         image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
         project_name: project.project_name,
         address: project.address,
@@ -460,13 +515,13 @@ export const getFeaturedProjectsService = async ({
 
     const projects = projectsRaw.map((proj) => ({
         id: proj.id,
-        type: proj.type,
+        category: proj.category,
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
         views: proj.views,
         company_name: proj.developer?.company?.name || null,
-        max_price: proj.max_price,
+        min_price: proj.min_price,
     }));
 
     const pagination = {
@@ -533,15 +588,15 @@ export const generateProjectROIReportService = async (
         throw new Error('Floor plan not found');
     }
 
-    const { min_price, locality, handover_time } = project;
+    const { min_price, locality, handover_year } = project;
     const { unit_size } = floorPlan;
 
-    if (!min_price || !handover_time || !locality || !unit_size) {
+    if (!min_price || !handover_year || !locality || !unit_size) {
         if (!min_price) {
             throw new Error('Price not found');
         }
 
-        if (!handover_time) {
+        if (!handover_year) {
             throw new Error('Handover year not found');
         }
 
@@ -557,7 +612,7 @@ export const generateProjectROIReportService = async (
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
-    const handoverYear = handover_time.getFullYear();
+    const handoverYear = handover_year
     const currentYear = new Date().getFullYear();
 
     const listingPriceAtHandover = calculateHandoverPrice(
@@ -756,15 +811,15 @@ export const getProjectAIReportService = async (
         throw new Error('Floor plan not found');
     }
 
-    const { min_price, locality, handover_time } = project;
+    const { min_price, locality, handover_year } = project;
     const { unit_size } = floorPlan;
 
-    if (!min_price || !handover_time || !locality || !unit_size) {
+    if (!min_price || !handover_year || !locality || !unit_size) {
         if (!min_price) {
             throw new Error('Price not found');
         }
 
-        if (!handover_time) {
+        if (!handover_year) {
             throw new Error('Handover year not found');
         }
 
@@ -780,7 +835,7 @@ export const getProjectAIReportService = async (
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
-    const handoverYear = handover_time.getFullYear();
+    const handoverYear = handover_year
     const currentYear = new Date().getFullYear();
 
     const listingPriceAtHandover = calculateHandoverPrice(
