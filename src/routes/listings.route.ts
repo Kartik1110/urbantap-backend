@@ -14,6 +14,9 @@ import {
     getListingROIReport,
     getAIReport,
 } from '../controllers/listings.controller';
+import { bulkListingsSchema } from '../schema/listingSchema';
+import validateSchema from '../middlewares/validate.middleware';
+
 
 const router = Router();
 
@@ -34,7 +37,7 @@ router.get('/listings/:id/ai-report', getAIReport);
 
 /* Bulk insert listings */
 export default (upload: any) => {
-    router.post('/listings/bulk', upload.array('images'), bulkInsertListings);
+    router.post('/listings/bulk', upload.array('images'), validateSchema(bulkListingsSchema), bulkInsertListings);
 
     router.put('/listings/:id', upload.array('images'), editListingController);
 
