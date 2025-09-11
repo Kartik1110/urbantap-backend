@@ -965,7 +965,7 @@ export const getProjectAIReportService = async (
             lat: project.latitude!,
             lng: project.longitude!,
         }),
-        amenities: project.amenities,
+        amenities: filterApprovedAmenities(project.amenities || []),
         broker: {
             id: '0ec378d9-abd7-494d-a291-21ed14df826b',
             name: 'Irma Ankunding',
