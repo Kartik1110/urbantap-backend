@@ -1466,6 +1466,8 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
         );
     };
 
+    const currentYear = new Date().getFullYear();
+
     return {
         listing: {
             title: listing.title,
@@ -1484,7 +1486,7 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
         },
         growth_graph: [
             {
-                year: 1,
+                year: String(currentYear),
                 appreciation: Math.round(
                     getListingAppreciationInYear(
                         propertyData,
@@ -1494,7 +1496,7 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
                 ),
             },
             {
-                year: 4,
+                year: String(currentYear + 3),
                 appreciation: Math.round(
                     getListingAppreciationInYear(
                         propertyData,
@@ -1504,28 +1506,28 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
                 ),
             },
             {
-                year: 7,
+                year: String(currentYear + 5),
                 appreciation: Math.round(
                     getListingAppreciationInYear(
                         propertyData,
                         listing.max_price,
-                        7
+                        6
                     )
                 ),
             },
         ],
         rental_graph: [
             {
-                year: 1,
+                year: String(currentYear),
                 rental: increaseInRentalPrice(1),
             },
             {
-                year: 4,
-                rental: increaseInRentalPrice(4),
+                year: String(currentYear + 3),
+                rental: increaseInRentalPrice(3),
             },
             {
-                year: 7,
-                rental: increaseInRentalPrice(7),
+                year: String(currentYear + 5),
+                rental: increaseInRentalPrice(5),
             },
         ],
         growth_projection: {

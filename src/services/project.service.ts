@@ -614,6 +614,7 @@ export const generateProjectROIReportService = async (
 
     const handoverYear = handover_year
     const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
 
     const listingPriceAtHandover = calculateHandoverPrice(
         min_price,
@@ -630,7 +631,7 @@ export const generateProjectROIReportService = async (
     const longTermRent = getRentalPriceInYear(
         propertyData,
         unit_size,
-        handoverYear - currentYear
+        yearDiff
     );
     const shortTermRent = longTermRent * shortTermRentMultiplier;
     const longTermAppreciation = (longTermRent / min_price) * 100;
@@ -639,7 +640,7 @@ export const generateProjectROIReportService = async (
     const longTermRentAtHandoverPlus5 = getRentalPriceInYear(
         propertyData,
         unit_size,
-        handoverYear - currentYear + 5
+        yearDiff + 5
     );
     const shortTermRentAtHandoverPlus5 =
         longTermRentAtHandoverPlus5 * shortTermRentMultiplier;
@@ -699,8 +700,8 @@ export const generateProjectROIReportService = async (
 
     const areaAppreciationGraph = [
         areaAppreciationGraphAll[0],
-        areaAppreciationGraphAll[handoverYear - currentYear],
-        areaAppreciationGraphAll[handoverYear - currentYear + 5],
+        areaAppreciationGraphAll[yearDiff],
+        areaAppreciationGraphAll[yearDiff + 5],
     ].map((item) => ({
         year: item.year,
         roi: Math.round(item.appreciation_perc),
@@ -716,23 +717,26 @@ export const generateProjectROIReportService = async (
             )
             .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
 
-    const increaseInRentalYield = (year: number) => {
-        const yearDiff = handoverYear - currentYear;
-        const currentYearRental = getRentalPriceInYear(
-            propertyData,
-            unit_size,
-            yearDiff,
-            'monthly'
-        );
+    const increaseInRentalPrice = (year: number) => {
+        if (year === 0) {
+            return 0;
+        }
 
-        const yearRental = getRentalPriceInYear(
+        const rentalInXYears = getRentalPriceInYear(
             propertyData,
             unit_size,
             yearDiff + year,
             'monthly'
         );
 
-        return ((yearRental - currentYearRental) / currentYearRental) * 100;
+        const rentalPriceToday = getRentalPriceInYear(
+            propertyData,
+            unit_size,
+            0,
+            'monthly'
+        );
+
+        return ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100;
     };
 
     return {
@@ -786,7 +790,7 @@ export const generateProjectROIReportService = async (
         area_appreciation_graph: areaAppreciationGraph,
         rental_yield: {
             year: 3,
-            percentage: Math.round(increaseInRentalYield(3) * 100) / 100,
+            percentage: Math.round(increaseInRentalPrice(3) * 100) / 100,
         },
     };
 };
@@ -797,6 +801,11 @@ export const getProjectAIReportService = async (
 ): Promise<any> => {
     const project = await prisma.project.findUnique({
         where: { id: projectId },
+        include: {
+            developer: {
+                include: { company: true },
+            },
+        },
     });
 
     if (!project) {
@@ -837,17 +846,49 @@ export const getProjectAIReportService = async (
 
     const handoverYear = handover_year
     const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
 
     const listingPriceAtHandover = calculateHandoverPrice(
         min_price,
         handoverYear
     );
+    const listingPriceAtHandoverPlus5 = calculatePriceAfterHandover(
+        propertyData,
+        listingPriceAtHandover,
+        handoverYear,
+        5
+    );
+
+    const increaseInRentalPriceAfterHandOver = (year: number) => {
+        if (year === 0) {
+            return 0;
+        }
+
+        const rentalInXYears = getRentalPriceInYear(
+            propertyData,
+            unit_size,
+            yearDiff + year,
+            'monthly'
+        );
+
+        const rentalPriceToday = getRentalPriceInYear(
+            propertyData,
+            unit_size,
+            0,
+            'monthly'
+        );
+
+        return Math.round(
+            ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100
+        );
+    };
 
     const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
     const longTermRent = getRentalPriceInYear(
         propertyData,
         unit_size,
-        handoverYear - currentYear
+        yearDiff,
+        'monthly'
     );
     const shortTermRent = longTermRent * shortTermRentMultiplier;
 
@@ -874,7 +915,7 @@ export const getProjectAIReportService = async (
                     getListingAppreciationInYear(
                         propertyData,
                         min_price,
-                        handoverYear - currentYear + 1
+                        yearDiff + 1
                     )
                 ),
             },
@@ -884,7 +925,7 @@ export const getProjectAIReportService = async (
                     getListingAppreciationInYear(
                         propertyData,
                         min_price,
-                        handoverYear - currentYear + 3
+                        yearDiff + 3
                     )
                 ),
             },
@@ -892,62 +933,39 @@ export const getProjectAIReportService = async (
         rental_graph: [
             {
                 year: String(handoverYear),
-                rental: Math.round(
-                    getRentalPriceInYear(
-                        propertyData,
-                        unit_size,
-                        handoverYear - currentYear
-                    )
-                ),
+                rental: increaseInRentalPriceAfterHandOver(1),
             },
             {
                 year: String(handoverYear + 2),
-                rental: Math.round(
-                    getRentalPriceInYear(
-                        propertyData,
-                        unit_size,
-                        handoverYear - currentYear + 2
-                    )
-                ),
+                rental: increaseInRentalPriceAfterHandOver(3),
             },
             {
                 year: String(handoverYear + 4),
-                rental: Math.round(
-                    getRentalPriceInYear(
-                        propertyData,
-                        unit_size,
-                        handoverYear - currentYear + 4
-                    )
-                ),
+                rental: increaseInRentalPriceAfterHandOver(5),
             },
         ],
         growth_projection: {
-            appreciation: 87,
-            rental: 71,
+            appreciation: Math.round(
+                ((listingPriceAtHandoverPlus5 - listingPriceAtHandover) /
+                    listingPriceAtHandover) *
+                    100
+            ),
+            rental: increaseInRentalPriceAfterHandOver(5),
         },
         rent: {
-            short_term: 9996,
-            long_term: 14685,
+            short_term: Math.round(shortTermRent),
+            long_term: Math.round(longTermRent),
         },
         developer: {
-            name: 'Emaar Properties',
-            logo_url: 'https://avatars.githubusercontent.com/u/4608063',
-            floor_plan_image_urls: [
-                'https://urbantap-bucket-prod.s3.me-central-1.amazonaws.com/offplan-722-floorplan-1-0-1756224608953-10yi50p9dhwq.jpg',
-            ],
+            name: project.developer.company?.name,
+            logo_url: project.developer.company?.logo,
+            floor_plan_image_urls: floorPlan.image_urls,
         },
-        nearby: {
-            metro: '700m walk',
-            grocery: '550m walk',
-            school: '350m walk',
-            restaurant: '600m walk',
-        },
-        // nearby: await getNearbySummary({
-        //     lat: project.latitude!,
-        //     lng: project.longitude!,
-        // }),
-        // amenities: project.amenities,
-        amenities: ['Gym', 'Pool', 'Parking'],
+        nearby: await getNearbySummary({
+            lat: project.latitude!,
+            lng: project.longitude!,
+        }),
+        amenities: project.amenities,
         broker: {
             id: '0ec378d9-abd7-494d-a291-21ed14df826b',
             name: 'Irma Ankunding',
