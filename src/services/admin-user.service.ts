@@ -593,14 +593,21 @@ export const getBrokersService = async (companyId: string) => {
 };
 
 export const getListingsForBrokerageService = async (brokerageId: string) => {
+    // Get all listings for the brokerage that are not sponsored
     return await prisma.listing.findMany({
         where: {
             brokerage_id: brokerageId,
+            is_sponsored: false,
+        },
+        orderBy: {
+            created_at: 'desc',
         },
     });
 };
 
-export const getSponsoredListingsForBrokerageService = async (brokerageId: string) => {
+export const getSponsoredListingsForBrokerageService = async (
+    brokerageId: string
+) => {
     return await prisma.listing.findMany({
         where: {
             brokerage_id: brokerageId,
