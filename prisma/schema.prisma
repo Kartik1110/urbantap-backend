@@ -159,6 +159,7 @@ model Listing {
   payment_plan          Payment_Plan?
   sale_type             Sale_Type?
   broker_id             String
+  is_sponsored          Boolean?          @default(false)
   created_at            DateTime          @default(now())
   broker                Broker            @relation(fields: [broker_id], references: [id])
   inquiries             Inquiry[]
@@ -469,6 +470,8 @@ model Notification {
   connectionRequest    ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
   listing_id           String?
   listing              Listing?           @relation(fields: [listing_id], references: [id], name: "ListingNotifications")
+  job_id               String?
+  job                  Job?               @relation(fields: [job_id], references: [id], name: "JobNotifications")
 }
 
 enum NotificationType {
@@ -547,6 +550,7 @@ model Job {
   user           User?         @relation(fields: [userId], references: [id])
   admin_user     AdminUser?    @relation(fields: [admin_user_id], references: [id])
   applications   Application[]
+  notifications  Notification[] @relation("JobNotifications")
 }
 
 enum Currency {
