@@ -13,6 +13,7 @@ import {
     getListingAppreciation,
     getListingROIReport,
     getAIReport,
+    createListing,
 } from '../controllers/listings.controller';
 
 const router = Router();
@@ -35,6 +36,8 @@ router.get('/listings/:id/ai-report', getAIReport);
 /* Bulk insert listings */
 export default (upload: any) => {
     router.post('/listings/bulk', upload.array('images'), bulkInsertListings);
+
+    router.post('/listings', upload.array('images'), createListing);
 
     router.put('/listings/:id', upload.array('images'), editListingController);
 

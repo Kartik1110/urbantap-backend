@@ -28,6 +28,8 @@ import {
     getListingsForBrokerage,
     bulkInsertListingsAdmin,
     deleteJobController,
+    bulkUpdateListingsSponsorshipController,
+    getSponsoredListingsForBrokerage,
 } from '../controllers/admin-user.controller';
 import {
     createTeamMember,
@@ -215,6 +217,12 @@ router.get(
 
 router.get('/admin-user/listings', verifyToken, getListingsForBrokerage);
 
+router.get(
+    '/admin-user/listings/sponsored',
+    verifyToken,
+    getSponsoredListingsForBrokerage
+);
+
 // Permission routes
 router.get('/admin-user/permissions', verifyToken, getAvailablePermissions);
 router.get('/admin-user/user-permissions', verifyToken, getUserPermissions);
@@ -252,4 +260,11 @@ router.delete(
     verifyToken,
     requireResourceAccess('JOB', 'DELETE'),
     deleteJobController
+);
+
+/* Bulk update listings sponsorship */
+router.put(
+    '/admin-user/listings/sponsor',
+    verifyToken,
+    bulkUpdateListingsSponsorshipController
 );

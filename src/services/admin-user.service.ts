@@ -600,6 +600,18 @@ export const getListingsForBrokerageService = async (brokerageId: string) => {
     });
 };
 
+export const getSponsoredListingsForBrokerageService = async (brokerageId: string) => {
+    return await prisma.listing.findMany({
+        where: {
+            brokerage_id: brokerageId,
+            is_sponsored: true,
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+    });
+};
+
 export const createListingService = async (
     data: Listing,
     brokerageId: string
@@ -814,4 +826,25 @@ export const getCompanyPostByIdWithRBACService = async (
             },
         },
     });
+};
+
+export const bulkUpdateListingsSponsorshipService = async (
+    listingIds: string[]
+) => {
+    if (!listingIds || listingIds.length === 0) {
+        throw new Error('Listing IDs array cannot be empty');
+    }
+
+    const updatedListings = await prisma.listing.updateMany({
+        where: {
+            id: {
+                in: listingIds,
+            },
+        },
+        data: {
+            is_sponsored: true,
+        },
+    });
+
+    return updatedListings;
 };

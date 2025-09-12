@@ -505,13 +505,15 @@ export const getListingsService = async (
             orderByClause = { max_price: 'asc' };
         }
 
-        const listings = await prisma.listing.findMany({
+        // Get sponsored listings first (up to 2 per page)
+        const sponsoredListings = await prisma.listing.findMany({
             where: {
                 ...whereCondition,
                 ...searchConditions,
+                is_sponsored: true,
             },
-            skip,
-            take: page_size,
+            skip: (page - 1) * 2, // Skip 2 sponsored listings per previous page
+            take: 2, // Take up to 2 sponsored listings per page
             orderBy: orderByClause,
             include: {
                 broker: {
@@ -535,6 +537,43 @@ export const getListingsService = async (
                 },
             },
         });
+
+        // Get the remaining regular listings to fill the page
+        const remainingSlots = page_size - sponsoredListings.length;
+        const regularListings = await prisma.listing.findMany({
+            where: {
+                ...whereCondition,
+                ...searchConditions,
+                is_sponsored: { not: true }, // Exclude sponsored listings
+            },
+            skip,
+            take: remainingSlots,
+            orderBy: orderByClause,
+            include: {
+                broker: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profile_pic: true,
+                        country_code: true,
+                        w_number: true,
+                        company: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+                listing_views: {
+                    select: {
+                        count: true,
+                    },
+                },
+            },
+        });
+
+        // Combine sponsored listings at the top with regular listings
+        const listings = [...sponsoredListings, ...regularListings];
 
         if (listings.length === 0) {
             return {
@@ -911,6 +950,44 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
         const result = await prisma.listing.createMany({
             data: enrichedListings,
             skipDuplicates: true,
+        });
+
+        return result;
+    } catch (error) {
+        logger.error(error);
+        throw error;
+    }
+};
+
+export const createListingService = async (listing: Listing) => {
+    try {
+        let enrichedListing = {
+            ...listing,
+            admin_status: Admin_Status.Pending,
+        };
+
+        // Add locality information if address is provided
+        if (listing.address) {
+            const rawAddress = `${listing.address}, Dubai`;
+            const geocodeResult = await geocodeAddress(rawAddress);
+
+            if (geocodeResult) {
+                enrichedListing = {
+                    ...enrichedListing,
+                    address: geocodeResult.formatted_address,
+                    locality: geocodeResult.locality,
+                };
+                console.log(
+                    `✅ Geocoded listing with address: ${listing.address}`
+                );
+            } else {
+                console.log(`⚠️ Unable to geocode address: ${listing.address}`);
+            }
+        }
+
+        // Use createMany for bulk insertion
+        const result = await prisma.listing.create({
+            data: enrichedListing,
         });
 
         return result;
