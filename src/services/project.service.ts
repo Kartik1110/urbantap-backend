@@ -717,6 +717,7 @@ export const generateProjectROIReportService = async (
 
     const avgAreaAppreciationPerYear =
         areaAppreciationGraphAll
+            .slice(0, 5)
             .map((item, i) =>
                 i === 0
                     ? item.appreciation_perc
@@ -903,6 +904,18 @@ export const getProjectAIReportService = async (
         shortTermRoiMultiplier
     );
 
+    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
+        propertyData,
+        min_price,
+        unit_size,
+        handoverYear,
+        6,
+        shortTermRoiMultiplier
+    );
+
+    const absoluteRoiAfter5years = roiGraphPoints[5].roi;
+    const roiAfter5years = (absoluteRoiAfter5years / min_price) * 100;
+
     return {
         listing: {
             title: project.title,
@@ -911,7 +924,7 @@ export const getProjectAIReportService = async (
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
             yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
-            roi_percentage: 9,
+            roi_percentage: Math.round(roiAfter5years * 100) / 100,
         },
         growth_graph: [
             {
