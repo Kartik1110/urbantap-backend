@@ -59,6 +59,7 @@ import {
     calculateAverageROI,
     calculateAverageRentPerYear,
     calculateAppreciationDataPoints,
+    calculateShortTermRental,
 } from '../utils/roiReport';
 
 declare const fetch: typeof globalThis.fetch;
@@ -1206,7 +1207,7 @@ export const getListingROIReportService = async (
     avg_area_appreciation_per_year: number;
     area_appreciation_graph: { year: string; roi: number }[];
     rental_yield: {
-        year: 3;
+        year: number;
         percentage: number;
     };
 }> => {
@@ -1250,7 +1251,7 @@ export const getListingROIReportService = async (
         }
     }
 
-    const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
+    const shortTermRoiMultiplier = 1.6; // Assuming 60% increase in rental roi
     const { max_price, sq_ft } = listing;
 
     if (max_price < 100_000) {
@@ -1273,15 +1274,16 @@ export const getListingROIReportService = async (
         ((futureValue - max_price) / max_price) * 100;
 
     const longTermRent = getRentalPriceInYear(propertyData, sq_ft, 0);
-    const shortTermRent = longTermRent * shortTermRentMultiplier;
+    const { rent: shortTermRent, roi: shortTermAppreciation } =
+        calculateShortTermRental(max_price, longTermRent);
+
     const longTermAppreciation = (longTermRent / max_price) * 100;
-    const shortTermAppreciation = (shortTermRent / max_price) * 100;
 
     const shortTermBreakEvenYear = calculateListingRentalBreakEvenPeriod(
         propertyData,
         max_price,
         sq_ft,
-        shortTermRentMultiplier
+        shortTermRoiMultiplier
     );
 
     const longTermBreakEvenYear = calculateListingRentalBreakEvenPeriod(
@@ -1295,21 +1297,22 @@ export const getListingROIReportService = async (
         5,
         max_price,
         sq_ft,
-        1.04
+        shortTermRoiMultiplier
     );
 
     const avgRentPerYear = calculateAverageRentPerYear(
         propertyData,
+        max_price,
         5,
         sq_ft,
-        1.04
+        shortTermRoiMultiplier
     );
 
     const roiGraphPoints = calculateRoiDataPointsByType(
         propertyData,
         max_price,
         sq_ft,
-        shortTermRentMultiplier
+        shortTermRoiMultiplier
     );
 
     const roiGraph = [
@@ -1339,7 +1342,11 @@ export const getListingROIReportService = async (
                     getListingAppreciationInYear(propertyData, max_price, 3)
             ),
             short_term_rental: Math.round(
-                longTermRent2 * shortTermRentMultiplier
+                calculateShortTermRental(
+                    max_price,
+                    longTermRent2,
+                    shortTermRoiMultiplier
+                ).rent
             ),
             long_term_rental: Math.round(longTermRent2),
         },
@@ -1350,7 +1357,11 @@ export const getListingROIReportService = async (
                     getListingAppreciationInYear(propertyData, max_price, 5)
             ),
             short_term_rental: Math.round(
-                longTermRent3 * shortTermRentMultiplier
+                calculateShortTermRental(
+                    max_price,
+                    longTermRent3,
+                    shortTermRoiMultiplier
+                ).rent
             ),
             long_term_rental: Math.round(longTermRent3),
         },
@@ -1359,11 +1370,7 @@ export const getListingROIReportService = async (
     const areaAppreciationGraphAll =
         calculateAppreciationDataPoints(propertyData);
 
-    const areaAppreciationGraph = [
-        areaAppreciationGraphAll[0],
-        areaAppreciationGraphAll[3],
-        areaAppreciationGraphAll[5],
-    ].map((item) => ({
+    const areaAppreciationGraph = areaAppreciationGraphAll.map((item) => ({
         year: item.year,
         roi: Math.round(item.appreciation_perc),
     }));
@@ -1388,6 +1395,7 @@ export const getListingROIReportService = async (
 
     const avgAreaAppreciationPerYear =
         areaAppreciationGraphAll
+            .slice(0, 5)
             .map((item, i) =>
                 i === 0
                     ? item.appreciation_perc
@@ -1424,8 +1432,8 @@ export const getListingROIReportService = async (
             Math.round(avgAreaAppreciationPerYear * 100) / 100,
         area_appreciation_graph: areaAppreciationGraph,
         rental_yield: {
-            year: 3,
-            percentage: Math.round(increaseInRentalYield(3) * 100) / 100,
+            year: 5,
+            percentage: Math.round(increaseInRentalYield(5) * 100) / 100,
         },
     };
 };

@@ -168,7 +168,7 @@ export function calculateCumulativeROI(
  * @param years - The number of years to average over (>=1)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
- * @param rentMultiplier - The multiplier to apply to the rent (default: 1)
+ * @param roiMultiplier - The multiplier to apply to the roi (default: 1)
  * @returns The average ROI percentage per year based on rental yield
  */
 export function calculateAverageROI(
@@ -176,7 +176,7 @@ export function calculateAverageROI(
     years: number,
     initialInvestment: number,
     propertySize: number,
-    rentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): number {
     if (years < 1 || years > 10) {
         const message = 'Years must be between 1 and 10';
@@ -212,13 +212,16 @@ export function calculateAverageROI(
             throw new Error(message);
         }
 
-        // Calculate short-term rental income (with rent multiplier)
-        const shortTermRentPerSqFt = yearData.rent_per_sq_ft * rentMultiplier;
-        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
-
         // Calculate long-term rental income (standard rate)
         const longTermAnnualIncome =
             yearData.rent_per_sq_ft * propertySize * 12;
+
+        // Calculate short-term rental income (with rent multiplier)
+        const shortTermAnnualIncome = calculateShortTermRental(
+            initialInvestment,
+            longTermAnnualIncome,
+            roiMultiplier
+        ).rent;
 
         // Average of short-term and long-term rental income
         const averageAnnualIncome =
@@ -237,16 +240,18 @@ export function calculateAverageROI(
  * Uses the average of short-term and long-term rental strategies.
  *
  * @param propertyData - The property data from the JSON file
+ * @param initialInvestment - The initial investment amount in the base currency
  * @param years - The number of years to average over (>=1)
  * @param propertySize - The property size in square feet
- * @param rentMultiplier - The multiplier to apply to the rent for short-term strategy (default: 1)
+ * @param roiMultiplier - The multiplier to apply to the roi (default: 1)
  * @returns The average annual rent per year
  */
 export function calculateAverageRentPerYear(
     propertyData: PropertyDataPoint[],
+    initialInvestment: number,
     years: number,
     propertySize: number,
-    rentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): number {
     if (years < 1 || years > 10) {
         const message = 'Years must be between 1 and 10';
@@ -271,13 +276,16 @@ export function calculateAverageRentPerYear(
     for (let year = 0; year < years; year++) {
         const yearData = propertyData[year];
 
-        // Calculate short-term rental income (with rent multiplier)
-        const shortTermRentPerSqFt = yearData.rent_per_sq_ft * rentMultiplier;
-        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
-
         // Calculate long-term rental income (standard rate)
         const longTermAnnualIncome =
             yearData.rent_per_sq_ft * propertySize * 12;
+
+        // Calculate short-term rental income (with roi multiplier)
+        const shortTermAnnualIncome = calculateShortTermRental(
+            initialInvestment,
+            longTermAnnualIncome,
+            roiMultiplier
+        ).rent;
 
         // Average of short-term and long-term rental income
         const averageAnnualIncome =
@@ -1349,7 +1357,7 @@ export function calculateCumulativeProfitPerYearByType(
 
 /**
  * Builds datapoints to plot cumulative ROI (amount) for years based on investment type.
- * Each point is { year: 1|3|5, roi: cumulative rental income accrued till that year }.
+ * Each point is { year: "2025"|"2026"|"2027", roi: cumulative rental income accrued till that year }.
  * ROI is calculated as the total rental income accumulated from year 0 to the specified year.
  * For rental properties, this includes rent per sq ft * property size * 12 months * years.
  * For self-use properties, ROI will be 0 as no rental income is generated.
@@ -1357,13 +1365,14 @@ export function calculateCumulativeProfitPerYearByType(
  * @param propertyData - The property data from the JSON file
  * @param initialInvestment - The initial investment amount for ROI calculation base
  * @param propertySize - Property size in square feet
+ * @param roiMultiplier - The roi multiplier (Default: 1)
  * @returns Array of { year, roi } for years with cumulative rental income as ROI
  */
 export function calculateRoiDataPointsByType(
     propertyData: PropertyDataPoint[],
     initialInvestment: number,
     propertySize: number,
-    shortTermRentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): { year: string; roi: number }[] {
     if (!propertyData || !propertyData.length) {
         const message = 'Property data not provided';
@@ -1394,15 +1403,18 @@ export function calculateRoiDataPointsByType(
 
         // Calculate annual rental income for this year
         const annualRentalIncome = yearData.rent_per_sq_ft * propertySize * 12;
+        const shortTermRentalIncome = calculateShortTermRental(
+            initialInvestment,
+            annualRentalIncome,
+            roiMultiplier
+        ).rent;
 
         // Calculate cumulative rental income till this year
         const cumulativeRentTillPrevYear =
             i === 0 ? 0 : yearlyRentalIncome[i - 1];
 
         const avgRentalIncomeThisYear =
-            (annualRentalIncome +
-                annualRentalIncome * shortTermRentMultiplier) /
-            2;
+            (annualRentalIncome + shortTermRentalIncome) / 2;
 
         // Summing up the average of short term and long term rental income
         yearlyRentalIncome.push(
@@ -1564,14 +1576,14 @@ export function getListingAppreciationInYear(
  * @param propertyData - The property data from the JSON file
  * @param listingPrice - The initial investment amount (listing price of the property)
  * @param propertySize - The property size in square feet
- * @param rentMultiplier - Multiplier to apply to the rent (default: 1.0, use 1.04 for 4% increase)
+ * @param roiMultiplier - Multiplier to apply to the roi (default: 1.0, use 1.6 for 60% increase)
  * @returns The break-even period in years (1-10), or 11 if not breaking even within available data
  */
 export function calculateListingRentalBreakEvenPeriod(
     propertyData: PropertyDataPoint[],
     listingPrice: number,
     propertySize: number,
-    rentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): number {
     if (listingPrice <= 0) {
         const message = 'Listing price must be positive';
@@ -1602,8 +1614,18 @@ export function calculateListingRentalBreakEvenPeriod(
         }
 
         // Calculate annual rental income for this year
-        const rentPerSqFt = yearData.rent_per_sq_ft * rentMultiplier;
-        const annualRentalIncome = rentPerSqFt * propertySize * 12;
+        const rentPerSqFt = yearData.rent_per_sq_ft;
+
+        let annualRentalIncome = rentPerSqFt * propertySize * 12;
+
+        if (roiMultiplier !== 1) {
+            annualRentalIncome = calculateShortTermRental(
+                listingPrice,
+                annualRentalIncome,
+                roiMultiplier
+            ).rent;
+        }
+
         cumulativeRentalIncome += annualRentalIncome;
 
         // Check if cumulative rental income has reached the initial investment
@@ -1951,4 +1973,24 @@ export function calculateRoiDataPointsByTypeAfterHandover(
     }));
 
     return datapoints;
+}
+
+/**
+ * Calculate short term rental
+ * @param initialInvestment - The initial investment amount
+ * @param longTermRent - The annual long term rent
+ * @param shortTermRoiMultiplier - The short term roi multiplier (Default: 1.6)
+ * @returns The short term rent and roi
+ */
+export function calculateShortTermRental(
+    initialInvestment: number,
+    annualLongTermRent: number,
+    shortTermRoiMultiplier: number = 1.6
+): { roi: number; rent: number } {
+    const longTermRoi = (annualLongTermRent / initialInvestment) * 100;
+    const shortTermRoi = longTermRoi * shortTermRoiMultiplier;
+
+    const shortTermRent = (shortTermRoi / 100) * initialInvestment;
+
+    return { roi: shortTermRoi, rent: shortTermRent };
 }
