@@ -891,14 +891,17 @@ export const getProjectAIReportService = async (
         );
     };
 
-    const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
+    const shortTermRoiMultiplier = 1.6;
     const longTermRent = getRentalPriceInYear(
         propertyData,
         unit_size,
-        yearDiff,
-        'monthly'
+        yearDiff
     );
-    const shortTermRent = longTermRent * shortTermRentMultiplier;
+    const { rent: shortTermRent } = calculateShortTermRental(
+        min_price,
+        longTermRent,
+        shortTermRoiMultiplier
+    );
 
     return {
         listing: {
@@ -913,27 +916,20 @@ export const getProjectAIReportService = async (
         growth_graph: [
             {
                 year: String(currentYear),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(propertyData, min_price, 1)
-                ),
+                appreciation: Math.round(min_price),
             },
             {
                 year: String(handoverYear),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(
-                        propertyData,
-                        min_price,
-                        yearDiff + 1
-                    )
-                ),
+                appreciation: Math.round(listingPriceAtHandover),
             },
             {
                 year: String(handoverYear + 2),
                 appreciation: Math.round(
-                    getListingAppreciationInYear(
+                    calculatePriceAfterHandover(
                         propertyData,
-                        min_price,
-                        yearDiff + 3
+                        listingPriceAtHandover,
+                        handoverYear,
+                        2
                     )
                 ),
             },
