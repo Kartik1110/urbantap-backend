@@ -785,15 +785,15 @@ export function calculatePriceAfterHandover(
  * @param listingPrice - The initial investment amount (listing price of the property)
  * @param propertySize - The property size in square feet
  * @param handoverYear - The year of handover
- * @param rentMultiplier - Multiplier to apply to the rent (default: 1.0, use 1.04 for 4% increase)
- * @returns The break-even period in years (1-10), or 11 if not breaking even within available data
+ * @param roiMultiplier - Multiplier to apply to the roi (default: 1.0, use 1.6 for 60% increase)
+ * @returns The break-even period in years
  */
 export function calculateBreakEvenAfterHandover(
     propertyData: PropertyDataPoint[],
     listingPrice: number,
     propertySize: number,
     handoverYear: number,
-    rentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): number {
     if (listingPrice <= 0) {
         const message = 'Listing price must be positive';
@@ -823,18 +823,26 @@ export function calculateBreakEvenAfterHandover(
         let rentPerSqFt = 0;
 
         if (yearDiff + year >= 10) {
-            const baseRent = propertyData[9].rent_per_sq_ft * rentMultiplier;
+            const baseRent = propertyData[9].rent_per_sq_ft;
             const extraYears = yearDiff + year - 10;
 
             // 5% increase compounded for every extra year
             rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
         } else {
-            rentPerSqFt =
-                propertyData[yearDiff + year].rent_per_sq_ft * rentMultiplier;
+            rentPerSqFt = propertyData[yearDiff + year].rent_per_sq_ft;
         }
 
         // Calculate annual rental income for this year
-        const annualRentalIncome = rentPerSqFt * propertySize * 12;
+        let annualRentalIncome = rentPerSqFt * propertySize * 12;
+
+        if (roiMultiplier !== 1) {
+            annualRentalIncome = calculateShortTermRental(
+                listingPrice,
+                annualRentalIncome,
+                roiMultiplier
+            ).rent;
+        }
+
         cumulativeRentalIncome += annualRentalIncome;
 
         year++;
@@ -851,7 +859,7 @@ export function calculateBreakEvenAfterHandover(
  * @param years - The number of years to average over (>=1)
  * @param initialInvestment - The initial investment amount in the base currency
  * @param propertySize - The property size in square feet
- * @param rentMultiplier - The multiplier to apply to the rent (default: 1)
+ * @param roiMultiplier - The multiplier to apply to the rent (default: 1)
  * @returns The average ROI percentage per year based on rental yield
  */
 export function calculateAverageROIAfterHandover(
@@ -860,7 +868,7 @@ export function calculateAverageROIAfterHandover(
     years: number,
     initialInvestment: number,
     propertySize: number,
-    rentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): number {
     if (!propertyData || propertyData.length === 0) {
         const message = 'Property data not provided';
@@ -889,22 +897,24 @@ export function calculateAverageROIAfterHandover(
         let rentPerSqFt = 0;
 
         if (yearDiff + year >= 10) {
-            const baseRent = propertyData[9].rent_per_sq_ft * rentMultiplier;
+            const baseRent = propertyData[9].rent_per_sq_ft;
             const extraYears = yearDiff + year - 10;
 
             // 5% increase compounded for every extra year
             rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
         } else {
-            rentPerSqFt =
-                propertyData[yearDiff + year].rent_per_sq_ft * rentMultiplier;
+            rentPerSqFt = propertyData[yearDiff + year].rent_per_sq_ft;
         }
-
-        // Calculate short-term rental income (with rent multiplier)
-        const shortTermRentPerSqFt = rentPerSqFt * rentMultiplier;
-        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
 
         // Calculate long-term rental income (standard rate)
         const longTermAnnualIncome = rentPerSqFt * propertySize * 12;
+
+        // Calculate short-term rental income (with roi multiplier)
+        const shortTermAnnualIncome = calculateShortTermRental(
+            initialInvestment,
+            longTermAnnualIncome,
+            roiMultiplier
+        ).rent;
 
         // Average of short-term and long-term rental income
         const averageAnnualIncome =
@@ -920,10 +930,11 @@ export function calculateAverageROIAfterHandover(
 
 export function calculateAverageRentPerYearAfterHandover(
     propertyData: PropertyDataPoint[],
+    initialInvestment: number,
     handoverYear: number,
     years: number,
     propertySize: number,
-    rentMultiplier: number = 1
+    roiMultiplier: number = 1
 ) {
     if (!propertyData || propertyData.length === 0) {
         const message = 'Property data not provided';
@@ -946,22 +957,24 @@ export function calculateAverageRentPerYearAfterHandover(
         let rentPerSqFt = 0;
 
         if (yearDiff + year >= 10) {
-            const baseRent = propertyData[9].rent_per_sq_ft * rentMultiplier;
+            const baseRent = propertyData[9].rent_per_sq_ft;
             const extraYears = yearDiff + year - 10;
 
             // 5% increase compounded for every extra year
             rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
         } else {
-            rentPerSqFt =
-                propertyData[yearDiff + year].rent_per_sq_ft * rentMultiplier;
+            rentPerSqFt = propertyData[yearDiff + year].rent_per_sq_ft;
         }
-
-        // Calculate short-term rental income (with rent multiplier)
-        const shortTermRentPerSqFt = rentPerSqFt * rentMultiplier;
-        const shortTermAnnualIncome = shortTermRentPerSqFt * propertySize * 12;
 
         // Calculate long-term rental income (standard rate)
         const longTermAnnualIncome = rentPerSqFt * propertySize * 12;
+
+        // Calculate short-term rental income (with roi multiplier)
+        const shortTermAnnualIncome = calculateShortTermRental(
+            initialInvestment,
+            longTermAnnualIncome,
+            roiMultiplier
+        ).rent;
 
         // Average of short-term and long-term rental income
         const averageAnnualIncome =
@@ -991,7 +1004,7 @@ export function calculateRoiDataPointsByTypeAfterHandover(
     propertySize: number,
     handoverYear: number,
     years: number,
-    shortTermRentMultiplier: number = 1
+    roiMultiplier: number = 1
 ): { year: string; roi: number }[] {
     if (!propertyData || !propertyData.length) {
         const message = 'Property data not provided';
@@ -1029,16 +1042,21 @@ export function calculateRoiDataPointsByTypeAfterHandover(
         }
 
         // Calculate annual rental income for this year
-        const annualRentalIncome = rentPerSqFt * propertySize * 12;
+        const longTermRentalIncome = rentPerSqFt * propertySize * 12;
+
+        // Calculate short-term rental income (with roi multiplier)
+        const shortTermAnnualIncome = calculateShortTermRental(
+            initialInvestment,
+            longTermRentalIncome,
+            roiMultiplier
+        ).rent;
 
         // Calculate cumulative rental income till this year
         const cumulativeRentTillPrevYear =
             year === yearDiff ? 0 : yearlyRentalIncome[year - yearDiff - 1];
 
         const avgRentalIncomeThisYear =
-            (annualRentalIncome +
-                annualRentalIncome * shortTermRentMultiplier) /
-            2;
+            (longTermRentalIncome + shortTermAnnualIncome) / 2;
 
         // Summing up the average of short term and long term rental income
         yearlyRentalIncome.push(
