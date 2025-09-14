@@ -51,14 +51,14 @@ const APPROVED_AMENITIES = [
     'Air_Conditioning',
     'Furnished',
     'Heating',
-    'Jaccuzi'
+    'Jaccuzi',
 ];
 
 // Function to filter amenities to only include approved ones and format specific ones
 const filterApprovedAmenities = (amenities: string[]): string[] => {
     return amenities
-        .filter(amenity => APPROVED_AMENITIES.includes(amenity))
-        .map(amenity => {
+        .filter((amenity) => APPROVED_AMENITIES.includes(amenity))
+        .map((amenity) => {
             // Format specific amenities to replace underscores with spaces
             switch (amenity) {
                 case 'Swimming_Pool':
@@ -256,44 +256,46 @@ export const getProjectByIdService = async (id: string) => {
                 unitTypeGroups[bedroomType].push(floorPlan);
             }
         });
-        
+
         // Map bedroom types to display names for unit_types name field
         const nameMapping: { [key: string]: string } = {
-            'Studio': 'Studio',
-            'One': '1BHK',
-            'Two': '2BHK', 
-            'Three': '3BHK',
-            'Four': '4BHK',
-            'Five': '5BHK',
-            'Six': '6BHK',
-            'Seven': '7BHK',
-            'Four_Plus': '4+BHK'
+            Studio: 'Studio',
+            One: '1BHK',
+            Two: '2BHK',
+            Three: '3BHK',
+            Four: '4BHK',
+            Five: '5BHK',
+            Six: '6BHK',
+            Seven: '7BHK',
+            Four_Plus: '4+BHK',
         };
 
         // Map bedroom types to numeric values for floor-plans bedrooms field
         const bedroomMapping: { [key: string]: string } = {
-            'Studio': 'Studio',
-            'One': '1',
-            'Two': '2', 
-            'Three': '3',
-            'Four': '4',
-            'Five': '5',
-            'Six': '6',
-            'Seven': '7',
-            'Four_Plus': '4+'
+            Studio: 'Studio',
+            One: '1',
+            Two: '2',
+            Three: '3',
+            Four: '4',
+            Five: '5',
+            Six: '6',
+            Seven: '7',
+            Four_Plus: '4+',
         };
-        
+
         // Convert to array of objects with name, properties_count, and floor-plans
         const unitTypes = Object.entries(unitTypeGroups)
             .map(([bedroomType, floorPlansForType]) => ({
                 name: nameMapping[bedroomType] || bedroomType,
                 properties_count: floorPlansForType.length,
-                "floor_plans": floorPlansForType.map(floorPlan => ({
+                floor_plans: floorPlansForType.map((floorPlan) => ({
                     id: floorPlan.id,
                     min_price: floorPlan.min_price,
-                    bedrooms: bedroomMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
-                    unit_size: floorPlan.unit_size
-                }))
+                    bedrooms:
+                        bedroomMapping[floorPlan.bedrooms] ||
+                        floorPlan.bedrooms,
+                    unit_size: floorPlan.unit_size,
+                })),
             }))
             .sort((a, b) => {
                 // Custom sorting: Studio first, then by number, then others
@@ -612,7 +614,7 @@ export const generateProjectROIReportService = async (
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
-    const handoverYear = handover_year
+    const handoverYear = handover_year;
     const currentYear = new Date().getFullYear();
     const yearDiff = handoverYear - currentYear;
 
@@ -844,7 +846,7 @@ export const getProjectAIReportService = async (
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
-    const handoverYear = handover_year
+    const handoverYear = handover_year;
     const currentYear = new Date().getFullYear();
     const yearDiff = handoverYear - currentYear;
 
