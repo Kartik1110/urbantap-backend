@@ -46,10 +46,8 @@ let propertiesData: MergedPropertyData;
 })();
 
 import {
-    calculateBreakEvenPeriodByType,
     calculateCapitalGains,
     calculateRoiDataPointsByType,
-    calculateCumulativeROIByType,
     getPropertyData,
     PropertyDataPoint,
     getListingAppreciationInYear,
@@ -59,6 +57,7 @@ import {
     calculateAverageROI,
     calculateAverageRentPerYear,
     calculateAppreciationDataPoints,
+    calculateShortTermRental,
 } from '../utils/roiReport';
 
 declare const fetch: typeof globalThis.fetch;
@@ -1206,7 +1205,7 @@ export const getListingROIReportService = async (
     avg_area_appreciation_per_year: number;
     area_appreciation_graph: { year: string; roi: number }[];
     rental_yield: {
-        year: 3;
+        year: number;
         percentage: number;
     };
 }> => {
@@ -1250,7 +1249,7 @@ export const getListingROIReportService = async (
         }
     }
 
-    const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
+    const shortTermRoiMultiplier = 1.6; // Assuming 60% increase in rental roi
     const { max_price, sq_ft } = listing;
 
     if (max_price < 100_000) {
@@ -1273,15 +1272,16 @@ export const getListingROIReportService = async (
         ((futureValue - max_price) / max_price) * 100;
 
     const longTermRent = getRentalPriceInYear(propertyData, sq_ft, 0);
-    const shortTermRent = longTermRent * shortTermRentMultiplier;
+    const { rent: shortTermRent, roi: shortTermAppreciation } =
+        calculateShortTermRental(max_price, longTermRent);
+
     const longTermAppreciation = (longTermRent / max_price) * 100;
-    const shortTermAppreciation = (shortTermRent / max_price) * 100;
 
     const shortTermBreakEvenYear = calculateListingRentalBreakEvenPeriod(
         propertyData,
         max_price,
         sq_ft,
-        shortTermRentMultiplier
+        shortTermRoiMultiplier
     );
 
     const longTermBreakEvenYear = calculateListingRentalBreakEvenPeriod(
@@ -1295,21 +1295,22 @@ export const getListingROIReportService = async (
         5,
         max_price,
         sq_ft,
-        1.04
+        shortTermRoiMultiplier
     );
 
     const avgRentPerYear = calculateAverageRentPerYear(
         propertyData,
+        max_price,
         5,
         sq_ft,
-        1.04
+        shortTermRoiMultiplier
     );
 
     const roiGraphPoints = calculateRoiDataPointsByType(
         propertyData,
         max_price,
         sq_ft,
-        shortTermRentMultiplier
+        shortTermRoiMultiplier
     );
 
     const roiGraph = [
@@ -1339,7 +1340,11 @@ export const getListingROIReportService = async (
                     getListingAppreciationInYear(propertyData, max_price, 3)
             ),
             short_term_rental: Math.round(
-                longTermRent2 * shortTermRentMultiplier
+                calculateShortTermRental(
+                    max_price,
+                    longTermRent2,
+                    shortTermRoiMultiplier
+                ).rent
             ),
             long_term_rental: Math.round(longTermRent2),
         },
@@ -1350,7 +1355,11 @@ export const getListingROIReportService = async (
                     getListingAppreciationInYear(propertyData, max_price, 5)
             ),
             short_term_rental: Math.round(
-                longTermRent3 * shortTermRentMultiplier
+                calculateShortTermRental(
+                    max_price,
+                    longTermRent3,
+                    shortTermRoiMultiplier
+                ).rent
             ),
             long_term_rental: Math.round(longTermRent3),
         },
@@ -1359,11 +1368,7 @@ export const getListingROIReportService = async (
     const areaAppreciationGraphAll =
         calculateAppreciationDataPoints(propertyData);
 
-    const areaAppreciationGraph = [
-        areaAppreciationGraphAll[0],
-        areaAppreciationGraphAll[3],
-        areaAppreciationGraphAll[5],
-    ].map((item) => ({
+    const areaAppreciationGraph = areaAppreciationGraphAll.map((item) => ({
         year: item.year,
         roi: Math.round(item.appreciation_perc),
     }));
@@ -1388,6 +1393,7 @@ export const getListingROIReportService = async (
 
     const avgAreaAppreciationPerYear =
         areaAppreciationGraphAll
+            .slice(0, 5)
             .map((item, i) =>
                 i === 0
                     ? item.appreciation_perc
@@ -1424,8 +1430,8 @@ export const getListingROIReportService = async (
             Math.round(avgAreaAppreciationPerYear * 100) / 100,
         area_appreciation_graph: areaAppreciationGraph,
         rental_yield: {
-            year: 3,
-            percentage: Math.round(increaseInRentalYield(3) * 100) / 100,
+            year: 5,
+            percentage: Math.round(increaseInRentalYield(5) * 100) / 100,
         },
     };
 };
@@ -1502,21 +1508,29 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
         listing.type
     );
 
-    const roiIn5Years = calculateCumulativeROIByType(
+    const shortTermRoiMultiplier = 1.6;
+
+    const roiGraphPoints = calculateRoiDataPointsByType(
         propertyData,
-        5,
         listing.max_price,
         listing.sq_ft,
-        false, // is_self_use - assuming rental property
-        true // is_self_paid - assuming mortgage
+        shortTermRoiMultiplier
     );
 
-    const breakEvenYear = calculateBreakEvenPeriodByType(
+    const absoluteRoiIn5Years = roiGraphPoints[4].roi;
+
+    const roiPercIn5Years = (absoluteRoiIn5Years / listing.max_price) * 100;
+
+    const breakEvenYear = calculateListingRentalBreakEvenPeriod(
         propertyData,
         listing.max_price,
-        listing.sq_ft,
-        false, // is_self_use - assuming rental property
-        true // is_self_paid - assuming self-paid (no mortgage)
+        listing.sq_ft
+    );
+
+    const longTermRent = getRentalPriceInYear(propertyData, listing.sq_ft, 0);
+    const { rent: shortTermRent } = calculateShortTermRental(
+        listing.max_price,
+        longTermRent
     );
 
     const increaseInRentalPrice = (year: number) => {
@@ -1543,6 +1557,14 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
         );
     };
 
+    const priceIn3Years =
+        listing.max_price +
+        getListingAppreciationInYear(propertyData, listing.max_price, 3);
+
+    const priceIn5Years =
+        listing.max_price +
+        getListingAppreciationInYear(propertyData, listing.max_price, 5);
+
     const currentYear = new Date().getFullYear();
 
     return {
@@ -1555,42 +1577,22 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
             num_of_bathrooms: listing.no_of_bathrooms,
             sq_ft: Math.round(listing.sq_ft),
             purchase_price: Math.round(listing.max_price),
-            appreciation: Math.round(
-                getListingAppreciationInYear(propertyData, listing.max_price, 5)
-            ),
-            roi_percentage: Math.round(roiIn5Years),
+            appreciation: Math.round(priceIn5Years),
+            roi_percentage: Math.round(roiPercIn5Years * 100) / 100,
             break_even_year: breakEvenYear,
         },
         growth_graph: [
             {
                 year: String(currentYear),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(
-                        propertyData,
-                        listing.max_price,
-                        1
-                    )
-                ),
+                appreciation: Math.round(listing.max_price),
             },
             {
                 year: String(currentYear + 3),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(
-                        propertyData,
-                        listing.max_price,
-                        4
-                    )
-                ),
+                appreciation: Math.round(priceIn3Years),
             },
             {
                 year: String(currentYear + 5),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(
-                        propertyData,
-                        listing.max_price,
-                        6
-                    )
-                ),
+                appreciation: Math.round(priceIn5Years),
             },
         ],
         rental_graph: [
@@ -1612,12 +1614,8 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
             rental: increaseInRentalPrice(7),
         },
         rent: {
-            current: Math.round(
-                getRentalPriceInYear(propertyData, listing.sq_ft!, 0, 'monthly')
-            ),
-            projected: Math.round(
-                getRentalPriceInYear(propertyData, listing.sq_ft!, 5, 'monthly')
-            ),
+            current: Math.round(shortTermRent),
+            projected: Math.round(longTermRent),
         },
         nearby: await getNearbySummary({
             lat: listing.latitude!,
