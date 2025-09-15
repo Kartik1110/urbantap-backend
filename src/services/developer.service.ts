@@ -123,6 +123,7 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         where: { id: developerId },
         include: {
             projects: {
+                take: 5,
                 select: {
                     id: true,
                     category: true,

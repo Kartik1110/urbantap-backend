@@ -264,13 +264,6 @@ export const getJobByIdService = async (id: string, userId?: string) => {
                     },
                 },
             },
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
-            },
             admin_user: {
                 select: {
                     broker: true,
@@ -295,20 +288,11 @@ export const getJobByIdService = async (id: string, userId?: string) => {
         applied = !!application;
     }
 
-    const cleanedBrokerage = job.company
-        ? {
-              id: job.company?.brokerage?.id,
-              name: job.company.name,
-              logo: job.company.logo,
-              description: job.company.description,
-              listings_count: job.company?.brokerage?._count?.listings ?? 0,
-          }
-        : null;
+    const { company, admin_user, ...jobWithoutCompany } = job;
 
-    const { admin_user, ...jobWithoutAdminUser } = job;
     const returnedJob = {
-        ...jobWithoutAdminUser,
-        brokerage: cleanedBrokerage,
+        ...jobWithoutCompany,
+        brokerage: transformBrokerageData(company),
         applied,
         broker: admin_user?.broker
             ? {
@@ -321,7 +305,7 @@ export const getJobByIdService = async (id: string, userId?: string) => {
                   linkedin_link: admin_user?.broker?.linkedin_link,
                   ig_link: admin_user?.broker?.ig_link,
                   company: {
-                      name: job.company?.name || '',
+                      name: company?.name || '',
                   },
               }
             : null,

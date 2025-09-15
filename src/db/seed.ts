@@ -162,7 +162,6 @@ async function main() {
                     property_size: faker.number.float({ min: 500, max: 5000 }),
                     payment_plan: Payment_Plan.Payment_Pending,
                     unit_types: ['1BHK', '2BHK'],
-                    amenities: ['Pool', 'Gym', 'Parking'] as any,
                     developer_id: developer.id,
                     currency: Currency.AED,
                 },
