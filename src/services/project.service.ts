@@ -8,6 +8,7 @@ import {
     calculateHandoverPrice,
     calculatePriceAfterHandover,
     calculateRoiDataPointsByTypeAfterHandover,
+    calculateShortTermRental,
     getListingAppreciationInYear,
     getPropertyData,
     getRentalPriceInYear,
@@ -51,14 +52,14 @@ const APPROVED_AMENITIES = [
     'Air_Conditioning',
     'Furnished',
     'Heating',
-    'Jaccuzi'
+    'Jaccuzi',
 ];
 
 // Function to filter amenities to only include approved ones and format specific ones
 const filterApprovedAmenities = (amenities: string[]): string[] => {
     return amenities
-        .filter(amenity => APPROVED_AMENITIES.includes(amenity))
-        .map(amenity => {
+        .filter((amenity) => APPROVED_AMENITIES.includes(amenity))
+        .map((amenity) => {
             // Format specific amenities to replace underscores with spaces
             switch (amenity) {
                 case 'Swimming_Pool':
@@ -256,44 +257,46 @@ export const getProjectByIdService = async (id: string) => {
                 unitTypeGroups[bedroomType].push(floorPlan);
             }
         });
-        
+
         // Map bedroom types to display names for unit_types name field
         const nameMapping: { [key: string]: string } = {
-            'Studio': 'Studio',
-            'One': '1BHK',
-            'Two': '2BHK', 
-            'Three': '3BHK',
-            'Four': '4BHK',
-            'Five': '5BHK',
-            'Six': '6BHK',
-            'Seven': '7BHK',
-            'Four_Plus': '4+BHK'
+            Studio: 'Studio',
+            One: '1BHK',
+            Two: '2BHK',
+            Three: '3BHK',
+            Four: '4BHK',
+            Five: '5BHK',
+            Six: '6BHK',
+            Seven: '7BHK',
+            Four_Plus: '4+BHK',
         };
 
         // Map bedroom types to numeric values for floor-plans bedrooms field
         const bedroomMapping: { [key: string]: string } = {
-            'Studio': 'Studio',
-            'One': '1',
-            'Two': '2', 
-            'Three': '3',
-            'Four': '4',
-            'Five': '5',
-            'Six': '6',
-            'Seven': '7',
-            'Four_Plus': '4+'
+            Studio: 'Studio',
+            One: '1',
+            Two: '2',
+            Three: '3',
+            Four: '4',
+            Five: '5',
+            Six: '6',
+            Seven: '7',
+            Four_Plus: '4+',
         };
-        
+
         // Convert to array of objects with name, properties_count, and floor-plans
         const unitTypes = Object.entries(unitTypeGroups)
             .map(([bedroomType, floorPlansForType]) => ({
                 name: nameMapping[bedroomType] || bedroomType,
                 properties_count: floorPlansForType.length,
-                "floor_plans": floorPlansForType.map(floorPlan => ({
+                floor_plans: floorPlansForType.map((floorPlan) => ({
                     id: floorPlan.id,
                     min_price: floorPlan.min_price,
-                    bedrooms: bedroomMapping[floorPlan.bedrooms] || floorPlan.bedrooms,
-                    unit_size: floorPlan.unit_size
-                }))
+                    bedrooms:
+                        bedroomMapping[floorPlan.bedrooms] ||
+                        floorPlan.bedrooms,
+                    unit_size: floorPlan.unit_size,
+                })),
             }))
             .sort((a, b) => {
                 // Custom sorting: Studio first, then by number, then others
@@ -612,7 +615,7 @@ export const generateProjectROIReportService = async (
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
-    const handoverYear = handover_year
+    const handoverYear = handover_year;
     const currentYear = new Date().getFullYear();
     const yearDiff = handoverYear - currentYear;
 
@@ -627,30 +630,38 @@ export const generateProjectROIReportService = async (
         5
     );
 
-    const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
+    const shortTermRoiMultiplier = 1.6;
     const longTermRent = getRentalPriceInYear(
         propertyData,
         unit_size,
         yearDiff
     );
-    const shortTermRent = longTermRent * shortTermRentMultiplier;
     const longTermAppreciation = (longTermRent / min_price) * 100;
-    const shortTermAppreciation = (shortTermRent / min_price) * 100;
+
+    const { rent: shortTermRent, roi: shortTermAppreciation } =
+        calculateShortTermRental(
+            min_price,
+            longTermRent,
+            shortTermRoiMultiplier
+        );
 
     const longTermRentAtHandoverPlus5 = getRentalPriceInYear(
         propertyData,
         unit_size,
         yearDiff + 5
     );
-    const shortTermRentAtHandoverPlus5 =
-        longTermRentAtHandoverPlus5 * shortTermRentMultiplier;
+    const { rent: shortTermRentAtHandoverPlus5 } = calculateShortTermRental(
+        min_price,
+        longTermRentAtHandoverPlus5,
+        shortTermRoiMultiplier
+    );
 
     const shortTermBreakEvenYear = calculateBreakEvenAfterHandover(
         propertyData,
         min_price,
         unit_size,
         handoverYear,
-        shortTermRentMultiplier
+        shortTermRoiMultiplier
     );
 
     const longTermBreakEvenYear = calculateBreakEvenAfterHandover(
@@ -666,15 +677,16 @@ export const generateProjectROIReportService = async (
         5,
         min_price,
         unit_size,
-        1.04
+        shortTermRoiMultiplier
     );
 
     const avgRentPerYear = calculateAverageRentPerYearAfterHandover(
         propertyData,
+        min_price,
         handoverYear,
         5,
         unit_size,
-        1.04
+        shortTermRoiMultiplier
     );
 
     const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
@@ -683,7 +695,7 @@ export const generateProjectROIReportService = async (
         unit_size,
         handoverYear,
         6,
-        shortTermRentMultiplier
+        shortTermRoiMultiplier
     );
 
     const roiGraph = [
@@ -698,17 +710,14 @@ export const generateProjectROIReportService = async (
     const areaAppreciationGraphAll =
         calculateAppreciationDataPoints(propertyData);
 
-    const areaAppreciationGraph = [
-        areaAppreciationGraphAll[0],
-        areaAppreciationGraphAll[yearDiff],
-        areaAppreciationGraphAll[yearDiff + 5],
-    ].map((item) => ({
+    const areaAppreciationGraph = areaAppreciationGraphAll.map((item) => ({
         year: item.year,
         roi: Math.round(item.appreciation_perc),
     }));
 
     const avgAreaAppreciationPerYear =
         areaAppreciationGraphAll
+            .slice(0, 5)
             .map((item, i) =>
                 i === 0
                     ? item.appreciation_perc
@@ -789,8 +798,8 @@ export const generateProjectROIReportService = async (
             Math.round(avgAreaAppreciationPerYear * 100) / 100,
         area_appreciation_graph: areaAppreciationGraph,
         rental_yield: {
-            year: 3,
-            percentage: Math.round(increaseInRentalPrice(3) * 100) / 100,
+            year: 5,
+            percentage: Math.round(increaseInRentalPrice(5) * 100) / 100,
         },
     };
 };
@@ -844,7 +853,7 @@ export const getProjectAIReportService = async (
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
-    const handoverYear = handover_year
+    const handoverYear = handover_year;
     const currentYear = new Date().getFullYear();
     const yearDiff = handoverYear - currentYear;
 
@@ -883,14 +892,29 @@ export const getProjectAIReportService = async (
         );
     };
 
-    const shortTermRentMultiplier = 1.04; // Assuming 4% increase in rent
+    const shortTermRoiMultiplier = 1.6;
     const longTermRent = getRentalPriceInYear(
         propertyData,
         unit_size,
-        yearDiff,
-        'monthly'
+        yearDiff
     );
-    const shortTermRent = longTermRent * shortTermRentMultiplier;
+    const { rent: shortTermRent } = calculateShortTermRental(
+        min_price,
+        longTermRent,
+        shortTermRoiMultiplier
+    );
+
+    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
+        propertyData,
+        min_price,
+        unit_size,
+        handoverYear,
+        6,
+        shortTermRoiMultiplier
+    );
+
+    const absoluteRoiAfter5years = roiGraphPoints[5].roi;
+    const roiAfter5years = (absoluteRoiAfter5years / min_price) * 100;
 
     return {
         listing: {
@@ -900,32 +924,25 @@ export const getProjectAIReportService = async (
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
             yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
-            roi_percentage: 9,
+            roi_percentage: Math.round(roiAfter5years * 100) / 100,
         },
         growth_graph: [
             {
                 year: String(currentYear),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(propertyData, min_price, 1)
-                ),
+                appreciation: Math.round(min_price),
             },
             {
                 year: String(handoverYear),
-                appreciation: Math.round(
-                    getListingAppreciationInYear(
-                        propertyData,
-                        min_price,
-                        yearDiff + 1
-                    )
-                ),
+                appreciation: Math.round(listingPriceAtHandover),
             },
             {
                 year: String(handoverYear + 2),
                 appreciation: Math.round(
-                    getListingAppreciationInYear(
+                    calculatePriceAfterHandover(
                         propertyData,
-                        min_price,
-                        yearDiff + 3
+                        listingPriceAtHandover,
+                        handoverYear,
+                        2
                     )
                 ),
             },
