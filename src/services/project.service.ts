@@ -356,14 +356,14 @@ export const getProjectFloorPlansService = async (
     const mapBhkToBedrooms = (bhk: string): string | undefined => {
         const bhkMapping: { [key: string]: string } = {
             Studio: 'Studio',
-            '1Bhk': 'One',
-            '2Bhk': 'Two',
-            '3Bhk': 'Three',
-            '4Bhk': 'Four',
-            '4+Bhk': 'Four_Plus',
-            '5Bhk': 'Five',
-            '6Bhk': 'Six',
-            '7Bhk': 'Seven',
+            '1BHK': 'One',
+            '2BHK': 'Two',
+            '3BHK': 'Three',
+            '4BHK': 'Four',
+            '4+BHK': 'Four_Plus',
+            '5BHK': 'Five',
+            '6BHK': 'Six',
+            '7BHK': 'Seven',
         };
         return bhkMapping[bhk];
     };
