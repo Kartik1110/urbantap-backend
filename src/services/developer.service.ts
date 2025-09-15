@@ -29,6 +29,13 @@ export const getDevelopersService = async ({
             where: whereClause,
             skip,
             take: pageSize,
+            orderBy: {
+                developer: {
+                    projects: {
+                        _count: 'desc'
+                    }
+                }
+            },
             select: {
                 id: true,
                 name: true,
