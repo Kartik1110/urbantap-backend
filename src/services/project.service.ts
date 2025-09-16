@@ -382,6 +382,16 @@ export const getProjectFloorPlansService = async (
             whereClause.bedrooms = bedroomFilter;
         }
     }
+    const nameMapping: { [key: string]: string } = {
+        'Studio': 'Studio',
+        'One': '1BHK',
+        'Two': '2BHK', 
+        'Three': '3BHK',
+        'Four': '4BHK',
+        'Five': '5BHK',
+        'Six': '6BHK',
+        'Seven': '7BHK'
+    }
 
     const floorPlans = await prisma.floorPlan.findMany({
         where: whereClause,
@@ -400,7 +410,36 @@ export const getProjectFloorPlansService = async (
         },
     });
 
-    return floorPlans;
+    // Transform the floorPlans to include BHK format in title
+    const transformedFloorPlans = floorPlans.map(floorPlan => ({
+        ...floorPlan,
+        title: floorPlan.bedrooms ? nameMapping[floorPlan.bedrooms] || floorPlan.title : floorPlan.title
+    }));
+
+    // Sort floor plans: Studio first, then by number (1BHK, 2BHK, etc.)
+    const sortedFloorPlans = transformedFloorPlans.sort((a, b) => {
+        // Handle null titles
+        const aTitle = a.title || '';
+        const bTitle = b.title || '';
+
+        // Studio comes first
+        if (aTitle === 'Studio') return -1;
+        if (bTitle === 'Studio') return 1;
+
+        // Extract numbers from titles for comparison
+        const aNum = parseInt(aTitle.match(/\d+/)?.[0] || '999');
+        const bNum = parseInt(bTitle.match(/\d+/)?.[0] || '999');
+
+        // Sort by number
+        if (aNum !== 999 && bNum !== 999) return aNum - bNum;
+        if (aNum !== 999) return -1;
+        if (bNum !== 999) return 1;
+
+        // Fallback to alphabetical
+        return aTitle.localeCompare(bTitle);
+    });
+
+    return sortedFloorPlans;
 };
 
 export const getProjectsByDeveloperService = async (
