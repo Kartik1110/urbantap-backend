@@ -119,28 +119,33 @@ export const createDeveloperService = async (data: {
 };
 
 export const getDeveloperDetailsService = async (developerId: string) => {
-    const developer = await prisma.developer.findUnique({
-        where: { id: developerId },
-        include: {
-            projects: {
-                take: 5,
-                select: {
-                    id: true,
-                    category: true,
-                    image_urls: true,
-                    project_name: true,
-                    address: true,
-                }
-            },
-            company: {
-                select: {
-                    name: true,
-                    logo: true,
-                    description: true,
+    const [developer, totalProjectCount] = await Promise.all([
+        prisma.developer.findUnique({
+            where: { id: developerId },
+            include: {
+                projects: {
+                    take: 5,
+                    select: {
+                        id: true,
+                        category: true,
+                        image_urls: true,
+                        project_name: true,
+                        address: true,
+                    }
+                },
+                company: {
+                    select: {
+                        name: true,
+                        logo: true,
+                        description: true,
+                    },
                 },
             },
-        },
-    });
+        }),
+        prisma.project.count({
+            where: { developer_id: developerId }
+        })
+    ]);
 
     if (!developer) throw new Error('Developer not found');
 
@@ -159,7 +164,7 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         logo: developer.company?.logo,
         cover_image: developer.cover_image,
         description: developer.company?.description,
-        project_count: developer.projects.length,
+        project_count: totalProjectCount,
         projects: formattedProjects,
     };
 };
