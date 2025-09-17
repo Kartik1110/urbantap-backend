@@ -26,6 +26,7 @@ export const getNotificationsService = async (
             orderBy: {
                 timestamp: 'desc',
             },
+            take: 50,
         });
     }
 
@@ -43,6 +44,7 @@ export const getNotificationsService = async (
             orderBy: {
                 timestamp: 'desc',
             },
+            take: 50,
         });
     }
     // For other types, we can use a more generic query
@@ -60,6 +62,7 @@ export const getNotificationsService = async (
         orderBy: {
             timestamp: 'desc',
         },
+        take: 50,
     });
 };
 
