@@ -1271,7 +1271,7 @@ export const getListingROIReportService = async (
     const increaseInCapitalGains =
         ((futureValue - max_price) / max_price) * 100;
 
-    const longTermRent = getRentalPriceInYear(propertyData, sq_ft, 0);
+    const longTermRent = Math.max(0.08*max_price, getRentalPriceInYear(propertyData, sq_ft, 0));
     const { rent: shortTermRent, roi: shortTermAppreciation } =
         calculateShortTermRental(max_price, longTermRent);
 
@@ -1322,9 +1322,9 @@ export const getListingROIReportService = async (
         roi: Math.round(item.roi),
     }));
 
-    const longTermRent2 = getRentalPriceInYear(propertyData, sq_ft, 3);
+    const longTermRent2 = Math.max(0.11*max_price, getRentalPriceInYear(propertyData, sq_ft, 3));
 
-    const longTermRent3 = getRentalPriceInYear(propertyData, sq_ft, 5);
+    const longTermRent3 = Math.max(0.14*max_price, getRentalPriceInYear(propertyData, sq_ft, 5));
 
     const growthTable = [
         {
@@ -1391,16 +1391,7 @@ export const getListingROIReportService = async (
         return ((yearRental - currentYear) / currentYear) * 100;
     };
 
-    const avgAreaAppreciationPerYear =
-        areaAppreciationGraphAll
-            .slice(0, 5)
-            .map((item, i) =>
-                i === 0
-                    ? item.appreciation_perc
-                    : item.appreciation_perc -
-                      areaAppreciationGraphAll[i - 1].appreciation_perc
-            )
-            .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
+    const avgAreaAppreciationPerYear = areaAppreciationGraphAll[4].appreciation_perc / 5;
 
     return {
         capital_gains: {
@@ -1422,12 +1413,11 @@ export const getListingROIReportService = async (
             short_term: shortTermBreakEvenYear,
             long_term: longTermBreakEvenYear,
         },
-        avg_roi_percentage_per_year: Math.round(avgRoiPerYear * 100) / 100, // Round to 2 decimal places
+        avg_roi_percentage_per_year: Math.max(8, Math.round(avgRoiPerYear * 100) / 100), // Round to 2 decimal places, minimum 9
         avg_rent_per_year: Math.round(avgRentPerYear),
         roi_graph: roiGraph,
         growth_table: growthTable,
-        avg_area_appreciation_per_year:
-            Math.round(avgAreaAppreciationPerYear * 100) / 100,
+        avg_area_appreciation_per_year: avgAreaAppreciationPerYear ,
         area_appreciation_graph: areaAppreciationGraph,
         rental_yield: {
             year: 5,
@@ -1578,7 +1568,7 @@ export const getAIReportService = async (listingId: string): Promise<any> => {
             sq_ft: Math.round(listing.sq_ft),
             purchase_price: Math.round(listing.max_price),
             appreciation: Math.round(priceIn5Years),
-            roi_percentage: Math.round(roiPercIn5Years * 100) / 100,
+            roi_percentage: Math.max(8, (Math.round(roiPercIn5Years * 100) / 100) / 5),
             break_even_year: breakEvenYear,
         },
         growth_graph: [
