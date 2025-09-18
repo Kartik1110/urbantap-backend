@@ -882,67 +882,64 @@ export const createSponsoredJobController = async (
         );
 
         // Send broadcast notification to all brokers
-        try {
-            // Get company details for notification
-            const company = await prisma.company.findUnique({
-                where: { id: companyId },
-            });
 
-            // Get all brokers with FCM tokens
-            const brokers = await prisma.broker.findMany({
-                where: {
-                    user: {
-                        fcm_token: {
-                            not: null,
-                        },
+        // Get company details for notification
+        const company = await prisma.company.findUnique({
+            where: { id: companyId },
+        });
+
+        // Get all brokers with FCM tokens
+        const brokers = await prisma.broker.findMany({
+            where: {
+                user: {
+                    fcm_token: {
+                        not: null,
                     },
                 },
-                include: {
-                    user: true,
-                },
-            });
-
-            const notificationTitle = 'New Job Available!';
-            if (!company) throw new Error('Company not found');
-            const notificationBody = `${company.name} just posted a new job: ${result.job.title}`;
-            // Create broadcast notification in database
-            await prisma.notification.create({
-                data: {
-                    sent_by_id: userId,
-                    text: notificationBody,
-                    type: NotificationType.Broadcast,
-                    job_id: result.job.id,
-                },
-            });
-
-            if (brokers.length > 0) {
-                // Prepare notifications for all brokers
-                const notifications: PushNotificationData[] = brokers.map(
-                    (broker) => ({
-                        token: broker.user!.fcm_token!,
-                        title: notificationTitle,
-                        body: notificationBody,
-                        data: {
-                            jobId: result.job.id,
-                            type: 'NEW_JOB_ALERT',
-                            companyId: companyId,
-                        },
-                    })
-                );
-
-                // Send multicast push notification
-                await sendMulticastPushNotification(notifications);
-            }
-        } catch (notificationError) {
-            console.error('Error sending job notification:', notificationError);
-            // Don't fail the job creation if notification fails
-        }
-
-        return res.status(201).json({
-            status: 'success',
-            message: 'Sponsored job created successfully',
-            data: result,
+            },
+            include: {
+                user: true,
+            },
         });
+
+        const notificationTitle = 'New Job Available!';
+        if (!company) throw new Error('Company not found');
+        const notificationBody = `${company.name} just posted a new job: ${result.job.title}`;
+
+        // Create broadcast notification in database
+        await prisma.notification.create({
+            data: {
+                sent_by_id: userId,
+                text: notificationBody,
+                type: NotificationType.Broadcast,
+                job_id: result.job.id,
+            },
+        });
+
+        if (brokers.length > 0) {
+            // Prepare notifications for all brokers
+            const notifications: PushNotificationData[] = brokers.map(
+                (broker) => ({
+                    token: broker.user!.fcm_token!,
+                    title: notificationTitle,
+                    body: notificationBody,
+                    data: {
+                        jobId: result.job.id,
+                        type: 'NEW_JOB_ALERT',
+                        companyId: companyId,
+                    },
+                })
+            );
+
+            // Send multicast push notification
+            await sendMulticastPushNotification(notifications);
+
+            return res.status(201).json({
+                status: 'success',
+                message: 'Sponsored job created successfully',
+                data: result,
+            });
+        }
     } catch (error: any) {
         console.error('Create sponsored job error:', error);
         return res.status(500).json({
