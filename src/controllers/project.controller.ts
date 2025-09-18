@@ -179,10 +179,6 @@ export const generateProjectROIReport = async (req: Request, res: Response) => {
         const projectId = req.params.id;
         const floorPlanId = req.query.floor_plan_id as string;
 
-        if (!floorPlanId) {
-            throw new Error('floor_plan_id is required');
-        }
-
         const roiReport = await generateProjectROIReportService(
             projectId,
             floorPlanId
@@ -209,10 +205,6 @@ export const getAIReport = async (req: Request, res: Response) => {
     try {
         const projectId = req.params.id;
         const floorPlanId = req.query.floor_plan_id as string;
-
-        if (!floorPlanId) {
-            throw new Error('floor_plan_id is required');
-        }
 
         const aiReport = await getProjectAIReportService(
             projectId,
