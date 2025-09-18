@@ -1,7 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client';
 
-export const authMiddleware = (
+const prisma = new PrismaClient();
+
+export interface UserAuthTokenPayload {
+    userId: string;
+    role: string;
+}
+
+export const authMiddleware = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -13,11 +21,33 @@ export const authMiddleware = (
             .status(401)
             .json({ error: 'Access denied, no token provided' });
     }
+
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-        (req as any).user = decoded;
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET!
+        ) as UserAuthTokenPayload;
+
+        if (!decoded.userId || !decoded.role) {
+            return res.status(401).json({ error: 'Invalid token payload' });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: decoded.userId },
+            select: { id: true, role: true, email: true },
+        });
+
+        if (!user) {
+            return res.status(401).json({ error: 'User not found' });
+        }
+
+        if (user.role !== decoded.role) {
+            return res.status(401).json({ error: 'Token role mismatch' });
+        }
+
+        (req as Request & { user: UserAuthTokenPayload }).user = decoded;
         next();
-    } catch (e) {
-        res.status(400).json({ error: 'Invalid token' });
+    } catch {
+        return res.status(401).json({ error: 'Invalid or expired token' });
     }
 };
