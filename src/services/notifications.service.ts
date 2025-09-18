@@ -26,6 +26,7 @@ export const getNotificationsService = async (
             orderBy: {
                 timestamp: 'desc',
             },
+            skip: 0,
             take: 50,
         });
     }
@@ -44,6 +45,7 @@ export const getNotificationsService = async (
             orderBy: {
                 timestamp: 'desc',
             },
+            skip: 0,
             take: 50,
         });
     }
@@ -62,6 +64,7 @@ export const getNotificationsService = async (
         orderBy: {
             timestamp: 'desc',
         },
+        skip: 0,
         take: 50,
     });
 };
