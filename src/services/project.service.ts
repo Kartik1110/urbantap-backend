@@ -9,7 +9,6 @@ import {
     calculatePriceAfterHandover,
     calculateRoiDataPointsByTypeAfterHandover,
     calculateShortTermRental,
-    getListingAppreciationInYear,
     getPropertyData,
     getRentalPriceInYear,
     MergedPropertyData,
@@ -779,15 +778,7 @@ export const generateProjectROIReportService = async (
     }));
 
     const avgAreaAppreciationPerYear =
-        areaAppreciationGraphAll
-            .slice(0, 5)
-            .map((item, i) =>
-                i === 0
-                    ? item.appreciation_perc
-                    : item.appreciation_perc -
-                      areaAppreciationGraphAll[i - 1].appreciation_perc
-            )
-            .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
+        areaAppreciationGraphAll[4].appreciation_perc / 5;
 
     const increaseInRentalPrice = (year: number) => {
         if (year === 0) {
@@ -797,18 +788,19 @@ export const generateProjectROIReportService = async (
         const rentalInXYears = getRentalPriceInYear(
             propertyData,
             unit_size,
-            yearDiff + year,
-            'monthly'
+            yearDiff + year
         );
 
-        const rentalPriceToday = getRentalPriceInYear(
+        const rentalPriceAtHandover = getRentalPriceInYear(
             propertyData,
             unit_size,
-            0,
-            'monthly'
+            yearDiff
         );
 
-        return ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100;
+        return (
+            ((rentalInXYears - rentalPriceAtHandover) / rentalPriceAtHandover) *
+            100
+        );
     };
 
     return {
@@ -965,15 +957,8 @@ export const getProjectAIReportService = async (
             'monthly'
         );
 
-        const rentalPriceToday = getRentalPriceInYear(
-            propertyData,
-            unit_size,
-            0,
-            'monthly'
-        );
-
         return Math.round(
-            ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100
+            ((rentalInXYears - longTermRent) / longTermRent) * 100
         );
     };
 
