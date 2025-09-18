@@ -625,13 +625,14 @@ export const generateProjectROIReportService = async (
     const floorPlan = await prisma.floorPlan.findUnique({
         where: { id: floorPlanId, project_id: projectId },
     });
-
-    if (!floorPlan) {
-        throw new Error('Floor plan not found');
-    }
-
     let { min_sq_ft, min_price, locality, handover_year } = project;
-    const { unit_size } = floorPlan;
+
+    let unit_size;
+    if (!floorPlan) {
+        unit_size = min_sq_ft; // Use min_sq_ft as unit_size when floor plan is not found
+    } else {
+        unit_size = floorPlan.unit_size;
+    }
     
     if (min_price && unit_size && min_sq_ft) {
         min_price = (min_price * unit_size) / min_sq_ft;
@@ -877,8 +878,8 @@ export const getProjectAIReportService = async (
     }
 
     const { min_price, locality, handover_year } = project;
-    // Use the first floor plan for unit_size calculation, or you can modify this logic as needed
-    const { unit_size } = floorPlans[0];
+    // Use the last floor plan for unit_size calculation
+    const { unit_size } = floorPlans[floorPlans.length - 1];
 
     if (!min_price || !handover_year || !locality || !unit_size) {
         if (!min_price) {
@@ -971,8 +972,8 @@ export const getProjectAIReportService = async (
             price: Math.round(min_price),
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
-            yearly_rental: Math.max(Math.round((shortTermRent + longTermRent) / 2), Math.round(listingPriceAtHandover * 0.08)),   // minimum 8% of price
-            roi_percentage:Math.round((Math.max(Math.round((shortTermRent + longTermRent) / 2), Math.round(listingPriceAtHandover * 0.08)) / listingPriceAtHandover) * 100), // minimum 8% ROI
+            yearly_rental: Math.round(Math.max(((shortTermRent + longTermRent) / 2), (min_price * 0.08))),   // minimum 8% of price
+            roi_percentage:Math.round((Math.max(((shortTermRent + longTermRent) / 2), (min_price * 0.08)) / min_price) * 100), // minimum 8% ROI
         },
         growth_graph: [
             {

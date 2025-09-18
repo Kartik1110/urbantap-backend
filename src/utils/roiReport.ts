@@ -530,7 +530,7 @@ export function getPropertyData(
 
         const locationData = propertiesData[location];
         if (!locationData) {
-            throw new Error('Location not found');
+            throw new Error('Location not found for ' + location);
         }
 
         const propertyData = locationData[propertyType];
