@@ -852,7 +852,9 @@ export const generateProjectROIReportService = async (
 
 export const getProjectAIReportService = async (
     projectId: string,
-    floorPlanId: string
+    floorPlanId: string,
+    userId: string,
+    brokerId?: string
 ): Promise<any> => {
     const project = await prisma.project.findUnique({
         where: { id: projectId },
@@ -916,6 +918,24 @@ export const getProjectAIReportService = async (
         if (!unit_size) {
             throw new Error('Unit size not found');
         }
+    }
+
+    let broker;
+
+    if (brokerId) {
+        broker = await prisma.broker.findUnique({
+            where: { id: brokerId },
+            include: { company: { select: { name: true } } },
+        });
+    } else {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                brokers: { include: { company: { select: { name: true } } } },
+            },
+        });
+
+        broker = user?.brokers[0];
     }
 
     const listingType = 'Apartment'; // TODO: figure this out
@@ -1037,20 +1057,18 @@ export const getProjectAIReportService = async (
         }),
         amenities: filterApprovedAmenities(project.amenities || []),
         broker: {
-            id: '0ec378d9-abd7-494d-a291-21ed14df826b',
-            name: 'Irma Ankunding',
-            designation: 'Broker',
-            y_o_e: 20,
-            specialities: ['Shop', 'Apartment'],
-            company: {
-                name: 'providentestate',
-            },
-            profile_pic: 'https://avatars.githubusercontent.com/u/4033837',
-            country_code: '+971',
-            w_number: '572073703',
-            email: 'Ara.Zulauf97@yahoo.com',
-            linkedin_link: 'https://moist-bowler.biz/',
-            ig_link: 'Laurence.Hyatt',
+            id: broker?.id,
+            name: broker?.name,
+            designation: broker?.designation,
+            y_o_e: broker?.y_o_e,
+            specialities: broker?.specialities,
+            company: broker?.company,
+            profile_pic: broker?.profile_pic,
+            country_code: broker?.country_code,
+            w_number: broker?.w_number,
+            email: broker?.email,
+            linkedin_link: broker?.linkedin_link,
+            ig_link: broker?.ig_link,
         },
     };
 };
