@@ -944,20 +944,12 @@ export const getProjectAIReportService = async (
         const rentalInXYears = getRentalPriceInYear(
             propertyData,
             unit_size,
-            yearDiff + year,
-            'monthly'
+            yearDiff + year
         );
 
-        const rentalPriceToday = getRentalPriceInYear(
-            propertyData,
-            unit_size,
-            0,
-            'monthly'
-        );
+        const percInc = ((rentalInXYears - longTermRent) / longTermRent) * 100;
 
-        return Math.round(
-            ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100
-        );
+        return Math.round(percInc * 100) / 100; // Rounding till 2 decimals
     };
 
     const shortTermRoiMultiplier = 1.6;
@@ -972,17 +964,8 @@ export const getProjectAIReportService = async (
         shortTermRoiMultiplier
     );
 
-    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
-        propertyData,
-        min_price,
-        unit_size,
-        handoverYear,
-        6,
-        shortTermRoiMultiplier
-    );
-
-    const absoluteRoiAfter5years = roiGraphPoints[5].roi;
-    const roiAfter5years = (absoluteRoiAfter5years / min_price) * 100;
+    const avgYearlyRental = (longTermRent + shortTermRent) / 2;
+    const roiAtHandoverYear = (avgYearlyRental / min_price) * 100;
 
     return {
         listing: {
@@ -991,8 +974,8 @@ export const getProjectAIReportService = async (
             price: Math.round(min_price),
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
-            yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
-            roi_percentage: Math.round(roiAfter5years * 100) / 100,
+            yearly_rental: Math.round(avgYearlyRental),
+            roi_percentage: Math.round(roiAtHandoverYear * 100) / 100,
         },
         growth_graph: [
             {
@@ -1044,7 +1027,9 @@ export const getProjectAIReportService = async (
         developer: {
             name: project.developer.company?.name,
             logo_url: project.developer.company?.logo,
-            floor_plan_image_urls: floorPlan.image_urls,
+            floor_plan_image_urls: floorPlanId
+                ? floorPlan.image_urls
+                : floorPlans.flatMap((plan) => plan.image_urls),
         },
         nearby: await getNearbySummary({
             lat: project.latitude!,
