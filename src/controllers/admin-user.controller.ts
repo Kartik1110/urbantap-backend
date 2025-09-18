@@ -923,16 +923,20 @@ export const createSponsoredJobController = async (
                 // Send multicast push notification
                 await sendMulticastPushNotification(notifications);
 
-                // Create broadcast notification in database
-                await prisma.notification.create({
-                    data: {
-                        sent_by_id: userId,
-                        broker_id: userId,
-                        text: notificationBody,
-                        type: NotificationType.Broadcast,
-                        job_id: result.job.id,
-                    },
-                });
+                // Create individual notifications for each broker
+                const notificationPromises = brokers.map((broker) =>
+                    prisma.notification.create({
+                        data: {
+                            sent_by_id: userId,
+                            broker_id: broker.id,
+                            text: notificationBody,
+                            type: NotificationType.Broadcast,
+                            job_id: result.job.id,
+                        },
+                    })
+                );
+
+                await Promise.all(notificationPromises);
             }
         } catch (notificationError) {
             console.error('Error sending job notification:', notificationError);
