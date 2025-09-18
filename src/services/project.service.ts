@@ -791,16 +791,7 @@ export const generateProjectROIReportService = async (
             yearDiff + year
         );
 
-        const rentalPriceAtHandover = getRentalPriceInYear(
-            propertyData,
-            unit_size,
-            yearDiff
-        );
-
-        return (
-            ((rentalInXYears - rentalPriceAtHandover) / rentalPriceAtHandover) *
-            100
-        );
+        return ((rentalInXYears - longTermRent) / longTermRent) * 100;
     };
 
     return {
@@ -957,8 +948,15 @@ export const getProjectAIReportService = async (
             'monthly'
         );
 
+        const rentalPriceToday = getRentalPriceInYear(
+            propertyData,
+            unit_size,
+            0,
+            'monthly'
+        );
+
         return Math.round(
-            ((rentalInXYears - longTermRent) / longTermRent) * 100
+            ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100
         );
     };
 
