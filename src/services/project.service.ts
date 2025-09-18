@@ -630,8 +630,14 @@ export const generateProjectROIReportService = async (
         throw new Error('Floor plan not found');
     }
 
-    const { min_price, locality, handover_year } = project;
+    let { min_sq_ft, min_price, locality, handover_year } = project;
     const { unit_size } = floorPlan;
+    
+    if (min_price && unit_size && min_sq_ft) {
+        min_price = (min_price * unit_size) / min_sq_ft;
+    }
+    
+    
 
     if (!min_price || !handover_year || !locality || !unit_size) {
         if (!min_price) {
@@ -754,16 +760,19 @@ export const generateProjectROIReportService = async (
         roi: Math.round(item.appreciation_perc),
     }));
 
-    const avgAreaAppreciationPerYear =
-        areaAppreciationGraphAll
-            .slice(0, 5)
-            .map((item, i) =>
-                i === 0
-                    ? item.appreciation_perc
-                    : item.appreciation_perc -
-                      areaAppreciationGraphAll[i - 1].appreciation_perc
-            )
-            .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
+    // const avgAreaAppreciationPerYear =
+    //     areaAppreciationGraphAll
+    //         .slice(0, 5)
+    //         .map((item, i) =>
+    //             i === 0
+    //                 ? item.appreciation_perc
+    //                 : item.appreciation_perc -
+    //                   areaAppreciationGraphAll[i - 1].appreciation_perc
+    //         )
+    //         .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
+
+    const avgAreaAppreciationPerYear = Math.round(areaAppreciationGraphAll[4].appreciation_perc / 5); // we have absoulte values for appreciation in area appreciation graph.
+
 
     const increaseInRentalPrice = (year: number) => {
         if (year === 0) {
@@ -844,8 +853,7 @@ export const generateProjectROIReportService = async (
 };
 
 export const getProjectAIReportService = async (
-    projectId: string,
-    floorPlanId: string
+    projectId: string
 ): Promise<any> => {
     const project = await prisma.project.findUnique({
         where: { id: projectId },
@@ -860,16 +868,17 @@ export const getProjectAIReportService = async (
         throw new Error('Project not found');
     }
 
-    const floorPlan = await prisma.floorPlan.findUnique({
-        where: { id: floorPlanId, project_id: projectId },
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: { project_id: projectId },
     });
 
-    if (!floorPlan) {
-        throw new Error('Floor plan not found');
+    if (!floorPlans || floorPlans.length === 0) {
+        throw new Error('No floor plans found for this project');
     }
 
     const { min_price, locality, handover_year } = project;
-    const { unit_size } = floorPlan;
+    // Use the first floor plan for unit_size calculation, or you can modify this logic as needed
+    const { unit_size } = floorPlans[0];
 
     if (!min_price || !handover_year || !locality || !unit_size) {
         if (!min_price) {
@@ -943,17 +952,17 @@ export const getProjectAIReportService = async (
         shortTermRoiMultiplier
     );
 
-    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
-        propertyData,
-        min_price,
-        unit_size,
-        handoverYear,
-        6,
-        shortTermRoiMultiplier
-    );
+    // const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
+    //     propertyData,
+    //     min_price,
+    //     unit_size,
+    //     handoverYear,
+    //     6,
+    //     shortTermRoiMultiplier
+    // );
 
-    const absoluteRoiAfter5years = roiGraphPoints[5].roi;
-    const roiAfter5years = (absoluteRoiAfter5years / min_price) * 100;
+    // const absoluteRoiAfter5years = roiGraphPoints[5].roi;
+    // const roiAfter5years = (absoluteRoiAfter5years / min_price) * 100;
 
     return {
         listing: {
@@ -962,8 +971,8 @@ export const getProjectAIReportService = async (
             price: Math.round(min_price),
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
-            yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
-            roi_percentage: Math.round(roiAfter5years * 100) / 100,
+            yearly_rental: Math.max(Math.round((shortTermRent + longTermRent) / 2), Math.round(listingPriceAtHandover * 0.08)),   // minimum 8% of price
+            roi_percentage:Math.round((Math.max(Math.round((shortTermRent + longTermRent) / 2), Math.round(listingPriceAtHandover * 0.08)) / listingPriceAtHandover) * 100), // minimum 8% ROI
         },
         growth_graph: [
             {
@@ -1015,7 +1024,7 @@ export const getProjectAIReportService = async (
         developer: {
             name: project.developer.company?.name,
             logo_url: project.developer.company?.logo,
-            floor_plan_image_urls: floorPlan.image_urls,
+            floor_plan_image_urls: floorPlans.flatMap(floorPlan => floorPlan.image_urls || []),
         },
         nearby: await getNearbySummary({
             lat: project.latitude!,

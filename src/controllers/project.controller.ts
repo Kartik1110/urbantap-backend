@@ -216,7 +216,7 @@ export const getAIReport = async (req: Request, res: Response) => {
 
         const aiReport = await getProjectAIReportService(
             projectId,
-            floorPlanId
+            // floorPlanId
         );
 
         return res.status(200).json({
