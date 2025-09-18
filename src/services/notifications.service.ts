@@ -19,9 +19,11 @@ export const getNotificationsService = async (
                     { type: NotificationType.General },
                     { type: NotificationType.Broadcast },
                 ],
-                broker_id: {
-                    not: brokerId,
-                },
+                AND: [
+                    {
+                        OR: [{ broker_id: brokerId }, { broker_id: null }],
+                    },
+                ],
             },
             orderBy: {
                 timestamp: 'desc',
