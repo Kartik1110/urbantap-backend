@@ -107,7 +107,7 @@ export const createNotificationService = async (data: {
                 body: data.text,
                 data: {
                     id: notification.id,
-                    broker_id: notification.broker_id, // sent_to_id
+                    broker_id: notification.broker_id || '', // sent_to_id
                     sent_by_id: notification.sent_by_id, // sent_by_id
                     type: notification.type,
                     timestamp: notification.timestamp.toISOString(),

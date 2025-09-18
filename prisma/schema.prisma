@@ -457,8 +457,8 @@ model ReportedListing {
 
 model Notification {
   id                   String             @id @default(uuid())
-  broker_id            String
-  broker               Broker             @relation(fields: [broker_id], references: [id])
+  broker_id            String?
+  broker               Broker?            @relation(fields: [broker_id], references: [id])
   sent_by_id           String
   timestamp            DateTime           @default(now())
   text                 String

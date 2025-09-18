@@ -927,7 +927,6 @@ export const createSponsoredJobController = async (
                 await prisma.notification.create({
                     data: {
                         sent_by_id: userId,
-                        broker_id: '', // Broadcast, Not sent by one broker
                         text: notificationBody,
                         type: NotificationType.Broadcast,
                         job_id: result.job.id,
