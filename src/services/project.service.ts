@@ -630,14 +630,8 @@ export const generateProjectROIReportService = async (
         throw new Error('Floor plan not found');
     }
 
-    let { min_sq_ft, min_price, locality, handover_year } = project;
+    const { min_price, locality, handover_year } = project;
     const { unit_size } = floorPlan;
-    
-    if (min_price && unit_size && min_sq_ft) {
-        min_price = (min_price * unit_size) / min_sq_ft;
-    }
-    
-    
 
     if (!min_price || !handover_year || !locality || !unit_size) {
         if (!min_price) {
@@ -968,8 +962,8 @@ export const getProjectAIReportService = async (
             price: Math.round(min_price),
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
-            yearly_rental: Math.max(Math.round((shortTermRent + longTermRent) / 2), Math.round(listingPriceAtHandover * 0.08)),
-            roi_percentage: Math.max(8, Math.round(roiAfter5years * 100) / 100 / 5),
+            yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
+            roi_percentage: Math.round(roiAfter5years * 100) / 100,
         },
         growth_graph: [
             {
