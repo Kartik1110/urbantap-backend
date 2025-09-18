@@ -9,7 +9,6 @@ import {
     calculatePriceAfterHandover,
     calculateRoiDataPointsByTypeAfterHandover,
     calculateShortTermRental,
-    getListingAppreciationInYear,
     getPropertyData,
     getRentalPriceInYear,
     MergedPropertyData,
@@ -779,15 +778,7 @@ export const generateProjectROIReportService = async (
     }));
 
     const avgAreaAppreciationPerYear =
-        areaAppreciationGraphAll
-            .slice(0, 5)
-            .map((item, i) =>
-                i === 0
-                    ? item.appreciation_perc
-                    : item.appreciation_perc -
-                      areaAppreciationGraphAll[i - 1].appreciation_perc
-            )
-            .reduce((a, b) => a + b, 0) / areaAppreciationGraphAll.length;
+        areaAppreciationGraphAll[4].appreciation_perc / 5;
 
     const increaseInRentalPrice = (year: number) => {
         if (year === 0) {
@@ -797,18 +788,10 @@ export const generateProjectROIReportService = async (
         const rentalInXYears = getRentalPriceInYear(
             propertyData,
             unit_size,
-            yearDiff + year,
-            'monthly'
+            yearDiff + year
         );
 
-        const rentalPriceToday = getRentalPriceInYear(
-            propertyData,
-            unit_size,
-            0,
-            'monthly'
-        );
-
-        return ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100;
+        return ((rentalInXYears - longTermRent) / longTermRent) * 100;
     };
 
     return {
@@ -869,7 +852,9 @@ export const generateProjectROIReportService = async (
 
 export const getProjectAIReportService = async (
     projectId: string,
-    floorPlanId: string
+    floorPlanId: string,
+    userId: string,
+    brokerId?: string
 ): Promise<any> => {
     const project = await prisma.project.findUnique({
         where: { id: projectId },
@@ -935,6 +920,24 @@ export const getProjectAIReportService = async (
         }
     }
 
+    let broker;
+
+    if (brokerId) {
+        broker = await prisma.broker.findUnique({
+            where: { id: brokerId },
+            include: { company: { select: { name: true } } },
+        });
+    } else {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                brokers: { include: { company: { select: { name: true } } } },
+            },
+        });
+
+        broker = user?.brokers[0];
+    }
+
     const listingType = 'Apartment'; // TODO: figure this out
     const propertyData = getPropertyData(propertiesData, locality, listingType);
 
@@ -961,20 +964,12 @@ export const getProjectAIReportService = async (
         const rentalInXYears = getRentalPriceInYear(
             propertyData,
             unit_size,
-            yearDiff + year,
-            'monthly'
+            yearDiff + year
         );
 
-        const rentalPriceToday = getRentalPriceInYear(
-            propertyData,
-            unit_size,
-            0,
-            'monthly'
-        );
+        const percInc = ((rentalInXYears - longTermRent) / longTermRent) * 100;
 
-        return Math.round(
-            ((rentalInXYears - rentalPriceToday) / rentalPriceToday) * 100
-        );
+        return Math.round(percInc * 100) / 100; // Rounding till 2 decimals
     };
 
     const shortTermRoiMultiplier = 1.6;
@@ -989,17 +984,8 @@ export const getProjectAIReportService = async (
         shortTermRoiMultiplier
     );
 
-    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandover(
-        propertyData,
-        min_price,
-        unit_size,
-        handoverYear,
-        6,
-        shortTermRoiMultiplier
-    );
-
-    const absoluteRoiAfter5years = roiGraphPoints[5].roi;
-    const roiAfter5years = (absoluteRoiAfter5years / min_price) * 100;
+    const avgYearlyRental = (longTermRent + shortTermRent) / 2;
+    const roiAtHandoverYear = (avgYearlyRental / min_price) * 100;
 
     return {
         listing: {
@@ -1008,8 +994,8 @@ export const getProjectAIReportService = async (
             price: Math.round(min_price),
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
-            yearly_rental: Math.round((shortTermRent + longTermRent) / 2),
-            roi_percentage: Math.round(roiAfter5years * 100) / 100,
+            yearly_rental: Math.round(avgYearlyRental),
+            roi_percentage: Math.round(roiAtHandoverYear * 100) / 100,
         },
         growth_graph: [
             {
@@ -1061,7 +1047,9 @@ export const getProjectAIReportService = async (
         developer: {
             name: project.developer.company?.name,
             logo_url: project.developer.company?.logo,
-            floor_plan_image_urls: floorPlan.image_urls,
+            floor_plan_image_urls: floorPlanId
+                ? floorPlan.image_urls
+                : floorPlans.flatMap((plan) => plan.image_urls),
         },
         nearby: await getNearbySummary({
             lat: project.latitude!,
@@ -1069,20 +1057,18 @@ export const getProjectAIReportService = async (
         }),
         amenities: filterApprovedAmenities(project.amenities || []),
         broker: {
-            id: '0ec378d9-abd7-494d-a291-21ed14df826b',
-            name: 'Irma Ankunding',
-            designation: 'Broker',
-            y_o_e: 20,
-            specialities: ['Shop', 'Apartment'],
-            company: {
-                name: 'providentestate',
-            },
-            profile_pic: 'https://avatars.githubusercontent.com/u/4033837',
-            country_code: '+971',
-            w_number: '572073703',
-            email: 'Ara.Zulauf97@yahoo.com',
-            linkedin_link: 'https://moist-bowler.biz/',
-            ig_link: 'Laurence.Hyatt',
+            id: broker?.id,
+            name: broker?.name,
+            designation: broker?.designation,
+            y_o_e: broker?.y_o_e,
+            specialities: broker?.specialities,
+            company: broker?.company,
+            profile_pic: broker?.profile_pic,
+            country_code: broker?.country_code,
+            w_number: broker?.w_number,
+            email: broker?.email,
+            linkedin_link: broker?.linkedin_link,
+            ig_link: broker?.ig_link,
         },
     };
 };

@@ -205,10 +205,13 @@ export const getAIReport = async (req: Request, res: Response) => {
     try {
         const projectId = req.params.id;
         const floorPlanId = req.query.floor_plan_id as string;
+        const brokerId = req.query.broker_id as string;
 
         const aiReport = await getProjectAIReportService(
             projectId,
-            floorPlanId
+            floorPlanId,
+            (req as any).user?.userId,
+            brokerId
         );
 
         return res.status(200).json({

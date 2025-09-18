@@ -541,7 +541,8 @@ export function getPropertyData(
         return propertyData;
     } catch (error) {
         logger.warn(
-            (error as Error).message + ', returning default property data'
+            (error as Error).message +
+                `, returning default property data for locality: ${location} and property_type: ${propertyType}`
         );
 
         return defaultPropertyData;
