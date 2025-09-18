@@ -383,15 +383,15 @@ export const getProjectFloorPlansService = async (
         }
     }
     const nameMapping: { [key: string]: string } = {
-        'Studio': 'Studio',
-        'One': '1BHK',
-        'Two': '2BHK', 
-        'Three': '3BHK',
-        'Four': '4BHK',
-        'Five': '5BHK',
-        'Six': '6BHK',
-        'Seven': '7BHK'
-    }
+        Studio: 'Studio',
+        One: '1BHK',
+        Two: '2BHK',
+        Three: '3BHK',
+        Four: '4BHK',
+        Five: '5BHK',
+        Six: '6BHK',
+        Seven: '7BHK',
+    };
 
     const floorPlans = await prisma.floorPlan.findMany({
         where: whereClause,
@@ -411,9 +411,11 @@ export const getProjectFloorPlansService = async (
     });
 
     // Transform the floorPlans to include BHK format in title
-    const transformedFloorPlans = floorPlans.map(floorPlan => ({
+    const transformedFloorPlans = floorPlans.map((floorPlan) => ({
         ...floorPlan,
-        title: floorPlan.bedrooms ? nameMapping[floorPlan.bedrooms] || floorPlan.title : floorPlan.title
+        title: floorPlan.bedrooms
+            ? nameMapping[floorPlan.bedrooms] || floorPlan.title
+            : floorPlan.title,
     }));
 
     // Sort floor plans: Studio first, then by number (1BHK, 2BHK, etc.)
@@ -622,15 +624,37 @@ export const generateProjectROIReportService = async (
         throw new Error('Project not found');
     }
 
-    const floorPlan = await prisma.floorPlan.findUnique({
-        where: { id: floorPlanId, project_id: projectId },
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: {
+            project_id: projectId,
+        },
     });
+
+    let floorPlan;
+    if (floorPlanId) {
+        floorPlan = floorPlans.find((plan) => plan.id === floorPlanId);
+    } else {
+        const minSizeFloorPlans = floorPlans
+            .filter((plan) => plan.bedrooms === project.min_bedrooms)
+            .sort((a, b) => (a.unit_size || 0) - (b.unit_size || 0));
+
+        floorPlan = minSizeFloorPlans[0];
+
+        logger.warn(
+            'Floor plan Id not provided, falling back to smallest unit available - ' +
+                `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
+        );
+    }
 
     if (!floorPlan) {
         throw new Error('Floor plan not found');
     }
 
-    const { min_price, locality, handover_year } = project;
+    const min_price = floorPlanId
+        ? floorPlan.min_price || project.min_price
+        : project.min_price;
+
+    const { locality, handover_year } = project;
     const { unit_size } = floorPlan;
 
     if (!min_price || !handover_year || !locality || !unit_size) {
@@ -860,15 +884,37 @@ export const getProjectAIReportService = async (
         throw new Error('Project not found');
     }
 
-    const floorPlan = await prisma.floorPlan.findUnique({
-        where: { id: floorPlanId, project_id: projectId },
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: {
+            project_id: projectId,
+        },
     });
+
+    let floorPlan;
+    if (floorPlanId) {
+        floorPlan = floorPlans.find((plan) => plan.id === floorPlanId);
+    } else {
+        const minSizeFloorPlans = floorPlans
+            .filter((plan) => plan.bedrooms === project.min_bedrooms)
+            .sort((a, b) => (a.unit_size || 0) - (b.unit_size || 0));
+
+        floorPlan = minSizeFloorPlans[0];
+
+        logger.warn(
+            'Floor plan Id not provided, falling back to smallest unit available - ' +
+                `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
+        );
+    }
 
     if (!floorPlan) {
         throw new Error('Floor plan not found');
     }
 
-    const { min_price, locality, handover_year } = project;
+    const min_price = floorPlanId
+        ? floorPlan.min_price || project.min_price
+        : project.min_price;
+
+    const { locality, handover_year } = project;
     const { unit_size } = floorPlan;
 
     if (!min_price || !handover_year || !locality || !unit_size) {
