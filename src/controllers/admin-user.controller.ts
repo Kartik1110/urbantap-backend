@@ -905,6 +905,15 @@ export const createSponsoredJobController = async (
             const notificationTitle = 'New Job Available!';
             if (!company) throw new Error('Company not found');
             const notificationBody = `${company.name} just posted a new job: ${result.job.title}`;
+            // Create broadcast notification in database
+            await prisma.notification.create({
+                data: {
+                    sent_by_id: userId,
+                    text: notificationBody,
+                    type: NotificationType.Broadcast,
+                    job_id: result.job.id,
+                },
+            });
 
             if (brokers.length > 0) {
                 // Prepare notifications for all brokers
@@ -924,15 +933,6 @@ export const createSponsoredJobController = async (
                 // Send multicast push notification
                 await sendMulticastPushNotification(notifications);
             }
-            // Create broadcast notification in database
-            await prisma.notification.create({
-                data: {
-                    sent_by_id: userId,
-                    text: notificationBody,
-                    type: NotificationType.Broadcast,
-                    job_id: result.job.id,
-                },
-            });
         } catch (notificationError) {
             console.error('Error sending job notification:', notificationError);
             // Don't fail the job creation if notification fails
