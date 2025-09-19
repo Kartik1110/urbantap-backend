@@ -159,6 +159,7 @@ model Listing {
   payment_plan          Payment_Plan?
   sale_type             Sale_Type?
   broker_id             String
+  is_sponsored          Boolean?          @default(false)
   created_at            DateTime          @default(now())
   broker                Broker            @relation(fields: [broker_id], references: [id])
   inquiries             Inquiry[]
@@ -241,6 +242,9 @@ enum Type {
   Plot
   Retail
   Warehouse
+  Duplex
+  Penthouse
+  Residential_Building
 }
 
 enum Rental_frequency {
@@ -273,6 +277,10 @@ enum Bedrooms {
   Two
   Three
   Four_Plus
+  Four
+  Five
+  Six
+  Seven
 }
 
 enum Bathrooms {
@@ -338,6 +346,7 @@ enum Permission {
 model Developer {
   id          String    @id @default(uuid())
   cover_image String?
+  total_projects Int?
   projects    Project[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -350,28 +359,52 @@ model Project {
   id              String       @id @default(uuid())
   title           String
   description     String
-  image           String
-  images          String[] // gallery images
-  floor_plans     String[] // floor plan images
+  image_urls      String[] // gallery images
   currency        Currency
-  price           Float
+  min_price       Float?
+  max_price       Float?
   address         String
   city            City
   file_url        String? // optional downloadable file
-  type            Category
+  type            Type[]   @default([])
+  category        Category
   project_name    String
   project_age     String
-  no_of_bedrooms  Bedrooms
-  no_of_bathrooms Bathrooms
+  min_bedrooms    Bedrooms?  
+  max_bedrooms    Bedrooms?
+  min_bathrooms   Bathrooms?
+  max_bathrooms   Bathrooms?
   furnished       Furnished
-  property_size   Float
-  payment_plan    Payment_Plan
+  min_sq_ft       Float?
+  max_sq_ft   Float?  
+  property_size       Float?
+  payment_plan    Payment_Plan?
+  payment_structure   String?
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
-  amenities       String[]
+  locality        String? //function
+  latitude        Float?
+  longitude       Float?
+  amenities       Amenities[] @default([])
+  views           Int         @default(0)
   developer_id    String
+  handover_year   Int? // e.g., 2025
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
+  floor_plans     FloorPlan[] 
+}
+
+model FloorPlan {
+  id         String   @id @default(uuid())
+  title       String?
+  image_urls  String[]  @default([])
+  min_price   Float?
+  max_price   Float?
+  unit_size   Float?
+  bedrooms    Bedrooms?
+  bathrooms   Bathrooms?
+  project_id String
+  project    Project  @relation(fields: [project_id], references: [id])
 }
 
 model Brokerage {
@@ -424,8 +457,8 @@ model ReportedListing {
 
 model Notification {
   id                   String             @id @default(uuid())
-  broker_id            String
-  broker               Broker             @relation(fields: [broker_id], references: [id])
+  broker_id            String?
+  broker               Broker?            @relation(fields: [broker_id], references: [id])
   sent_by_id           String
   timestamp            DateTime           @default(now())
   text                 String
@@ -437,6 +470,8 @@ model Notification {
   connectionRequest    ConnectionRequest? @relation(fields: [connectionRequest_id], references: [id], name: "ConnectionRequestNotifications")
   listing_id           String?
   listing              Listing?           @relation(fields: [listing_id], references: [id], name: "ListingNotifications")
+  job_id               String?
+  job                  Job?               @relation(fields: [job_id], references: [id], name: "JobNotifications")
 }
 
 enum NotificationType {
@@ -515,6 +550,7 @@ model Job {
   user           User?         @relation(fields: [userId], references: [id])
   admin_user     AdminUser?    @relation(fields: [admin_user_id], references: [id])
   applications   Application[]
+  notifications  Notification[] @relation("JobNotifications")
 }
 
 enum Currency {
@@ -585,4 +621,26 @@ enum OrderType {
   JOB
   LISTING
   CREDIT
+}
+enum Amenities {
+  Pets_Allowed
+  Swimming_Pool
+  Gym
+  Parking
+  Security
+  Balcony
+  Garden
+  Air_Conditioning
+  Furnished
+  Heating
+  Jaccuzi
+  Play_Area
+  Lobby
+  Scenic_View
+  Wardrobes
+  Spa
+  Kitchen_Appliances
+  Barbecue_Area
+  Study
+  Concierge_Service
 }

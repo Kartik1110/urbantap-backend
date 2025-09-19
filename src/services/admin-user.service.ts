@@ -333,10 +333,10 @@ export const getDeveloperDetailsService = async (developerId: string) => {
     const groupedProjects = {
         all: developer.projects,
         off_plan: developer.projects.filter(
-            (p) => p.type === Category.Off_plan
+            (p) => p.category === Category.Off_plan
         ),
         ready: developer.projects.filter(
-            (p) => p.type === Category.Ready_to_move
+            (p) => p.category === Category.Ready_to_move
         ),
     };
 
@@ -593,9 +593,28 @@ export const getBrokersService = async (companyId: string) => {
 };
 
 export const getListingsForBrokerageService = async (brokerageId: string) => {
+    // Get all listings for the brokerage that are not sponsored
     return await prisma.listing.findMany({
         where: {
             brokerage_id: brokerageId,
+            is_sponsored: false,
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+    });
+};
+
+export const getSponsoredListingsForBrokerageService = async (
+    brokerageId: string
+) => {
+    return await prisma.listing.findMany({
+        where: {
+            brokerage_id: brokerageId,
+            is_sponsored: true,
+        },
+        orderBy: {
+            created_at: 'desc',
         },
     });
 };
@@ -814,4 +833,25 @@ export const getCompanyPostByIdWithRBACService = async (
             },
         },
     });
+};
+
+export const bulkUpdateListingsSponsorshipService = async (
+    listingIds: string[]
+) => {
+    if (!listingIds || listingIds.length === 0) {
+        throw new Error('Listing IDs array cannot be empty');
+    }
+
+    const updatedListings = await prisma.listing.updateMany({
+        where: {
+            id: {
+                in: listingIds,
+            },
+        },
+        data: {
+            is_sponsored: true,
+        },
+    });
+
+    return updatedListings;
 };

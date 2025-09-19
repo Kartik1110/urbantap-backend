@@ -10,11 +10,7 @@ import {
     createCompanyPostService,
     createSponsoredCompanyPostService,
     editCompanyPostService,
-    getAllCompanyPostsService,
-    getCompanyPostByIdService,
     createJobService,
-    getJobsForCompanyService,
-    getJobByIdService,
     getProfileService,
     getJobApplicationsService,
     getProjectsService,
@@ -27,6 +23,8 @@ import {
     getCompanyPostsWithRBACService,
     getJobByIdWithRBACService,
     getCompanyPostByIdWithRBACService,
+    bulkUpdateListingsSponsorshipService,
+    getSponsoredListingsForBrokerageService,
 } from '../services/admin-user.service';
 import { Express } from 'express';
 import prisma from '../utils/prisma';
@@ -34,7 +32,16 @@ import { Request, Response } from 'express';
 import { uploadToS3 } from '../utils/s3Upload';
 import { createSponsoredJobService } from '../services/job.service';
 import { AuthenticatedRequest } from '../utils/verifyToken';
-import { CompanyType, Currency, Listing } from '@prisma/client';
+import {
+    CompanyType,
+    Currency,
+    Listing,
+    NotificationType,
+} from '@prisma/client';
+import {
+    sendMulticastPushNotification,
+    PushNotificationData,
+} from '../services/firebase.service';
 import { v4 as uuidv4 } from 'uuid';
 
 export const signup = async (req: Request, res: Response) => {
@@ -304,7 +311,7 @@ export const createProject = async (
             price,
             address,
             city,
-            type,
+            category,
             project_name,
             project_age,
             no_of_bedrooms,
@@ -319,14 +326,14 @@ export const createProject = async (
         const projectData = {
             title,
             description,
-            price: parseFloat(price),
+            min_price: parseFloat(price),
             address,
             city,
-            type,
+            category,
             project_name,
             project_age,
-            no_of_bedrooms,
-            no_of_bathrooms,
+            min_bedrooms: no_of_bedrooms,
+            min_bathrooms: no_of_bathrooms,
             furnished,
             property_size: parseFloat(property_size),
             payment_plan,
@@ -334,7 +341,6 @@ export const createProject = async (
             amenities: JSON.parse(amenities), // expects JSON string
             image: mainImageUrl,
             images: galleryImageUrls,
-            floor_plans: floorPlanUrls,
             file_url: fileUrl,
             developer_id: req.user.entityId,
             currency: Currency.AED,
@@ -875,11 +881,65 @@ export const createSponsoredJobController = async (
             sponsor_duration_days
         );
 
-        return res.status(201).json({
-            status: 'success',
-            message: 'Sponsored job created successfully',
-            data: result,
+        // Send broadcast notification to all brokers
+
+        // Get company details for notification
+        const company = await prisma.company.findUnique({
+            where: { id: companyId },
         });
+
+        // Get all brokers with FCM tokens
+        const brokers = await prisma.broker.findMany({
+            where: {
+                user: {
+                    fcm_token: {
+                        not: null,
+                    },
+                },
+            },
+            include: {
+                user: true,
+            },
+        });
+
+        const notificationTitle = 'New Job Available!';
+        if (!company) throw new Error('Company not found');
+        const notificationBody = `${company.name} just posted a new job: ${result.job.title}`;
+
+        // Create broadcast notification in database
+        await prisma.notification.create({
+            data: {
+                sent_by_id: userId,
+                text: notificationBody,
+                type: NotificationType.Broadcast,
+                job_id: result.job.id,
+            },
+        });
+
+        if (brokers.length > 0) {
+            // Prepare notifications for all brokers
+            const notifications: PushNotificationData[] = brokers.map(
+                (broker) => ({
+                    token: broker.user!.fcm_token!,
+                    title: notificationTitle,
+                    body: notificationBody,
+                    data: {
+                        jobId: result.job.id,
+                        type: 'NEW_JOB_ALERT',
+                        companyId: companyId,
+                    },
+                })
+            );
+
+            // Send multicast push notification
+            await sendMulticastPushNotification(notifications);
+
+            return res.status(201).json({
+                status: 'success',
+                message: 'Sponsored job created successfully',
+                data: result,
+            });
+        }
     } catch (error: any) {
         console.error('Create sponsored job error:', error);
         return res.status(500).json({
@@ -948,6 +1008,83 @@ export const createSponsoredCompanyPostController = async (
         res.status(500).json({
             status: 'error',
             message: error.message || 'Server Error',
+        });
+    }
+};
+
+export const bulkUpdateListingsSponsorshipController = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const { listingIds } = req.body;
+
+        if (
+            !listingIds ||
+            !Array.isArray(listingIds) ||
+            listingIds.length === 0
+        ) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'listingIds must be a non-empty array of strings',
+            });
+        }
+
+        if (listingIds.some((id) => typeof id !== 'string')) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'All listing IDs must be strings',
+            });
+        }
+
+        const updatedListings =
+            await bulkUpdateListingsSponsorshipService(listingIds);
+
+        res.status(200).json({
+            status: 'success',
+            message: `Successfully updated ${updatedListings.count} listings to sponsored`,
+            data: {
+                updatedCount: updatedListings.count,
+                listingIds,
+            },
+        });
+    } catch (error: any) {
+        console.error('Bulk update listings sponsorship error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message || 'Failed to update listings sponsorship',
+        });
+    }
+};
+
+export const getSponsoredListingsForBrokerage = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const brokerageId = req.user?.entityId;
+        if (!brokerageId || req.user?.type !== CompanyType.Brokerage) {
+            return res.status(401).json({
+                status: 'error',
+                message:
+                    'Unauthorized: Only brokerage companies can access this endpoint',
+            });
+        }
+
+        const sponsoredListings =
+            await getSponsoredListingsForBrokerageService(brokerageId);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Sponsored listings fetched successfully',
+            data: sponsoredListings,
+            count: sponsoredListings.length,
+        });
+    } catch (error: any) {
+        console.error('Get sponsored listings error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message || 'Failed to fetch sponsored listings',
         });
     }
 };

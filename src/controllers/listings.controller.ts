@@ -15,6 +15,7 @@ import {
     getListingAppreciationProjections,
     getListingROIReportService,
     getAIReportService,
+    createListingService,
 } from '../services/listings.service';
 import { uploadToS3 } from '../utils/s3Upload';
 import prisma from '../utils/prisma';
@@ -141,6 +142,57 @@ export const bulkInsertListings = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to insert listings',
+            error: error,
+        });
+    }
+};
+
+/* Create listings */
+export const createListing = async (req: Request, res: Response) => {
+    const images = req.files as Express.Multer.File[] | undefined;
+    const listingData = req.body.listing; // Single listing, not array
+
+    let imageUrls: string[] = [];
+
+    // Only process images if they exist
+    if (images && images.length > 0) {
+        try {
+            imageUrls = await Promise.all(
+                images.map(async (image) => {
+                    const fileExtension = image.originalname.split('.').pop();
+                    return await uploadToS3(
+                        image.path,
+                        `listings/${Date.now()}-${uuidv4()}.${fileExtension}`
+                    );
+                })
+            );
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: 'Failed to upload images to S3',
+                error: error,
+            });
+            return; // Exit early on error
+        }
+    }
+
+    // Parse single listing and attach images
+    const listingWithImages = {
+        ...JSON.parse(listingData),
+        image_urls: imageUrls,
+    };
+
+    try {
+        const createdListing = await createListingService(listingWithImages);
+        res.json({
+            status: 'success',
+            message: 'Listing created successfully',
+            data: createdListing,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to create listing',
             error: error,
         });
     }
@@ -355,22 +407,9 @@ export const getListingAppreciation = async (req: Request, res: Response) => {
 // Get listing ROI report
 export const getListingROIReport = async (req: Request, res: Response) => {
     const listingId = req.params.id;
-    const {
-        user_preference: num_of_years,
-        goal,
-        mortgage,
-    }: {
-        user_preference: number;
-        goal: 'Rental' | 'Self Use';
-        mortgage: boolean;
-    } = req.body;
 
     try {
-        const roiReport = await getListingROIReportService(listingId, {
-            num_of_years,
-            is_self_use: goal === 'Self Use',
-            is_self_paid: mortgage,
-        });
+        const roiReport = await getListingROIReportService(listingId);
 
         return res.status(200).json({
             status: 'success',

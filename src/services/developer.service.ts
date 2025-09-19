@@ -29,6 +29,13 @@ export const getDevelopersService = async ({
             where: whereClause,
             skip,
             take: pageSize,
+            orderBy: {
+                developer: {
+                    projects: {
+                        _count: 'desc'
+                    }
+                }
+            },
             select: {
                 id: true,
                 name: true,
@@ -112,30 +119,44 @@ export const createDeveloperService = async (data: {
 };
 
 export const getDeveloperDetailsService = async (developerId: string) => {
-    const developer = await prisma.developer.findUnique({
-        where: { id: developerId },
-        include: {
-            projects: {
-                select: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    image: true,
-                    images: true,
-                    address: true,
-                }
-            },
-            company: {
-                select: {
-                    name: true,
-                    logo: true,
-                    description: true,
+    const [developer, totalProjectCount] = await Promise.all([
+        prisma.developer.findUnique({
+            where: { id: developerId },
+            include: {
+                projects: {
+                    take: 5,
+                    select: {
+                        id: true,
+                        category: true,
+                        image_urls: true,
+                        project_name: true,
+                        address: true,
+                    }
+                },
+                company: {
+                    select: {
+                        name: true,
+                        logo: true,
+                        description: true,
+                    },
                 },
             },
-        },
-    });
+        }),
+        prisma.project.count({
+            where: { developer_id: developerId }
+        })
+    ]);
 
     if (!developer) throw new Error('Developer not found');
+
+    // Format projects to match the required structure
+    const formattedProjects = developer.projects.map(project => ({
+        id: project.id,
+        category: project.category,
+        image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
+        project_name: project.project_name,
+        address: project.address,
+    }));
 
     return {
         id: developer.id,
@@ -143,7 +164,8 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         logo: developer.company?.logo,
         cover_image: developer.cover_image,
         description: developer.company?.description,
-        project_count: developer.projects.length,
-        projects: developer.projects,
+        project_count: totalProjectCount,
+        projects: formattedProjects,
     };
 };
+
