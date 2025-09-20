@@ -87,14 +87,14 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.userId || undefined;
 
     try {
-        const queryParams = {
-            page: parseInt(req.query.page as string) || undefined,
-            page_size: parseInt(req.query.page_size as string) || undefined,
-            search: (req.query.search as string) || undefined,
-            show_expired_sponsored: false, // Always filter out expired sponsored jobs
+        const bodyParams = {
+            page: req.body.page || undefined,
+            page_size: req.body.page_size || undefined,
+            search: req.body.search || undefined,
+            show_expired_sponsored: req.body.show_expired_sponsored || false, // Always filter out expired sponsored jobs by default
         };
 
-        const { jobs, pagination } = await getJobsService(queryParams, userId);
+        const { jobs, pagination } = await getJobsService(bodyParams, userId);
 
         res.status(200).json({
             status: 'success',
