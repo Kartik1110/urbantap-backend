@@ -256,19 +256,30 @@ export function getRentalPriceInYear(
     year: number,
     period: 'annual' | 'monthly' = 'annual'
 ): number {
-    if (year < 0 || year > 9) {
-        const message = 'Year must be between 0 and 9';
-        logger.error(`getRentalPriceInYear: ${message}`);
-        throw new Error(message);
-    }
-
     if (!propertyData || !propertyData.length) {
         const message = 'Property type not found';
         logger.error(`getRentalPriceInYear: ${message}`);
         throw new Error(message);
     }
 
-    const monthlyRent = propertyData[year].rent_per_sq_ft * propertySize;
+    if (year < 0) {
+        const message = `Year value can not be negative, year: ${year}`;
+        logger.error(`getRentalPriceInYear: ${message}`);
+        throw new Error(message);
+    }
+
+    let rentPerSqFt = 0;
+    if (year >= 10) {
+        const baseRent = propertyData[9].rent_per_sq_ft;
+        const extraYears = year - 10;
+
+        // 5% increase compounded for every extra year
+        rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
+    } else {
+        rentPerSqFt = propertyData[year].rent_per_sq_ft;
+    }
+
+    const monthlyRent = rentPerSqFt * propertySize;
 
     if (period === 'monthly') {
         return monthlyRent;
