@@ -11,9 +11,9 @@ generator client {
 model User {
   id                 String        @id @default(uuid())
   email              String        @unique
-  password           String
+  password           String?
   name               String?
-  role               Role
+  role               Role?
   country_code       String?
   w_number           String?
   createdAt          DateTime      @default(now())
@@ -26,6 +26,7 @@ model User {
   appleAccessToken   String?
   appleRefreshToken  String?
   fcm_token          String?
+  email_secret       String?
   jobs               Job[]
   applications       Application[]
 }
@@ -99,6 +100,7 @@ model Company {
   logo        String        @default("")
   type        CompanyType   @default(Other)
   website     String?       @default("")
+  domain_name String?       @unique
   email       String?       @default("")
   phone       String?       @default("")
   address     String?       @default("")
