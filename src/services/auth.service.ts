@@ -2,9 +2,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import appleSignin from 'apple-signin-auth';
 import { OAuth2Client } from 'google-auth-library';
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role, User } from '@prisma/client';
 
 import logger from '../utils/logger';
+import emailService from '../common/services/email.service';
+import { EmailRecipient, OtpSignupEmailData } from '../types/email.types';
 
 const prisma = new PrismaClient();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -50,7 +52,16 @@ export const loginService = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
     const broker = await prisma.broker.findUnique({ where: { email } });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    if (!user.password) {
+        throw new Error('Invalid credentials');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
         throw new Error('Invalid credentials');
     }
 
@@ -294,4 +305,112 @@ export const updateFcmTokenService = async (
         where: { id: decoded.userId },
         data: { fcm_token: fcmToken },
     });
+};
+
+/** This function is used to send an email to the user with an OTP and update the user */
+const sendEmailOtpAndCreateUser = async (user: User) => {
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    // keeping it for debugging purposes
+    console.log('otp::::', otp);
+
+    const emailSecret = await bcrypt.hash(otp.toString(), 10);
+
+    const recipient: EmailRecipient = {
+        email: user.email,
+        name: user.name || 'User',
+    };
+
+    if (!recipient.name) {
+        throw new Error('User name not found');
+    }
+
+    const data: OtpSignupEmailData = {
+        recipientName: recipient.name,
+        otpCode: String(otp),
+        companyName: process.env.COMPANY_NAME || 'Ruba.ai',
+        companyAddress: process.env.COMPANY_ADDRESS || 'Dubai, UAE',
+        supportEmail: process.env.SUPPORT_EMAIL || 'support@ruba.ai',
+    };
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { email_secret: emailSecret },
+    });
+
+    // Send email to user
+    await emailService.sendTemplateEmail(
+        {
+            name: 'otp-signup',
+            description: 'OTP verification email for user signup',
+        },
+        recipient,
+        data
+    );
+};
+
+/** This function is used to verify the OTP */
+const verifyOTP = async (userEnteredOTP: string, storedHash: string) => {
+    try {
+        const isValid = await bcrypt.compare(userEnteredOTP, storedHash);
+        return isValid;
+    } catch (error) {
+        logger.error('Error verifying OTP:', error);
+        return false;
+    }
+};
+
+export const sendEmailOtpService = async (email: string) => {
+    const userCompanyDomain = email.split('@')[1];
+
+    const companyDomainName = await prisma.company.findUnique({
+        where: { domain_name: userCompanyDomain },
+    });
+    if (!companyDomainName) {
+        throw new Error('Company is not registered with UrbanTap.');
+    }
+
+    if (userCompanyDomain !== companyDomainName.domain_name) {
+        throw new Error('You are not authorized to signup with this email.');
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+        await sendEmailOtpAndCreateUser(user);
+        return;
+    }
+
+    const newUser = await prisma.user.create({
+        data: {
+            email,
+            password: '',
+        },
+    });
+
+    await sendEmailOtpAndCreateUser(newUser);
+    return;
+};
+
+export const verifyEmailOtpService = async (email: string, otp: string) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+    const broker = await prisma.broker.findUnique({ where: { email } });
+
+    if (!user || !user.email_secret) {
+        throw new Error('User not found');
+    }
+
+    const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_SECRET!
+    );
+
+    const isValid = await verifyOTP(otp, user.email_secret);
+    if (!isValid) {
+        throw new Error('Invalid OTP');
+    }
+
+    return {
+        token,
+        user,
+        brokerId: broker?.id || null,
+    };
 };

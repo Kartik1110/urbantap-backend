@@ -7,6 +7,8 @@ import {
     updateUserService,
     deleteUserService,
     updateFcmTokenService,
+    sendEmailOtpService,
+    verifyEmailOtpService,
 } from '../services/auth.service';
 import logger from '../utils/logger';
 
@@ -190,7 +192,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
 };
 
-export const updateFcmTokenHandler = async (req: Request, res: Response) => {
+export const updateFcmToken = async (req: Request, res: Response) => {
     try {
         const { fcmToken } = req.body;
         const token = req.headers.authorization;
@@ -209,5 +211,54 @@ export const updateFcmTokenHandler = async (req: Request, res: Response) => {
             logger.error(String(error));
         }
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const sendEmailOtp = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        await sendEmailOtpService(email);
+        res.json({
+            status: 'success',
+            message: 'Email OTP sent successfully. Please check your email.',
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            logger.error(error.message);
+            return res
+                .status(400)
+                .json({ status: 'error', message: error.message });
+        } else {
+            logger.error(String(error));
+        }
+        return res.status(500).json({
+            status: 'error',
+            message: 'Internal server error',
+        });
+    }
+};
+
+export const verifyEmailOtp = async (req: Request, res: Response) => {
+    try {
+        const { email, otp } = req.body;
+        const result = await verifyEmailOtpService(email, otp);
+        res.json({
+            status: 'success',
+            message: 'Email OTP verified successfully',
+            data: result,
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            logger.error(error.message);
+            return res
+                .status(400)
+                .json({ status: 'error', message: error.message });
+        } else {
+            logger.error(String(error));
+        }
+        return res.status(500).json({
+            status: 'error',
+            message: 'Internal server error',
+        });
     }
 };
