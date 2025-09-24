@@ -14,100 +14,6 @@ export interface MergedPropertyData {
     [location: string]: PropertyTypeData;
 }
 
-const DEFFAULT_DP_RATIO = 0.4;
-const DEFFAULT_INTEREST_RATE = 0.0399;
-
-/**
- * Calculates the property ROI for a given year based on appreciation rate, rental income, and mortgage costs
- * @param propertyData - The property data from the JSON file
- * @param year - The year to calculate ROI for (0-9, where 0 is the first year)
- * @param initialInvestment - The initial investment amount in the base currency
- * @param propertySize - The property size in square feet
- * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
- * @param annualInterestRate - The annual interest rate (default: 0.0399)
- * @param monthlyRent - The monthly rent (default: undefined)
- * @returns The calculated ROI percentage, or null if data is not available
- */
-export function calculatePropertyROI(
-    propertyData: PropertyDataPoint[],
-    year: number,
-    initialInvestment: number,
-    propertySize: number,
-    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
-    annualInterestRate: number = DEFFAULT_INTEREST_RATE,
-    monthlyRent?: number
-): number {
-    // Validate inputs
-    if (year < 0 || year > 9) {
-        const message = 'Year must be between 0 and 9';
-        logger.error(`calculatePropertyROI: ${message}`);
-        throw new Error(message);
-    }
-
-    if (initialInvestment <= 0) {
-        const message = 'Initial investment must be positive';
-        logger.error(`calculatePropertyROI: ${message}`);
-        throw new Error(message);
-    }
-
-    if (propertySize <= 0) {
-        const message = 'Property size must be positive';
-        logger.error(`calculatePropertyROI: ${message}`);
-        throw new Error(message);
-    }
-
-    if (!propertyData || !propertyData[year]) {
-        const message = 'Property data points not provided';
-        logger.error(`calculatePropertyROI: ${message}`);
-        throw new Error(message);
-    }
-
-    const yearData = propertyData[year];
-
-    // Calculate property value appreciation
-    // appreciation_perc is cumulative from year 0, so we need to calculate year-over-year
-    let appreciationPercentage: number;
-
-    if (year === 0) {
-        // Year 0 should use the first period's cumulative appreciation from current year
-        appreciationPercentage = yearData.appreciation_perc;
-    } else {
-        // Get previous year's cumulative appreciation
-        const previousYearData = propertyData[year - 1];
-        if (!previousYearData) {
-            const message = 'Previous year data not found';
-            logger.error(`calculatePropertyROI: ${message}`);
-            throw new Error(message);
-        }
-
-        // Calculate year-over-year appreciation
-        appreciationPercentage =
-            yearData.appreciation_perc - previousYearData.appreciation_perc;
-    }
-
-    const propertyValueIncrease =
-        initialInvestment * (appreciationPercentage / 100);
-
-    // Calculate rental income for the year
-    const rentPerSqFt = yearData.rent_per_sq_ft;
-    const annualRentalIncome = (monthlyRent || rentPerSqFt * propertySize) * 12; // Assuming 12 months
-
-    const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
-    const downPayment = initialInvestment * downPaymentToLoanRatio;
-
-    // Calculate annual mortgage interest payment
-    const annualMortgageInterest = loanAmount * annualInterestRate;
-
-    // Calculate net ROI (returns minus mortgage costs)
-    const totalReturn = propertyValueIncrease + annualRentalIncome;
-    const netReturn = totalReturn - annualMortgageInterest;
-
-    // ROI is calculated on the actual cash invested (down payment)
-    const roi = (netReturn / downPayment) * 100;
-
-    return roi;
-}
-
 /**
  * Calculates the average annual ROI percentage over a given number of years.
  * ROI is calculated as rental yield using the average of short-term and long-term rents.
@@ -336,99 +242,6 @@ export function calculateAppreciationDataPoints(
 }
 
 /**
- * Calculates cumulative ROI over multiple years based on investment type
- * @param propertyData - The property data from the JSON file
- * @param years - The number of years to calculate cumulative ROI for
- * @param initialInvestment - The initial investment amount in the base currency
- * @param propertySize - The property size in square feet
- * @param isSelfUse - Boolean: true for self-use, false for rental
- * @param isSelfPaid - Boolean: true for self-paid, false for mortgage
- * @param downPaymentToLoanRatio - The down payment to loan ratio (default: 0.4)
- * @param annualInterestRate - The annual interest rate (default: 0.0399)
- * @returns The cumulative ROI percentage, or null if data is not available
- */
-export function calculateCumulativeROIByType(
-    propertyData: PropertyDataPoint[],
-    years: number,
-    initialInvestment: number,
-    propertySize: number,
-    isSelfUse: boolean,
-    isSelfPaid: boolean,
-    downPaymentToLoanRatio: number = DEFFAULT_DP_RATIO,
-    annualInterestRate: number = DEFFAULT_INTEREST_RATE
-): number {
-    if (years < 1 || years > 10) {
-        const message = 'Years must be between 1 and 10';
-        logger.error(`calculateCumulativeROIByType: ${message}`);
-        throw new Error(message);
-    }
-
-    if (!propertyData || propertyData.length === 0) {
-        const message = 'Property data not provided';
-        logger.error(`calculateCumulativeROIByType: ${message}`);
-        throw new Error(message);
-    }
-
-    // For self-paid investments, the initial investment is the full amount
-    // For mortgage investments, we use the down payment
-    const cashInvested = isSelfPaid
-        ? initialInvestment
-        : initialInvestment * downPaymentToLoanRatio;
-    let totalNetReturnAmount = 0;
-
-    for (let year = 0; year < years; year++) {
-        const yearData = propertyData[year];
-        if (!yearData) {
-            const message = 'Year data not found';
-            logger.error(`calculateCumulativeROIByType: ${message}`);
-            throw new Error(message);
-        }
-
-        // Calculate year-over-year appreciation
-        let appreciationPercentage: number;
-        if (year === 0) {
-            appreciationPercentage = yearData.appreciation_perc;
-        } else {
-            const previousYearData = propertyData[year - 1];
-            if (!previousYearData) {
-                const message = 'Previous year data not found';
-                logger.error(`calculateCumulativeROIByType: ${message}`);
-                throw new Error(message);
-            }
-
-            appreciationPercentage =
-                yearData.appreciation_perc - previousYearData.appreciation_perc;
-        }
-
-        const propertyValueIncrease =
-            initialInvestment * (appreciationPercentage / 100);
-
-        // Calculate rental income (only for rental properties)
-        let annualRentalIncome = 0;
-        if (!isSelfUse) {
-            const rentPerSqFt = yearData.rent_per_sq_ft;
-            annualRentalIncome = rentPerSqFt * propertySize * 12;
-        }
-
-        // Calculate mortgage costs (only for mortgage properties)
-        let annualMortgageInterest = 0;
-        if (!isSelfPaid) {
-            const loanAmount = initialInvestment * (1 - downPaymentToLoanRatio);
-            annualMortgageInterest = loanAmount * annualInterestRate;
-        }
-
-        // Calculate net return for this year
-        const netReturn =
-            propertyValueIncrease + annualRentalIncome - annualMortgageInterest;
-        totalNetReturnAmount += netReturn;
-    }
-
-    // ROI is calculated on the actual cash invested
-    const roi = (totalNetReturnAmount / cashInvested) * 100;
-    return roi;
-}
-
-/**
  * Gets the rental price for a given year.
  *
  * @param propertyData - The property data from the JSON file
@@ -443,19 +256,30 @@ export function getRentalPriceInYear(
     year: number,
     period: 'annual' | 'monthly' = 'annual'
 ): number {
-    if (year < 0 || year > 9) {
-        const message = 'Year must be between 0 and 9';
-        logger.error(`getRentalPriceInYear: ${message}`);
-        throw new Error(message);
-    }
-
     if (!propertyData || !propertyData.length) {
         const message = 'Property type not found';
         logger.error(`getRentalPriceInYear: ${message}`);
         throw new Error(message);
     }
 
-    const monthlyRent = propertyData[year].rent_per_sq_ft * propertySize;
+    if (year < 0) {
+        const message = `Year value can not be negative, year: ${year}`;
+        logger.error(`getRentalPriceInYear: ${message}`);
+        throw new Error(message);
+    }
+
+    let rentPerSqFt = 0;
+    if (year >= 10) {
+        const baseRent = propertyData[9].rent_per_sq_ft;
+        const extraYears = year - 10;
+
+        // 5% increase compounded for every extra year
+        rentPerSqFt = baseRent * Math.pow(1.05, extraYears);
+    } else {
+        rentPerSqFt = propertyData[year].rent_per_sq_ft;
+    }
+
+    const monthlyRent = rentPerSqFt * propertySize;
 
     if (period === 'monthly') {
         return monthlyRent;
