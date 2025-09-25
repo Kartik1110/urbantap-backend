@@ -7,6 +7,7 @@ import { PrismaClient, Role, User } from '@prisma/client';
 import logger from '../utils/logger';
 import emailService from '../common/services/email.service';
 import { EmailRecipient, OtpSignupEmailData } from '../types/email.types';
+import { EMAIL_CONFIG } from '../config/email.config';
 
 const prisma = new PrismaClient();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -309,8 +310,22 @@ export const updateFcmTokenService = async (
 
 /** This function is used to send an email to the user with an OTP and update the user */
 const sendEmailOtpAndCreateUser = async (user: User) => {
-    const otp = Math.floor(1000 + Math.random() * 9000);
-    // keeping it for debugging purposes
+    // Check if email is whitelisted
+    const isWhitelisted = EMAIL_CONFIG.otp.whitelistedEmails.includes(
+        user.email.toLowerCase()
+    );
+
+    let otp: number;
+    if (isWhitelisted) {
+        otp = parseInt(EMAIL_CONFIG.otp.whitelistOtpCode);
+        logger.info(
+            `Whitelisted email detected: ${user.email}, using OTP: ${otp}`
+        );
+    } else {
+        otp = Math.floor(1000 + Math.random() * 9000);
+        logger.info(`Generated OTP for ${user.email}: ${otp}`);
+    }
+
     console.log('otp::::', otp);
 
     const emailSecret = await bcrypt.hash(otp.toString(), 10);
@@ -360,17 +375,27 @@ const verifyOTP = async (userEnteredOTP: string, storedHash: string) => {
 };
 
 export const sendEmailOtpService = async (email: string) => {
-    const userCompanyDomain = email.split('@')[1];
+    // Whitelisted emails check for testing purposes
+    const isWhitelisted = EMAIL_CONFIG.otp.whitelistedEmails.includes(
+        email.toLowerCase()
+    );
 
-    const companyDomainName = await prisma.company.findUnique({
-        where: { domain_name: userCompanyDomain },
-    });
-    if (!companyDomainName) {
-        throw new Error('Company is not registered with UrbanTap.');
-    }
+    // Skip company validation for whitelisted emails
+    if (!isWhitelisted) {
+        const userCompanyDomain = email.split('@')[1];
 
-    if (userCompanyDomain !== companyDomainName.domain_name) {
-        throw new Error('You are not authorized to signup with this email.');
+        const companyDomainName = await prisma.company.findUnique({
+            where: { domain_name: userCompanyDomain },
+        });
+        if (!companyDomainName) {
+            throw new Error('Company is not registered with UrbanTap.');
+        }
+
+        if (userCompanyDomain !== companyDomainName.domain_name) {
+            throw new Error(
+                'You are not authorized to signup with this email.'
+            );
+        }
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

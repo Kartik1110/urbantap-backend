@@ -25,6 +25,16 @@ export const EMAIL_CONFIG = {
         companyAddress: process.env.COMPANY_ADDRESS || 'Dubai, UAE',
         supportEmail: process.env.SUPPORT_EMAIL || 'support@urbantap.io',
     },
+
+    // OTP settings
+    otp: {
+        whitelistedEmails: process.env.OTP_WHITELISTED_EMAILS
+            ? process.env.OTP_WHITELISTED_EMAILS.split(',').map((email) =>
+                  email.trim()
+              )
+            : [],
+        whitelistOtpCode: process.env.OTP_WHITELIST_CODE || '1001',
+    },
 };
 
 export interface EmailConfig {
@@ -47,6 +57,10 @@ export interface EmailConfig {
         companyName: string;
         companyAddress: string;
         supportEmail: string;
+    };
+    otp: {
+        whitelistedEmails: string[];
+        whitelistOtpCode: string;
     };
     rateLimit: {
         maxEmailsPerHour: number;
