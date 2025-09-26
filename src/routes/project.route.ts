@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
     getProjects,
     getProjectById,
+    getProjectByName,
     createProject,
     getProjectFloorPlans,
     getProjectsByDeveloper,
@@ -20,6 +21,9 @@ router.get('/projects/featured', getFeaturedProjects);
 
 /* Get all projects for a specific developer */
 router.get('/projects/developer/:id', getProjectsByDeveloper);
+
+/* Get project by name */
+router.get('/projects/name/:name', getProjectByName);
 
 /* Get project by ID */
 router.get('/projects/:id', getProjectById);

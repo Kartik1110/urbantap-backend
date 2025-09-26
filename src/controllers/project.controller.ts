@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {
     getProjectsService,
     getProjectByIdService,
+    getProjectByNameService,
     createProjectService,
     getProjectFloorPlansService,
     getProjectsByDeveloperService,
@@ -52,6 +53,33 @@ export const getProjectById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const project = await getProjectByIdService(id);
+
+        if (!project) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Project not found',
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Project details fetched successfully',
+            data: project,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch project details',
+            error,
+        });
+    }
+};
+
+// GET /projects/name/:name
+export const getProjectByName = async (req: Request, res: Response) => {
+    try {
+        const { name } = req.params;
+        const project = await getProjectByNameService(name);
 
         if (!project) {
             return res.status(404).json({
