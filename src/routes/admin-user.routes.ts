@@ -82,12 +82,7 @@ export default (upload: any) => {
     router.post(
         '/admin-user/projects',
         verifyToken,
-        upload.fields([
-            { name: 'image', maxCount: 1 },
-            { name: 'images', maxCount: 10 },
-            { name: 'floor_plans', maxCount: 10 },
-            { name: 'file_url', maxCount: 1 },
-        ]),
+        upload.array('image_urls', 20), // Allow up to 20 images in single field
         validateSchema(createProjectSchema),
         createProject
     );

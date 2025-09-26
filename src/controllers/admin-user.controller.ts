@@ -251,98 +251,78 @@ export const createProject = async (
             });
         }
 
-        const files = req.files as {
-            image?: Express.Multer.File[];
-            images?: Express.Multer.File[];
-            floor_plans?: Express.Multer.File[];
-            file_url?: Express.Multer.File[];
-        };
+        const files = req.files as Express.Multer.File[] | undefined;
 
-        // Upload main image
-        let mainImageUrl = '';
-        if (files?.image?.[0]) {
-            const ext = files.image[0].originalname.split('.').pop();
-            mainImageUrl = await uploadToS3(
-                files.image[0].path,
-                `projects/image_${Date.now()}.${ext}`
-            );
-        }
+        // console.log('Files received:', files?.length || 0);
+        // console.log('Files details:', files?.map(f => ({ name: f.originalname, size: f.size })));
 
-        // Upload gallery images
-        let galleryImageUrls: string[] = [];
-        if (files?.images) {
-            for (const file of files.images) {
+        // Upload multiple images from image_urls field
+        let imageUrls: string[] = [];
+        if (files && files.length > 0) {
+            for (const file of files) {
                 const ext = file.originalname.split('.').pop();
                 const url = await uploadToS3(
                     file.path,
-                    `projects/gallery_${Date.now()}_${file.originalname}`
+                    `projects/images_${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
                 );
-                galleryImageUrls.push(url);
+                imageUrls.push(url);
             }
         }
 
-        // Upload floor plan images
-        let floorPlanUrls: string[] = [];
-        if (files?.floor_plans) {
-            for (const file of files.floor_plans) {
-                const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
-                    `projects/floorplan_${Date.now()}_${file.originalname}`
-                );
-                floorPlanUrls.push(url);
-            }
-        }
-
-        // Upload optional downloadable file
-        let fileUrl = '';
-        if (files?.file_url?.[0]) {
-            const ext = files.file_url[0].originalname.split('.').pop();
-            fileUrl = await uploadToS3(
-                files.file_url[0].path,
-                `projects/file_${Date.now()}.${ext}`
-            );
-        }
+        // console.log('Uploaded image URLs:', imageUrls);
 
         // Parse body fields
         const {
             title,
             description,
-            price,
+            min_price,
+            max_price,
             address,
             city,
             category,
+            type,
             project_name,
             project_age,
-            no_of_bedrooms,
-            no_of_bathrooms,
+            min_bedrooms,
+            max_bedrooms,
+            min_bathrooms,
+            max_bathrooms,
             furnished,
+            min_sq_ft,
+            max_sq_ft,
             property_size,
             payment_plan,
+            payment_structure,
             unit_types,
             amenities,
+            handover_year,
         } = req.body;
 
         const projectData = {
             title,
             description,
-            min_price: parseFloat(price),
+            min_price: min_price ? parseFloat(min_price) : undefined,
+            max_price: max_price ? parseFloat(max_price) : undefined,
             address,
             city,
             category,
+            type: JSON.parse(type), // expects JSON string array
             project_name,
             project_age,
-            min_bedrooms: no_of_bedrooms,
-            min_bathrooms: no_of_bathrooms,
+            min_bedrooms,
+            max_bedrooms,
+            min_bathrooms,
+            max_bathrooms,
             furnished,
-            property_size: parseFloat(property_size),
+            min_sq_ft: min_sq_ft ? parseFloat(min_sq_ft) : undefined,
+            max_sq_ft: max_sq_ft ? parseFloat(max_sq_ft) : undefined,
+            property_size: property_size ? parseFloat(property_size) : undefined,
             payment_plan,
+            payment_structure,
             unit_types: JSON.parse(unit_types), // expects JSON string
-            amenities: JSON.parse(amenities), // expects JSON string
-            image: mainImageUrl,
-            images: galleryImageUrls,
-            file_url: fileUrl,
-            developer_id: req.user.entityId,
+            amenities: amenities ? JSON.parse(amenities) : undefined, // expects JSON string
+            handover_year: handover_year ? parseInt(handover_year) : undefined,
+            image_urls: imageUrls, // All images from single field
             currency: Currency.AED,
             developer: {
                 connect: {

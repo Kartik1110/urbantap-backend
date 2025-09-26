@@ -7,6 +7,8 @@ import {
     Furnished,
     Payment_Plan,
     Currency,
+    Type,
+    Amenities,
 } from '@prisma/client';
 
 export const createProjectSchema = z.object({
@@ -20,12 +22,22 @@ export const createProjectSchema = z.object({
         .min(1, 'Description is required')
         .max(2000, 'Description must be less than 2000 characters'),
 
-    price: z.preprocess(
+    min_price: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
         z
             .number()
-            .positive('Price must be positive')
-            .max(1_000_000_000, 'Price seems unreasonably high')
+            .positive('Min price must be positive')
+            .max(1_000_000_000, 'Min price seems unreasonably high')
+            .optional()
+    ),
+
+    max_price: z.preprocess(
+        (val) => (typeof val === 'string' ? parseFloat(val) : val),
+        z
+            .number()
+            .positive('Max price must be positive')
+            .max(1_000_000_000, 'Max price seems unreasonably high')
+            .optional()
     ),
 
     currency: z.nativeEnum(Currency, {
@@ -45,11 +57,19 @@ export const createProjectSchema = z.object({
         }),
     }),
 
-    type: z.nativeEnum(Category, {
+    category: z.nativeEnum(Category, {
         errorMap: () => ({
-            message: `Type must be one of: ${Object.values(Category).join(', ')}`,
+            message: `Category must be one of: ${Object.values(Category).join(', ')}`,
         }),
     }),
+
+    type: z.preprocess(
+        (val) => (typeof val === 'string' ? JSON.parse(val) : val),
+        z
+            .array(z.nativeEnum(Type))
+            .min(1, 'At least one type is required')
+            .max(10, 'Too many types (max 10)')
+    ),
 
     project_name: z
         .string()
@@ -61,17 +81,29 @@ export const createProjectSchema = z.object({
         .min(1, 'Project age is required')
         .max(100, 'Project age must be less than 100 characters'),
 
-    no_of_bedrooms: z.nativeEnum(Bedrooms, {
+    min_bedrooms: z.nativeEnum(Bedrooms, {
         errorMap: () => ({
-            message: `Bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+            message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
         }),
-    }),
+    }).optional(),
 
-    no_of_bathrooms: z.nativeEnum(Bathrooms, {
+    max_bedrooms: z.nativeEnum(Bedrooms, {
         errorMap: () => ({
-            message: `Bathrooms must be one of: ${Object.values(Bathrooms).join(', ')}`,
+            message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
         }),
-    }),
+    }).optional(),
+
+    min_bathrooms: z.nativeEnum(Bathrooms, {
+        errorMap: () => ({
+            message: `Min bathrooms must be one of: ${Object.values(Bathrooms).join(', ')}`,
+        }),
+    }).optional(),
+
+    max_bathrooms: z.nativeEnum(Bathrooms, {
+        errorMap: () => ({
+            message: `Max bathrooms must be one of: ${Object.values(Bathrooms).join(', ')}`,
+        }),
+    }).optional(),
 
     furnished: z.nativeEnum(Furnished, {
         errorMap: () => ({
@@ -79,19 +111,49 @@ export const createProjectSchema = z.object({
         }),
     }),
 
+    min_sq_ft: z.preprocess(
+        (val) => (typeof val === 'string' ? parseFloat(val) : val),
+        z
+            .number()
+            .positive('Min sq ft must be positive')
+            .max(1_000_000, 'Min sq ft seems unreasonably high')
+    ).optional(),
+
+    max_sq_ft: z.preprocess(
+        (val) => (typeof val === 'string' ? parseFloat(val) : val),
+        z
+            .number()
+            .positive('Max sq ft must be positive')
+            .max(1_000_000, 'Max sq ft seems unreasonably high')
+    ).optional(),
+
     property_size: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
         z
             .number()
             .positive('Property size must be positive')
             .max(1_000_000, 'Property size seems unreasonably high')
-    ),
+    ).optional(),
+
+    payment_structure: z
+        .string()
+        .max(500, 'Payment structure must be less than 500 characters')
+        .optional(),
+
+    handover_year: z.preprocess(
+        (val) => (typeof val === 'string' ? parseInt(val) : val),
+        z
+            .number()
+            .int('Handover year must be an integer')
+            .min(2020, 'Handover year must be 2020 or later')
+            .max(2050, 'Handover year must be 2050 or earlier')
+    ).optional(),
 
     payment_plan: z.nativeEnum(Payment_Plan, {
         errorMap: () => ({
             message: `Payment plan must be one of: ${Object.values(Payment_Plan).join(', ')}`,
         }),
-    }),
+    }).optional(),
 
     unit_types: z.preprocess(
         (val) => (typeof val === 'string' ? JSON.parse(val) : val),
@@ -103,7 +165,7 @@ export const createProjectSchema = z.object({
     amenities: z.preprocess(
         (val) => (typeof val === 'string' ? JSON.parse(val) : val),
         z
-            .array(z.string().min(1, 'Amenity cannot be empty'))
+            .array(z.nativeEnum(Amenities))
             .max(50, 'Too many amenities (max 50)')
-    ),
+    ).optional(),
 });
