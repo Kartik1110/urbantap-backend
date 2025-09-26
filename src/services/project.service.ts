@@ -343,6 +343,173 @@ export const getProjectByIdService = async (id: string) => {
     };
 };
 
+export const getProjectByNameService = async (name: string) => {
+    // First check if project exists by name
+    const project = await prisma.project.findFirst({
+        where: { 
+            project_name: {
+                equals: name,
+                mode: 'insensitive'
+            }
+        },
+        include: {
+            developer: true,
+            floor_plans: true,
+        },
+    });
+
+    if (!project) {
+        throw new Error('Project not found');
+    }
+
+    // Increment the views count only if project exists
+    await prisma.project.update({
+        where: { id: project.id },
+        data: {
+            views: {
+                increment: 1,
+            },
+        },
+    });
+
+    // Parse and structure payment_plan2 data as list of objects
+    const parsePaymentPlan = (paymentPlanString: string | null) => {
+        if (!paymentPlanString) return [];
+
+        try {
+            const parsed = JSON.parse(paymentPlanString);
+            const paymentStages = [
+                { stage: 'one', label: 'Booking', percentage: parsed.one },
+                {
+                    stage: 'two',
+                    label: 'During Construction',
+                    percentage: parsed.two,
+                },
+                {
+                    stage: 'three',
+                    label: 'On Completion',
+                    percentage: parsed.three,
+                },
+                { stage: 'four', label: 'Handover', percentage: parsed.four },
+            ];
+
+            // Filter out stages with 0% and return as list of objects
+            return paymentStages
+                .filter((stage) => stage.percentage > 0)
+                .map((stage) => ({
+                    stage: stage.stage,
+                    label: stage.label,
+                    percentage: parseInt(stage.percentage.toString()),
+                }));
+        } catch (error) {
+            console.error('Error parsing payment_plan2:', error);
+            return [];
+        }
+    };
+
+    // Process and format unit_types data with properties count and floor plan details
+    const processUnitTypes = (floorPlans: any[]) => {
+        if (!floorPlans || !Array.isArray(floorPlans)) return [];
+
+        // Count floor plans by bedroom type
+        const unitTypeGroups: { [key: string]: any[] } = {};
+
+        floorPlans.forEach((floorPlan) => {
+            if (floorPlan.bedrooms) {
+                const bedroomType = floorPlan.bedrooms;
+                if (!unitTypeGroups[bedroomType]) {
+                    unitTypeGroups[bedroomType] = [];
+                }
+                unitTypeGroups[bedroomType].push(floorPlan);
+            }
+        });
+
+        // Map bedroom types to display names for unit_types name field
+        const nameMapping: { [key: string]: string } = {
+            Studio: 'Studio',
+            One: '1BHK',
+            Two: '2BHK',
+            Three: '3BHK',
+            Four: '4BHK',
+            Five: '5BHK',
+            Six: '6BHK',
+            Seven: '7BHK',
+            Four_Plus: '4+BHK',
+        };
+
+        // Map bedroom types to numeric values for floor-plans bedrooms field
+        const bedroomMapping: { [key: string]: string } = {
+            Studio: 'Studio',
+            One: '1',
+            Two: '2',
+            Three: '3',
+            Four: '4',
+            Five: '5',
+            Six: '6',
+            Seven: '7',
+            Four_Plus: '4+',
+        };
+
+        // Convert to array of objects with name, properties_count, and floor-plans
+        const unitTypes = Object.entries(unitTypeGroups)
+            .map(([bedroomType, floorPlansForType]) => ({
+                name: nameMapping[bedroomType] || bedroomType,
+                properties_count: floorPlansForType.length,
+                floor_plans: floorPlansForType.map((floorPlan) => ({
+                    id: floorPlan.id,
+                    min_price: floorPlan.min_price,
+                    bedrooms:
+                        bedroomMapping[floorPlan.bedrooms] ||
+                        floorPlan.bedrooms,
+                    unit_size: floorPlan.unit_size,
+                })),
+            }))
+            .sort((a, b) => {
+                // Custom sorting: Studio first, then by number, then others
+                if (a.name === 'Studio') return -1;
+                if (b.name === 'Studio') return 1;
+
+                const aNum = parseInt(a.name.match(/\d+/)?.[0] || '999');
+                const bNum = parseInt(b.name.match(/\d+/)?.[0] || '999');
+
+                if (aNum !== 999 && bNum !== 999) return aNum - bNum;
+                if (aNum !== 999) return -1;
+                if (bNum !== 999) return 1;
+
+                return a.name.localeCompare(b.name);
+            });
+
+        return unitTypes;
+    };
+
+    return {
+        id: project.id,
+        project_name: project.project_name,
+        description: project.description,
+        image_urls: project.image_urls,
+        currency: project.currency,
+        min_price: project.min_price,
+        max_price: project.max_price,
+        address: project.address,
+        city: project.city,
+        file_url: project.file_url,
+        category: project.category,
+        project_age: project.project_age,
+        furnished: project.furnished,
+        max_sq_ft: project.max_sq_ft,
+        payment_structure: parsePaymentPlan(project.payment_structure),
+        unit_types: processUnitTypes(project.floor_plans),
+        locality: project.locality,
+        latitude: project.latitude,
+        longitude: project.longitude,
+        amenities: filterApprovedAmenities(project.amenities),
+        views: project.views,
+        floor_plans: project.floor_plans.flatMap(
+            (floorPlan) => floorPlan.image_urls || []
+        ),
+    };
+};
+
 export const createProjectService = async (data: any) => {
     return await prisma.project.create({
         data,
