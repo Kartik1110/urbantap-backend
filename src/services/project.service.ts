@@ -359,7 +359,7 @@ export const getProjectByNameService = async (name: string) => {
     });
 
     if (!project) {
-        return null;
+        throw new Error('Project not found');
     }
 
     // Increment the views count only if project exists

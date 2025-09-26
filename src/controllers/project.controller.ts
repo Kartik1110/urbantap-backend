@@ -81,19 +81,19 @@ export const getProjectByName = async (req: Request, res: Response) => {
         const { name } = req.params;
         const project = await getProjectByNameService(name);
 
-        if (!project) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Project not found',
-            });
-        }
-
         res.json({
             status: 'success',
             message: 'Project details fetched successfully',
             data: project,
         });
     } catch (error) {
+        if ((error as Error).message === 'Project not found') {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Project not found',
+            });
+        }
+        
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch project details',
