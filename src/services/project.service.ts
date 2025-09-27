@@ -493,7 +493,7 @@ export const getProjectByNameService = async (name: string) => {
         max_price: project.max_price,
         address: project.address,
         city: project.city,
-        file_url: project.file_url,
+        brochure_url: project.brochure_url,
         category: project.category,
         project_age: project.project_age,
         furnished: project.furnished,
