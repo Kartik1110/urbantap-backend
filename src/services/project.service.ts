@@ -346,11 +346,11 @@ export const getProjectByIdService = async (id: string) => {
 export const getProjectByNameService = async (name: string) => {
     // First check if project exists by name
     const project = await prisma.project.findFirst({
-        where: { 
+        where: {
             project_name: {
                 equals: name,
-                mode: 'insensitive'
-            }
+                mode: 'insensitive',
+            },
         },
         include: {
             developer: true,
@@ -1154,6 +1154,41 @@ export const getProjectAIReportService = async (
     const avgYearlyRental = (longTermRent + shortTermRent) / 2;
     const roiAtHandoverYear = (avgYearlyRental / min_price) * 100;
 
+    // Parse and structure payment_plan2 data as list of objects
+    const parsePaymentPlan = (paymentPlanString: string | null) => {
+        if (!paymentPlanString) return [];
+
+        try {
+            const parsed = JSON.parse(paymentPlanString);
+            const paymentStages = [
+                { stage: 'one', label: 'Booking', percentage: parsed.one },
+                {
+                    stage: 'two',
+                    label: 'During Construction',
+                    percentage: parsed.two,
+                },
+                {
+                    stage: 'three',
+                    label: 'On Completion',
+                    percentage: parsed.three,
+                },
+                { stage: 'four', label: 'Handover', percentage: parsed.four },
+            ];
+
+            // Filter out stages with 0% and return as list of objects
+            return paymentStages
+                .filter((stage) => stage.percentage > 0)
+                .map((stage) => ({
+                    stage: stage.stage,
+                    label: stage.label,
+                    percentage: parseInt(stage.percentage.toString()),
+                }));
+        } catch (error) {
+            console.error('Error parsing payment_plan2:', error);
+            return [];
+        }
+    };
+
     return {
         listing: {
             title: project.title,
@@ -1164,6 +1199,9 @@ export const getProjectAIReportService = async (
             yearly_rental: Math.round(avgYearlyRental),
             roi_percentage: Math.round(roiAtHandoverYear * 100) / 100,
         },
+        payment_structure: parsePaymentPlan(project.payment_structure),
+        latitude: project.latitude,
+        longitude: project.longitude,
         growth_graph: [
             {
                 year: String(currentYear),
