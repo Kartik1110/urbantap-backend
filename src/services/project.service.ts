@@ -1190,18 +1190,19 @@ export const getProjectAIReportService = async (
     };
 
     return {
-        listing: {
+        project: {
             title: project.title,
             images: project.image_urls,
             price: Math.round(min_price),
+            description: project.description,
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),
             yearly_rental: Math.round(avgYearlyRental),
             roi_percentage: Math.round(roiAtHandoverYear * 100) / 100,
+            payment_structure: parsePaymentPlan(project.payment_structure),
+            latitude: project.latitude,
+            longitude: project.longitude,
         },
-        payment_structure: parsePaymentPlan(project.payment_structure),
-        latitude: project.latitude,
-        longitude: project.longitude,
         growth_graph: [
             {
                 year: String(currentYear),
