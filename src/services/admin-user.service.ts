@@ -369,15 +369,49 @@ export const getDeveloperDetailsService = async (developerId: string) => {
     };
 };
 
+
 export const createProjectService = async (data: Prisma.ProjectCreateInput) => {
-    return await prisma.project.create({
+    const project = await prisma.project.create({
         data,
+        include: {
+            floor_plans: true,
+            developer: {
+                select: {
+                    id: true,
+                    company: {
+                        select: {
+                            name: true,
+                            logo: true,
+                        }
+                    }
+                }
+            }
+        }
     });
+
+    return project;
 };
 
 export const getProjectsService = async (developerId: string) => {
     return await prisma.project.findMany({
         where: { developer_id: developerId },
+        include: {
+            floor_plans: true,
+            developer: {
+                select: {
+                    id: true,
+                    company: {
+                        select: {
+                            name: true,
+                            logo: true,
+                        }
+                    }
+                }
+            }
+        },
+        orderBy: {
+            created_at: 'desc'
+        }
     });
 };
 
