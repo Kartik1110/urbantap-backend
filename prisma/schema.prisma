@@ -367,7 +367,8 @@ model Project {
   max_price       Float?
   address         String
   city            City
-  file_url        String? // optional downloadable file
+  brochure_url    String? // optional downloadable file
+  inventory       Inventory[]
   type            Type[]   @default([])
   category        Category
   project_name    String
@@ -378,8 +379,8 @@ model Project {
   max_bathrooms   Bathrooms?
   furnished       Furnished
   min_sq_ft       Float?
-  max_sq_ft   Float?  
-  property_size       Float?
+  max_sq_ft       Float?  
+  property_size   Float?
   payment_plan    Payment_Plan?
   payment_structure   String?
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
@@ -394,6 +395,15 @@ model Project {
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   floor_plans     FloorPlan[] 
+}
+
+model Inventory {
+  id         String   @id @default(uuid())
+  file_url   String
+  project_id String
+  project    Project  @relation(fields: [project_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model FloorPlan {

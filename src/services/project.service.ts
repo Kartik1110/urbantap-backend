@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma';
+import prisma from '@/utils/prisma';
 import { Prisma, City, Category } from '@prisma/client';
 import {
     calculateAppreciationDataPoints,
@@ -12,8 +12,8 @@ import {
     getPropertyData,
     getRentalPriceInYear,
     MergedPropertyData,
-} from '../utils/roiReport';
-import logger from '../utils/logger';
+} from '@/utils/roiReport';
+import logger from '@/utils/logger';
 
 declare const fetch: typeof globalThis.fetch;
 
@@ -169,6 +169,7 @@ export const getProjectsService = async ({
         project_name: proj.project_name,
         address: proj.address,
         views: proj.views,
+        brochure_url: proj.brochure_url,
     }));
 
     const pagination = {
@@ -325,7 +326,7 @@ export const getProjectByIdService = async (id: string) => {
         max_price: project.max_price,
         address: project.address,
         city: project.city,
-        file_url: project.file_url,
+        brochure_url: project.brochure_url,
         category: project.category,
         project_age: project.project_age,
         furnished: project.furnished,

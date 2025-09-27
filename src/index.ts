@@ -6,10 +6,9 @@ import logger from './utils/logger';
 import './crons/listingApprovalCron';
 import jobRoutes from './routes/job.route';
 import { connectDB } from './utils/prisma';
+import adminuserRoutes from '@/apps/admin';
 import authRoutes from './routes/auth.route';
 import adminRoutes from './routes/admin.route';
-import orderRoutes from './routes/order.route';
-import creditRoutes from './routes/credit.route';
 import projectRoutes from './routes/project.route';
 import companyRoutes from './routes/company.route';
 import brokersRoutes from './routes/brokers.route';
@@ -18,7 +17,6 @@ import developerRoutes from './routes/developer.route';
 import inquiriesRoutes from './routes/inquiries.route';
 import brokerageRoutes from './routes/brokerage.route';
 import dashboardRoutes from './routes/dashboard.route';
-import adminuserRoutes from './routes/admin-user.routes';
 import connectionsRoutes from './routes/connections.route';
 import notificationsRoutes from './routes/notifications.route';
 import { authMiddleware } from './middlewares/auth.middleware';
@@ -45,8 +43,6 @@ app.use('/api/v1', authRoutes);
 
 /* Admin User Routes */
 app.use('/api/v1', adminuserRoutes(upload));
-app.use('/api/v1', creditRoutes);
-app.use('/api/v1', orderRoutes);
 
 // Protected routes
 app.use('/api/v1', authMiddleware, notificationsRoutes);
