@@ -168,4 +168,9 @@ export const createProjectSchema = z.object({
             .array(z.nativeEnum(Amenities))
             .max(50, 'Too many amenities (max 50)')
     ).optional(),
+
+    file_url: z
+        .string()
+        .url('Project brochure URL must be a valid URL')
+        .optional(),
 });
