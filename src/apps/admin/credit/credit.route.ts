@@ -1,11 +1,8 @@
 import { Router } from 'express';
-import { verifyToken } from '../utils/verifyToken';
-import {
-    assignCredits,
-    getCreditBalance,
-} from '../controllers/credit.controller';
-import { authMiddleware } from '../middlewares/auth.middleware';
-import { adminMiddleware } from '../middlewares/admin.middleware';
+import { verifyToken } from '@/utils/verifyToken';
+import { authMiddleware } from '@/middlewares/auth.middleware';
+import { adminMiddleware } from '@/middlewares/admin.middleware';
+import { assignCredits, getCreditBalance } from './credit.controller';
 
 const router = Router();
 
