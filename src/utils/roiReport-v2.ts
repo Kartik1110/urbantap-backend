@@ -738,7 +738,7 @@ export function calculateAverageROIAfterHandover(
         const currentYear = new Date().getFullYear();
         const yearDiff = handoverYear - currentYear;
 
-        let totalRentalYield = 0;
+        let avgRoiPerYear = 0;
         for (let year = yearDiff; year < yearDiff + years; year++) {
             let currentLongTermRoi = propertyData[yearDiff].roi;
             if (yearDiff + years >= 10) {
@@ -752,26 +752,19 @@ export function calculateAverageROIAfterHandover(
 
             const currentShortTermRoi = currentLongTermRoi + increaseRoiBy;
 
-            const avgRoiPerYear =
-                (currentShortTermRoi + currentLongTermRoi) / 2;
-
-            const rentalYield = (avgRoiPerYear * initialInvestment) / 100;
-            totalRentalYield += rentalYield;
+            avgRoiPerYear += (currentShortTermRoi + currentLongTermRoi) / 2;
         }
 
-        return totalRentalYield / years;
+        return avgRoiPerYear / years;
     } catch (error) {
         logger.error(
             `calculateAverageROIAfterHandover: ${(error as Error).message}`
         );
-
-        const defaultRentalYield =
-            (initialInvestment * DEFAULT_ROI_PER_YEAR) / 100;
         logger.error(
-            `calculateAverageROIAfterHandover: Returning: ${defaultRentalYield}`
+            `calculateAverageROIAfterHandover: Returning: ${DEFAULT_ROI_PER_YEAR}`
         );
 
-        return defaultRentalYield;
+        return DEFAULT_ROI_PER_YEAR;
     }
 }
 
@@ -875,9 +868,9 @@ export function calculateRoiDataPointsByTypeAfterHandover(
 
         const yearlyRentalIncome: number[] = [];
         for (let year = yearDiff; year < yearDiff + years; year++) {
-            let currentTermRoi = propertyData[year].roi;
+            let currentLongTermRoi = propertyData[year].roi;
             if (yearDiff + year >= 10) {
-                currentTermRoi =
+                currentLongTermRoi =
                     propertyData[9].roi *
                     Math.pow(
                         DEFAULT_ROI_INCREMENT_PER_YEAR,
@@ -886,12 +879,12 @@ export function calculateRoiDataPointsByTypeAfterHandover(
             }
             // Calculate annual rental income for this year
             const longTermRentalIncome =
-                (currentTermRoi * initialInvestment) / 100;
+                (currentLongTermRoi * initialInvestment) / 100;
 
             // Calculate short-term rental income
             const shortTermAnnualIncome = calculateShortTermRental(
                 initialInvestment,
-                longTermRentalIncome,
+                currentLongTermRoi,
                 increaseRoiBy
             ).rent;
 

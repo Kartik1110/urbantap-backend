@@ -7,8 +7,10 @@ import {
     getProjectFloorPlans,
     getProjectsByDeveloper,
     getFeaturedProjects,
-    generateProjectROIReport,
-    getAIReport,
+    // generateProjectROIReport,
+    // getAIReport,
+    generateProjectROIReportV2,
+    getAIReportV2,
 } from '../controllers/project.controller';
 
 const router = Router();
@@ -32,9 +34,10 @@ router.get('/projects/:id', getProjectById);
 router.post('/projects', createProject);
 
 /* Generate ROI report for project */
-router.get('/projects/:id/roi-report', generateProjectROIReport);
+router.get('/projects/:id/roi-report', generateProjectROIReportV2);
 
-router.get('/projects/:id/ai-report', getAIReport);
+/* Get AI report for a project */
+router.get('/projects/:id/ai-report', getAIReportV2);
 
 /* Get floor plans for a specific project with optional BHK filtering */
 router.get('/projects/:id/floorplans', getProjectFloorPlans);
