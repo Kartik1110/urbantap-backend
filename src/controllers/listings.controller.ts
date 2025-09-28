@@ -16,6 +16,8 @@ import {
     getListingROIReportService,
     getAIReportService,
     createListingService,
+    getListingROIReportServiceV2,
+    getAIReportServiceV2,
 } from '../services/listings.service';
 import { uploadToS3 } from '../utils/s3Upload';
 import prisma from '../utils/prisma';
@@ -427,11 +429,55 @@ export const getListingROIReport = async (req: Request, res: Response) => {
     }
 };
 
+// Get listing ROI report v2
+export const getListingROIReportV2 = async (req: Request, res: Response) => {
+    const listingId = req.params.id;
+
+    try {
+        const roiReport = await getListingROIReportServiceV2(listingId);
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Listing ROI report fetched successfully',
+            data: roiReport,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message:
+                (error as Error).message ||
+                'Failed to fetch listing ROI report',
+            error,
+        });
+    }
+};
+
+// Get listing AI report
 export const getAIReport = async (req: Request, res: Response) => {
     const listingId = req.params.id;
 
     try {
         const aiReport = await getAIReportService(listingId);
+        return res.status(200).json({
+            status: 'success',
+            message: 'AI report fetched successfully',
+            data: aiReport,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message: (error as Error).message || 'Failed to fetch AI report',
+            error,
+        });
+    }
+};
+
+// Get listing AI report v2
+export const getAIReportV2 = async (req: Request, res: Response) => {
+    const listingId = req.params.id;
+
+    try {
+        const aiReport = await getAIReportServiceV2(listingId);
         return res.status(200).json({
             status: 'success',
             message: 'AI report fetched successfully',
