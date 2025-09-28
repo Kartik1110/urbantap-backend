@@ -556,7 +556,7 @@ export function calculateListingRentalBreakEvenPeriod(
             if (increaseRoiBy !== 1) {
                 annualRentalIncome = calculateShortTermRental(
                     initialInvestment,
-                    annualRentalIncome,
+                    currentLongTermRoi,
                     increaseRoiBy
                 ).rent;
             }
