@@ -11,9 +11,11 @@ import {
     getFeaturedListings,
     getRecentListings,
     getListingAppreciation,
-    getListingROIReport,
-    getAIReport,
+    // getListingROIReport,
+    // getAIReport,
     createListing,
+    getListingROIReportV2,
+    getAIReportV2,
 } from '../controllers/listings.controller';
 
 const router = Router();
@@ -29,9 +31,9 @@ router.get('/listings/:id', getListingById);
 
 router.get('/listings/:id/appreciation', getListingAppreciation);
 
-router.get('/listings/:id/roi-report', getListingROIReport);
+router.get('/listings/:id/roi-report', getListingROIReportV2);
 
-router.get('/listings/:id/ai-report', getAIReport);
+router.get('/listings/:id/ai-report', getAIReportV2);
 
 /* Bulk insert listings */
 export default (upload: any) => {
