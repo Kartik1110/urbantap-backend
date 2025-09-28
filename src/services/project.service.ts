@@ -15,6 +15,22 @@ import {
 } from '@/utils/roiReport';
 import logger from '@/utils/logger';
 
+import {
+    calculateAppreciationDataPoints as calculateAppreciationDataPointsV2,
+    calculateAverageRentPerYearAfterHandover as calculateAverageRentPerYearAfterHandoverV2,
+    calculateAverageROIAfterHandover as calculateAverageROIAfterHandoverV2,
+    calculateBreakEvenAfterHandover as calculateBreakEvenAfterHandoverV2,
+    calculateHandoverPrice as calculateHandoverPriceV2,
+    calculatePriceAfterHandover as calculatePriceAfterHandoverV2,
+    calculateRoiDataPointsByTypeAfterHandover as calculateRoiDataPointsByTypeAfterHandoverV2,
+    calculateShortTermRental as calculateShortTermRentalV2,
+    DEFAULT_INCREASE_IN_SHORT_TERM_ROI,
+    getLongTermRoiPercentage,
+    getPropertyData as getPropertyDataV2,
+    getRentalPriceInYear as getRentalPriceInYearV2,
+} from '../utils/roiReport-v2';
+import propertiesDataV2 from '../data/property-data-v5';
+
 declare const fetch: typeof globalThis.fetch;
 
 // Dynamic import based on environment variable
@@ -1018,6 +1034,288 @@ export const generateProjectROIReportService = async (
     };
 };
 
+export const generateProjectROIReportServiceV2 = async (
+    projectId: string,
+    floorPlanId: string
+): Promise<{
+    capital_gains: {
+        today: number;
+        handover: {
+            year: string;
+            value: number;
+        };
+        future: {
+            year: string;
+            value: number;
+        };
+    };
+    expected_rental: {
+        short_term: number;
+        short_term_percentage: number;
+        long_term: number;
+        long_term_percentage: number;
+    };
+    break_even_year: {
+        short_term: number;
+        long_term: number;
+    };
+    avg_roi_percentage_per_year: number;
+    avg_rent_per_year: number;
+    roi_graph: { year: string; roi: number }[];
+    growth_table: {
+        year: string;
+        max_price: number;
+        short_term_rental: number;
+        long_term_rental: number;
+    }[];
+    avg_area_appreciation_per_year: number;
+    area_appreciation_graph: { year: string; roi: number }[];
+    rental_yield: { year: number; percentage: number };
+}> => {
+    const project = await prisma.project.findUnique({
+        where: { id: projectId },
+    });
+
+    if (!project) {
+        throw new Error('Project not found');
+    }
+
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: {
+            project_id: projectId,
+        },
+    });
+
+    let floorPlan;
+    if (floorPlanId) {
+        floorPlan = floorPlans.find((plan) => plan.id === floorPlanId);
+    } else {
+        const minSizeFloorPlans = floorPlans
+            .filter((plan) => plan.bedrooms === project.min_bedrooms)
+            .sort((a, b) => (a.unit_size || 0) - (b.unit_size || 0));
+
+        floorPlan = minSizeFloorPlans[0];
+
+        logger.warn(
+            'Floor plan Id not provided, falling back to smallest unit available - ' +
+                `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
+        );
+    }
+
+    if (!floorPlan) {
+        throw new Error('Floor plan not found');
+    }
+
+    const min_price = floorPlanId
+        ? floorPlan.min_price || project.min_price
+        : project.min_price;
+
+    const { locality, handover_year } = project;
+    const { unit_size } = floorPlan;
+
+    if (!min_price || !handover_year || !locality || !unit_size) {
+        if (!min_price) {
+            throw new Error('Price not found');
+        }
+
+        if (!handover_year) {
+            throw new Error('Handover year not found');
+        }
+
+        if (!locality) {
+            throw new Error('Locality not found');
+        }
+
+        if (!unit_size) {
+            throw new Error('Unit size not found');
+        }
+    }
+
+    const listingType = 'Apartment'; // TODO: figure this out
+    const propertyData = getPropertyDataV2(
+        propertiesDataV2,
+        locality,
+        listingType
+    );
+
+    const handoverYear = handover_year;
+    const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
+
+    const listingPriceAtHandover = calculateHandoverPriceV2(
+        min_price,
+        handoverYear
+    );
+    const listingPriceAtHandoverPlus5 = calculatePriceAfterHandoverV2(
+        propertyData,
+        listingPriceAtHandover,
+        handoverYear,
+        5
+    );
+
+    const longTermRent = getRentalPriceInYearV2(
+        propertyData,
+        min_price,
+        yearDiff
+    );
+    const longTermRoi = getLongTermRoiPercentage(propertyData, yearDiff);
+
+    const { rent: shortTermRent, roi: shortTermRoi } =
+        calculateShortTermRentalV2(min_price, longTermRoi);
+
+    const longTermRentAtHandoverPlus5 = getRentalPriceInYearV2(
+        propertyData,
+        min_price,
+        yearDiff + 5
+    );
+    const longTermRoiAtHandoverPlus5 = getLongTermRoiPercentage(
+        propertyData,
+        yearDiff + 5
+    );
+
+    const { rent: shortTermRentAtHandoverPlus5 } = calculateShortTermRentalV2(
+        min_price,
+        longTermRoiAtHandoverPlus5
+    );
+
+    const shortTermBreakEvenYear = calculateBreakEvenAfterHandoverV2(
+        propertyData,
+        min_price,
+        handoverYear,
+        DEFAULT_INCREASE_IN_SHORT_TERM_ROI
+    );
+
+    const longTermBreakEvenYear = calculateBreakEvenAfterHandoverV2(
+        propertyData,
+        min_price,
+        handoverYear
+    );
+
+    const avgRoiPerYear = calculateAverageROIAfterHandoverV2(
+        propertyData,
+        handoverYear,
+        5,
+        min_price
+    );
+
+    const avgRentPerYear = calculateAverageRentPerYearAfterHandoverV2(
+        propertyData,
+        min_price,
+        handoverYear,
+        5
+    );
+
+    const roiGraphPoints = calculateRoiDataPointsByTypeAfterHandoverV2(
+        propertyData,
+        min_price,
+        handoverYear,
+        6
+    );
+
+    const roiGraph = [
+        roiGraphPoints[0],
+        roiGraphPoints[3],
+        roiGraphPoints[5],
+    ].map((item) => ({
+        year: item.year,
+        roi: Math.round(item.roi),
+    }));
+
+    const areaAppreciationGraphAll =
+        calculateAppreciationDataPointsV2(propertyData);
+
+    const areaAppreciationGraph = areaAppreciationGraphAll.map((item) => ({
+        year: item.year,
+        roi: Math.round(item.appreciation_perc),
+    }));
+
+    const avgAreaAppreciationPerYear =
+        areaAppreciationGraphAll[4].appreciation_perc / 5;
+
+    const increaseInRentalPrice = (year: number) => {
+        if (year === 0) {
+            return 0;
+        }
+
+        const currentYearRental = (longTermRent + shortTermRent) / 2;
+
+        const longTermRentalInXYears = getRentalPriceInYearV2(
+            propertyData,
+            min_price,
+            yearDiff + year
+        );
+        const longTermRoiAtXYears = getLongTermRoiPercentage(
+            propertyData,
+            yearDiff + year
+        );
+        const { rent: shortTermRentalAtXYears } = calculateShortTermRentalV2(
+            min_price,
+            longTermRoiAtXYears
+        );
+
+        const avgRentalInXYears =
+            (longTermRentalInXYears + shortTermRentalAtXYears) / 2;
+
+        return (
+            ((avgRentalInXYears - currentYearRental) / currentYearRental) * 100
+        );
+    };
+
+    return {
+        capital_gains: {
+            today: Math.round(min_price),
+            handover: {
+                value: Math.round(listingPriceAtHandover),
+                year: String(handoverYear),
+            },
+            future: {
+                value: Math.round(listingPriceAtHandoverPlus5),
+                year: String(handoverYear + 5),
+            },
+        },
+        expected_rental: {
+            short_term: Math.round(shortTermRent),
+            short_term_percentage: Math.round(shortTermRoi * 100) / 100, // Round to 2 decimal places
+            long_term: Math.round(longTermRent),
+            long_term_percentage: Math.round(longTermRoi * 100) / 100, // Round to 2 decimal places
+        },
+        break_even_year: {
+            short_term: shortTermBreakEvenYear,
+            long_term: longTermBreakEvenYear,
+        },
+        avg_roi_percentage_per_year: Math.round(avgRoiPerYear * 100) / 100, // Round to 2 decimal places
+        avg_rent_per_year: Math.round(avgRentPerYear),
+        roi_graph: roiGraph,
+        growth_table: [
+            {
+                year: String(currentYear),
+                max_price: Math.round(min_price),
+                short_term_rental: 0,
+                long_term_rental: 0,
+            },
+            {
+                year: String(handoverYear),
+                max_price: Math.round(listingPriceAtHandover),
+                short_term_rental: Math.round(shortTermRent),
+                long_term_rental: Math.round(longTermRent),
+            },
+            {
+                year: String(handoverYear + 5),
+                max_price: Math.round(listingPriceAtHandoverPlus5),
+                short_term_rental: Math.round(shortTermRentAtHandoverPlus5),
+                long_term_rental: Math.round(longTermRentAtHandoverPlus5),
+            },
+        ],
+        avg_area_appreciation_per_year:
+            Math.round(avgAreaAppreciationPerYear * 100) / 100,
+        area_appreciation_graph: areaAppreciationGraph,
+        rental_yield: {
+            year: 5,
+            percentage: Math.round(increaseInRentalPrice(5) * 100) / 100,
+        },
+    };
+};
+
 export const getProjectAIReportService = async (
     projectId: string,
     floorPlanId: string,
@@ -1185,7 +1483,7 @@ export const getProjectAIReportService = async (
                     percentage: parseInt(stage.percentage.toString()),
                 }));
         } catch (error) {
-            console.error('Error parsing payment_plan2:', error);
+            logger.error('Error parsing payment_plan2:', error);
             return [];
         }
     };
@@ -1217,6 +1515,289 @@ export const getProjectAIReportService = async (
                 year: String(handoverYear + 2),
                 appreciation: Math.round(
                     calculatePriceAfterHandover(
+                        propertyData,
+                        listingPriceAtHandover,
+                        handoverYear,
+                        2
+                    )
+                ),
+            },
+        ],
+        rental_graph: [
+            {
+                year: String(handoverYear),
+                rental: increaseInRentalPriceAfterHandOver(1),
+            },
+            {
+                year: String(handoverYear + 2),
+                rental: increaseInRentalPriceAfterHandOver(3),
+            },
+            {
+                year: String(handoverYear + 4),
+                rental: increaseInRentalPriceAfterHandOver(5),
+            },
+        ],
+        growth_projection: {
+            appreciation: Math.round(
+                ((listingPriceAtHandoverPlus5 - listingPriceAtHandover) /
+                    listingPriceAtHandover) *
+                    100
+            ),
+            rental: increaseInRentalPriceAfterHandOver(5),
+        },
+        rent: {
+            short_term: Math.round(shortTermRent),
+            long_term: Math.round(longTermRent),
+        },
+        developer: {
+            name: project.developer.company?.name,
+            logo_url: project.developer.company?.logo,
+            floor_plan_image_urls: floorPlanId
+                ? floorPlan.image_urls
+                : floorPlans.flatMap((plan) => plan.image_urls),
+        },
+        nearby: await getNearbySummary({
+            lat: project.latitude!,
+            lng: project.longitude!,
+        }),
+        amenities: filterApprovedAmenities(project.amenities || []),
+        broker: {
+            id: broker?.id,
+            name: broker?.name,
+            designation: broker?.designation,
+            y_o_e: broker?.y_o_e,
+            specialities: broker?.specialities,
+            company: broker?.company,
+            profile_pic: broker?.profile_pic,
+            country_code: broker?.country_code,
+            w_number: broker?.w_number,
+            email: broker?.email,
+            linkedin_link: broker?.linkedin_link,
+            ig_link: broker?.ig_link,
+        },
+    };
+};
+
+export const getProjectAIReportServiceV2 = async (
+    projectId: string,
+    floorPlanId: string,
+    userId: string,
+    brokerId?: string
+): Promise<any> => {
+    const project = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: {
+            developer: {
+                include: { company: true },
+            },
+        },
+    });
+
+    if (!project) {
+        throw new Error('Project not found');
+    }
+
+    const floorPlans = await prisma.floorPlan.findMany({
+        where: {
+            project_id: projectId,
+        },
+    });
+
+    let floorPlan;
+    if (floorPlanId) {
+        floorPlan = floorPlans.find((plan) => plan.id === floorPlanId);
+    } else {
+        const minSizeFloorPlans = floorPlans
+            .filter((plan) => plan.bedrooms === project.min_bedrooms)
+            .sort((a, b) => (a.unit_size || 0) - (b.unit_size || 0));
+
+        floorPlan = minSizeFloorPlans[0];
+
+        logger.warn(
+            'Floor plan Id not provided, falling back to smallest unit available - ' +
+                `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
+        );
+    }
+
+    if (!floorPlan) {
+        throw new Error('Floor plan not found');
+    }
+
+    const min_price = floorPlanId
+        ? floorPlan.min_price || project.min_price
+        : project.min_price;
+
+    const { locality, handover_year } = project;
+    const { unit_size } = floorPlan;
+
+    if (!min_price || !handover_year || !locality || !unit_size) {
+        if (!min_price) {
+            throw new Error('Price not found');
+        }
+
+        if (!handover_year) {
+            throw new Error('Handover year not found');
+        }
+
+        if (!locality) {
+            throw new Error('Locality not found');
+        }
+
+        if (!unit_size) {
+            throw new Error('Unit size not found');
+        }
+    }
+
+    let broker;
+
+    if (brokerId) {
+        broker = await prisma.broker.findUnique({
+            where: { id: brokerId },
+            include: { company: { select: { name: true } } },
+        });
+    } else {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                brokers: { include: { company: { select: { name: true } } } },
+            },
+        });
+
+        broker = user?.brokers[0];
+    }
+
+    const listingType = 'Apartment'; // TODO: figure this out
+    const propertyData = getPropertyDataV2(
+        propertiesDataV2,
+        locality,
+        listingType
+    );
+
+    const handoverYear = handover_year;
+    const currentYear = new Date().getFullYear();
+    const yearDiff = handoverYear - currentYear;
+
+    const listingPriceAtHandover = calculateHandoverPriceV2(
+        min_price,
+        handoverYear
+    );
+    const listingPriceAtHandoverPlus5 = calculatePriceAfterHandoverV2(
+        propertyData,
+        listingPriceAtHandover,
+        handoverYear,
+        5
+    );
+
+    const longTermRent = getRentalPriceInYearV2(
+        propertyData,
+        min_price,
+        yearDiff
+    );
+    const longTermRoi = getLongTermRoiPercentage(propertyData, yearDiff);
+    const shortTermRoi = longTermRoi + DEFAULT_INCREASE_IN_SHORT_TERM_ROI;
+
+    const { rent: shortTermRent } = calculateShortTermRentalV2(
+        min_price,
+        longTermRoi
+    );
+
+    const avgYearlyRentalAtHandover = (longTermRent + shortTermRent) / 2;
+    const roiAtHandoverYear = (longTermRoi + shortTermRoi) / 2;
+
+    const increaseInRentalPriceAfterHandOver = (year: number) => {
+        if (year === 0) {
+            return 0;
+        }
+
+        const currentYearRental = (longTermRent + shortTermRent) / 2;
+
+        const longTermRentalInXYears = getRentalPriceInYearV2(
+            propertyData,
+            min_price,
+            yearDiff + year
+        );
+
+        const longTermRoiAtXYears = getLongTermRoiPercentage(
+            propertyData,
+            yearDiff + year
+        );
+
+        const { rent: shortTermRentalAtXYears } = calculateShortTermRentalV2(
+            min_price,
+            longTermRoiAtXYears
+        );
+
+        const avgRentalInXYears =
+            (longTermRentalInXYears + shortTermRentalAtXYears) / 2;
+
+        const percIncrease =
+            ((avgRentalInXYears - currentYearRental) / currentYearRental) * 100;
+
+        return Math.round(percIncrease * 100) / 100;
+    };
+
+    // Parse and structure payment_plan2 data as list of objects
+    const parsePaymentPlan = (paymentPlanString: string | null) => {
+        if (!paymentPlanString) return [];
+
+        try {
+            const parsed = JSON.parse(paymentPlanString);
+            const paymentStages = [
+                { stage: 'one', label: 'Booking', percentage: parsed.one },
+                {
+                    stage: 'two',
+                    label: 'During Construction',
+                    percentage: parsed.two,
+                },
+                {
+                    stage: 'three',
+                    label: 'On Completion',
+                    percentage: parsed.three,
+                },
+                { stage: 'four', label: 'Handover', percentage: parsed.four },
+            ];
+
+            // Filter out stages with 0% and return as list of objects
+            return paymentStages
+                .filter((stage) => stage.percentage > 0)
+                .map((stage) => ({
+                    stage: stage.stage,
+                    label: stage.label,
+                    percentage: parseInt(stage.percentage.toString()),
+                }));
+        } catch (error) {
+            logger.error('Error parsing payment_plan2:', error);
+            return [];
+        }
+    };
+
+    return {
+        project: {
+            title: project.title,
+            images: project.image_urls,
+            price: Math.round(min_price),
+            description: project.description,
+            locality: locality,
+            price_after_handover: Math.round(listingPriceAtHandover),
+            yearly_rental: Math.round(avgYearlyRentalAtHandover),
+            roi_percentage: Math.round(roiAtHandoverYear * 100) / 100,
+            payment_structure: parsePaymentPlan(project.payment_structure),
+            latitude: project.latitude,
+            longitude: project.longitude,
+        },
+        growth_graph: [
+            {
+                year: String(currentYear),
+                appreciation: Math.round(min_price),
+            },
+            {
+                year: String(handoverYear),
+                appreciation: Math.round(listingPriceAtHandover),
+            },
+            {
+                year: String(handoverYear + 2),
+                appreciation: Math.round(
+                    calculatePriceAfterHandoverV2(
                         propertyData,
                         listingPriceAtHandover,
                         handoverYear,
