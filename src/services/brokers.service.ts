@@ -264,6 +264,9 @@ export const getBrokerListService = async ({
         const brokers = await prisma.broker.findMany({
             where: {
                 AND: [{ NOT: { id: currentBroker?.id } }, searchCondition],
+                name: {
+                    not: '',
+                },
             },
             skip: (page - 1) * page_size,
             take: page_size,
