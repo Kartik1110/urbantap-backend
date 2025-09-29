@@ -316,6 +316,19 @@ export const getProjectByIdService = async (id: string) => {
         return unitTypes;
     };
 
+    // Get the latest inventory (most recent by created_at) for the project
+    const latestInventory = await prisma.inventory.findFirst({
+        where: {
+            project_id: project.id,
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+        select: {
+            file_url: true,
+        },
+    });
+
     return {
         id: project.id,
         project_name: project.project_name,
@@ -327,6 +340,7 @@ export const getProjectByIdService = async (id: string) => {
         address: project.address,
         city: project.city,
         brochure_url: project.brochure_url,
+        inventory_url: latestInventory?.file_url || null,
         category: project.category,
         project_age: project.project_age,
         furnished: project.furnished,
@@ -483,6 +497,19 @@ export const getProjectByNameService = async (name: string) => {
         return unitTypes;
     };
 
+    // Get the latest inventory (most recent by created_at) for the project
+    const latestInventory = await prisma.inventory.findFirst({
+        where: {
+            project_id: project.id,
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+        select: {
+            file_url: true,
+        },
+    });
+
     return {
         id: project.id,
         project_name: project.project_name,
@@ -494,6 +521,7 @@ export const getProjectByNameService = async (name: string) => {
         address: project.address,
         city: project.city,
         brochure_url: project.brochure_url,
+        inventory_url: latestInventory?.file_url || null,
         category: project.category,
         project_age: project.project_age,
         furnished: project.furnished,
