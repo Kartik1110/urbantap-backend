@@ -1,13 +1,14 @@
 import logger from '@/utils/logger';
 import { Response, Express } from 'express';
 import { uploadToS3 } from '@/utils/s3Upload';
-import { Currency, CompanyType } from '@prisma/client';
+import { Currency } from '@prisma/client';
 import { AuthenticatedRequest } from '@/utils/verifyToken';
 import {
     createProjectService,
-    getProjectsService,
     updateProjectService,
     deleteProjectService,
+    getProjectsWithRBACService,
+    getProjectByIdWithRBACService,
 } from './project.service';
 
 export const createProject = async (
@@ -134,6 +135,7 @@ export const createProject = async (
             brochure_url: brochureUrl,
             floor_plans: floorPlansData,
             inventory_files: inventoryFiles,
+            admin_user_id: req.user.id,
             developer: {
                 connect: {
                     id: req.user.entityId,
@@ -160,17 +162,12 @@ export const createProject = async (
 
 export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const entityData = req.user?.entityId;
-        const type = req.user?.type;
-
-        if (!entityData || !type || type !== CompanyType.Developer) {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Unauthorized',
-            });
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
         }
 
-        const projects = await getProjectsService(entityData);
+        const projects = await getProjectsWithRBACService(adminUserId);
 
         res.status(200).json({
             status: 'success',
@@ -183,6 +180,37 @@ export const getProjects = async (req: AuthenticatedRequest, res: Response) => {
             message: 'Failed to fetch projects',
             error: error.message || error,
         });
+    }
+};
+
+export const getProjectById = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const projectId = req.params.id;
+        const adminUserId = req.user?.id;
+        if (!adminUserId) {
+            return res.status(401).json({ message: 'Admin user ID not found' });
+        }
+
+        const project = await getProjectByIdWithRBACService(
+            adminUserId,
+            projectId
+        );
+
+        if (!project) {
+            return res
+                .status(404)
+                .json({ status: 'error', message: 'Project not found' });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: project,
+        });
+    } catch (error: any) {
+        res.status(500).json({ status: 'error', message: error.message });
     }
 };
 

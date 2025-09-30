@@ -203,8 +203,17 @@ export const getProjectByIdService = async (id: string) => {
     const project = await prisma.project.findUnique({
         where: { id },
         include: {
-            developer: true,
+            developer: {
+                select: {
+                    company: true,
+                },
+            },
             floor_plans: true,
+            admin_user: {
+                select: {
+                    broker: true,
+                },
+            },
         },
     });
 
@@ -345,6 +354,8 @@ export const getProjectByIdService = async (id: string) => {
         },
     });
 
+    const { admin_user, developer, ...projectWithoutCompany } = project;
+
     return {
         id: project.id,
         project_name: project.project_name,
@@ -371,6 +382,21 @@ export const getProjectByIdService = async (id: string) => {
         floor_plans: project.floor_plans.flatMap(
             (floorPlan) => floorPlan.image_urls || []
         ),
+        broker: admin_user?.broker
+            ? {
+                  id: admin_user?.broker?.id,
+                  name: admin_user?.broker?.name,
+                  profile_pic: admin_user?.broker?.profile_pic,
+                  country_code: admin_user?.broker?.country_code,
+                  w_number: admin_user?.broker?.w_number,
+                  email: admin_user?.broker?.email,
+                  linkedin_link: admin_user?.broker?.linkedin_link,
+                  ig_link: admin_user?.broker?.ig_link,
+                  company: {
+                      name: developer?.company?.name || '',
+                  },
+              }
+            : null,
     };
 };
 
@@ -384,8 +410,17 @@ export const getProjectByNameService = async (name: string) => {
             },
         },
         include: {
-            developer: true,
+            developer: {
+                select: {
+                    company: true,
+                },
+            },
             floor_plans: true,
+            admin_user: {
+                select: {
+                    broker: true,
+                },
+            },
         },
     });
 
@@ -526,6 +561,8 @@ export const getProjectByNameService = async (name: string) => {
         },
     });
 
+    const { admin_user, developer, ...projectWithoutCompany } = project;
+
     return {
         id: project.id,
         project_name: project.project_name,
@@ -552,6 +589,21 @@ export const getProjectByNameService = async (name: string) => {
         floor_plans: project.floor_plans.flatMap(
             (floorPlan) => floorPlan.image_urls || []
         ),
+        broker: admin_user?.broker
+            ? {
+                  id: admin_user?.broker?.id,
+                  name: admin_user?.broker?.name,
+                  profile_pic: admin_user?.broker?.profile_pic,
+                  country_code: admin_user?.broker?.country_code,
+                  w_number: admin_user?.broker?.w_number,
+                  email: admin_user?.broker?.email,
+                  linkedin_link: admin_user?.broker?.linkedin_link,
+                  ig_link: admin_user?.broker?.ig_link,
+                  company: {
+                      name: developer?.company?.name || '',
+                  },
+              }
+            : null,
     };
 };
 

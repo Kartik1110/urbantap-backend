@@ -1,5 +1,6 @@
 import prisma from '@/utils/prisma';
 import { Prisma } from '@prisma/client';
+import { PermissionChecker } from '@/utils/permissions';
 
 interface FloorPlanData {
     title: string;
@@ -15,14 +16,23 @@ interface ProjectCreateData
     extends Omit<Prisma.ProjectCreateInput, 'floor_plans' | 'inventory'> {
     floor_plans?: FloorPlanData[];
     inventory_files?: string[];
+    admin_user_id?: string;
 }
 
 export const createProjectService = async (data: ProjectCreateData) => {
-    const { floor_plans, inventory_files, ...projectData } = data;
+    const { floor_plans, inventory_files, admin_user_id, ...projectData } =
+        data;
 
     const project = await prisma.project.create({
         data: {
             ...projectData,
+            admin_user: admin_user_id
+                ? {
+                      connect: {
+                          id: admin_user_id,
+                      },
+                  }
+                : undefined,
             floor_plans: floor_plans
                 ? {
                       create: floor_plans.map((fp) => ({
@@ -49,6 +59,9 @@ export const createProjectService = async (data: ProjectCreateData) => {
         include: {
             floor_plans: true,
             inventory: true,
+            admin_user: {
+                include: { broker: true },
+            },
             developer: {
                 select: {
                     id: true,
@@ -72,6 +85,9 @@ export const getProjectsService = async (developerId: string) => {
         include: {
             floor_plans: true,
             inventory: true,
+            admin_user: {
+                include: { broker: true },
+            },
             developer: {
                 select: {
                     id: true,
@@ -94,7 +110,8 @@ export const updateProjectService = async (
     projectId: string,
     data: ProjectCreateData
 ) => {
-    const { floor_plans, inventory_files, ...projectData } = data;
+    const { floor_plans, inventory_files, admin_user_id, ...projectData } =
+        data;
 
     // Delete existing floor plans if updating (floor plans are replaced)
     await prisma.floorPlan.deleteMany({
@@ -116,6 +133,13 @@ export const updateProjectService = async (
         where: { id: projectId },
         data: {
             ...projectData,
+            admin_user: admin_user_id
+                ? {
+                      connect: {
+                          id: admin_user_id,
+                      },
+                  }
+                : undefined,
             floor_plans:
                 floor_plans && floor_plans.length > 0
                     ? {
@@ -136,6 +160,9 @@ export const updateProjectService = async (
         include: {
             floor_plans: true,
             inventory: true,
+            admin_user: {
+                include: { broker: true },
+            },
             developer: {
                 select: {
                     id: true,
@@ -184,4 +211,50 @@ export const deleteProjectService = async (
     });
 
     return deletedProject;
+};
+
+/**
+ * Get projects with RBAC filtering
+ */
+export const getProjectsWithRBACService = async (adminUserId: string) => {
+    return await PermissionChecker.getAccessibleProjects(adminUserId);
+};
+
+/**
+ * Get project by ID with RBAC validation
+ */
+export const getProjectByIdWithRBACService = async (
+    adminUserId: string,
+    projectId: string
+) => {
+    const canView = await PermissionChecker.canViewProject(
+        adminUserId,
+        projectId
+    );
+
+    if (!canView) {
+        throw new Error('Access denied: Cannot view this project');
+    }
+
+    return await prisma.project.findUnique({
+        where: { id: projectId },
+        include: {
+            floor_plans: true,
+            inventory: true,
+            admin_user: {
+                include: { broker: true },
+            },
+            developer: {
+                select: {
+                    id: true,
+                    company: {
+                        select: {
+                            name: true,
+                            logo: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
 };
