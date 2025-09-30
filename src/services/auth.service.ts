@@ -440,19 +440,25 @@ export const verifyEmailOtpService = async (email: string, otp: string) => {
         throw new Error('User not found');
     }
 
-    const token = jwt.sign(
-        { userId: user.id, role: user.role },
-        process.env.JWT_SECRET!
-    );
-
     const isValid = await verifyOTP(otp, user.email_secret);
     if (!isValid) {
         throw new Error('Invalid OTP');
     }
 
+    // Check if user is new based on creation time (within last 5 minutes)
+    /* TODO: find some reliable logic to check if the user is new */
+    const fiveMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+    const isNewUser = user.createdAt > fiveMinutesAgo;
+
+    const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_SECRET!
+    );
+
     return {
         token,
         user,
         brokerId: broker?.id || null,
+        is_new_user: isNewUser,
     };
 };
