@@ -28,7 +28,7 @@ export const authMiddleware = async (
             process.env.JWT_SECRET!
         ) as UserAuthTokenPayload;
 
-        if (!decoded.userId || !decoded.role) {
+        if (!decoded.userId) {
             return res.status(401).json({ error: 'Invalid token payload' });
         }
 

@@ -380,13 +380,14 @@ export const sendEmailOtpService = async (email: string) => {
         email.toLowerCase()
     );
 
+    const userCompanyDomain = email.split('@')[1];
+
     // Skip company validation for whitelisted emails
     if (!isWhitelisted) {
-        const userCompanyDomain = email.split('@')[1];
-
         const companyDomainName = await prisma.company.findUnique({
             where: { domain_name: userCompanyDomain },
         });
+
         if (!companyDomainName) {
             throw new Error('Company is not registered with UrbanTap.');
         }
@@ -408,6 +409,22 @@ export const sendEmailOtpService = async (email: string) => {
         data: {
             email,
             password: '',
+        },
+    });
+
+    const company = await prisma.company.findUnique({
+        where: { domain_name: userCompanyDomain },
+        select: { id: true },
+    });
+
+    /* Create an empty broker for the user mapped to the company */
+    await prisma.broker.create({
+        data: {
+            email,
+            name: '',
+            company: {
+                connect: { id: company?.id },
+            },
         },
     });
 
