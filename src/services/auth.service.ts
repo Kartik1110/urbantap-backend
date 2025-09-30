@@ -425,6 +425,9 @@ export const sendEmailOtpService = async (email: string) => {
             company: {
                 connect: { id: company?.id },
             },
+            user: {
+                connect: { id: newUser.id },
+            },
         },
     });
 
