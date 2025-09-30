@@ -315,6 +315,7 @@ model AdminUser {
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt
   jobs          Job[]
+  projects      Project[]
   companyPosts  CompanyPost[]
   Order         Order[]
 }
@@ -343,6 +344,10 @@ enum Permission {
   EDIT_COMPANY_POST
   VIEW_COMPANY_POST
   DELETE_COMPANY_POST
+  CREATE_PROJECT
+  EDIT_PROJECT
+  VIEW_PROJECT
+  DELETE_PROJECT
 }
 
 model Developer {
@@ -391,6 +396,8 @@ model Project {
   views           Int         @default(0)
   developer_id    String
   handover_year   Int? // e.g., 2025
+  admin_user_id   String?
+  admin_user      AdminUser?   @relation(fields: [admin_user_id], references: [id])
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt

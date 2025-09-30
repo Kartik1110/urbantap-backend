@@ -8,10 +8,12 @@ import validateSchema from '@/middlewares/validate.middleware';
 import {
     createProject,
     getProjects,
+    getProjectById,
     updateProject,
     deleteProject,
 } from './project.controller';
 import multer from 'multer';
+import { requirePermission } from '@/middlewares/rbac.middleware';
 
 const router = Router();
 
@@ -35,11 +37,15 @@ export default (upload: multer.Multer) => {
             { name: 'floor_plan_image_8', maxCount: 1 },
             { name: 'floor_plan_image_9', maxCount: 1 },
         ]),
+        requirePermission('CREATE_PROJECT'),
         validateSchema(createProjectSchema),
         createProject
     );
 
     router.get('/admin-user/projects', verifyToken, getProjects);
+
+    /* Get Project by ID Route */
+    router.get('/admin-user/projects/:id', verifyToken, getProjectById);
 
     /* Update Project Route */
     router.put(
