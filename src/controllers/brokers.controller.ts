@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, Express } from 'express';
 import { Broker } from '@prisma/client';
 import {
     getBrokerDetailService,
@@ -98,7 +98,9 @@ export const getBrokerList = async (req: Request, res: Response) => {
 
 /* Bulk insert brokers */
 export const bulkInsertBrokers = async (req: Request, res: Response) => {
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const files = req.files as
+        | { [fieldname: string]: Express.Multer.File[] }
+        | undefined;
     const brokersJson = req.body.brokers;
 
     let brokers = [];
@@ -120,7 +122,9 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
         try {
             // Handle profile picture
             if (files.file && files.file[0]) {
-                const fileExtension = files.file[0].originalname.split('.').pop();
+                const fileExtension = files.file[0].originalname
+                    .split('.')
+                    .pop();
                 const userId = brokers[0]?.user_id || 'unknown';
                 profile_pic_url = await uploadToS3(
                     files.file[0].path,
@@ -130,7 +134,9 @@ export const bulkInsertBrokers = async (req: Request, res: Response) => {
 
             // Handle cover image
             if (files.cover_image && files.cover_image[0]) {
-                const fileExtension = files.cover_image[0].originalname.split('.').pop();
+                const fileExtension = files.cover_image[0].originalname
+                    .split('.')
+                    .pop();
                 const userId = brokers[0]?.user_id || 'unknown';
                 cover_image_url = await uploadToS3(
                     files.cover_image[0].path,
@@ -187,7 +193,9 @@ export const updateBroker = async (req: Request, res: Response) => {
     const brokerId = req.params.id;
     const updateData = JSON.parse(req.body.data);
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const files = req.files as
+        | { [fieldname: string]: Express.Multer.File[] }
+        | undefined;
     let profile_pic_url;
     let cover_image_url;
 
@@ -195,7 +203,9 @@ export const updateBroker = async (req: Request, res: Response) => {
         try {
             // Handle profile picture
             if (files.file && files.file[0]) {
-                const fileExtension = files.file[0].originalname.split('.').pop();
+                const fileExtension = files.file[0].originalname
+                    .split('.')
+                    .pop();
                 const userId = updateData.user_id || 'unknown';
                 profile_pic_url = await uploadToS3(
                     files.file[0].path,
@@ -205,7 +215,9 @@ export const updateBroker = async (req: Request, res: Response) => {
 
             // Handle cover image
             if (files.cover_image && files.cover_image[0]) {
-                const fileExtension = files.cover_image[0].originalname.split('.').pop();
+                const fileExtension = files.cover_image[0].originalname
+                    .split('.')
+                    .pop();
                 const userId = updateData.user_id || 'unknown';
                 cover_image_url = await uploadToS3(
                     files.cover_image[0].path,
@@ -221,14 +233,17 @@ export const updateBroker = async (req: Request, res: Response) => {
         }
     }
 
+    // Separate role from broker data (role belongs to User, not Broker)
+    const { role, ...brokerData } = updateData;
+
     const updatedBrokerData = {
-        ...updateData,
+        ...brokerData,
         profile_pic: profile_pic_url || updateData.profile_pic,
         cover_image: cover_image_url || updateData.cover_image,
     };
 
     try {
-        await updateBrokerService(brokerId, updatedBrokerData);
+        await updateBrokerService(brokerId, updatedBrokerData, role);
 
         res.json({
             status: 'success',
