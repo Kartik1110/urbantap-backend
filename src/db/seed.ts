@@ -152,7 +152,7 @@ async function main() {
                     min_price: faker.number.float({ min: 100000, max: 5000000 }),
                     address: faker.location.streetAddress(),
                     city: City.Dubai,
-                    file_url: faker.internet.url(),
+                    brochure_url: faker.internet.url(),
                     category: Category.Off_plan,
                     project_name: faker.company.name(),
                     project_age: String(faker.number.int({ min: 1, max: 10 })),

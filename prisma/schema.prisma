@@ -11,9 +11,9 @@ generator client {
 model User {
   id                 String        @id @default(uuid())
   email              String        @unique
-  password           String
+  password           String?
   name               String?
-  role               Role
+  role               Role?
   country_code       String?
   w_number           String?
   createdAt          DateTime      @default(now())
@@ -26,6 +26,7 @@ model User {
   appleAccessToken   String?
   appleRefreshToken  String?
   fcm_token          String?
+  email_secret       String?
   jobs               Job[]
   applications       Application[]
 }
@@ -42,14 +43,14 @@ model Broker {
   id                       String              @id @default(uuid())
   name                     String
   email                    String              @unique
-  info                     String
-  y_o_e                    Int
+  info                     String?
+  y_o_e                    Int?
   languages                String[]
-  is_certified             Boolean
-  profile_pic              String
+  is_certified             Boolean?
+  profile_pic              String?
   cover_image              String?
   country_code             String?
-  w_number                 String
+  w_number                 String?
   ig_link                  String?
   linkedin_link            String?
   designation              String?
@@ -99,6 +100,7 @@ model Company {
   logo        String        @default("")
   type        CompanyType   @default(Other)
   website     String?       @default("")
+  domain_name String?       @unique
   email       String?       @default("")
   phone       String?       @default("")
   address     String?       @default("")
@@ -313,6 +315,7 @@ model AdminUser {
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt
   jobs          Job[]
+  projects      Project[]
   companyPosts  CompanyPost[]
   Order         Order[]
 }
@@ -341,6 +344,10 @@ enum Permission {
   EDIT_COMPANY_POST
   VIEW_COMPANY_POST
   DELETE_COMPANY_POST
+  CREATE_PROJECT
+  EDIT_PROJECT
+  VIEW_PROJECT
+  DELETE_PROJECT
 }
 
 model Developer {
@@ -365,7 +372,8 @@ model Project {
   max_price       Float?
   address         String
   city            City
-  file_url        String? // optional downloadable file
+  brochure_url    String? // optional downloadable file
+  inventory       Inventory[]
   type            Type[]   @default([])
   category        Category
   project_name    String
@@ -376,8 +384,8 @@ model Project {
   max_bathrooms   Bathrooms?
   furnished       Furnished
   min_sq_ft       Float?
-  max_sq_ft   Float?  
-  property_size       Float?
+  max_sq_ft       Float?  
+  property_size   Float?
   payment_plan    Payment_Plan?
   payment_structure   String?
   unit_types      String[] // dynamic list like: ["1BHK", "2BHK Villa", etc.]
@@ -388,10 +396,21 @@ model Project {
   views           Int         @default(0)
   developer_id    String
   handover_year   Int? // e.g., 2025
+  admin_user_id   String?
+  admin_user      AdminUser?   @relation(fields: [admin_user_id], references: [id])
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   floor_plans     FloorPlan[] 
+}
+
+model Inventory {
+  id         String   @id @default(uuid())
+  file_url   String
+  project_id String
+  project    Project  @relation(fields: [project_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model FloorPlan {

@@ -1,6 +1,7 @@
-import { Broker, Prisma, RequestStatus } from '@prisma/client';
+import { Broker, Prisma, RequestStatus, Role, User } from '@prisma/client';
 import prisma from '../utils/prisma';
 import jwt from 'jsonwebtoken';
+import logger from '@/utils/logger';
 
 /* Get broker detail by id */
 export const getBrokerDetailService = async (
@@ -264,6 +265,9 @@ export const getBrokerListService = async ({
         const brokers = await prisma.broker.findMany({
             where: {
                 AND: [{ NOT: { id: currentBroker?.id } }, searchCondition],
+                name: {
+                    not: '',
+                },
             },
             skip: (page - 1) * page_size,
             take: page_size,
@@ -373,19 +377,32 @@ export const bulkInsertBrokersService = async (brokers: Broker[]) => {
 };
 
 /* Update a broker by id */
-export const updateBrokerService = async (brokerId: string, data: any) => {
+export const updateBrokerService = async (
+    brokerId: string,
+    data: Partial<Broker & User>,
+    role?: string
+) => {
     try {
         // If company_id is empty string, set it to null instead
         if (data.company_id === '') {
             data.company_id = null;
         }
 
-        await prisma.broker.update({
+        // Update broker data
+        const broker = await prisma.broker.update({
             where: { id: brokerId },
             data: data,
         });
+
+        // If role is provided and broker has user_id, update the user's role
+        if (role && broker.user_id) {
+            await prisma.user.update({
+                where: { id: broker.user_id },
+                data: { role: role as Role },
+            });
+        }
     } catch (error) {
-        console.log(error);
+        logger.log('Error updating broker', error);
         throw error;
     }
 };

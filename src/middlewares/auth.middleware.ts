@@ -28,7 +28,7 @@ export const authMiddleware = async (
             process.env.JWT_SECRET!
         ) as UserAuthTokenPayload;
 
-        if (!decoded.userId || !decoded.role) {
+        if (!decoded.userId) {
             return res.status(401).json({ error: 'Invalid token payload' });
         }
 
@@ -41,9 +41,11 @@ export const authMiddleware = async (
             return res.status(401).json({ error: 'User not found' });
         }
 
-        if (user.role !== decoded.role) {
-            return res.status(401).json({ error: 'Token role mismatch' });
-        }
+        /* Removing this check since we are generating token after verify otp and we don't have role selection there */
+        /* TODO: figure out a better way to generate token */
+        // if (user.role !== decoded.role) {
+        //     return res.status(401).json({ error: 'Token role mismatch' });
+        // }
 
         (req as Request & { user: UserAuthTokenPayload }).user = decoded;
         next();

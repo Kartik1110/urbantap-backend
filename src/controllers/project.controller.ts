@@ -2,12 +2,15 @@ import { Request, Response } from 'express';
 import {
     getProjectsService,
     getProjectByIdService,
+    getProjectByNameService,
     createProjectService,
     getProjectFloorPlansService,
     getProjectsByDeveloperService,
     getFeaturedProjectsService,
     generateProjectROIReportService,
+    generateProjectROIReportServiceV2,
     getProjectAIReportService,
+    getProjectAIReportServiceV2,
 } from '../services/project.service';
 
 // GET /projects
@@ -66,6 +69,33 @@ export const getProjectById = async (req: Request, res: Response) => {
             data: project,
         });
     } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch project details',
+            error,
+        });
+    }
+};
+
+// GET /projects/name/:name
+export const getProjectByName = async (req: Request, res: Response) => {
+    try {
+        const { name } = req.params;
+        const project = await getProjectByNameService(name);
+
+        res.json({
+            status: 'success',
+            message: 'Project details fetched successfully',
+            data: project,
+        });
+    } catch (error) {
+        if ((error as Error).message === 'Project not found') {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Project not found',
+            });
+        }
+
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch project details',
@@ -200,6 +230,36 @@ export const generateProjectROIReport = async (req: Request, res: Response) => {
     }
 };
 
+// GET ROI Report for a project v2
+export const generateProjectROIReportV2 = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const projectId = req.params.id;
+        const floorPlanId = req.query.floor_plan_id as string;
+
+        const roiReport = await generateProjectROIReportServiceV2(
+            projectId,
+            floorPlanId
+        );
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Project ROI report generated successfully',
+            data: roiReport,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message:
+                (error as Error).message ||
+                'Failed to generate project ROI report',
+            error,
+        });
+    }
+};
+
 // GET AI Report for a project
 export const getAIReport = async (req: Request, res: Response) => {
     try {
@@ -208,6 +268,34 @@ export const getAIReport = async (req: Request, res: Response) => {
         const brokerId = req.query.broker_id as string;
 
         const aiReport = await getProjectAIReportService(
+            projectId,
+            floorPlanId,
+            (req as any).user?.userId,
+            brokerId
+        );
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'AI report fetched successfully',
+            data: aiReport,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: (error as Error).message || 'Failed to fetch AI report',
+            error,
+        });
+    }
+};
+
+// GET AI Report for a project v2
+export const getAIReportV2 = async (req: Request, res: Response) => {
+    try {
+        const projectId = req.params.id;
+        const floorPlanId = req.query.floor_plan_id as string;
+        const brokerId = req.query.broker_id as string;
+
+        const aiReport = await getProjectAIReportServiceV2(
             projectId,
             floorPlanId,
             (req as any).user?.userId,

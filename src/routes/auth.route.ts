@@ -6,7 +6,9 @@ import {
     appleSignIn,
     updateUser,
     deleteUser,
-    updateFcmTokenHandler,
+    updateFcmToken,
+    sendEmailOtp,
+    verifyEmailOtp,
 } from '../controllers/auth.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
@@ -23,7 +25,11 @@ router.post('/login', login);
 router.put('/user/:id', updateUser);
 router.delete('/user/:id', deleteUser);
 
+// Email OTP
+router.post('/auth/otp-send', sendEmailOtp);
+router.post('/auth/otp-verify', verifyEmailOtp);
+
 // FCM token route (protected)
-router.post('/fcm-token/:id', authMiddleware, updateFcmTokenHandler);
+router.post('/fcm-token/:id', authMiddleware, updateFcmToken);
 
 export default router;
