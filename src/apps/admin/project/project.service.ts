@@ -23,9 +23,24 @@ export const createProjectService = async (data: ProjectCreateData) => {
     const { floor_plans, inventory_files, admin_user_id, ...projectData } =
         data;
 
+    // Calculate max_sq_ft from the largest unit_size in floor_plans
+    let calculatedMaxSqFt: number | undefined;
+    if (floor_plans && floor_plans.length > 0) {
+        const unitSizes = floor_plans
+            .map((fp) => fp.unit_size)
+            .filter(
+                (size): size is number => size !== undefined && size !== null
+            );
+
+        if (unitSizes.length > 0) {
+            calculatedMaxSqFt = Math.max(...unitSizes);
+        }
+    }
+
     const project = await prisma.project.create({
         data: {
             ...projectData,
+            max_sq_ft: calculatedMaxSqFt,
             admin_user: admin_user_id
                 ? {
                       connect: {
@@ -113,6 +128,20 @@ export const updateProjectService = async (
     const { floor_plans, inventory_files, admin_user_id, ...projectData } =
         data;
 
+    // Calculate max_sq_ft from the largest unit_size in floor_plans
+    let calculatedMaxSqFt: number | undefined;
+    if (floor_plans && floor_plans.length > 0) {
+        const unitSizes = floor_plans
+            .map((fp) => fp.unit_size)
+            .filter(
+                (size): size is number => size !== undefined && size !== null
+            );
+
+        if (unitSizes.length > 0) {
+            calculatedMaxSqFt = Math.max(...unitSizes);
+        }
+    }
+
     // Delete existing floor plans if updating (floor plans are replaced)
     await prisma.floorPlan.deleteMany({
         where: { project_id: projectId },
@@ -133,6 +162,7 @@ export const updateProjectService = async (
         where: { id: projectId },
         data: {
             ...projectData,
+            max_sq_ft: calculatedMaxSqFt,
             admin_user: admin_user_id
                 ? {
                       connect: {
