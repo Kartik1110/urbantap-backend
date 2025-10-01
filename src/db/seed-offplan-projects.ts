@@ -581,6 +581,7 @@ async function seedOffPlanProjects() {
                         max_price: null, // Keep max_price as null
                         address: listing.region || 'Dubai',
                         city: mappedCity as any,
+                        brochure_url: null, // Optional field
                         category: "Off_plan" as any,
                         type: propertyTypes as any, // Use mapped property types array
                         project_name: listing.title,

@@ -94,6 +94,8 @@ export const createProject = async (
             handover_year,
             payment_structure,
             floor_plans,
+            latitude,
+            longitude,
         } = req.body;
 
         // Parse floor plans and add images
@@ -131,6 +133,8 @@ export const createProject = async (
             payment_structure: payment_structure
                 ? JSON.stringify(JSON.parse(payment_structure))
                 : undefined,
+            latitude: latitude ? parseFloat(latitude) : undefined,
+            longitude: longitude ? parseFloat(longitude) : undefined,
             image_urls: imageUrls,
             brochure_url: brochureUrl,
             floor_plans: floorPlansData,
@@ -307,6 +311,8 @@ export const updateProject = async (
             payment_structure,
             floor_plans,
             existing_image_urls,
+            latitude,
+            longitude,
         } = req.body;
 
         // Parse floor plans and add images
@@ -353,6 +359,8 @@ export const updateProject = async (
                     JSON.parse(payment_structure)
                 ),
             }),
+            ...(latitude && { latitude: parseFloat(latitude) }),
+            ...(longitude && { longitude: parseFloat(longitude) }),
             ...(finalImageUrls.length > 0 && { image_urls: finalImageUrls }),
             ...(brochureUrl && { brochure_url: brochureUrl }),
             floor_plans: floorPlansData,
