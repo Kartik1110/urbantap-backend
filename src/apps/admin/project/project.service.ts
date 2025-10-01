@@ -1,6 +1,8 @@
 import prisma from '@/utils/prisma';
 import { Prisma } from '@prisma/client';
 import { PermissionChecker } from '@/utils/permissions';
+import { geocodeAddress } from '@/utils/geocoding';
+import logger from '@/utils/logger';
 
 interface FloorPlanData {
     title: string;
@@ -37,9 +39,33 @@ export const createProjectService = async (data: ProjectCreateData) => {
         }
     }
 
+    // Add locality information if address is provided
+    let enrichedProjectData = { ...projectData };
+    if (projectData.address) {
+        const rawAddress = `${projectData.address}, Dubai`;
+        const geocodeResult = await geocodeAddress(rawAddress);
+
+        if (geocodeResult) {
+            enrichedProjectData = {
+                ...enrichedProjectData,
+                address: geocodeResult.formatted_address,
+                locality: geocodeResult.locality,
+                latitude: geocodeResult.lat,
+                longitude: geocodeResult.lng,
+            };
+            logger.info(
+                `✅ Geocoded project with address: ${projectData.address}`
+            );
+        } else {
+            logger.warn(
+                `⚠️ Unable to geocode project address: ${projectData.address}`
+            );
+        }
+    }
+
     const project = await prisma.project.create({
         data: {
-            ...projectData,
+            ...enrichedProjectData,
             max_sq_ft: calculatedMaxSqFt,
             admin_user: admin_user_id
                 ? {
@@ -142,6 +168,30 @@ export const updateProjectService = async (
         }
     }
 
+    // Add locality information if address is provided and being updated
+    let enrichedProjectData = { ...projectData };
+    if (projectData.address) {
+        const rawAddress = `${projectData.address}, Dubai`;
+        const geocodeResult = await geocodeAddress(rawAddress);
+
+        if (geocodeResult) {
+            enrichedProjectData = {
+                ...enrichedProjectData,
+                address: geocodeResult.formatted_address,
+                locality: geocodeResult.locality,
+                latitude: geocodeResult.lat,
+                longitude: geocodeResult.lng,
+            };
+            logger.info(
+                `✅ Geocoded project update with address: ${projectData.address}`
+            );
+        } else {
+            logger.warn(
+                `⚠️ Unable to geocode project address during update: ${projectData.address}`
+            );
+        }
+    }
+
     // Delete existing floor plans if updating (floor plans are replaced)
     await prisma.floorPlan.deleteMany({
         where: { project_id: projectId },
@@ -161,7 +211,7 @@ export const updateProjectService = async (
     const project = await prisma.project.update({
         where: { id: projectId },
         data: {
-            ...projectData,
+            ...enrichedProjectData,
             max_sq_ft: calculatedMaxSqFt,
             admin_user: admin_user_id
                 ? {
