@@ -125,15 +125,39 @@ export const createProjectSchema = z.object({
         )
         .optional(),
 
+    min_bedrooms: z.nativeEnum(Bedrooms, {
+        errorMap: () => ({
+            message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+        }),
+    }).optional(),
+
+    max_bedrooms: z.nativeEnum(Bedrooms, {
+        errorMap: () => ({
+            message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+        }),
+    }).optional(),
+
     // Payment plan structure from frontend (percentage breakdown)
     payment_structure: z
         .preprocess(
             (val) => (typeof val === 'string' ? JSON.parse(val) : val),
             z.object({
-                one: z.number().min(0).max(100),
-                two: z.number().min(0).max(100),
-                three: z.number().min(0).max(100),
-                four: z.number().min(0).max(100),
+                one: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
+                two: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
+                three: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
+                four: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
             })
         )
         .optional(),
@@ -279,15 +303,39 @@ export const updateProjectSchema = z.object({
         )
         .optional(),
 
+    min_bedrooms: z.nativeEnum(Bedrooms, {
+        errorMap: () => ({
+            message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+        }),
+    }).optional(),
+
+    max_bedrooms: z.nativeEnum(Bedrooms, {
+        errorMap: () => ({
+            message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+        }),
+    }).optional(),
+
     // Payment plan structure from frontend (percentage breakdown)
     payment_structure: z
         .preprocess(
             (val) => (typeof val === 'string' ? JSON.parse(val) : val),
             z.object({
-                one: z.number().min(0).max(100),
-                two: z.number().min(0).max(100),
-                three: z.number().min(0).max(100),
-                four: z.number().min(0).max(100),
+                one: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
+                two: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
+                three: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
+                four: z.string().refine((val) => {
+                    const num = Number(val);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                }, "Must be a valid number between 0 and 100"),
             })
         )
         .optional(),
