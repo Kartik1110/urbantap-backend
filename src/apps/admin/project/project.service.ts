@@ -67,8 +67,6 @@ export const createProjectService = async (data: ProjectCreateData) => {
         data: {
             ...enrichedProjectData,
             max_sq_ft: calculatedMaxSqFt,
-            min_bedrooms: projectData.min_bedrooms,
-            max_bedrooms: projectData.max_bedrooms,
             admin_user: admin_user_id
                 ? {
                       connect: {
@@ -215,8 +213,6 @@ export const updateProjectService = async (
         data: {
             ...enrichedProjectData,
             max_sq_ft: calculatedMaxSqFt,
-            min_bedrooms: projectData.min_bedrooms,
-            max_bedrooms: projectData.max_bedrooms,
             admin_user: admin_user_id
                 ? {
                       connect: {

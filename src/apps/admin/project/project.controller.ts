@@ -96,8 +96,6 @@ export const createProject = async (
             floor_plans,
             latitude,
             longitude,
-            min_bedrooms,
-            max_bedrooms,
         } = req.body;
 
         // Parse floor plans and add images
@@ -137,8 +135,6 @@ export const createProject = async (
                 : undefined,
             latitude: latitude ? parseFloat(latitude) : undefined,
             longitude: longitude ? parseFloat(longitude) : undefined,
-            min_bedrooms,
-            max_bedrooms,
             image_urls: imageUrls,
             brochure_url: brochureUrl,
             floor_plans: floorPlansData,
@@ -317,8 +313,6 @@ export const updateProject = async (
             existing_image_urls,
             latitude,
             longitude,
-            min_bedrooms,
-            max_bedrooms,
         } = req.body;
 
         // Parse floor plans and add images
@@ -367,8 +361,6 @@ export const updateProject = async (
             }),
             ...(latitude && { latitude: parseFloat(latitude) }),
             ...(longitude && { longitude: parseFloat(longitude) }),
-            ...(min_bedrooms && { min_bedrooms }),
-            ...(max_bedrooms && { max_bedrooms }),
             ...(finalImageUrls.length > 0 && { image_urls: finalImageUrls }),
             ...(brochureUrl && { brochure_url: brochureUrl }),
             floor_plans: floorPlansData,
