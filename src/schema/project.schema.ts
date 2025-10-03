@@ -16,11 +16,11 @@ const floorPlanSchema = z.object({
     title: z.string().min(1, 'Floor plan title is required'),
     min_price: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
-        z.number().positive().optional()
+        z.number().positive().nullable().optional()
     ),
     max_price: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
-        z.number().positive().optional()
+        z.number().positive().nullable().optional()
     ),
     unit_size: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
@@ -149,12 +149,20 @@ export const createProjectSchema = z.object({
     // Latitude and longitude for location
     latitude: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
-        z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90').optional()
+        z
+            .number()
+            .min(-90, 'Latitude must be between -90 and 90')
+            .max(90, 'Latitude must be between -90 and 90')
+            .optional()
     ),
 
     longitude: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
-        z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180').optional()
+        z
+            .number()
+            .min(-180, 'Longitude must be between -180 and 180')
+            .max(180, 'Longitude must be between -180 and 180')
+            .optional()
     ),
 });
 
@@ -181,11 +189,13 @@ export const updateProjectSchema = z.object({
             .optional()
     ),
 
-    currency: z.nativeEnum(Currency, {
-        errorMap: () => ({
-            message: `Currency must be one of: ${Object.values(Currency).join(', ')}`,
-        }),
-    }).optional(),
+    currency: z
+        .nativeEnum(Currency, {
+            errorMap: () => ({
+                message: `Currency must be one of: ${Object.values(Currency).join(', ')}`,
+            }),
+        })
+        .optional(),
 
     address: z
         .string()
@@ -193,25 +203,31 @@ export const updateProjectSchema = z.object({
         .max(500, 'Address must be less than 500 characters')
         .optional(),
 
-    city: z.nativeEnum(City, {
-        errorMap: () => ({
-            message: `City must be one of: ${Object.values(City).join(', ')}`,
-        }),
-    }).optional(),
+    city: z
+        .nativeEnum(City, {
+            errorMap: () => ({
+                message: `City must be one of: ${Object.values(City).join(', ')}`,
+            }),
+        })
+        .optional(),
 
-    category: z.nativeEnum(Category, {
-        errorMap: () => ({
-            message: `Category must be one of: ${Object.values(Category).join(', ')}`,
-        }),
-    }).optional(),
+    category: z
+        .nativeEnum(Category, {
+            errorMap: () => ({
+                message: `Category must be one of: ${Object.values(Category).join(', ')}`,
+            }),
+        })
+        .optional(),
 
-    type: z.preprocess(
-        (val) => (typeof val === 'string' ? JSON.parse(val) : val),
-        z
-            .array(z.nativeEnum(Type))
-            .min(1, 'At least one type is required')
-            .max(10, 'Too many types (max 10)')
-    ).optional(),
+    type: z
+        .preprocess(
+            (val) => (typeof val === 'string' ? JSON.parse(val) : val),
+            z
+                .array(z.nativeEnum(Type))
+                .min(1, 'At least one type is required')
+                .max(10, 'Too many types (max 10)')
+        )
+        .optional(),
 
     project_name: z
         .string()
@@ -225,19 +241,23 @@ export const updateProjectSchema = z.object({
         .max(100, 'Project age must be less than 100 characters')
         .optional(),
 
-    furnished: z.nativeEnum(Furnished, {
-        errorMap: () => ({
-            message: `Furnished must be one of: ${Object.values(Furnished).join(', ')}`,
-        }),
-    }).optional(),
+    furnished: z
+        .nativeEnum(Furnished, {
+            errorMap: () => ({
+                message: `Furnished must be one of: ${Object.values(Furnished).join(', ')}`,
+            }),
+        })
+        .optional(),
 
-    unit_types: z.preprocess(
-        (val) => (typeof val === 'string' ? JSON.parse(val) : val),
-        z
-            .array(z.string().min(1, 'Unit type cannot be empty'))
-            .min(1, 'At least one unit type is required')
-            .max(50, 'Too many unit types (max 50)')
-    ).optional(),
+    unit_types: z
+        .preprocess(
+            (val) => (typeof val === 'string' ? JSON.parse(val) : val),
+            z
+                .array(z.string().min(1, 'Unit type cannot be empty'))
+                .min(1, 'At least one unit type is required')
+                .max(50, 'Too many unit types (max 50)')
+        )
+        .optional(),
 
     amenities: z
         .preprocess(
@@ -291,11 +311,19 @@ export const updateProjectSchema = z.object({
     // Latitude and longitude for location
     latitude: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
-        z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90').optional()
+        z
+            .number()
+            .min(-90, 'Latitude must be between -90 and 90')
+            .max(90, 'Latitude must be between -90 and 90')
+            .optional()
     ),
 
     longitude: z.preprocess(
         (val) => (typeof val === 'string' ? parseFloat(val) : val),
-        z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180').optional()
+        z
+            .number()
+            .min(-180, 'Longitude must be between -180 and 180')
+            .max(180, 'Longitude must be between -180 and 180')
+            .optional()
     ),
 });
