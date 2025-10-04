@@ -66,4 +66,3 @@ export const getDeveloperDetails = async (req: Request, res: Response) => {
         });
     }
 };
-

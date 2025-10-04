@@ -143,7 +143,7 @@ export const createProject = async (
             brochure_url: brochureUrl,
             floor_plans: floorPlansData,
             inventory_files: inventoryFiles,
-            admin_user_id: req.user.id,
+            company_id: req.user.companyId!,
             developer: {
                 connect: {
                     id: req.user.entityId,

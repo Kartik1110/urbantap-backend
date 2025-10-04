@@ -21,7 +21,6 @@ router.use(authRoutes);
 router.use(roleGroupRoutes);
 router.use(teamMemberRoutes);
 router.use(permissionRoutes);
-router.use(brokerRoutes);
 router.use(creditRoutes);
 router.use(orderRoutes);
 
@@ -32,6 +31,7 @@ export default (upload: any) => {
     router.use(postRoutes(upload));
     router.use(listingRoutes(upload));
     router.use(jobRoutes);
+    router.use(brokerRoutes(upload));
 
     return router;
 };

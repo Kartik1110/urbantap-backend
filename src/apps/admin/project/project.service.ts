@@ -1,5 +1,5 @@
 import prisma from '@/utils/prisma';
-import { Prisma } from '@prisma/client';
+import { AdminUserType, Prisma } from '@prisma/client';
 import { PermissionChecker } from '@/utils/permissions';
 import { geocodeAddress } from '@/utils/geocoding';
 import logger from '@/utils/logger';
@@ -18,12 +18,28 @@ interface ProjectCreateData
     extends Omit<Prisma.ProjectCreateInput, 'floor_plans' | 'inventory'> {
     floor_plans?: FloorPlanData[];
     inventory_files?: string[];
-    admin_user_id?: string;
+    company_id: string;
 }
 
 export const createProjectService = async (data: ProjectCreateData) => {
-    const { floor_plans, inventory_files, admin_user_id, ...projectData } =
-        data;
+    const { floor_plans, inventory_files, company_id, ...projectData } = data;
+
+    const admin_user = await prisma.adminUser.findFirst({
+        where: {
+            type: AdminUserType.MEMBER,
+            company_id: company_id,
+        },
+        select: {
+            id: true,
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+    });
+
+    if (!admin_user) {
+        throw new Error('Admin Member not found for this broker.');
+    }
 
     // Calculate max_sq_ft from the largest unit_size in floor_plans
     let calculatedMaxSqFt: number | undefined;
@@ -69,13 +85,11 @@ export const createProjectService = async (data: ProjectCreateData) => {
             max_sq_ft: calculatedMaxSqFt,
             min_bedrooms: projectData.min_bedrooms,
             max_bedrooms: projectData.max_bedrooms,
-            admin_user: admin_user_id
-                ? {
-                      connect: {
-                          id: admin_user_id,
-                      },
-                  }
-                : undefined,
+            admin_user: {
+                connect: {
+                    id: admin_user.id,
+                },
+            },
             floor_plans: floor_plans
                 ? {
                       create: floor_plans.map((fp) => ({
@@ -153,8 +167,7 @@ export const updateProjectService = async (
     projectId: string,
     data: ProjectCreateData
 ) => {
-    const { floor_plans, inventory_files, admin_user_id, ...projectData } =
-        data;
+    const { floor_plans, inventory_files, ...projectData } = data;
 
     // Calculate max_sq_ft from the largest unit_size in floor_plans
     let calculatedMaxSqFt: number | undefined;
@@ -217,13 +230,6 @@ export const updateProjectService = async (
             max_sq_ft: calculatedMaxSqFt,
             min_bedrooms: projectData.min_bedrooms,
             max_bedrooms: projectData.max_bedrooms,
-            admin_user: admin_user_id
-                ? {
-                      connect: {
-                          id: admin_user_id,
-                      },
-                  }
-                : undefined,
             floor_plans:
                 floor_plans && floor_plans.length > 0
                     ? {
