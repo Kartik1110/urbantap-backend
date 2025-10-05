@@ -173,10 +173,6 @@ export const getDeveloperDetailsService = async (developerId: string) => {
         },
     });
 
-    if (!admin_user) {
-        throw new Error('Admin Member not found for this broker.');
-    }
-
     return {
         id: developer.id,
         name: developer.company?.name,
