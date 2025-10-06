@@ -38,7 +38,7 @@ export const createProjectService = async (data: ProjectCreateData) => {
     });
 
     if (!admin_user) {
-        throw new Error('Admin Member not found for this broker.');
+        logger.error('Admin Member not found for this broker.');
     }
 
     // Calculate max_sq_ft from the largest unit_size in floor_plans
@@ -85,11 +85,13 @@ export const createProjectService = async (data: ProjectCreateData) => {
             max_sq_ft: calculatedMaxSqFt,
             min_bedrooms: projectData.min_bedrooms,
             max_bedrooms: projectData.max_bedrooms,
-            admin_user: {
-                connect: {
-                    id: admin_user.id,
+            ...(admin_user && {
+                admin_user: {
+                    connect: {
+                        id: admin_user.id,
+                    },
                 },
-            },
+            }),
             floor_plans: floor_plans
                 ? {
                       create: floor_plans.map((fp) => ({
