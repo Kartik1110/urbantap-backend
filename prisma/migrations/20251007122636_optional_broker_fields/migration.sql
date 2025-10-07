@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Broker" ALTER COLUMN "info" DROP NOT NULL,
+ALTER COLUMN "y_o_e" DROP NOT NULL,
+ALTER COLUMN "is_certified" DROP NOT NULL,
+ALTER COLUMN "profile_pic" DROP NOT NULL;
