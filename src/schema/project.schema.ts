@@ -27,7 +27,10 @@ const floorPlanSchema = z.object({
         z.number().positive().optional()
     ),
     bedrooms: z.nativeEnum(Bedrooms),
-    bathrooms: z.nativeEnum(Bathrooms),
+    bathrooms: z.preprocess(
+        (val) => (val === null || val === undefined ? undefined : val),
+        z.nativeEnum(Bathrooms).optional()
+    ),
 });
 
 export const createProjectSchema = z.object({
@@ -125,17 +128,21 @@ export const createProjectSchema = z.object({
         )
         .optional(),
 
-    min_bedrooms: z.nativeEnum(Bedrooms, {
-        errorMap: () => ({
-            message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
-        }),
-    }).optional(),
+    min_bedrooms: z
+        .nativeEnum(Bedrooms, {
+            errorMap: () => ({
+                message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+            }),
+        })
+        .optional(),
 
-    max_bedrooms: z.nativeEnum(Bedrooms, {
-        errorMap: () => ({
-            message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
-        }),
-    }).optional(),
+    max_bedrooms: z
+        .nativeEnum(Bedrooms, {
+            errorMap: () => ({
+                message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+            }),
+        })
+        .optional(),
 
     // Payment plan structure from frontend (percentage breakdown)
     payment_structure: z
@@ -145,19 +152,19 @@ export const createProjectSchema = z.object({
                 one: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
                 two: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
                 three: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
                 four: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
             })
         )
         .optional(),
@@ -303,17 +310,21 @@ export const updateProjectSchema = z.object({
         )
         .optional(),
 
-    min_bedrooms: z.nativeEnum(Bedrooms, {
-        errorMap: () => ({
-            message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
-        }),
-    }).optional(),
+    min_bedrooms: z
+        .nativeEnum(Bedrooms, {
+            errorMap: () => ({
+                message: `Min bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+            }),
+        })
+        .optional(),
 
-    max_bedrooms: z.nativeEnum(Bedrooms, {
-        errorMap: () => ({
-            message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
-        }),
-    }).optional(),
+    max_bedrooms: z
+        .nativeEnum(Bedrooms, {
+            errorMap: () => ({
+                message: `Max bedrooms must be one of: ${Object.values(Bedrooms).join(', ')}`,
+            }),
+        })
+        .optional(),
 
     // Payment plan structure from frontend (percentage breakdown)
     payment_structure: z
@@ -323,19 +334,19 @@ export const updateProjectSchema = z.object({
                 one: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
                 two: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
                 three: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
                 four: z.string().refine((val) => {
                     const num = Number(val);
                     return !isNaN(num) && num >= 0 && num <= 100;
-                }, "Must be a valid number between 0 and 100"),
+                }, 'Must be a valid number between 0 and 100'),
             })
         )
         .optional(),
