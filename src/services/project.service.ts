@@ -786,19 +786,12 @@ export const getFeaturedProjectsService = async ({
 }) => {
     const skip = (page - 1) * pageSize;
 
-    const whereClause = {
-        views: {
-            gte: 1, // Only projects with at least 1 view
-        },
-    };
-
     const [projectsRaw, totalCount] = await Promise.all([
         prisma.project.findMany({
-            where: whereClause,
             skip,
             take: pageSize,
             orderBy: {
-                views: 'desc', // Most viewed first
+                created_at: 'desc', // Most recent first
             },
             include: {
                 developer: {
@@ -817,7 +810,7 @@ export const getFeaturedProjectsService = async ({
                 },
             },
         }),
-        prisma.project.count({ where: whereClause }),
+        prisma.project.count(),
     ]);
 
     const projects = projectsRaw.map((proj) => ({
