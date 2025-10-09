@@ -18,7 +18,7 @@ const router = Router();
 /* Get all projects */
 router.get('/projects', getProjects);
 
-/* Get featured projects (most viewed) - MUST be before /projects/:id */
+/* Get featured projects (most recent) - MUST be before /projects/:id */
 router.get('/projects/featured', getFeaturedProjects);
 
 /* Get all projects for a specific developer */
