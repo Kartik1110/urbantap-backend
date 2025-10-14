@@ -23,14 +23,23 @@ export const createProject = async (
             });
         }
 
-        const files = req.files as
-            | { [fieldname: string]: Express.Multer.File[] }
-            | undefined;
+        const files = req.files as Express.Multer.File[] | undefined;
+
+        // Organize files by field name
+        const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
+        if (files && Array.isArray(files)) {
+            files.forEach((file) => {
+                if (!organizedFiles[file.fieldname]) {
+                    organizedFiles[file.fieldname] = [];
+                }
+                organizedFiles[file.fieldname].push(file);
+            });
+        }
 
         // Upload project images
         let imageUrls: string[] = [];
-        if (files?.image_urls) {
-            for (const file of files.image_urls) {
+        if (organizedFiles.image_urls) {
+            for (const file of organizedFiles.image_urls) {
                 const ext = file.originalname.split('.').pop();
                 const url = await uploadToS3(
                     file.path,
@@ -42,37 +51,39 @@ export const createProject = async (
 
         // Upload project brochure
         let brochureUrl: string | undefined;
-        if (files?.file_url?.[0]) {
-            const ext = files.file_url[0].originalname.split('.').pop();
+        if (organizedFiles.file_url?.[0]) {
+            const ext = organizedFiles.file_url[0].originalname.split('.').pop();
             brochureUrl = await uploadToS3(
-                files.file_url[0].path,
+                organizedFiles.file_url[0].path,
                 `projects/brochures/${Date.now()}_brochure.${ext}`
             );
         }
 
         // Upload inventory file
         let inventoryFiles: string[] = [];
-        if (files?.inventory_file?.[0]) {
-            const ext = files.inventory_file[0].originalname.split('.').pop();
+        if (organizedFiles.inventory_file?.[0]) {
+            const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
             const url = await uploadToS3(
-                files.inventory_file[0].path,
+                organizedFiles.inventory_file[0].path,
                 `projects/inventory/${Date.now()}_inventory.${ext}`
             );
             inventoryFiles.push(url);
         }
 
-        // Upload floor plan images
+        // Upload floor plan images dynamically
         const floorPlanImages: { [index: number]: string } = {};
-        for (let i = 0; i < 10; i++) {
-            const fieldName = `floor_plan_image_${i}`;
-            if (files?.[fieldName]?.[0]) {
-                const file = files[fieldName][0];
-                const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
-                    `projects/floor_plans/${Date.now()}_floor_plan_${i}.${ext}`
-                );
-                floorPlanImages[i] = url;
+        for (const fieldName in organizedFiles) {
+            if (fieldName.startsWith('floor_plan_image_')) {
+                const index = parseInt(fieldName.replace('floor_plan_image_', ''));
+                if (!isNaN(index) && organizedFiles[fieldName][0]) {
+                    const file = organizedFiles[fieldName][0];
+                    const ext = file.originalname.split('.').pop();
+                    const url = await uploadToS3(
+                        file.path,
+                        `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
+                    );
+                    floorPlanImages[index] = url;
+                }
             }
         }
 
@@ -243,14 +254,23 @@ export const updateProject = async (
             });
         }
 
-        const files = req.files as
-            | { [fieldname: string]: Express.Multer.File[] }
-            | undefined;
+        const files = req.files as Express.Multer.File[] | undefined;
+
+        // Organize files by field name
+        const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
+        if (files && Array.isArray(files)) {
+            files.forEach((file) => {
+                if (!organizedFiles[file.fieldname]) {
+                    organizedFiles[file.fieldname] = [];
+                }
+                organizedFiles[file.fieldname].push(file);
+            });
+        }
 
         // Upload new project images if provided
         let imageUrls: string[] = [];
-        if (files?.image_urls) {
-            for (const file of files.image_urls) {
+        if (organizedFiles.image_urls) {
+            for (const file of organizedFiles.image_urls) {
                 const ext = file.originalname.split('.').pop();
                 const url = await uploadToS3(
                     file.path,
@@ -262,37 +282,39 @@ export const updateProject = async (
 
         // Upload new project brochure if provided
         let brochureUrl: string | undefined;
-        if (files?.file_url?.[0]) {
-            const ext = files.file_url[0].originalname.split('.').pop();
+        if (organizedFiles.file_url?.[0]) {
+            const ext = organizedFiles.file_url[0].originalname.split('.').pop();
             brochureUrl = await uploadToS3(
-                files.file_url[0].path,
+                organizedFiles.file_url[0].path,
                 `projects/brochures/${Date.now()}_brochure.${ext}`
             );
         }
 
         // Upload new inventory file if provided
         let inventoryFiles: string[] = [];
-        if (files?.inventory_file?.[0]) {
-            const ext = files.inventory_file[0].originalname.split('.').pop();
+        if (organizedFiles.inventory_file?.[0]) {
+            const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
             const url = await uploadToS3(
-                files.inventory_file[0].path,
+                organizedFiles.inventory_file[0].path,
                 `projects/inventory/${Date.now()}_inventory.${ext}`
             );
             inventoryFiles.push(url);
         }
 
-        // Upload new floor plan images if provided
+        // Upload new floor plan images dynamically
         const floorPlanImages: { [index: number]: string } = {};
-        for (let i = 0; i < 10; i++) {
-            const fieldName = `floor_plan_image_${i}`;
-            if (files?.[fieldName]?.[0]) {
-                const file = files[fieldName][0];
-                const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
-                    `projects/floor_plans/${Date.now()}_floor_plan_${i}.${ext}`
-                );
-                floorPlanImages[i] = url;
+        for (const fieldName in organizedFiles) {
+            if (fieldName.startsWith('floor_plan_image_')) {
+                const index = parseInt(fieldName.replace('floor_plan_image_', ''));
+                if (!isNaN(index) && organizedFiles[fieldName][0]) {
+                    const file = organizedFiles[fieldName][0];
+                    const ext = file.originalname.split('.').pop();
+                    const url = await uploadToS3(
+                        file.path,
+                        `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
+                    );
+                    floorPlanImages[index] = url;
+                }
             }
         }
 
