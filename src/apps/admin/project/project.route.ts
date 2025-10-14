@@ -22,21 +22,7 @@ export default (upload: multer.Multer) => {
     router.post(
         '/admin-user/projects',
         verifyToken,
-        upload.fields([
-            { name: 'image_urls', maxCount: 20 },
-            { name: 'file_url', maxCount: 1 },
-            { name: 'inventory_file', maxCount: 1 },
-            { name: 'floor_plan_image_0', maxCount: 1 },
-            { name: 'floor_plan_image_1', maxCount: 1 },
-            { name: 'floor_plan_image_2', maxCount: 1 },
-            { name: 'floor_plan_image_3', maxCount: 1 },
-            { name: 'floor_plan_image_4', maxCount: 1 },
-            { name: 'floor_plan_image_5', maxCount: 1 },
-            { name: 'floor_plan_image_6', maxCount: 1 },
-            { name: 'floor_plan_image_7', maxCount: 1 },
-            { name: 'floor_plan_image_8', maxCount: 1 },
-            { name: 'floor_plan_image_9', maxCount: 1 },
-        ]),
+        upload.any(), // Accept any number of files with any field names
         requirePermission('CREATE_PROJECT'),
         validateSchema(createProjectSchema),
         createProject
@@ -51,21 +37,7 @@ export default (upload: multer.Multer) => {
     router.put(
         '/admin-user/projects/:id',
         verifyToken,
-        upload.fields([
-            { name: 'image_urls', maxCount: 20 },
-            { name: 'file_url', maxCount: 1 },
-            { name: 'inventory_file', maxCount: 1 },
-            { name: 'floor_plan_image_0', maxCount: 1 },
-            { name: 'floor_plan_image_1', maxCount: 1 },
-            { name: 'floor_plan_image_2', maxCount: 1 },
-            { name: 'floor_plan_image_3', maxCount: 1 },
-            { name: 'floor_plan_image_4', maxCount: 1 },
-            { name: 'floor_plan_image_5', maxCount: 1 },
-            { name: 'floor_plan_image_6', maxCount: 1 },
-            { name: 'floor_plan_image_7', maxCount: 1 },
-            { name: 'floor_plan_image_8', maxCount: 1 },
-            { name: 'floor_plan_image_9', maxCount: 1 },
-        ]),
+        upload.any(), // Accept any number of files with any field names
         validateSchema(updateProjectSchema),
         updateProject
     );
