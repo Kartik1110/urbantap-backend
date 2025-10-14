@@ -1,0 +1,1041 @@
+[
+  {
+    "name": "Academic City",
+    "lat": 25.113106,
+    "lng": 55.4084034,
+    "formatted_address": "Academic City - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Al Awir",
+    "lat": 25.1784957,
+    "lng": 55.545002,
+    "formatted_address": "Al Aweer - Dubai - United Arab Emirates",
+    "types": [
+      "locality",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Barsha",
+    "lat": 25.083827,
+    "lng": 55.220397,
+    "formatted_address": "Al Barsha - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Al Barsha South",
+    "lat": 25.080552,
+    "lng": 55.2348891,
+    "formatted_address": "Al Barsha - Al Barsha South - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Furjan",
+    "lat": 25.0251668,
+    "lng": 55.1458611,
+    "formatted_address": "Jabal Ali First - Al Furjan - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Garhoud",
+    "lat": 25.2436289,
+    "lng": 55.3474236,
+    "formatted_address": "Al Garhoud - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Al Khawaneej",
+    "lat": 25.2304998,
+    "lng": 55.5036409,
+    "formatted_address": "Al Khawaneej - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Al Lisaili",
+    "lat": 24.9337617,
+    "lng": 55.474856,
+    "formatted_address": "Al Lisaili - Dubai - United Arab Emirates",
+    "types": [
+      "locality",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Mamzar",
+    "lat": 25.316746,
+    "lng": 55.3363372,
+    "formatted_address": "Dubai Islands - Al Mamzar - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Mizhar",
+    "lat": 25.2441685,
+    "lng": 55.4427254,
+    "formatted_address": "Al Mizhar - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Al Nahda",
+    "lat": 25.2919567,
+    "lng": 55.365513,
+    "formatted_address": "Al Nahda - Al Nahda 1 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Quoz",
+    "lat": 25.1514047,
+    "lng": 55.250782,
+    "formatted_address": "Al Quoz - Al Quoz 4 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Quoz Industrial Area",
+    "lat": 25.1246222,
+    "lng": 55.22233439999999,
+    "formatted_address": "Al Quoz - Al Quoz Industrial Area 3 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Qusais",
+    "lat": 25.2619867,
+    "lng": 55.3987166,
+    "formatted_address": "Al Twar Fourth - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Safa",
+    "lat": 25.1586178,
+    "lng": 55.2245398,
+    "formatted_address": "Al Safa - Al Safa 2 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Sufouh",
+    "lat": 25.1133927,
+    "lng": 55.1762197,
+    "formatted_address": "Al Sufouh - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Al Warqa",
+    "lat": 25.1874594,
+    "lng": 55.4056356,
+    "formatted_address": "Al Warqa - Al Warqa 1 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Al Wasl",
+    "lat": 25.1944157,
+    "lng": 55.25434869999999,
+    "formatted_address": "Al Wasl - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Arabian Ranches",
+    "lat": 25.0523684,
+    "lng": 55.2673602,
+    "formatted_address": "Arabian Ranches - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Arabian Ranches 2",
+    "lat": 25.0331427,
+    "lng": 55.272887,
+    "formatted_address": "Wadi Al Safa 7 - Arabian Ranches 2 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Arabian Ranches 3",
+    "lat": 25.0657844,
+    "lng": 55.3214386,
+    "formatted_address": "Unnamed Road - Wadi Al Safa 5 - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Arjan",
+    "lat": 25.0605347,
+    "lng": 55.2397317,
+    "formatted_address": "Arjan-Dubailand - Al Barsha South - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Aviation City",
+    "lat": 25.2807136,
+    "lng": 55.3867774,
+    "formatted_address": "Damascus Street - Al Qusais Industrial Area - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Barsha Heights",
+    "lat": 25.096962,
+    "lng": 55.1775999,
+    "formatted_address": "Al Barsha - Barsha Heights - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Bur Dubai",
+    "lat": 25.2145565,
+    "lng": 55.3032906,
+    "formatted_address": "Bur Dubai - Dubai - United Arab Emirates",
+    "types": [
+      "colloquial_area",
+      "political"
+    ]
+  },
+  {
+    "name": "Business Bay",
+    "lat": 25.1815668,
+    "lng": 55.27151019999999,
+    "formatted_address": "Business Bay - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Commercial City",
+    "lat": 25.2356185,
+    "lng": 55.36797780000001,
+    "formatted_address": "11 17th St - Umm Ramool - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Damac Hills",
+    "lat": 25.0292369,
+    "lng": 55.2527796,
+    "formatted_address": "Al Hebiah Third - DAMAC Hills - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Damac Hills 2",
+    "lat": 24.9879316,
+    "lng": 55.3749762,
+    "formatted_address": "Madinat Hind 4 - Damac Hills - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Deira",
+    "lat": 25.2788468,
+    "lng": 55.3309395,
+    "formatted_address": "Deira - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Discovery Gardens",
+    "lat": 25.0390117,
+    "lng": 55.1444815,
+    "formatted_address": "Jabal Ali First - Discovery Gardens - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Downtown Dubai",
+    "lat": 25.1949849,
+    "lng": 55.2784141,
+    "formatted_address": "Downtown Dubai - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dragon Mart",
+    "lat": 25.1753672,
+    "lng": 55.4126284,
+    "formatted_address": "Al Awir Road - Dubai International City - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest",
+      "shopping_mall"
+    ]
+  },
+  {
+    "name": "Dubai Creek Harbour",
+    "lat": 25.2066955,
+    "lng": 55.34779109999999,
+    "formatted_address": "Ras Al Khor - Dubai Creek Harbour - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai Design District",
+    "lat": 25.1866742,
+    "lng": 55.3019726,
+    "formatted_address": "Business Bay - Dubai Design District - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai Festival City",
+    "lat": 25.2187726,
+    "lng": 55.3637911,
+    "formatted_address": "Dubai Festival City - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai Healthcare City",
+    "lat": 25.2327665,
+    "lng": 55.3241397,
+    "formatted_address": "2 26 Street - Building 25 Dubai Healthcare City - Umm Hurair Second - Dubai Healthcare City - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "health",
+      "hospital",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubai Hills",
+    "lat": 25.1156255,
+    "lng": 55.2682079,
+    "formatted_address": "Dubai Hills Estate - حدائق الشيخ محمد بن راشد - دبي - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubai Hills Estate",
+    "lat": 25.1156255,
+    "lng": 55.2682079,
+    "formatted_address": "Dubai Hills Estate - حدائق الشيخ محمد بن راشد - دبي - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubai International City",
+    "lat": 25.1648925,
+    "lng": 55.4084034,
+    "formatted_address": "Dubai International City - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dubai Internet City",
+    "lat": 25.0929611,
+    "lng": 55.1602848,
+    "formatted_address": "35V6+54 - Al Safouh Second - Dubai Internet City - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubai Investment Park",
+    "lat": 24.9789814,
+    "lng": 55.1762197,
+    "formatted_address": "Dubai Investment Park First - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dubai Investments Park",
+    "lat": 24.9789814,
+    "lng": 55.1762197,
+    "formatted_address": "Dubai Investment Park First - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dubai Knowledge Park",
+    "lat": 25.1040726,
+    "lng": 55.163109,
+    "formatted_address": "Al Sufouh - Dubai Knowledge Park - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai Marina",
+    "lat": 25.0806744,
+    "lng": 55.13979209999999,
+    "formatted_address": "Dubai Marina - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai Maritime City",
+    "lat": 25.2697914,
+    "lng": 55.2632154,
+    "formatted_address": "Madinat Dubai Al Melaheyah - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dubai Media City",
+    "lat": 25.0930152,
+    "lng": 55.15181250000001,
+    "formatted_address": "CNN Building - 2 King Salman Bin Abdulaziz Al Saud St - Al Safouh Second - Dubai Media City - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubai Motor City",
+    "lat": 25.0450177,
+    "lng": 55.2397317,
+    "formatted_address": "Motor City - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dubai Production City",
+    "lat": 25.0317773,
+    "lng": 55.19002270000001,
+    "formatted_address": "Dubai Production City - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Dubai Silicon Oasis",
+    "lat": 25.1238698,
+    "lng": 55.3997112,
+    "formatted_address": "Binghatti House - Nadd Hessa - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest",
+      "store"
+    ]
+  },
+  {
+    "name": "Dubai Silicon Oasis",
+    "lat": 25.1238698,
+    "lng": 55.3997112,
+    "formatted_address": "Binghatti House - Nadd Hessa - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest",
+      "store"
+    ]
+  },
+  {
+    "name": "Dubai South",
+    "lat": 24.8846524,
+    "lng": 55.1260067,
+    "formatted_address": "Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai Sports City",
+    "lat": 25.0418328,
+    "lng": 55.2194201,
+    "formatted_address": "Gate No.1 Near - شارع الشيخ محمد بن زايد - Al Hebiah Fourth - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubai Studio City",
+    "lat": 25.0346728,
+    "lng": 55.2397317,
+    "formatted_address": "Motor City - Dubai Studio City - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubai World Central",
+    "lat": 24.8846524,
+    "lng": 55.1260067,
+    "formatted_address": "Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Dubailand",
+    "lat": 25.090954,
+    "lng": 55.3784977,
+    "formatted_address": "39RH+99Q - Wadi Al Safa 5 - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Dubailand Residence Complex",
+    "lat": 25.0921185,
+    "lng": 55.37977739999999,
+    "formatted_address": "Wadi Al Safa 5 - Dubai Land Residence Complex - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Falcon City of Wonders",
+    "lat": 25.0999071,
+    "lng": 55.3420226,
+    "formatted_address": "Wadi Al Safa 2 - Falconcity of Wonders - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Golf City",
+    "lat": 25.0125131,
+    "lng": 55.234207,
+    "formatted_address": "Golf City - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Green Community",
+    "lat": 25.005121,
+    "lng": 55.1554696,
+    "formatted_address": "The Green Community, West Gate Entrance2 - قرية المجتمع الخضراء - دبي - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Hatta",
+    "lat": 24.8061691,
+    "lng": 56.1253848,
+    "formatted_address": "Hatta - Dubai - United Arab Emirates",
+    "types": [
+      "locality",
+      "political"
+    ]
+  },
+  {
+    "name": "Hor Al Anz",
+    "lat": 25.2769983,
+    "lng": 55.3337049,
+    "formatted_address": "Hor Al Anz - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "International City",
+    "lat": 25.1648925,
+    "lng": 55.4084034,
+    "formatted_address": "Dubai International City - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Jebel Ali",
+    "lat": 24.9857145,
+    "lng": 55.0272904,
+    "formatted_address": "Mena Jabal Ali - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Jebel Ali Free Zone",
+    "lat": 24.984977,
+    "lng": 55.04382520000001,
+    "formatted_address": "Mena Jabal Ali - Jebel Ali Freezone - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Jebel Ali Industrial Area",
+    "lat": 24.9952814,
+    "lng": 55.1210303,
+    "formatted_address": "Jebel Ali Industrial Area - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Jebel Ali Port",
+    "lat": 25.0236111,
+    "lng": 55.0402778,
+    "formatted_address": "Port of Jebel Ali - Jabal Ali Third - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "natural_feature"
+    ]
+  },
+  {
+    "name": "Jumeirah",
+    "lat": 25.2027912,
+    "lng": 55.2413195,
+    "formatted_address": "Jumeirah - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Jumeirah Golf Estates",
+    "lat": 25.0209208,
+    "lng": 55.20019629999999,
+    "formatted_address": "Jumeirah Golf Estates - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "food",
+      "point_of_interest",
+      "restaurant"
+    ]
+  },
+  {
+    "name": "Jumeirah Heights",
+    "lat": 25.0655904,
+    "lng": 55.14724080000001,
+    "formatted_address": "Jumeirah Islands - Jumeirah Heights - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Jumeirah Park",
+    "lat": 25.0471279,
+    "lng": 55.1555195,
+    "formatted_address": "Jumeirah Park - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Jumeirah Village Circle",
+    "lat": 25.0608609,
+    "lng": 55.2088007,
+    "formatted_address": "Jumeirah Village - Jumeirah Village Circle - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Jumeirah Village Triangle",
+    "lat": 25.0472882,
+    "lng": 55.19002270000001,
+    "formatted_address": "Jumeirah Village - Jumeirah Village Triangle - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Lehbab",
+    "lat": 25.0361145,
+    "lng": 55.5926577,
+    "formatted_address": "Lahbab - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Living Legends",
+    "lat": 25.0910153,
+    "lng": 55.30260389999999,
+    "formatted_address": "Unnamed Road - 38R3+C25 - وادي الصفا 3 - Legends - دبي - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Liwan",
+    "lat": 25.1115263,
+    "lng": 55.3682795,
+    "formatted_address": "Dubai Silicon Oasis - Liwan - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Logistics City",
+    "lat": 24.8993149,
+    "lng": 55.1099967,
+    "formatted_address": "Madinat Al Mataar - Dubai Logistics City - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Margham",
+    "lat": 24.9037042,
+    "lng": 55.6273332,
+    "formatted_address": "Margham - Dubai - United Arab Emirates",
+    "types": [
+      "locality",
+      "political"
+    ]
+  },
+  {
+    "name": "Meydan",
+    "lat": 25.1577925,
+    "lng": 55.3008283,
+    "formatted_address": "Al Meydan Rd - Nad Al Sheba - Nad Al Sheba 1 - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Mirdif",
+    "lat": 25.2194316,
+    "lng": 55.4248844,
+    "formatted_address": "Mirdif - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Motor City",
+    "lat": 25.0450177,
+    "lng": 55.2397317,
+    "formatted_address": "Motor City - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Mudon",
+    "lat": 25.0234353,
+    "lng": 55.2716551,
+    "formatted_address": "Al Hebiah Sixth - Mudon - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Muhaisnah",
+    "lat": 25.2712259,
+    "lng": 55.4042518,
+    "formatted_address": "Muhaisnah - Muhaisnah 3 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Mushrif",
+    "lat": 25.2156165,
+    "lng": 55.44784670000001,
+    "formatted_address": "Mushraif - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Nad Al Sheba",
+    "lat": 25.1435458,
+    "lng": 55.3475331,
+    "formatted_address": "Nad Al Sheba - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Nad Shamma",
+    "lat": 25.2168894,
+    "lng": 55.3848803,
+    "formatted_address": "Nadd Shamma - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Palm Jumeirah",
+    "lat": 25.1124317,
+    "lng": 55.13897799999999,
+    "formatted_address": "Palm Jumeirah - Nakhlat Jumeira - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "natural_feature"
+    ]
+  },
+  {
+    "name": "Rashidiya",
+    "lat": 25.2244647,
+    "lng": 55.38903089999999,
+    "formatted_address": "Al Rashidiya - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Remraam",
+    "lat": 25.0042305,
+    "lng": 55.2514865,
+    "formatted_address": "Remraam - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Residential City",
+    "lat": 24.9403343,
+    "lng": 55.2167205,
+    "formatted_address": "W6R8+4MQ DWC Residential City - Dubai South Residential District - Dubai South - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Serena",
+    "lat": 25.0389716,
+    "lng": 55.28909059999999,
+    "formatted_address": "27QP+2V9 - D54 - Wadi Al Safa 7 - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Sports City",
+    "lat": 25.0391345,
+    "lng": 55.2176352,
+    "formatted_address": "Al Hebiah Fourth - Dubai Sports City - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Techno Park",
+    "lat": 24.9392625,
+    "lng": 55.0686622,
+    "formatted_address": "Technopark - Jabal Ali Industrial Third - National Industries Park - Dubai - United Arab Emirates",
+    "types": [
+      "route"
+    ]
+  },
+  {
+    "name": "The Gardens",
+    "lat": 25.0423411,
+    "lng": 55.127927,
+    "formatted_address": "Jabal Ali First - The Gardens - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "The Sustainable City",
+    "lat": 25.0277766,
+    "lng": 55.27703229999999,
+    "formatted_address": "Wadi Al Safa 7 - The Sustainable City - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "The Villa",
+    "lat": 25.0876881,
+    "lng": 55.3613635,
+    "formatted_address": "The Villa - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Umm Suqeim",
+    "lat": 25.1561827,
+    "lng": 55.2046451,
+    "formatted_address": "Umm Suqeim - Dubai - United Arab Emirates",
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ]
+  },
+  {
+    "name": "Victory Heights",
+    "lat": 25.0340907,
+    "lng": 55.2097831,
+    "formatted_address": "26M5+JWM - Lake Dr - Al Hebiah Fourth - Dubai Sports City - Dubai - United Arab Emirates",
+    "types": [
+      "establishment",
+      "point_of_interest"
+    ]
+  },
+  {
+    "name": "Wadi Al Safa",
+    "lat": 25.0939009,
+    "lng": 55.3827294,
+    "formatted_address": "Wadi Al Safa 5 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  },
+  {
+    "name": "Warsan",
+    "lat": 25.1633458,
+    "lng": 55.4416234,
+    "formatted_address": "Dubai International City - Warsan 2 - Dubai - United Arab Emirates",
+    "types": [
+      "neighborhood",
+      "political"
+    ]
+  }
+]

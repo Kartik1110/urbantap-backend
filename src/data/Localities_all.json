@@ -1,0 +1,1612 @@
+[
+  {
+    "originalName": "Al Barsha",
+    "actualLocality": "Al Barsha",
+    "lat": 25.083827,
+    "lng": 55.220397,
+    "fullAddress": "Al Barsha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Sufouh",
+    "actualLocality": "Al Sufouh",
+    "lat": 25.1133927,
+    "lng": 55.1762197,
+    "fullAddress": "Al Sufouh - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Umm Suqeim",
+    "actualLocality": "Umm Suqeim",
+    "lat": 25.1561827,
+    "lng": 55.2046451,
+    "fullAddress": "Umm Suqeim - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah",
+    "actualLocality": "Jumeirah",
+    "lat": 25.2027912,
+    "lng": 55.2413195,
+    "fullAddress": "Jumeirah - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Wasl",
+    "actualLocality": "Al Wasl",
+    "lat": 25.1944157,
+    "lng": 55.25434869999999,
+    "fullAddress": "Al Wasl - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Safa",
+    "actualLocality": "Al Safa 2",
+    "lat": 25.1586178,
+    "lng": 55.2245398,
+    "fullAddress": "Al Safa - Al Safa 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Umm Al Sheif",
+    "actualLocality": "Umm Al Sheif",
+    "lat": 25.1327715,
+    "lng": 55.2052085,
+    "fullAddress": "Umm Al Sheif - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Madinat Jumeirah",
+    "actualLocality": "Al Sufouh 1",
+    "lat": 25.1330986,
+    "lng": 55.183466,
+    "fullAddress": "Al Safouh First - Al Sufouh 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Islands",
+    "actualLocality": "Jumeirah Islands",
+    "lat": 25.0574653,
+    "lng": 55.1555195,
+    "fullAddress": "Jumeirah Islands - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Emirates Hills",
+    "actualLocality": "Emirates Hills",
+    "lat": 25.0687174,
+    "lng": 55.1734594,
+    "fullAddress": "Al Thanyah Fourth - Emirates Hills - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Springs",
+    "actualLocality": "Springs 11",
+    "lat": 25.055543,
+    "lng": 55.177575,
+    "fullAddress": "353J+QXC The Springs - Al Asayel St - Al Thanyah Fourth - Springs 11 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Meadows",
+    "actualLocality": "Al Thanyah Fourth",
+    "lat": 25.0613261,
+    "lng": 55.1758876,
+    "fullAddress": "7 Street 3 - Al Thanyah Fourth - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Lakes",
+    "actualLocality": "The Lakes",
+    "lat": 25.0792423,
+    "lng": 55.1693191,
+    "fullAddress": "The Lakes - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Greens",
+    "actualLocality": "The Greens",
+    "lat": 25.0920718,
+    "lng": 55.1713892,
+    "fullAddress": "Al Thanyah Third - The Greens - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Marina",
+    "actualLocality": "Dubai Marina",
+    "lat": 25.0806744,
+    "lng": 55.13979209999999,
+    "fullAddress": "Dubai Marina - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Lake Towers (JLT)",
+    "actualLocality": "Jumeirah Lake Towers",
+    "lat": 25.0692834,
+    "lng": 55.1417222,
+    "fullAddress": "Jumeirah Lake Towers - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Beach Residence (JBR)",
+    "actualLocality": "Jumeirah Beach Residence",
+    "lat": 25.0769441,
+    "lng": 55.1341346,
+    "fullAddress": "Marsa Dubai - Jumeirah Beach Residence - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Media City",
+    "actualLocality": "Dubai Media City",
+    "lat": 25.0930152,
+    "lng": 55.15181250000001,
+    "fullAddress": "CNN Building - 2 King Salman Bin Abdulaziz Al Saud St - Al Safouh Second - Dubai Media City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Internet City",
+    "actualLocality": "Dubai Internet City",
+    "lat": 25.0929611,
+    "lng": 55.1602848,
+    "fullAddress": "35V6+54 - Al Safouh Second - Dubai Internet City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Knowledge Village",
+    "actualLocality": "Dubai Knowledge Park",
+    "lat": 25.1040726,
+    "lng": 55.163109,
+    "fullAddress": "Al Sufouh - Dubai Knowledge Park - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Barsha Heights (Tecom)",
+    "actualLocality": "Barsha Heights",
+    "lat": 25.096962,
+    "lng": 55.1775999,
+    "fullAddress": "Al Barsha - Barsha Heights - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Quoz",
+    "actualLocality": "Al Quoz 4",
+    "lat": 25.1514047,
+    "lng": 55.250782,
+    "fullAddress": "Al Quoz - Al Quoz 4 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Palm Jumeirah",
+    "actualLocality": "Nakhlat Jumeira",
+    "lat": 25.1124317,
+    "lng": 55.13897799999999,
+    "fullAddress": "Palm Jumeirah - Nakhlat Jumeira - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Downtown Dubai",
+    "actualLocality": "Downtown Dubai",
+    "lat": 25.1949849,
+    "lng": 55.2784141,
+    "fullAddress": "Downtown Dubai - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Business Bay",
+    "actualLocality": "Business Bay",
+    "lat": 25.1815668,
+    "lng": 55.27151019999999,
+    "fullAddress": "Business Bay - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "DIFC",
+    "actualLocality": "DIFC",
+    "lat": 25.20884,
+    "lng": 55.27703229999999,
+    "fullAddress": "Trade Centre - DIFC - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Za'abeel",
+    "actualLocality": "Za'abeel 1",
+    "lat": 25.2230543,
+    "lng": 55.30605509999999,
+    "fullAddress": "Za'abeel - Za'abeel 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Karama",
+    "actualLocality": "Al Karama",
+    "lat": 25.2489204,
+    "lng": 55.30605509999999,
+    "fullAddress": "Al Karama - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Oud Metha",
+    "actualLocality": "Oud Metha",
+    "lat": 25.239126,
+    "lng": 55.3129667,
+    "fullAddress": "Oud Metha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Jaddaf",
+    "actualLocality": "Al Jadaf",
+    "lat": 25.216757,
+    "lng": 55.3309395,
+    "fullAddress": "Al Jadaf - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Healthcare City",
+    "actualLocality": "Dubai Healthcare City",
+    "lat": 25.2327665,
+    "lng": 55.3241397,
+    "fullAddress": "2 26 Street - Building 25 Dubai Healthcare City - Umm Hurair Second - Dubai Healthcare City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Satwa",
+    "actualLocality": "Al Satwa",
+    "lat": 25.21937,
+    "lng": 55.272887,
+    "fullAddress": "Al Satwa - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Mankhool",
+    "actualLocality": "Al Mankhool",
+    "lat": 25.2459667,
+    "lng": 55.29499759999999,
+    "fullAddress": "Al Mankhool - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Jafiliya",
+    "actualLocality": "Al Jafiliya",
+    "lat": 25.2378401,
+    "lng": 55.2839416,
+    "fullAddress": "Al Jafiliya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Bur Dubai",
+    "actualLocality": "Bur Dubai",
+    "lat": 25.2145565,
+    "lng": 55.3032906,
+    "fullAddress": "Bur Dubai - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Raffa",
+    "actualLocality": "Al Raffa",
+    "lat": 25.255758,
+    "lng": 55.28808739999999,
+    "fullAddress": "Al Raffa - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Hamriya",
+    "actualLocality": "Al Hamriya",
+    "lat": 25.2601903,
+    "lng": 55.3046728,
+    "fullAddress": "Al Hamriya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Fahidi",
+    "actualLocality": "Al Fahidi",
+    "lat": 25.2640103,
+    "lng": 55.28867210000001,
+    "fullAddress": "Al Fahidi - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Shindagha",
+    "actualLocality": "Al Shindagha",
+    "lat": 25.2670274,
+    "lng": 55.2893391,
+    "fullAddress": "Al Shindagha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Old Town Dubai",
+    "actualLocality": "Al Hamriya",
+    "lat": 25.2626895,
+    "lng": 55.3076973,
+    "fullAddress": "7865+X46 - Al Hamriya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Design District (d3)",
+    "actualLocality": "Dubai Design District (d3)",
+    "lat": 25.1874956,
+    "lng": 55.2974816,
+    "fullAddress": "d3 Managment Offices, Level 2, Building 3 - زعبيل الثانية - Dubai Design District - دبي - United Arab Emirates"
+  },
+  {
+    "originalName": "City Walk",
+    "actualLocality": "Al Wasl",
+    "lat": 25.2074895,
+    "lng": 55.2625253,
+    "fullAddress": "Al Safa St - Al Wasl - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Kifaf",
+    "actualLocality": "Al Kifaf",
+    "lat": 25.2346972,
+    "lng": 55.2963797,
+    "fullAddress": "Za'abeel - Al Kifaf - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Ras Al Khor",
+    "actualLocality": "Ras Al Khor",
+    "lat": 25.1960586,
+    "lng": 55.3309395,
+    "fullAddress": "Ras Al Khor - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Sheba",
+    "actualLocality": "Nad Al Sheba",
+    "lat": 25.1435458,
+    "lng": 55.3475331,
+    "fullAddress": "Nad Al Sheba - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Meydan City",
+    "actualLocality": "Nad Al Sheba 1",
+    "lat": 25.1591193,
+    "lng": 55.3088196,
+    "fullAddress": "Nad Al Sheba - Nad Al Sheba 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Production City",
+    "actualLocality": "Dubai Production City",
+    "lat": 25.0317773,
+    "lng": 55.19002270000001,
+    "fullAddress": "Dubai Production City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Studio City",
+    "actualLocality": "Dubai Studio City",
+    "lat": 25.0346728,
+    "lng": 55.2397317,
+    "fullAddress": "Motor City - Dubai Studio City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Sports City",
+    "actualLocality": "Al Hebiah Fourth",
+    "lat": 25.0418328,
+    "lng": 55.2194201,
+    "fullAddress": "Gate No.1 Near - شارع الشيخ محمد بن زايد - Al Hebiah Fourth - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Motor City",
+    "actualLocality": "Motor City",
+    "lat": 25.0450177,
+    "lng": 55.2397317,
+    "fullAddress": "Motor City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Remraam",
+    "actualLocality": "Remraam",
+    "lat": 25.0042305,
+    "lng": 55.2514865,
+    "fullAddress": "Remraam - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Arabian Ranches",
+    "actualLocality": "Arabian Ranches",
+    "lat": 25.0523684,
+    "lng": 55.2673602,
+    "fullAddress": "Arabian Ranches - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Polo & Equestrian Club",
+    "actualLocality": "Dubai Studio City",
+    "lat": 25.0380251,
+    "lng": 55.2532308,
+    "fullAddress": "Al Qudra Rd - next to 7477 - Al Hebiah Second - Dubai Studio City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Sustainable City",
+    "actualLocality": "The Sustainable City",
+    "lat": 25.0277766,
+    "lng": 55.27703229999999,
+    "fullAddress": "Wadi Al Safa 7 - The Sustainable City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubailand",
+    "actualLocality": "Wadi Al Safa 5",
+    "lat": 25.090954,
+    "lng": 55.3784977,
+    "fullAddress": "39RH+99Q - Wadi Al Safa 5 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Outlet Mall Area",
+    "actualLocality": "Dubai Outlet Mall",
+    "lat": 25.0727872,
+    "lng": 55.40085449999999,
+    "fullAddress": "Route 66 - Al Ain - Dubai Rd - Madinat Hind 1 - Dubai Outlet Mall - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Academic City",
+    "actualLocality": "Academic City",
+    "lat": 25.113106,
+    "lng": 55.4084034,
+    "fullAddress": "Academic City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Quoz Industrial",
+    "actualLocality": "Al Quoz Industrial Area 3",
+    "lat": 25.1246222,
+    "lng": 55.22233439999999,
+    "fullAddress": "Al Quoz - Al Quoz Industrial Area 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Village Circle (JVC)",
+    "actualLocality": "Jumeirah Village Circle",
+    "lat": 25.0608609,
+    "lng": 55.2088007,
+    "fullAddress": "Jumeirah Village - Jumeirah Village Circle - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Village Triangle (JVT)",
+    "actualLocality": "Jumeirah Village Triangle",
+    "lat": 25.0472882,
+    "lng": 55.19002270000001,
+    "fullAddress": "Jumeirah Village - Jumeirah Village Triangle - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Discovery Gardens",
+    "actualLocality": "Discovery Gardens",
+    "lat": 25.0390117,
+    "lng": 55.1444815,
+    "fullAddress": "Jabal Ali First - Discovery Gardens - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Gardens",
+    "actualLocality": "The Gardens",
+    "lat": 25.0423411,
+    "lng": 55.127927,
+    "fullAddress": "Jabal Ali First - The Gardens - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jebel Ali Village",
+    "actualLocality": "Jabal Ali First",
+    "lat": 25.0359875,
+    "lng": 55.1431266,
+    "fullAddress": "Jabal Ali First - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jebel Ali Gardens",
+    "actualLocality": "Lehbab Rd",
+    "lat": 24.9552485,
+    "lng": 55.3952161,
+    "fullAddress": "Jebel Ali - Lehbab Rd - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Green Community",
+    "actualLocality": "Green Community",
+    "lat": 25.005121,
+    "lng": 55.1554696,
+    "fullAddress": "The Green Community, West Gate Entrance2 - قرية المجتمع الخضراء - دبي - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Investments Park (DIP)",
+    "actualLocality": "Dubai Investment Park First",
+    "lat": 24.9789814,
+    "lng": 55.1762197,
+    "fullAddress": "Dubai Investment Park First - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Furjan",
+    "actualLocality": "Al Furjan",
+    "lat": 25.0251668,
+    "lng": 55.1458611,
+    "fullAddress": "Jabal Ali First - Al Furjan - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Park",
+    "actualLocality": "Jumeirah Park",
+    "lat": 25.0471279,
+    "lng": 55.1555195,
+    "fullAddress": "Jumeirah Park - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Heights",
+    "actualLocality": "Jumeirah Heights",
+    "lat": 25.0655904,
+    "lng": 55.14724080000001,
+    "fullAddress": "Jumeirah Islands - Jumeirah Heights - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Victory Heights",
+    "actualLocality": "Dubai Sports City",
+    "lat": 25.0340907,
+    "lng": 55.2097831,
+    "fullAddress": "26M5+JWM - Lake Dr - Al Hebiah Fourth - Dubai Sports City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Sports City",
+    "actualLocality": "Dubai Sports City",
+    "lat": 25.0391345,
+    "lng": 55.2176352,
+    "fullAddress": "Al Hebiah Fourth - Dubai Sports City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mudon",
+    "actualLocality": "Mudon",
+    "lat": 25.0234353,
+    "lng": 55.2716551,
+    "fullAddress": "Al Hebiah Sixth - Mudon - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Serena",
+    "actualLocality": "Wadi Al Safa 7",
+    "lat": 25.0389716,
+    "lng": 55.28909059999999,
+    "fullAddress": "27QP+2V9 - D54 - Wadi Al Safa 7 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Reem",
+    "actualLocality": "Wadi Al Safa 6",
+    "lat": 25.0589772,
+    "lng": 55.295622,
+    "fullAddress": "Reem Dr - Wadi Al Safa 6 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mira",
+    "actualLocality": "Mira",
+    "lat": 25.1866742,
+    "lng": 55.3019726,
+    "fullAddress": "Showroom 1, Building 2 - زعبيل الثانية - Dubai Design District - دبي - United Arab Emirates"
+  },
+  {
+    "originalName": "Casa",
+    "actualLocality": "Al Barsha 1",
+    "lat": 25.1083,
+    "lng": 55.18366229999999,
+    "fullAddress": "455M+8F7 - Al Barsha 1 - Al Barsha - Al Barsha 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Villanova",
+    "actualLocality": "Dubai Land Residence Complex",
+    "lat": 25.0759463,
+    "lng": 55.3531876,
+    "fullAddress": "Wadi Al Safa 5 - Dubai Land Residence Complex - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Layan",
+    "actualLocality": "Layan",
+    "lat": 25.0266577,
+    "lng": 55.2825597,
+    "fullAddress": "Wadi Al Safa 7 - Layan - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nshama Town Square",
+    "actualLocality": "Al Yalayis 2",
+    "lat": 25.0036834,
+    "lng": 55.2927732,
+    "fullAddress": "Al Qudra Rd - Al Yalayis 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mag 5 Boulevard",
+    "actualLocality": "Dubai South",
+    "lat": 24.948612,
+    "lng": 55.2304093,
+    "fullAddress": "South - Dubai South Residential District - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai South",
+    "actualLocality": "Dubai South",
+    "lat": 24.8846524,
+    "lng": 55.1260067,
+    "fullAddress": "Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Expo City Dubai",
+    "actualLocality": "Dubai South",
+    "lat": 24.9608843,
+    "lng": 55.1506911,
+    "fullAddress": "Al Wasl Avenue - Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Villa",
+    "actualLocality": "The Villa",
+    "lat": 25.0876881,
+    "lng": 55.3613635,
+    "fullAddress": "The Villa - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Barari",
+    "actualLocality": "Al Barari",
+    "lat": 25.0994215,
+    "lng": 55.3129667,
+    "fullAddress": "Wadi Al Safa 3 - Al Barari - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mirdif",
+    "actualLocality": "Mirdif",
+    "lat": 25.2194316,
+    "lng": 55.4248844,
+    "fullAddress": "Mirdif - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Uptown Mirdif",
+    "actualLocality": "Mirdif",
+    "lat": 25.2241362,
+    "lng": 55.4237142,
+    "fullAddress": "Corner 47 Algeria St - Mirdif - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Muhaisnah",
+    "actualLocality": "Muhaisnah 3",
+    "lat": 25.2712259,
+    "lng": 55.4042518,
+    "fullAddress": "Muhaisnah - Muhaisnah 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Twar",
+    "actualLocality": "Al Twar 2",
+    "lat": 25.2620038,
+    "lng": 55.37934629999999,
+    "fullAddress": "Al Twar - Al Twar 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Rashidiya",
+    "actualLocality": "Al Rashidiya",
+    "lat": 25.2244647,
+    "lng": 55.38903089999999,
+    "fullAddress": "Al Rashidiya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Warqa",
+    "actualLocality": "Al Warqa 1",
+    "lat": 25.1874594,
+    "lng": 55.4056356,
+    "fullAddress": "Al Warqa - Al Warqa 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Hamar",
+    "actualLocality": "Nadd Al Hamar",
+    "lat": 25.2004324,
+    "lng": 55.3862638,
+    "fullAddress": "Nadd Al Hamar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Hor Al Anz",
+    "actualLocality": "Hor Al Anz",
+    "lat": 25.2769983,
+    "lng": 55.3337049,
+    "fullAddress": "Hor Al Anz - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Qusais",
+    "actualLocality": "Al Twar Fourth",
+    "lat": 25.2619867,
+    "lng": 55.3987166,
+    "fullAddress": "Al Twar Fourth - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Nahda",
+    "actualLocality": "Al Nahda 1",
+    "lat": 25.2919567,
+    "lng": 55.365513,
+    "fullAddress": "Al Nahda - Al Nahda 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Mamzar",
+    "actualLocality": "Al Mamzar",
+    "lat": 25.316746,
+    "lng": 55.3363372,
+    "fullAddress": "Dubai Islands - Al Mamzar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Hamriya",
+    "actualLocality": "Al Hamriya",
+    "lat": 25.2601903,
+    "lng": 55.3046728,
+    "fullAddress": "Al Hamriya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Khabisi",
+    "actualLocality": "Al Khabaisi",
+    "lat": 25.2666503,
+    "lng": 55.3337049,
+    "fullAddress": "Al Khabaisi - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Abu Hail",
+    "actualLocality": "Abu Hail",
+    "lat": 25.2858687,
+    "lng": 55.3281742,
+    "fullAddress": "Abu Hail - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Muteena",
+    "actualLocality": "Al Muteena",
+    "lat": 25.2740443,
+    "lng": 55.3226439,
+    "fullAddress": "Al Muteena - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Rigga",
+    "actualLocality": "Al Rigga",
+    "lat": 25.2675792,
+    "lng": 55.3129667,
+    "fullAddress": "Deira - Al Rigga - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nadd Al Hamar",
+    "actualLocality": "Nadd Al Hamar",
+    "lat": 25.2004324,
+    "lng": 55.3862638,
+    "fullAddress": "Nadd Al Hamar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Hor Al Anz East",
+    "actualLocality": "Hor Al Anz East",
+    "lat": 25.2830909,
+    "lng": 55.351682,
+    "fullAddress": "Hor Al Anz East - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Ayal Nasir",
+    "actualLocality": "Ayal Nasir",
+    "lat": 25.2728322,
+    "lng": 55.3037969,
+    "fullAddress": "Deira - Ayal Nasir - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Naif",
+    "actualLocality": "Naif",
+    "lat": 25.2727524,
+    "lng": 55.3129667,
+    "fullAddress": "Naif - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Wuheida",
+    "actualLocality": "Al Wuheida St",
+    "lat": 25.2896057,
+    "lng": 55.3460594,
+    "fullAddress": "Al Wuheida St - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Buteen",
+    "actualLocality": "Riggat Al Buteen",
+    "lat": 25.2580614,
+    "lng": 55.3233351,
+    "fullAddress": "Deira - Riggat Al Buteen - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Dhagaya",
+    "actualLocality": "Al Dhagaya",
+    "lat": 25.272632,
+    "lng": 55.3004654,
+    "fullAddress": "Deira - Al Dhagaya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Baraha",
+    "actualLocality": "Al Baraha",
+    "lat": 25.2819897,
+    "lng": 55.3184964,
+    "fullAddress": "Al Baraha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Murar",
+    "actualLocality": "Al Murar",
+    "lat": 25.2763552,
+    "lng": 55.3095108,
+    "fullAddress": "Al Murar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Sabkha",
+    "actualLocality": "Al Sabkha",
+    "lat": 25.2711827,
+    "lng": 55.2998351,
+    "fullAddress": "Deira - Al Sabkha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Ras",
+    "actualLocality": "Al Ras",
+    "lat": 25.2687811,
+    "lng": 55.2956887,
+    "fullAddress": "Deira - Al Ras - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Souq Al Kabeer",
+    "actualLocality": "Al Souq Al Kabeer",
+    "lat": 25.262408,
+    "lng": 55.2936155,
+    "fullAddress": "Al Souq Al Kabeer - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Corniche Deira",
+    "actualLocality": "Corniche Deira",
+    "lat": 25.2871629,
+    "lng": 55.3184964,
+    "fullAddress": "Corniche Deira - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Port Saeed",
+    "actualLocality": "Port Saeed",
+    "lat": 25.2513145,
+    "lng": 55.3295568,
+    "fullAddress": "Port Saeed - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Salah Al Din",
+    "actualLocality": "Deira",
+    "lat": 25.2701408,
+    "lng": 55.3209295,
+    "fullAddress": "Salah Al Din Metro Station - Deira - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Deira",
+    "actualLocality": "Deira",
+    "lat": 25.2788468,
+    "lng": 55.3309395,
+    "fullAddress": "Deira - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Garhoud",
+    "actualLocality": "Al Garhoud",
+    "lat": 25.2436289,
+    "lng": 55.3474236,
+    "fullAddress": "Al Garhoud - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Festival City",
+    "actualLocality": "Dubai Festival City",
+    "lat": 25.2187726,
+    "lng": 55.3637911,
+    "fullAddress": "Dubai Festival City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Creek Harbour",
+    "actualLocality": "Dubai Creek Harbour",
+    "lat": 25.2066955,
+    "lng": 55.34779109999999,
+    "fullAddress": "Ras Al Khor - Dubai Creek Harbour - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Ras Al Khor Industrial",
+    "actualLocality": "Ras Al Khor Industrial Area 1",
+    "lat": 25.1801556,
+    "lng": 55.3392359,
+    "fullAddress": "Ras Al Khor Industrial Area - Ras Al Khor Industrial Area 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Awir",
+    "actualLocality": "Al Aweer",
+    "lat": 25.1784957,
+    "lng": 55.545002,
+    "fullAddress": "Al Aweer - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Warsan",
+    "actualLocality": "Warsan 2",
+    "lat": 25.1633458,
+    "lng": 55.4416234,
+    "fullAddress": "Dubai International City - Warsan 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Silicon Oasis",
+    "actualLocality": "Nadd Hessa",
+    "lat": 25.1238698,
+    "lng": 55.3997112,
+    "fullAddress": "Binghatti House - Nadd Hessa - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Liwan",
+    "actualLocality": "Liwan",
+    "lat": 25.1115263,
+    "lng": 55.3682795,
+    "fullAddress": "Dubai Silicon Oasis - Liwan - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 2",
+    "actualLocality": "Wadi Al Safa 2",
+    "lat": 25.0984282,
+    "lng": 55.353065,
+    "fullAddress": "Wadi Al Safa 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 3",
+    "actualLocality": "Wadi Al Safa 3",
+    "lat": 25.1103156,
+    "lng": 55.3198788,
+    "fullAddress": "Wadi Al Safa 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 4",
+    "actualLocality": "Wadi Al Safa 4",
+    "lat": 25.0759415,
+    "lng": 55.3171139,
+    "fullAddress": "Wadi Al Safa 4 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 5",
+    "actualLocality": "Wadi Al Safa 5",
+    "lat": 25.0939009,
+    "lng": 55.3827294,
+    "fullAddress": "Wadi Al Safa 5 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 6",
+    "actualLocality": "Wadi Al Safa 6",
+    "lat": 25.0486644,
+    "lng": 55.272887,
+    "fullAddress": "Wadi Al Safa 6 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 7",
+    "actualLocality": "Wadi Al Safa 7",
+    "lat": 25.0394014,
+    "lng": 55.2867055,
+    "fullAddress": "Wadi Al Safa 7 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Sheba 1",
+    "actualLocality": "Nad Al Sheba 1",
+    "lat": 25.1591193,
+    "lng": 55.3088196,
+    "fullAddress": "Nad Al Sheba - Nad Al Sheba 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Sheba 2",
+    "actualLocality": "Nad Al Sheba 3",
+    "lat": 25.1600397,
+    "lng": 55.3699947,
+    "fullAddress": "Mall - Level 02 Nad Al Sheba - Nadd Al Shiba Third - Nad Al Sheba 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Sheba 3",
+    "actualLocality": "Nad Al Sheba 3",
+    "lat": 25.1594792,
+    "lng": 55.3699604,
+    "fullAddress": "East Entrance, Mall L3036 - Level 3 Nad Al Sheba - beside McDonalds - Nad Al Sheba - Nad Al Sheba 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Sheba 4",
+    "actualLocality": "Nad Al Sheba 4",
+    "lat": 25.1357501,
+    "lng": 55.3668963,
+    "fullAddress": "Nad Al Sheba - Nad Al Sheba 4 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Meydan",
+    "actualLocality": "Nad Al Sheba 1",
+    "lat": 25.1577925,
+    "lng": 55.3008283,
+    "fullAddress": "Al Meydan Rd - Nad Al Sheba - Nad Al Sheba 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mohammed Bin Rashid City",
+    "actualLocality": "Al Merkadh",
+    "lat": 25.1663758,
+    "lng": 55.2766574,
+    "fullAddress": "Mohammed Bin Rashid Al Maktoum City District One - Al Merkadh - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "District One",
+    "actualLocality": "District 1",
+    "lat": 25.0346536,
+    "lng": 55.1741495,
+    "fullAddress": "Jumeirah Village - District 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "International City",
+    "actualLocality": "Dubai International City",
+    "lat": 25.1648925,
+    "lng": 55.4084034,
+    "fullAddress": "Dubai International City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Warsan Village",
+    "actualLocality": "Dubai International City",
+    "lat": 25.1570655,
+    "lng": 55.4048671,
+    "fullAddress": "597W+69 - 4 شارع الحمرية - Dubai International City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dragon Mart Area",
+    "actualLocality": "Dubai International City",
+    "lat": 25.1753672,
+    "lng": 55.4126284,
+    "fullAddress": "Al Awir Road - Dubai International City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Silicon Oasis (DSO)",
+    "actualLocality": "Dubai Silicon Oasis",
+    "lat": 25.1250606,
+    "lng": 55.3837419,
+    "fullAddress": "Dubai Silicon Oasis - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Academic City",
+    "actualLocality": "Academic City",
+    "lat": 25.113106,
+    "lng": 55.4084034,
+    "fullAddress": "Academic City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Liwan",
+    "actualLocality": "Liwan",
+    "lat": 25.1115263,
+    "lng": 55.3682795,
+    "fullAddress": "Dubai Silicon Oasis - Liwan - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Queue Point",
+    "actualLocality": "Liwan",
+    "lat": 25.1114538,
+    "lng": 55.3682204,
+    "fullAddress": "4969+H7Q - Wadi Al Safa 2 - Liwan - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa",
+    "actualLocality": "Wadi Al Safa 5",
+    "lat": 25.0939009,
+    "lng": 55.3827294,
+    "fullAddress": "Wadi Al Safa 5 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Shamma",
+    "actualLocality": "Nadd Shamma",
+    "lat": 25.2168894,
+    "lng": 55.3848803,
+    "fullAddress": "Nadd Shamma - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Khawaneej",
+    "actualLocality": "Al Khawaneej",
+    "lat": 25.2304998,
+    "lng": 55.5036409,
+    "fullAddress": "Al Khawaneej - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mushrif",
+    "actualLocality": "Mushraif",
+    "lat": 25.2156165,
+    "lng": 55.44784670000001,
+    "fullAddress": "Mushraif - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mizhar",
+    "actualLocality": "Al Mizhar",
+    "lat": 25.2441685,
+    "lng": 55.4427254,
+    "fullAddress": "Al Mizhar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Muhaisnah",
+    "actualLocality": "Muhaisnah 3",
+    "lat": 25.2712259,
+    "lng": 55.4042518,
+    "fullAddress": "Muhaisnah - Muhaisnah 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Qusais Industrial",
+    "actualLocality": "Al Qusais Industrial Area",
+    "lat": 25.2880583,
+    "lng": 55.3945655,
+    "fullAddress": "Al Qusais Industrial Area - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Hamriya Port",
+    "actualLocality": "Al Hamriya Port",
+    "lat": 25.2993991,
+    "lng": 55.3346284,
+    "fullAddress": "344 Al Khaleej St - Al Hamriya Port - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Mamzar Beach",
+    "actualLocality": "Al Mamzar",
+    "lat": 25.3113036,
+    "lng": 55.3471167,
+    "fullAddress": "Al Mamzar Beach St - Al Mamzar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Baraha",
+    "actualLocality": "Al Baraha",
+    "lat": 25.2819897,
+    "lng": 55.3184964,
+    "fullAddress": "Al Baraha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Murar",
+    "actualLocality": "Al Murar",
+    "lat": 25.2763552,
+    "lng": 55.3095108,
+    "fullAddress": "Al Murar - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Sabkha",
+    "actualLocality": "Al Sabkha",
+    "lat": 25.2711827,
+    "lng": 55.2998351,
+    "fullAddress": "Deira - Al Sabkha - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Ras",
+    "actualLocality": "Al Ras",
+    "lat": 25.2687811,
+    "lng": 55.2956887,
+    "fullAddress": "Deira - Al Ras - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Buteen",
+    "actualLocality": "Riggat Al Buteen",
+    "lat": 25.2580614,
+    "lng": 55.3233351,
+    "fullAddress": "Deira - Riggat Al Buteen - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Corniche Deira",
+    "actualLocality": "Corniche Deira",
+    "lat": 25.2871629,
+    "lng": 55.3184964,
+    "fullAddress": "Corniche Deira - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Port Saeed",
+    "actualLocality": "Port Saeed",
+    "lat": 25.2513145,
+    "lng": 55.3295568,
+    "fullAddress": "Port Saeed - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Daghaya",
+    "actualLocality": "Al Dhagaya",
+    "lat": 25.272632,
+    "lng": 55.3004654,
+    "fullAddress": "Deira - Al Dhagaya - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Salah Al Din",
+    "actualLocality": "Deira",
+    "lat": 25.2701408,
+    "lng": 55.3209295,
+    "fullAddress": "Salah Al Din Metro Station - Deira - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Abu Hail",
+    "actualLocality": "Abu Hail",
+    "lat": 25.2858687,
+    "lng": 55.3281742,
+    "fullAddress": "Abu Hail - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Hills Estate",
+    "actualLocality": "Dubai Hills Estate",
+    "lat": 25.1156255,
+    "lng": 55.2682079,
+    "fullAddress": "Dubai Hills Estate - حدائق الشيخ محمد بن راشد - دبي - United Arab Emirates"
+  },
+  {
+    "originalName": "Jumeirah Golf Estates",
+    "actualLocality": "Jumeirah Golf Estates",
+    "lat": 25.0209208,
+    "lng": 55.20019629999999,
+    "fullAddress": "Jumeirah Golf Estates - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Motor City",
+    "actualLocality": "Motor City",
+    "lat": 25.0450177,
+    "lng": 55.2397317,
+    "fullAddress": "Motor City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Sports City",
+    "actualLocality": "Al Hebiah Fourth",
+    "lat": 25.0418328,
+    "lng": 55.2194201,
+    "fullAddress": "Gate No.1 Near - شارع الشيخ محمد بن زايد - Al Hebiah Fourth - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Damac Hills (Akoya)",
+    "actualLocality": "Damac Hills",
+    "lat": 24.9879316,
+    "lng": 55.3749762,
+    "fullAddress": "Madinat Hind 4 - Damac Hills - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Damac Hills 2",
+    "actualLocality": "Damac Hills",
+    "lat": 24.9879316,
+    "lng": 55.3749762,
+    "fullAddress": "Madinat Hind 4 - Damac Hills - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Arabian Ranches 2",
+    "actualLocality": "Arabian Ranches 2",
+    "lat": 25.0331427,
+    "lng": 55.272887,
+    "fullAddress": "Wadi Al Safa 7 - Arabian Ranches 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Arabian Ranches 3",
+    "actualLocality": "Wadi Al Safa 5",
+    "lat": 25.0657844,
+    "lng": 55.3214386,
+    "fullAddress": "Unnamed Road - Wadi Al Safa 5 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Mudon",
+    "actualLocality": "Mudon",
+    "lat": 25.0234353,
+    "lng": 55.2716551,
+    "fullAddress": "Al Hebiah Sixth - Mudon - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Serena",
+    "actualLocality": "Wadi Al Safa 7",
+    "lat": 25.0389716,
+    "lng": 55.28909059999999,
+    "fullAddress": "27QP+2V9 - D54 - Wadi Al Safa 7 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Remraam",
+    "actualLocality": "Remraam",
+    "lat": 25.0042305,
+    "lng": 55.2514865,
+    "fullAddress": "Remraam - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Barsha South",
+    "actualLocality": "Al Barsha South",
+    "lat": 25.080552,
+    "lng": 55.2348891,
+    "fullAddress": "Al Barsha - Al Barsha South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Arjan",
+    "actualLocality": "Al Barsha South",
+    "lat": 25.0605347,
+    "lng": 55.2397317,
+    "fullAddress": "Arjan-Dubailand - Al Barsha South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubailand Residence Complex",
+    "actualLocality": "Dubai Land Residence Complex",
+    "lat": 25.0921185,
+    "lng": 55.37977739999999,
+    "fullAddress": "Wadi Al Safa 5 - Dubai Land Residence Complex - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Living Legends",
+    "actualLocality": "Living Legends",
+    "lat": 25.0910153,
+    "lng": 55.30260389999999,
+    "fullAddress": "Unnamed Road - 38R3+C25 - وادي الصفا 3 - Legends - دبي - United Arab Emirates"
+  },
+  {
+    "originalName": "Falcon City of Wonders",
+    "actualLocality": "Falconcity of Wonders",
+    "lat": 25.0999071,
+    "lng": 55.3420226,
+    "fullAddress": "Wadi Al Safa 2 - Falconcity of Wonders - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Villa",
+    "actualLocality": "The Villa",
+    "lat": 25.0876881,
+    "lng": 55.3613635,
+    "fullAddress": "The Villa - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jebel Ali Industrial Area",
+    "actualLocality": "Jebel Ali Industrial Area",
+    "lat": 24.9952814,
+    "lng": 55.1210303,
+    "fullAddress": "Jebel Ali Industrial Area - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jebel Ali Free Zone (JAFZA)",
+    "actualLocality": "Jebel Ali Freezone",
+    "lat": 24.984977,
+    "lng": 55.04382520000001,
+    "fullAddress": "Mena Jabal Ali - Jebel Ali Freezone - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Jebel Ali Port",
+    "actualLocality": "Jabal Ali Third",
+    "lat": 25.0236111,
+    "lng": 55.0402778,
+    "fullAddress": "Port of Jebel Ali - Jabal Ali Third - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Maritime City",
+    "actualLocality": "Madinat Dubai Al Melaheyah",
+    "lat": 25.2697914,
+    "lng": 55.2632154,
+    "fullAddress": "Madinat Dubai Al Melaheyah - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Quoz Industrial 1",
+    "actualLocality": "Al Quoz Industrial Area 1",
+    "lat": 25.1452435,
+    "lng": 55.230174,
+    "fullAddress": "Al Quoz - Al Quoz Industrial Area 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Quoz Industrial 2",
+    "actualLocality": "Al Quoz Industrial Area 2",
+    "lat": 25.133157,
+    "lng": 55.2409489,
+    "fullAddress": "Al Quoz - Al Quoz Industrial Area 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Quoz Industrial 3",
+    "actualLocality": "Al Quoz Industrial Area 3",
+    "lat": 25.1246222,
+    "lng": 55.22233439999999,
+    "fullAddress": "Al Quoz - Al Quoz Industrial Area 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Quoz Industrial 4",
+    "actualLocality": "Al Quoz Industrial Area 4",
+    "lat": 25.1159525,
+    "lng": 55.234207,
+    "fullAddress": "Al Quoz - Al Quoz Industrial Area 4 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Investments Park 1",
+    "actualLocality": "Dubai Investment Park First",
+    "lat": 24.9772098,
+    "lng": 55.1434151,
+    "fullAddress": "1 - Dubai Investment Park First - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Investments Park 2",
+    "actualLocality": "2",
+    "lat": 24.9735353,
+    "lng": 55.1975016,
+    "fullAddress": "Dubai Investment Park - 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Techno Park",
+    "actualLocality": "National Industries Park",
+    "lat": 24.9392625,
+    "lng": 55.0686622,
+    "fullAddress": "Technopark - Jabal Ali Industrial Third - National Industries Park - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai World Central",
+    "actualLocality": "Dubai South",
+    "lat": 24.8846524,
+    "lng": 55.1260067,
+    "fullAddress": "Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Maktoum International Airport Area",
+    "actualLocality": "Dubai South",
+    "lat": 24.8859505,
+    "lng": 55.1588019,
+    "fullAddress": "Al Maktoum International Airport (DWC) (DWC) - Emirates Rd - Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Logistics City",
+    "actualLocality": "Dubai Logistics City",
+    "lat": 24.8993149,
+    "lng": 55.1099967,
+    "fullAddress": "Madinat Al Mataar - Dubai Logistics City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Aviation City",
+    "actualLocality": "Al Qusais Industrial Area",
+    "lat": 25.2807136,
+    "lng": 55.3867774,
+    "fullAddress": "Damascus Street - Al Qusais Industrial Area - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Residential City",
+    "actualLocality": "Dubai South",
+    "lat": 24.9403343,
+    "lng": 55.2167205,
+    "fullAddress": "W6R8+4MQ DWC Residential City - Dubai South Residential District - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Golf City",
+    "actualLocality": "Golf City",
+    "lat": 25.0125131,
+    "lng": 55.234207,
+    "fullAddress": "Golf City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Commercial City",
+    "actualLocality": "Umm Ramool",
+    "lat": 25.2356185,
+    "lng": 55.36797780000001,
+    "fullAddress": "11 17th St - Umm Ramool - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Hatta",
+    "actualLocality": "Hatta",
+    "lat": 24.8061691,
+    "lng": 56.1253848,
+    "fullAddress": "Hatta - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Margham",
+    "actualLocality": "Margham",
+    "lat": 24.9037042,
+    "lng": 55.6273332,
+    "fullAddress": "Margham - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Lisaili",
+    "actualLocality": "Al Lisaili",
+    "lat": 24.9337617,
+    "lng": 55.474856,
+    "fullAddress": "Al Lisaili - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Saih Shuaib",
+    "actualLocality": "Saih Shuaib 2",
+    "lat": 24.8710067,
+    "lng": 55.0449183,
+    "fullAddress": "Saih Shuaib 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Lehbab",
+    "actualLocality": "Lahbab",
+    "lat": 25.0361145,
+    "lng": 55.5926577,
+    "fullAddress": "Lahbab - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Warsan",
+    "actualLocality": "Warsan 2",
+    "lat": 25.1633458,
+    "lng": 55.4416234,
+    "fullAddress": "Dubai International City - Warsan 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Nad Al Sheba",
+    "actualLocality": "Nad Al Sheba",
+    "lat": 25.1435458,
+    "lng": 55.3475331,
+    "fullAddress": "Nad Al Sheba - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Ras Al Khor",
+    "actualLocality": "Ras Al Khor",
+    "lat": 25.1960586,
+    "lng": 55.3309395,
+    "fullAddress": "Ras Al Khor - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai South",
+    "actualLocality": "Dubai South",
+    "lat": 24.8846524,
+    "lng": 55.1260067,
+    "fullAddress": "Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai World Central",
+    "actualLocality": "Dubai South",
+    "lat": 24.8846524,
+    "lng": 55.1260067,
+    "fullAddress": "Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Expo Village",
+    "actualLocality": "Expo Village",
+    "lat": 24.9631634,
+    "lng": 55.14370899999999,
+    "fullAddress": "Dubai - Expo City Dubai - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Maktoum International Airport Area",
+    "actualLocality": "Dubai South",
+    "lat": 24.8859505,
+    "lng": 55.1588019,
+    "fullAddress": "Al Maktoum International Airport (DWC) (DWC) - Emirates Rd - Madinat Al Mataar - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Logistics City",
+    "actualLocality": "Dubai Logistics City",
+    "lat": 24.8993149,
+    "lng": 55.1099967,
+    "fullAddress": "Madinat Al Mataar - Dubai Logistics City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Aviation City",
+    "actualLocality": "Al Qusais Industrial Area",
+    "lat": 25.2807136,
+    "lng": 55.3867774,
+    "fullAddress": "Damascus Street - Al Qusais Industrial Area - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Residential City",
+    "actualLocality": "Dubai South",
+    "lat": 24.9403343,
+    "lng": 55.2167205,
+    "fullAddress": "W6R8+4MQ DWC Residential City - Dubai South Residential District - Dubai South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Golf City",
+    "actualLocality": "Golf City",
+    "lat": 25.0125131,
+    "lng": 55.234207,
+    "fullAddress": "Golf City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Commercial City",
+    "actualLocality": "Umm Ramool",
+    "lat": 25.2356185,
+    "lng": 55.36797780000001,
+    "fullAddress": "11 17th St - Umm Ramool - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "The Sustainable City",
+    "actualLocality": "The Sustainable City",
+    "lat": 25.0277766,
+    "lng": 55.27703229999999,
+    "fullAddress": "Wadi Al Safa 7 - The Sustainable City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Remraam",
+    "actualLocality": "Remraam",
+    "lat": 25.0042305,
+    "lng": 55.2514865,
+    "fullAddress": "Remraam - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Al Barsha South",
+    "actualLocality": "Al Barsha South",
+    "lat": 25.080552,
+    "lng": 55.2348891,
+    "fullAddress": "Al Barsha - Al Barsha South - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Production City",
+    "actualLocality": "Dubai Production City",
+    "lat": 25.0317773,
+    "lng": 55.19002270000001,
+    "fullAddress": "Dubai Production City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Studio City",
+    "actualLocality": "Dubai Studio City",
+    "lat": 25.0346728,
+    "lng": 55.2397317,
+    "fullAddress": "Motor City - Dubai Studio City - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Sports City",
+    "actualLocality": "Al Hebiah Fourth",
+    "lat": 25.0418328,
+    "lng": 55.2194201,
+    "fullAddress": "Gate No.1 Near - شارع الشيخ محمد بن زايد - Al Hebiah Fourth - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Dubai Islands",
+    "actualLocality": "Dubai Islands",
+    "lat": 25.3180117,
+    "lng": 55.3032906,
+    "fullAddress": "Dubai Islands - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 2",
+    "actualLocality": "Wadi Al Safa 2",
+    "lat": 25.0984282,
+    "lng": 55.353065,
+    "fullAddress": "Wadi Al Safa 2 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 3",
+    "actualLocality": "Wadi Al Safa 3",
+    "lat": 25.1103156,
+    "lng": 55.3198788,
+    "fullAddress": "Wadi Al Safa 3 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 4",
+    "actualLocality": "Wadi Al Safa 4",
+    "lat": 25.0759415,
+    "lng": 55.3171139,
+    "fullAddress": "Wadi Al Safa 4 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 5",
+    "actualLocality": "Wadi Al Safa 5",
+    "lat": 25.0939009,
+    "lng": 55.3827294,
+    "fullAddress": "Wadi Al Safa 5 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 6",
+    "actualLocality": "Wadi Al Safa 6",
+    "lat": 25.0486644,
+    "lng": 55.272887,
+    "fullAddress": "Wadi Al Safa 6 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Wadi Al Safa 7",
+    "actualLocality": "Wadi Al Safa 7",
+    "lat": 25.0394014,
+    "lng": 55.2867055,
+    "fullAddress": "Wadi Al Safa 7 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Sobha Hartland",
+    "actualLocality": "Nad Al Sheba 1",
+    "lat": 25.1760625,
+    "lng": 55.3063125,
+    "fullAddress": "58G4+CGF - Al Merkadh - Nad Al Sheba 1 - Dubai - United Arab Emirates"
+  },
+  {
+    "originalName": "Meydan Horizon",
+    "actualLocality": "Nad Al Sheba 1",
+    "lat": 25.1591193,
+    "lng": 55.3088196,
+    "fullAddress": "Nad Al Sheba - Nad Al Sheba 1 - Dubai - United Arab Emirates"
+  }
+]
