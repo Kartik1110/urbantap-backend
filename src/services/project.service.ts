@@ -68,6 +68,24 @@ const APPROVED_AMENITIES = [
     'Furnished',
     'Heating',
     'Jaccuzi',
+    'Play_Area',
+    'Lobby',
+    'Scenic_View',
+    'Wardrobes',
+    'Spa',
+    'Kitchen_Appliances',
+    'Barbecue_Area',
+    'Study',
+    'Concierge_Service',
+    'Private_Beach_Access',
+    'Restaurants_and_Cafes',
+    'Co_working_Spaces',
+    'Padel_Tennis_Court',
+    'Golf',
+    'Basketball_Court',
+    'Walking_and_Jogging_Tracks',
+    'Open_Air_Cinema',
+    'Gaming_Area',
 ];
 
 // Function to filter amenities to only include approved ones and format specific ones
@@ -77,12 +95,38 @@ const filterApprovedAmenities = (amenities: string[]): string[] => {
         .map((amenity) => {
             // Format specific amenities to replace underscores with spaces
             switch (amenity) {
-                case 'Swimming_Pool':
-                    return 'Swimming Pool';
                 case 'Pets_Allowed':
                     return 'Pets Allowed';
+                case 'Swimming_Pool':
+                    return 'Swimming Pool';
                 case 'Air_Conditioning':
                     return 'Air Conditioning';
+                case 'Play_Area':
+                    return 'Play Area';
+                case 'Scenic_View':
+                    return 'Scenic View';
+                case 'Kitchen_Appliances':
+                    return 'Kitchen Appliances';
+                case 'Barbecue_Area':
+                    return 'Barbecue Area';
+                case 'Concierge_Service':
+                    return 'Concierge Service';
+                case 'Private_Beach_Access':
+                    return 'Private Beach Access';
+                case 'Restaurants_and_Cafes':
+                    return 'Restaurants and Cafes';
+                case 'Co_working_Spaces':
+                    return 'Co-working Spaces';
+                case 'Padel_Tennis_Court':
+                    return 'Padel Tennis Court';
+                case 'Basketball_Court':
+                    return 'Basketball Court';
+                case 'Walking_and_Jogging_Tracks':
+                    return 'Walking and Jogging Tracks';
+                case 'Open_Air_Cinema':
+                    return 'Open Air Cinema';
+                case 'Gaming_Area':
+                    return 'Gaming Area';
                 default:
                     return amenity;
             }
