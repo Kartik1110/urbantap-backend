@@ -68,25 +68,38 @@ const APPROVED_AMENITIES = [
     'Furnished',
     'Heating',
     'Jaccuzi',
+    'Play_Area',
+    'Lobby',
+    'Scenic_View',
+    'Wardrobes',
+    'Spa',
+    'Kitchen_Appliances',
+    'Barbecue_Area',
+    'Study',
+    'Concierge_Service',
+    'Private_Beach_Access',
+    'Restaurants_and_Cafes',
+    'Co_working_Spaces',
+    'Padel_Tennis_Court',
+    'Golf',
+    'Basketball_Court',
+    'Walking_and_Jogging_Tracks',
+    'Open_Air_Cinema',
+    'Gaming_Area',
 ];
 
-// Function to filter amenities to only include approved ones and format specific ones
+// Map for amenities that need special formatting (not just underscore to space)
+const AMENITY_FORMATTING_EXCEPTIONS: Record<string, string> = {
+    'Co_working_Spaces': 'Co-working Spaces',
+};
+
+// Function to filter amenities to only include approved ones and format them
 const filterApprovedAmenities = (amenities: string[]): string[] => {
     return amenities
         .filter((amenity) => APPROVED_AMENITIES.includes(amenity))
-        .map((amenity) => {
-            // Format specific amenities to replace underscores with spaces
-            switch (amenity) {
-                case 'Swimming_Pool':
-                    return 'Swimming Pool';
-                case 'Pets_Allowed':
-                    return 'Pets Allowed';
-                case 'Air_Conditioning':
-                    return 'Air Conditioning';
-                default:
-                    return amenity;
-            }
-        });
+        .map((amenity) => 
+            AMENITY_FORMATTING_EXCEPTIONS[amenity] || amenity.replace(/_/g, ' ')
+        );
 };
 
 export const getProjectsService = async ({
