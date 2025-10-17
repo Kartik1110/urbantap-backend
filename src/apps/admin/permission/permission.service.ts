@@ -1,4 +1,4 @@
-import { RoleGroupService } from '../../../services/role-group.service';
+import { RoleGroupService } from './role-group.service';
 import { PermissionChecker } from '@/utils/permissions';
 
 export class PermissionService {
