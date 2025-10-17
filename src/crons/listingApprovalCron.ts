@@ -1,20 +1,18 @@
 import cron from 'node-cron';
 import {
-    PrismaClient,
     Listing,
     Broker,
     User,
     Admin_Status,
     NotificationType,
 } from '@prisma/client';
+import prisma from '@/utils/prisma';
 import {
     sendPushNotification,
     sendMulticastPushNotification,
     PushNotificationData,
-} from '../services/firebase.service';
-import logger from '../utils/logger';
-
-const prisma = new PrismaClient();
+} from '@/common/services/firebase.service';
+import logger from '@/utils/logger';
 
 interface ListingWithBroker extends Listing {
     broker: BrokerWithUser | null;
