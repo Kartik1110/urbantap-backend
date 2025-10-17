@@ -1908,8 +1908,8 @@ export const getProjectAIReportServiceV2 = async (
         rent: {
             short_term: Math.round(shortTermRent),
             long_term: Math.round(longTermRent),
-            short_term_percentage: 0,
-            long_term_percentage: 0,
+            short_term_percentage: Math.round(shortTermRoi * 100) / 100,
+            long_term_percentage: Math.round(longTermRoi * 100) / 100,
             short_term_percentage_buy_at_handover: 0,
             long_term_percentage_buy_at_handover: 0,
         },
