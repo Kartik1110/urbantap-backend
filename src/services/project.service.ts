@@ -1127,6 +1127,8 @@ export const generateProjectROIReportServiceV2 = async (
         short_term_percentage: number;
         long_term: number;
         long_term_percentage: number;
+        short_term_percentage_buy_now: number;
+        long_term_percentage_buy_now: number;
     };
     break_even_year: {
         short_term: number;
@@ -1351,6 +1353,8 @@ export const generateProjectROIReportServiceV2 = async (
             short_term_percentage: Math.round(shortTermRoi * 100) / 100, // Round to 2 decimal places
             long_term: Math.round(longTermRent),
             long_term_percentage: Math.round(longTermRoi * 100) / 100, // Round to 2 decimal places
+            short_term_percentage_buy_now: 0,
+            long_term_percentage_buy_now: 0,
         },
         break_even_year: {
             short_term: shortTermBreakEvenYear,
