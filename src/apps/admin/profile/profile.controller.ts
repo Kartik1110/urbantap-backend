@@ -6,7 +6,7 @@ import {
 import { uploadToS3 } from '@/utils/s3Upload';
 import { Response, Request, Express } from 'express';
 import { AuthenticatedRequest } from '@/utils/verifyToken';
-import { getProfileService } from '@/services/admin-user.service';
+import { getProfileService } from './profile.service';
 
 export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {

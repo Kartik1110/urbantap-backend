@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-import { faker } from "@faker-js/faker";
+import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
 import { assignLocalityFromCoordinates } from '../utils/locality-assignment';
-
-const prisma = new PrismaClient();
+import prisma from '@/utils/prisma';
 
 // Locality assignment using proximity-based calculation
 

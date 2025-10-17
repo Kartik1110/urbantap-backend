@@ -1,7 +1,7 @@
 import {
     PushNotificationData,
     sendMulticastPushNotification,
-} from '@/services/firebase.service';
+} from '@/common/services/firebase.service';
 import {
     createSponsoredJobService,
     deleteJobService,

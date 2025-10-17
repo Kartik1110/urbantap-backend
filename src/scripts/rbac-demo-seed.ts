@@ -1,6 +1,5 @@
-import { PrismaClient, Permission } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Permission } from '@prisma/client';
+import prisma from '@/utils/prisma';
 
 async function createRBACDemoData() {
     console.log('🌱 Creating RBAC demo data...');

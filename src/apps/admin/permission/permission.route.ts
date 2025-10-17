@@ -1,6 +1,9 @@
 import { Router } from 'express';
-import { verifyToken } from '../../../utils/verifyToken';
-import { getAvailablePermissions, getUserPermissions } from './permission.controller';
+import { verifyToken } from '@/utils/verifyToken';
+import {
+    getAvailablePermissions,
+    getUserPermissions,
+} from './permission.controller';
 
 const router = Router();
 

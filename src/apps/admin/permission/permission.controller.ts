@@ -1,7 +1,7 @@
-import logger from '../../../utils/logger';
+import logger from '@/utils/logger';
 import { Request, Response } from 'express';
-import { AuthenticatedRequest } from '../../../utils/verifyToken';
 import { PermissionService } from './permission.service';
+import { AuthenticatedRequest } from '@/utils/verifyToken';
 
 export const getAvailablePermissions = async (req: Request, res: Response) => {
     try {
@@ -35,7 +35,8 @@ export const getUserPermissions = async (
             });
         }
 
-        const permissions = await PermissionService.getUserPermissions(adminUserId);
+        const permissions =
+            await PermissionService.getUserPermissions(adminUserId);
 
         res.status(200).json({
             status: 'success',
