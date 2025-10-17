@@ -344,6 +344,19 @@ const DEFAULT_PROPERTY_DATA: PropertyDataPoint[] = [
         appreciation_perc: 115.88, // 99.89 + (99.89 * 0.08) = 115.88
         roi: 18.86,
     },
+    {
+        appreciation_perc: 133.09, // 115.88 + (115.88 * 0.08) = 133.09
+        roi: 21.05,
+    },
+    {
+        appreciation_perc: 147.09, // 133.09 + (133.09 * 0.08) = 147.09
+        roi: 23.16,
+    },
+    {
+        appreciation_perc: 161.09, // 147.09 + (147.09 * 0.08) = 161.09
+        roi: 25.37,
+    },
+
 ];
 
 /**
