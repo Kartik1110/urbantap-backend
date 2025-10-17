@@ -1,10 +1,9 @@
-import { PrismaClient, CompanyType } from '@prisma/client';
+import { CompanyType } from '@prisma/client';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
 import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
-
-const prisma = new PrismaClient();
+import prisma from '../src/utils/prisma';
 
 interface CompanyData {
   name: string;

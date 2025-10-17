@@ -1,9 +1,8 @@
-import { PrismaClient, Role, CompanyType, BrokerType, Speciality, Category, Type, Bedrooms, Bathrooms, Furnished, Payment_Plan, City, Rental_frequency, Admin_Status, Type_of_use, DealType, CurrentStatus, Views, Market, Sale_Type, Quarter, WorkplaceType, JobType, Currency, NotificationType } from '@prisma/client';
+import { Role, CompanyType, BrokerType, Speciality, Category, Type, Bedrooms, Bathrooms, Furnished, Payment_Plan, City, Rental_frequency, Admin_Status, Type_of_use, DealType, CurrentStatus, Views, Market, Sale_Type, Quarter, WorkplaceType, JobType, Currency, NotificationType } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
-
-const prisma = new PrismaClient();
+import prisma from '@/utils/prisma';
 
 // Load images and logos from files
 const listingsImages = JSON.parse(

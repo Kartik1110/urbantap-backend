@@ -5,7 +5,7 @@ import {
     EmailTemplate,
     EmailTemplateData,
     EmailRecipient,
-} from '../../types/email.types';
+} from '@/types/email.types';
 
 class EmailService {
     private transporter: Transporter;
