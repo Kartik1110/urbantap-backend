@@ -75,7 +75,7 @@ import {
     DEFAULT_INCREASE_IN_SHORT_TERM_ROI,
 } from '../utils/roiReport-v2';
 
-import propertiesDataV2 from '../data/property-data-v5';
+import propertiesDataV2 from '../data/property-data-v6';
 
 declare const fetch: typeof globalThis.fetch;
 
