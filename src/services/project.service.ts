@@ -88,49 +88,18 @@ const APPROVED_AMENITIES = [
     'Gaming_Area',
 ];
 
-// Function to filter amenities to only include approved ones and format specific ones
+// Map for amenities that need special formatting (not just underscore to space)
+const AMENITY_FORMATTING_EXCEPTIONS: Record<string, string> = {
+    'Co_working_Spaces': 'Co-working Spaces',
+};
+
+// Function to filter amenities to only include approved ones and format them
 const filterApprovedAmenities = (amenities: string[]): string[] => {
     return amenities
         .filter((amenity) => APPROVED_AMENITIES.includes(amenity))
-        .map((amenity) => {
-            // Format specific amenities to replace underscores with spaces
-            switch (amenity) {
-                case 'Pets_Allowed':
-                    return 'Pets Allowed';
-                case 'Swimming_Pool':
-                    return 'Swimming Pool';
-                case 'Air_Conditioning':
-                    return 'Air Conditioning';
-                case 'Play_Area':
-                    return 'Play Area';
-                case 'Scenic_View':
-                    return 'Scenic View';
-                case 'Kitchen_Appliances':
-                    return 'Kitchen Appliances';
-                case 'Barbecue_Area':
-                    return 'Barbecue Area';
-                case 'Concierge_Service':
-                    return 'Concierge Service';
-                case 'Private_Beach_Access':
-                    return 'Private Beach Access';
-                case 'Restaurants_and_Cafes':
-                    return 'Restaurants and Cafes';
-                case 'Co_working_Spaces':
-                    return 'Co-working Spaces';
-                case 'Padel_Tennis_Court':
-                    return 'Padel Tennis Court';
-                case 'Basketball_Court':
-                    return 'Basketball Court';
-                case 'Walking_and_Jogging_Tracks':
-                    return 'Walking and Jogging Tracks';
-                case 'Open_Air_Cinema':
-                    return 'Open Air Cinema';
-                case 'Gaming_Area':
-                    return 'Gaming Area';
-                default:
-                    return amenity;
-            }
-        });
+        .map((amenity) => 
+            AMENITY_FORMATTING_EXCEPTIONS[amenity] || amenity.replace(/_/g, ' ')
+        );
 };
 
 export const getProjectsService = async ({
