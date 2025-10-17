@@ -90,15 +90,17 @@ const APPROVED_AMENITIES = [
 
 // Map for amenities that need special formatting (not just underscore to space)
 const AMENITY_FORMATTING_EXCEPTIONS: Record<string, string> = {
-    'Co_working_Spaces': 'Co-working Spaces',
+    Co_working_Spaces: 'Co-working Spaces',
 };
 
 // Function to filter amenities to only include approved ones and format them
 const filterApprovedAmenities = (amenities: string[]): string[] => {
     return amenities
         .filter((amenity) => APPROVED_AMENITIES.includes(amenity))
-        .map((amenity) => 
-            AMENITY_FORMATTING_EXCEPTIONS[amenity] || amenity.replace(/_/g, ' ')
+        .map(
+            (amenity) =>
+                AMENITY_FORMATTING_EXCEPTIONS[amenity] ||
+                amenity.replace(/_/g, ' ')
         );
 };
 
