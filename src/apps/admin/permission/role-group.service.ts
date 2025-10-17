@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma';
+import prisma from '@/utils/prisma';
 import { Permission, AdminUserType } from '@prisma/client';
 
 export interface CreateRoleGroupDTO {
