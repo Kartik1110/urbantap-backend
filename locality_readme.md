@@ -69,8 +69,16 @@ The `locality-mapping.ts` utility provides these functions:
 1. **Fetches records** based on script type (new vs all)
 2. **Geocodes addresses** using Google Maps API
 3. **Maps localities** to the 187 unique localities using `mapToUniqueLocality`
-4. **Updates database** with coordinates, formatted address, and mapped locality
+4. **Updates database** with coordinates and mapped locality (address field remains unchanged)
 5. **Handles errors gracefully** and continues processing
+
+## 📝 Fields Updated
+
+The scripts update the following fields:
+- ✅ **`locality`** - Mapped to one of the 187 unique localities or "Other"
+- ✅ **`latitude`** - Only when missing coordinates (forward geocoding)
+- ✅ **`longitude`** - Only when missing coordinates (forward geocoding)
+- ❌ **`address`** - **PRESERVED** (original address remains unchanged)
 
 ## ⚡ Performance Notes
 
