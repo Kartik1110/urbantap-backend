@@ -146,13 +146,12 @@ async function updateNewListingsLocality() {
                 const mappedLocality = mapToUniqueLocality(result.components);
 
                 if ('lat' in result && 'lng' in result) {
-                    // Forward geocode result
-                    updateData.address = result.formatted_address;
+                    // Forward geocode result - only update coordinates and locality
                     updateData.latitude = result.lat;
                     updateData.longitude = result.lng;
                     updateData.locality = mappedLocality;
                 } else {
-                    // Reverse geocode result
+                    // Reverse geocode result - only update locality
                     updateData.locality = mappedLocality;
                 }
 
@@ -231,13 +230,12 @@ async function updateNewProjectsLocality() {
                 const mappedLocality = mapToUniqueLocality(result.components);
 
                 if ('lat' in result && 'lng' in result) {
-                    // Forward geocode result
-                    updateData.address = result.formatted_address;
+                    // Forward geocode result - only update coordinates and locality
                     updateData.latitude = result.lat;
                     updateData.longitude = result.lng;
                     updateData.locality = mappedLocality;
                 } else {
-                    // Reverse geocode result
+                    // Reverse geocode result - only update locality
                     updateData.locality = mappedLocality;
                 }
 
