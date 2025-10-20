@@ -125,17 +125,21 @@ async function updateExistingListingsLocality() {
 
             let result: GeocodeResult | ReverseGeocodeResult | null = null;
 
-            if (!hasLatitude || !hasLongitude) {
-                // Missing coordinates: forward geocode
+            if (listing.address && listing.address.trim() !== '') {
+                // Has address: forward geocode (prioritize address)
                 console.log(`🔍 Forward geocoding for listing ${listing.id}`);
                 result = await geocodeAddress(rawAddress);
-            } else {
-                // Has coordinates: reverse geocode to get updated locality
+            } else if (hasLatitude && hasLongitude) {
+                // No address but has coordinates: reverse geocode (fallback)
                 console.log(`🔍 Reverse geocoding for listing ${listing.id}`);
                 result = await reverseGeocode(
                     listing.latitude!,
                     listing.longitude!
                 );
+            } else {
+                // No address and no coordinates: skip
+                console.log(`⚠️ Skipping listing ${listing.id} - no address or coordinates`);
+                result = null;
             }
 
             if (result) {
@@ -206,17 +210,21 @@ async function updateExistingProjectsLocality() {
 
             let result: GeocodeResult | ReverseGeocodeResult | null = null;
 
-            if (!hasLatitude || !hasLongitude) {
-                // Missing coordinates: forward geocode
+            if (project.address && project.address.trim() !== '') {
+                // Has address: forward geocode (prioritize address)
                 console.log(`🔍 Forward geocoding for project ${project.id}`);
                 result = await geocodeAddress(rawAddress);
-            } else {
-                // Has coordinates: reverse geocode to get updated locality
+            } else if (hasLatitude && hasLongitude) {
+                // No address but has coordinates: reverse geocode (fallback)
                 console.log(`🔍 Reverse geocoding for project ${project.id}`);
                 result = await reverseGeocode(
                     project.latitude!,
                     project.longitude!
                 );
+            } else {
+                // No address and no coordinates: skip
+                console.log(`⚠️ Skipping project ${project.id} - no address or coordinates`);
+                result = null;
             }
 
             if (result) {
