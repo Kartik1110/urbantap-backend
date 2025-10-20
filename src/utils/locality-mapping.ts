@@ -28,11 +28,11 @@ export interface ReverseGeocodeResult {
 /**
  * Maps address components to one of the 187 unique localities
  * @param components - Array of address components from Google Maps API
- * @returns The matched unique locality or "Other" if no match found
+ * @returns The matched unique locality or "UAE" if no match found
  */
 export function mapToUniqueLocality(components: AddressComponent[]): string {
     if (!components || components.length === 0) {
-        return 'Other';
+        return 'UAE';
     }
 
     // Check each component against our unique localities
@@ -53,7 +53,7 @@ export function mapToUniqueLocality(components: AddressComponent[]): string {
         }
     }
 
-    return 'Other';
+    return 'UAE';
 }
 
 /**
@@ -98,3 +98,4 @@ export function getUniqueLocalities(): string[] {
 export function isUniqueLocality(locality: string): boolean {
     return uniqueLocalitiesList.includes(locality);
 }
+
