@@ -201,6 +201,7 @@ export const getProjectsService = async ({
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
+        locality: proj.locality,
         views: proj.views,
         brochure_url: proj.brochure_url,
     }));
@@ -836,6 +837,7 @@ export const getFeaturedProjectsService = async ({
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
+        locality: proj.locality,
         views: proj.views,
         company_name: proj.developer?.company?.name || null,
         min_price: proj.min_price,
