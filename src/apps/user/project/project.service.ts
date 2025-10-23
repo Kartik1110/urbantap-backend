@@ -764,6 +764,7 @@ export const getProjectsByDeveloperService = async (
                 image_urls: true,
                 project_name: true,
                 address: true,
+                locality: true,
             },
             skip,
             take: pageSize,
@@ -783,6 +784,7 @@ export const getProjectsByDeveloperService = async (
         image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
         project_name: project.project_name,
         address: project.address,
+        locality: project.locality,
     }));
 
     const pagination = {
