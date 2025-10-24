@@ -58,7 +58,7 @@ export const createProjectService = async (data: ProjectCreateData) => {
     // Add locality information if address is provided
     let enrichedProjectData = { ...projectData };
     if (projectData.address) {
-        const rawAddress = `${projectData.address}, Dubai`;
+        const rawAddress = `${projectData.address}, ${projectData.city}`;
         const geocodeResult = await geocodeAddress(rawAddress);
 
         if (geocodeResult) {
@@ -188,7 +188,7 @@ export const updateProjectService = async (
     // Add locality information if address is provided and being updated
     let enrichedProjectData = { ...projectData };
     if (projectData.address) {
-        const rawAddress = `${projectData.address}, Dubai`;
+        const rawAddress = `${projectData.address}, ${projectData.city}`;
         const geocodeResult = await geocodeAddress(rawAddress);
 
         if (geocodeResult) {

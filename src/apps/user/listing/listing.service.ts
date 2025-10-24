@@ -933,7 +933,7 @@ export const bulkInsertListingsService = async (listings: Listing[]) => {
 
             // Add locality information if address is provided
             if (listing.address) {
-                const rawAddress = `${listing.address}, Dubai`;
+                const rawAddress = `${listing.address}, ${listing.city}`;
                 const geocodeResult = await geocodeAddress(rawAddress);
 
                 if (geocodeResult) {
@@ -982,7 +982,7 @@ export const createListingService = async (listing: Listing) => {
 
         // Add locality information if address is provided
         if (listing.address) {
-            const rawAddress = `${listing.address}, Dubai`;
+            const rawAddress = `${listing.address}, ${listing.city}`;
             const geocodeResult = await geocodeAddress(rawAddress);
 
             if (geocodeResult) {

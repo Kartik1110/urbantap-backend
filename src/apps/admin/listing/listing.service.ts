@@ -20,7 +20,7 @@ export const bulkInsertListingsAdminService = async (
 
             // Add locality information if address is provided
             if (listing.address) {
-                const rawAddress = `${listing.address}, Dubai`;
+                const rawAddress = `${listing.address}, ${listing.city}`;
                 const geocodeResult = await geocodeAddress(rawAddress);
 
                 if (geocodeResult) {

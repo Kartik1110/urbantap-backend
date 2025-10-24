@@ -1,6 +1,12 @@
-import prisma from '../utils/prisma';
+import prisma from '@/utils/prisma';
 import dotenv from 'dotenv';
-import { mapToUniqueLocality, updateRecordLocality, GeocodeResult, ReverseGeocodeResult, AddressComponent } from '../utils/locality-mapping';
+import {
+    mapToUniqueLocality,
+    updateRecordLocality,
+    GeocodeResult,
+    ReverseGeocodeResult,
+    AddressComponent,
+} from '@/utils/locality-mapping';
 
 // Load environment variables from .env file FIRST
 dotenv.config();
@@ -35,7 +41,7 @@ async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
     try {
         const encodedAddress = encodeURIComponent(address);
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${GOOGLE_MAPS_API_KEY}`;
-        
+
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`Geocoding API error: ${response.status}`);
@@ -63,15 +69,20 @@ async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
     }
 }
 
-async function reverseGeocode(lat: number, lng: number): Promise<ReverseGeocodeResult | null> {
+async function reverseGeocode(
+    lat: number,
+    lng: number
+): Promise<ReverseGeocodeResult | null> {
     if (!GOOGLE_MAPS_API_KEY) {
-        console.warn('GOOGLE_MAPS_API_KEY not configured, skipping reverse geocoding');
+        console.warn(
+            'GOOGLE_MAPS_API_KEY not configured, skipping reverse geocoding'
+        );
         return null;
     }
 
     try {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`;
-        
+
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`Reverse geocoding API error: ${response.status}`);
@@ -104,7 +115,7 @@ async function updateNewListingsLocality() {
         // Fetch only listings that don't have locality set
         const listings = await prisma.listing.findMany({
             where: {
-                locality: null
+                locality: null,
             },
             select: {
                 id: true,
@@ -141,7 +152,9 @@ async function updateNewListingsLocality() {
                 );
             } else {
                 // No address and no coordinates: skip
-                console.log(`⚠️ Skipping listing ${listing.id} - no address or coordinates`);
+                console.log(
+                    `⚠️ Skipping listing ${listing.id} - no address or coordinates`
+                );
                 result = null;
             }
 
@@ -160,10 +173,17 @@ async function updateNewListingsLocality() {
                 }
 
                 // Update the listing using utility function
-                await updateRecordLocality(updateData, listing.id, 'listing', prisma);
+                await updateRecordLocality(
+                    updateData,
+                    listing.id,
+                    'listing',
+                    prisma
+                );
 
                 updateCount++;
-                console.log(`✅ Updated listing ${listing.id} with locality: ${mappedLocality}`);
+                console.log(
+                    `✅ Updated listing ${listing.id} with locality: ${mappedLocality}`
+                );
             } else {
                 console.log(
                     `❌ No results for listing ${listing.id} — raw address: ${rawAddress}`
@@ -192,7 +212,7 @@ async function updateNewProjectsLocality() {
         // Fetch only projects that don't have locality set
         const projects = await prisma.project.findMany({
             where: {
-                locality: null
+                locality: null,
             },
             select: {
                 id: true,
@@ -229,7 +249,9 @@ async function updateNewProjectsLocality() {
                 );
             } else {
                 // No address and no coordinates: skip
-                console.log(`⚠️ Skipping project ${project.id} - no address or coordinates`);
+                console.log(
+                    `⚠️ Skipping project ${project.id} - no address or coordinates`
+                );
                 result = null;
             }
 
@@ -248,10 +270,17 @@ async function updateNewProjectsLocality() {
                 }
 
                 // Update the project using utility function
-                await updateRecordLocality(updateData, project.id, 'project', prisma);
+                await updateRecordLocality(
+                    updateData,
+                    project.id,
+                    'project',
+                    prisma
+                );
 
                 updateCount++;
-                console.log(`✅ Updated project ${project.id} with locality: ${mappedLocality}`);
+                console.log(
+                    `✅ Updated project ${project.id} with locality: ${mappedLocality}`
+                );
             } else {
                 console.log(
                     `❌ No results for project ${project.id} — raw address: ${rawAddress}`
@@ -275,13 +304,15 @@ async function updateNewProjectsLocality() {
 
 async function updateNewLocality() {
     console.log('🚀 Starting locality update process for NEW data only...');
-    console.log('📋 This will only process records that don\'t have locality set');
+    console.log(
+        "📋 This will only process records that don't have locality set"
+    );
 
     try {
         await updateNewListingsLocality();
         console.log('\n' + '='.repeat(50) + '\n');
         await updateNewProjectsLocality();
-        
+
         console.log('\n🎉 NEW locality update process completed successfully!');
     } catch (error) {
         console.error('❌ Script failed:', error);
