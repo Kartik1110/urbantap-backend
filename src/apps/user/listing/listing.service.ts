@@ -30,7 +30,7 @@ let propertiesData: MergedPropertyData;
 (async () => {
     try {
         const module = await import(
-            `../data/property-data-${PROPERTY_DATA_PATH}`
+            `../../../data/property-data-${PROPERTY_DATA_PATH}`
         );
         propertiesData = module.default;
     } catch (error) {
