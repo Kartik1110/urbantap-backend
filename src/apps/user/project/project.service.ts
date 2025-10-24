@@ -25,7 +25,9 @@ import {
     calculateRoiDataPointsByTypeAfterHandover as calculateRoiDataPointsByTypeAfterHandoverV2,
     calculateShortTermRental as calculateShortTermRentalV2,
     DEFAULT_INCREASE_IN_SHORT_TERM_ROI,
+    DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER,
     getLongTermRoiPercentage,
+    getLongTermRoiPercentageAtHandover,
     getPropertyData as getPropertyDataV2,
     getRentalPriceInYear as getRentalPriceInYearV2,
 } from '@/utils/roiReport-v2';
@@ -199,6 +201,7 @@ export const getProjectsService = async ({
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
+        locality: proj.locality,
         views: proj.views,
         brochure_url: proj.brochure_url,
     }));
@@ -761,6 +764,7 @@ export const getProjectsByDeveloperService = async (
                 image_urls: true,
                 project_name: true,
                 address: true,
+                locality: true,
             },
             skip,
             take: pageSize,
@@ -780,6 +784,7 @@ export const getProjectsByDeveloperService = async (
         image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
         project_name: project.project_name,
         address: project.address,
+        locality: project.locality,
     }));
 
     const pagination = {
@@ -834,6 +839,7 @@ export const getFeaturedProjectsService = async ({
         image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
         project_name: proj.project_name,
         address: proj.address,
+        locality: proj.locality,
         views: proj.views,
         company_name: proj.developer?.company?.name || null,
         min_price: proj.min_price,
@@ -1368,8 +1374,8 @@ export const generateProjectROIReportServiceV2 = async (
             short_term_percentage: Math.round(shortTermRoi * 100) / 100, // Round to 2 decimal places
             long_term: Math.round(longTermRent),
             long_term_percentage: Math.round(longTermRoi * 100) / 100, // Round to 2 decimal places
-            short_term_percentage_buy_at_handover: 0,
-            long_term_percentage_buy_at_handover: 0,
+            short_term_percentage_buy_at_handover: Math.round((getLongTermRoiPercentageAtHandover(propertyData) * DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER) * 100) / 100,
+            long_term_percentage_buy_at_handover: Math.round(getLongTermRoiPercentageAtHandover(propertyData) * 100) / 100,
         },
         break_even_year: {
             short_term: shortTermBreakEvenYear,
@@ -1925,8 +1931,8 @@ export const getProjectAIReportServiceV2 = async (
             long_term: Math.round(longTermRent),
             short_term_percentage: Math.round(shortTermRoi * 100) / 100,
             long_term_percentage: Math.round(longTermRoi * 100) / 100,
-            short_term_percentage_buy_at_handover: 0,
-            long_term_percentage_buy_at_handover: 0,
+            short_term_percentage_buy_at_handover: Math.round((getLongTermRoiPercentageAtHandover(propertyData) * DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER) * 100) / 100,
+            long_term_percentage_buy_at_handover: Math.round(getLongTermRoiPercentageAtHandover(propertyData) * 100) / 100,
         },
         developer: {
             name: project.developer.company?.name,
