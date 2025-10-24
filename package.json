@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.645.0",
+    "@aws-sdk/s3-request-presigner": "^3.916.0",
     "@faker-js/faker": "^9.9.0",
     "@prisma/client": "^5.22.0",
     "@types/multer": "^1.4.12",
