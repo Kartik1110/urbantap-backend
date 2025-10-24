@@ -11,6 +11,7 @@ import {
     getProjectById,
     updateProject,
     deleteProject,
+    generatePresignedUrls,
 } from './project.controller';
 import multer from 'multer';
 import { requirePermission } from '@/middlewares/rbac.middleware';
@@ -44,6 +45,13 @@ export default (upload: multer.Multer) => {
 
     /* Delete Project Route */
     router.delete('/admin-user/projects/:id', verifyToken, deleteProject);
+
+    /* Generate Presigned URLs for File Uploads */
+    router.post(
+        '/admin-user/projects/presigned-urls',
+        verifyToken,
+        generatePresignedUrls
+    );
 
     return router;
 };
