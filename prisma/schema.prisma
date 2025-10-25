@@ -662,4 +662,13 @@ enum Amenities {
   Barbecue_Area
   Study
   Concierge_Service
+  fPrivate_Beach_Access
+  Restaurants_and_Cafes
+  Co_working_Spaces
+  Padel_Tennis_Court
+  Golf
+  Basketball_Court
+  Walking_and_Jogging_Tracks
+  Open_Air_Cinema
+  Gaming_Area
 }
