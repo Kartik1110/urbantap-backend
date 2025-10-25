@@ -10,6 +10,207 @@ import {
     getProjectsWithRBACService,
     getProjectByIdWithRBACService,
 } from './project.service';
+import {
+    isChunkedUpload,
+    getChunkInfo,
+    processChunkedFile,
+} from '@/utils/chunkedFileUpload';
+import fs from 'fs';
+import path from 'path';
+
+// Helper function to retrieve assembled chunked files
+async function retrieveAssembledChunkedFiles(
+    files: Express.Multer.File[] | undefined,
+    req: AuthenticatedRequest
+): Promise<Express.Multer.File[] | undefined> {
+    const assembledDir = path.join(process.cwd(), 'uploads', 'assembled');
+    
+    if (!fs.existsSync(assembledDir)) {
+        return files;
+    }
+
+    const resultFiles = files ? [...files] : [];
+
+    // Check for brochure chunk fileId
+    const brochureChunkId = req.body.file_url_chunk_id;
+    
+    if (brochureChunkId) {
+        const brochureFile = await findAndCreateFileFromChunk(assembledDir, brochureChunkId, 'file_url');
+        if (brochureFile) {
+            resultFiles.push(brochureFile);
+        }
+    }
+
+    // Check for inventory chunk fileId
+    const inventoryChunkId = req.body.inventory_file_chunk_id;
+    
+    if (inventoryChunkId) {
+        const inventoryFile = await findAndCreateFileFromChunk(assembledDir, inventoryChunkId, 'inventory_file');
+        if (inventoryFile) {
+            resultFiles.push(inventoryFile);
+        }
+    }
+
+    return resultFiles.length > 0 ? resultFiles : undefined;
+}
+
+// Helper function to find and create file from chunk
+async function findAndCreateFileFromChunk(
+    assembledDir: string,
+    chunkId: string,
+    fieldName: string
+): Promise<Express.Multer.File | null> {
+    try {
+        const existingFiles = fs.readdirSync(assembledDir).filter(f => f.startsWith(chunkId));
+        
+        if (existingFiles.length === 0) {
+            return null;
+        }
+
+        const assembledPath = path.join(assembledDir, existingFiles[0]);
+        const assembledBuffer = fs.readFileSync(assembledPath);
+        const stats = fs.statSync(assembledPath);
+        
+        // Extract original filename
+        const parts = existingFiles[0].split('_');
+        const originalName = parts.slice(1).join('_'); // Remove chunkId prefix
+        
+        // Determine mime type
+        const ext = originalName.split('.').pop()?.toLowerCase();
+        const mimeType = ext === 'pdf' ? 'application/pdf' : 
+                        ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
+                        ext === 'png' ? 'image/png' : 'application/octet-stream';
+
+        const assembledFile: Express.Multer.File = {
+            fieldname: fieldName,
+            originalname: originalName,
+            encoding: '7bit',
+            mimetype: mimeType,
+            buffer: assembledBuffer,
+            size: stats.size,
+            destination: '',
+            filename: '',
+            path: assembledPath,
+            stream: fs.createReadStream(assembledPath),
+        };
+
+        return assembledFile;
+    } catch (error) {
+        logger.error(`Error retrieving assembled file for chunk ID ${chunkId}:`, error);
+        return null;
+    }
+}
+
+// Helper function to process chunked uploads
+async function processChunkedUploads(
+    files: Express.Multer.File[] | undefined,
+    req: AuthenticatedRequest
+): Promise<{ files: Express.Multer.File[] | undefined; returnEarly: boolean }> {
+    if (!files || files.length === 0) {
+        return { files, returnEarly: false };
+    }
+
+    // Check if this is a chunked upload request
+    if (isChunkedUpload(req)) {
+        const chunkInfo = getChunkInfo(req);
+        
+        if (chunkInfo) {
+            // Process chunk and assemble if complete
+            const assembledPath = await processChunkedFile(files[0], chunkInfo);
+            
+            if (assembledPath) {
+                // File is complete - convert to Multer file format and add to files array
+                const assembledBuffer = fs.readFileSync(assembledPath);
+                const assembledFile: Express.Multer.File = {
+                    fieldname: files[0].fieldname,
+                    originalname: chunkInfo.fileName,
+                    encoding: files[0].encoding,
+                    mimetype: chunkInfo.mimeType,
+                    buffer: assembledBuffer,
+                    size: assembledBuffer.length,
+                    destination: '',
+                    filename: '',
+                    path: assembledPath,
+                    stream: fs.createReadStream(assembledPath),
+                };
+                
+                // Clean up assembled file after use
+                process.nextTick(() => {
+                    try {
+                        fs.unlinkSync(assembledPath);
+                    } catch (e) {
+                        logger.error('Error cleaning up assembled file:', e);
+                    }
+                });
+                
+                return {
+                    files: [assembledFile],
+                    returnEarly: false,
+                };
+            } else {
+                // Waiting for more chunks
+                return {
+                    files: undefined,
+                    returnEarly: true,
+                };
+            }
+        }
+    }
+
+    return { files, returnEarly: false };
+}
+
+export const uploadChunk = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const files = req.files as Express.Multer.File[] | undefined;
+        
+        if (!files || files.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'No file provided',
+            });
+        }
+
+        const chunkInfo = getChunkInfo(req);
+        
+        if (!chunkInfo) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid chunk information',
+            });
+        }
+
+        // Process chunk and assemble if complete
+        const assembledPath = await processChunkedFile(files[0], chunkInfo);
+        
+        if (assembledPath) {
+            // File is complete
+            return res.json({
+                status: 'success',
+                message: 'File uploaded successfully',
+                chunksComplete: true,
+                fileId: chunkInfo.fileId,
+            });
+        } else {
+            // Waiting for more chunks
+            return res.json({
+                status: 'success',
+                message: 'Chunk received successfully',
+                chunksComplete: false,
+            });
+        }
+    } catch (error) {
+        logger.error('Chunk upload error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to upload chunk',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
 
 export const createProject = async (
     req: AuthenticatedRequest,
@@ -23,7 +224,20 @@ export const createProject = async (
             });
         }
 
-        const files = req.files as Express.Multer.File[] | undefined;
+        let files = req.files as Express.Multer.File[] | undefined;
+
+        // Handle assembled chunked files
+        files = await retrieveAssembledChunkedFiles(files, req);
+
+        // Store assembled file paths for cleanup after S3 upload
+        const assembledFilePaths: string[] = [];
+        if (files) {
+            files.forEach(file => {
+                if (file.path && file.path.includes('assembled')) {
+                    assembledFilePaths.push(file.path);
+                }
+            });
+        }
 
         // Organize files by field name
         const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
@@ -86,6 +300,17 @@ export const createProject = async (
                 }
             }
         }
+
+        // Clean up assembled files after S3 upload
+        assembledFilePaths.forEach(filePath => {
+            try {
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            } catch (e) {
+                logger.error(`Error cleaning up assembled file ${filePath}:`, e);
+            }
+        });
 
         // Parse body fields
         const {
@@ -254,7 +479,20 @@ export const updateProject = async (
             });
         }
 
-        const files = req.files as Express.Multer.File[] | undefined;
+        let files = req.files as Express.Multer.File[] | undefined;
+
+        // Handle assembled chunked files
+        files = await retrieveAssembledChunkedFiles(files, req);
+
+        // Store assembled file paths for cleanup after S3 upload
+        const assembledFilePaths: string[] = [];
+        if (files) {
+            files.forEach(file => {
+                if (file.path && file.path.includes('assembled')) {
+                    assembledFilePaths.push(file.path);
+                }
+            });
+        }
 
         // Organize files by field name
         const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
@@ -317,6 +555,17 @@ export const updateProject = async (
                 }
             }
         }
+
+        // Clean up assembled files after S3 upload
+        assembledFilePaths.forEach(filePath => {
+            try {
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            } catch (e) {
+                logger.error(`Error cleaning up assembled file ${filePath}:`, e);
+            }
+        });
 
         // Parse body fields
         const {
