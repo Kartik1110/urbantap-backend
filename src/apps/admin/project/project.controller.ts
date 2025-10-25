@@ -1,6 +1,7 @@
 import logger from '@/utils/logger';
 import { Response, Express } from 'express';
 import { uploadToS3 } from '@/utils/s3Upload';
+import { uploadToS3Chunked, shouldUseChunkedUpload } from '@/utils/s3ChunkedUpload';
 import { Currency } from '@prisma/client';
 import { AuthenticatedRequest } from '@/utils/verifyToken';
 import {
@@ -10,6 +11,26 @@ import {
     getProjectsWithRBACService,
     getProjectByIdWithRBACService,
 } from './project.service';
+
+// Helper function to upload files with chunking support
+async function uploadFileWithChunking(
+    file: Express.Multer.File,
+    fileName: string
+): Promise<string> {
+    const fileSize = file.size;
+    const useChunking = shouldUseChunkedUpload(fileSize);
+    
+    logger.info(`📤 Processing file upload: ${file.originalname}`);
+    logger.info(`📏 File details - Size: ${(fileSize / (1024 * 1024)).toFixed(2)}MB, Type: ${file.mimetype}`);
+    
+    if (useChunking) {
+        logger.info(`🔧 Using chunked upload for file: ${file.originalname} (${(fileSize / (1024 * 1024)).toFixed(2)}MB)`);
+        return await uploadToS3Chunked(file.path, fileName);
+    } else {
+        logger.info(`⚡ Using regular upload for file: ${file.originalname} (${(fileSize / (1024 * 1024)).toFixed(2)}MB)`);
+        return await uploadToS3(file.path, fileName);
+    }
+}
 
 export const createProject = async (
     req: AuthenticatedRequest,
@@ -41,8 +62,8 @@ export const createProject = async (
         if (organizedFiles.image_urls) {
             for (const file of organizedFiles.image_urls) {
                 const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
+                const url = await uploadFileWithChunking(
+                    file,
                     `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
                 );
                 imageUrls.push(url);
@@ -53,8 +74,8 @@ export const createProject = async (
         let brochureUrl: string | undefined;
         if (organizedFiles.file_url?.[0]) {
             const ext = organizedFiles.file_url[0].originalname.split('.').pop();
-            brochureUrl = await uploadToS3(
-                organizedFiles.file_url[0].path,
+            brochureUrl = await uploadFileWithChunking(
+                organizedFiles.file_url[0],
                 `projects/brochures/${Date.now()}_brochure.${ext}`
             );
         }
@@ -63,8 +84,8 @@ export const createProject = async (
         let inventoryFiles: string[] = [];
         if (organizedFiles.inventory_file?.[0]) {
             const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
-            const url = await uploadToS3(
-                organizedFiles.inventory_file[0].path,
+            const url = await uploadFileWithChunking(
+                organizedFiles.inventory_file[0],
                 `projects/inventory/${Date.now()}_inventory.${ext}`
             );
             inventoryFiles.push(url);
@@ -78,8 +99,8 @@ export const createProject = async (
                 if (!isNaN(index) && organizedFiles[fieldName][0]) {
                     const file = organizedFiles[fieldName][0];
                     const ext = file.originalname.split('.').pop();
-                    const url = await uploadToS3(
-                        file.path,
+                    const url = await uploadFileWithChunking(
+                        file,
                         `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
                     );
                     floorPlanImages[index] = url;
@@ -272,8 +293,8 @@ export const updateProject = async (
         if (organizedFiles.image_urls) {
             for (const file of organizedFiles.image_urls) {
                 const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
+                const url = await uploadFileWithChunking(
+                    file,
                     `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
                 );
                 imageUrls.push(url);
@@ -284,8 +305,8 @@ export const updateProject = async (
         let brochureUrl: string | undefined;
         if (organizedFiles.file_url?.[0]) {
             const ext = organizedFiles.file_url[0].originalname.split('.').pop();
-            brochureUrl = await uploadToS3(
-                organizedFiles.file_url[0].path,
+            brochureUrl = await uploadFileWithChunking(
+                organizedFiles.file_url[0],
                 `projects/brochures/${Date.now()}_brochure.${ext}`
             );
         }
@@ -294,8 +315,8 @@ export const updateProject = async (
         let inventoryFiles: string[] = [];
         if (organizedFiles.inventory_file?.[0]) {
             const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
-            const url = await uploadToS3(
-                organizedFiles.inventory_file[0].path,
+            const url = await uploadFileWithChunking(
+                organizedFiles.inventory_file[0],
                 `projects/inventory/${Date.now()}_inventory.${ext}`
             );
             inventoryFiles.push(url);
@@ -309,8 +330,8 @@ export const updateProject = async (
                 if (!isNaN(index) && organizedFiles[fieldName][0]) {
                     const file = organizedFiles[fieldName][0];
                     const ext = file.originalname.split('.').pop();
-                    const url = await uploadToS3(
-                        file.path,
+                    const url = await uploadFileWithChunking(
+                        file,
                         `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
                     );
                     floorPlanImages[index] = url;
