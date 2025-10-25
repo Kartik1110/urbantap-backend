@@ -18,12 +18,8 @@ export async function uploadToS3Chunked(
     chunkSize: number = 10 * 1024 * 1024 // 10MB chunks by default
 ): Promise<string> {
     try {
-        logger.info(`🚀 Starting chunked upload for file: ${fileName}`);
-        logger.info(`📁 File path: ${filePath}`);
-        logger.info(`📦 Chunk size: ${chunkSize / (1024 * 1024)}MB`);
-        
+       
         const fileStats = fs.statSync(filePath);
-        logger.info(`📊 File size: ${(fileStats.size / (1024 * 1024)).toFixed(2)}MB`);
         
         const fileStream = fs.createReadStream(filePath);
         
@@ -74,15 +70,8 @@ function getContentType(fileName: string): string {
         'jpeg': 'image/jpeg',
         'png': 'image/png',
         'gif': 'image/gif',
+        'webp': 'image/webp',
         'pdf': 'application/pdf',
-        'doc': 'application/msword',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'xls': 'application/vnd.ms-excel',
-        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'txt': 'text/plain',
-        'mp4': 'video/mp4',
-        'avi': 'video/x-msvideo',
-        'mov': 'video/quicktime',
     };
     
     return contentTypes[ext || ''] || 'application/octet-stream';
@@ -91,6 +80,5 @@ function getContentType(fileName: string): string {
 // Function to check if file should use chunked upload based on size
 export function shouldUseChunkedUpload(fileSize: number, threshold: number = 9 * 1024 * 1024): boolean {
     const useChunking = fileSize > threshold;
-    logger.info(`🔍 File size check: ${(fileSize / (1024 * 1024)).toFixed(2)}MB vs threshold ${(threshold / (1024 * 1024))}MB - ${useChunking ? 'Using chunked upload' : 'Using regular upload'}`);
     return useChunking; // Use chunking for files larger than 9MB
 }
