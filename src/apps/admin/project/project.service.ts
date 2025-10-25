@@ -3,6 +3,9 @@ import { AdminUserType, Prisma } from '@prisma/client';
 import { PermissionChecker } from '@/utils/permissions';
 import { geocodeAddress } from '@/utils/geocoding';
 import logger from '@/utils/logger';
+import { Express } from 'express';
+import { uploadToS3 } from '@/utils/s3Upload';
+import { uploadToS3Chunked, shouldUseChunkedUpload } from '@/utils/s3ChunkedUpload';
 
 interface FloorPlanData {
     title: string;
@@ -19,6 +22,100 @@ interface ProjectCreateData
     floor_plans?: FloorPlanData[];
     inventory_files?: string[];
     company_id: string;
+}
+
+// Helper function to upload files with chunking support
+async function uploadFileWithChunking(
+    file: Express.Multer.File,
+    fileName: string
+): Promise<string> {
+    const fileSize = file.size;
+    const useChunking = shouldUseChunkedUpload(fileSize);
+    
+    logger.info(`📤 Processing file upload: ${file.originalname}`);
+    logger.info(`📏 File details - Size: ${(fileSize / (1024 * 1024)).toFixed(2)}MB, Type: ${file.mimetype}`);
+    
+    if (useChunking) {
+        logger.info(`🔧 Using chunked upload for file: ${file.originalname} (${(fileSize / (1024 * 1024)).toFixed(2)}MB)`);
+        return await uploadToS3Chunked(file.path, fileName);
+    } else {
+        logger.info(`⚡ Using regular upload for file: ${file.originalname} (${(fileSize / (1024 * 1024)).toFixed(2)}MB)`);
+        return await uploadToS3(file.path, fileName);
+    }
+}
+
+// Service function to process and upload files
+export async function processProjectFiles(files: Express.Multer.File[] | undefined) {
+    const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
+    
+    if (files && Array.isArray(files)) {
+        files.forEach((file) => {
+            if (!organizedFiles[file.fieldname]) {
+                organizedFiles[file.fieldname] = [];
+            }
+            organizedFiles[file.fieldname].push(file);
+        });
+    }
+
+    const result: {
+        imageUrls: string[];
+        brochureUrl?: string;
+        inventoryFiles: string[];
+        floorPlanImages: { [index: number]: string };
+    } = {
+        imageUrls: [],
+        inventoryFiles: [],
+        floorPlanImages: {},
+    };
+
+    // Upload project images
+    if (organizedFiles.image_urls) {
+        for (const file of organizedFiles.image_urls) {
+            const ext = file.originalname.split('.').pop();
+            const url = await uploadFileWithChunking(
+                file,
+                `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
+            );
+            result.imageUrls.push(url);
+        }
+    }
+
+    // Upload project brochure
+    if (organizedFiles.file_url?.[0]) {
+        const ext = organizedFiles.file_url[0].originalname.split('.').pop();
+        result.brochureUrl = await uploadFileWithChunking(
+            organizedFiles.file_url[0],
+            `projects/brochures/${Date.now()}_brochure.${ext}`
+        );
+    }
+
+    // Upload inventory file
+    if (organizedFiles.inventory_file?.[0]) {
+        const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
+        const url = await uploadFileWithChunking(
+            organizedFiles.inventory_file[0],
+            `projects/inventory/${Date.now()}_inventory.${ext}`
+        );
+        result.inventoryFiles.push(url);
+    }
+
+    // Upload floor plan images dynamically
+    for (const fieldName in organizedFiles) {
+        if (fieldName.startsWith('floor_plan_image_')) {
+            const index = parseInt(fieldName.replace('floor_plan_image_', ''));
+            if (!isNaN(index) && organizedFiles[fieldName][0]) {
+                const file = organizedFiles[fieldName][0];
+                const ext = file.originalname.split('.').pop();
+                const url = await uploadFileWithChunking(
+                    file,
+                    `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
+                );
+                result.floorPlanImages[index] = url;
+            }
+        }
+    }
+
+    return result;
 }
 
 export const createProjectService = async (data: ProjectCreateData) => {
