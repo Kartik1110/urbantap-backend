@@ -5,10 +5,16 @@ import { Express } from 'express';
 
 const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
 const TEMP_DIR = path.join(process.cwd(), 'uploads', 'chunks');
+const ASSEMBLED_DIR = path.join(process.cwd(), 'uploads', 'assembled');
 
 // Ensure temp directory exists
 if (!fs.existsSync(TEMP_DIR)) {
     fs.mkdirSync(TEMP_DIR, { recursive: true });
+}
+
+// Ensure assembled directory exists
+if (!fs.existsSync(ASSEMBLED_DIR)) {
+    fs.mkdirSync(ASSEMBLED_DIR, { recursive: true });
 }
 
 interface ChunkInfo {
@@ -52,6 +58,14 @@ export async function processChunkedFile(
     } else if (chunk.path) {
         // File is on disk, read it
         chunkData = fs.readFileSync(chunk.path);
+        
+        // Clean up multer's temporary file
+        try {
+            fs.unlinkSync(chunk.path);
+            logger.info(`Cleaned up multer temp file: ${chunk.path}`);
+        } catch (error) {
+            logger.error(`Error cleaning up multer temp file ${chunk.path}:`, error);
+        }
     } else {
         throw new Error('Chunk has neither buffer nor path');
     }
@@ -117,7 +131,12 @@ async function assembleChunks(
     logger.info(`File assembled successfully: ${fileName}`);
 
     // Clean up chunks directory
-    fs.rmSync(chunkDir, { recursive: true, force: true });
+    try {
+        fs.rmSync(chunkDir, { recursive: true, force: true });
+        logger.info(`Cleaned up chunks directory for file: ${fileName}`);
+    } catch (error) {
+        logger.error(`Error cleaning up chunks directory: ${error}`);
+    }
 
     return assembledFilePath;
 }
@@ -171,6 +190,7 @@ export function cleanupOldChunks(): void {
             // Remove directories older than 1 hour
             if (now - stats.mtimeMs > 60 * 60 * 1000) {
                 fs.rmSync(dirPath, { recursive: true, force: true });
+                logger.info(`Cleaned up old chunks directory: ${dir}`);
             }
         }
     } catch (error) {
@@ -178,6 +198,34 @@ export function cleanupOldChunks(): void {
     }
 }
 
+/**
+ * Clean up old assembled files (older than 1 hour)
+ */
+export function cleanupOldAssembledFiles(): void {
+    try {
+        if (!fs.existsSync(ASSEMBLED_DIR)) {
+            return;
+        }
+
+        const now = Date.now();
+        const files = fs.readdirSync(ASSEMBLED_DIR);
+
+        for (const file of files) {
+            const filePath = path.join(ASSEMBLED_DIR, file);
+            const stats = fs.statSync(filePath);
+            
+            // Remove files older than 1 hour
+            if (now - stats.mtimeMs > 60 * 60 * 1000) {
+                fs.unlinkSync(filePath);
+                logger.info(`Cleaned up old assembled file: ${file}`);
+            }
+        }
+    } catch (error) {
+        logger.error('Error cleaning up old assembled files:', error);
+    }
+}
+
 // Run cleanup every hour
 setInterval(cleanupOldChunks, 60 * 60 * 1000);
+setInterval(cleanupOldAssembledFiles, 60 * 60 * 1000);
 

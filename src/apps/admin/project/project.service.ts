@@ -32,6 +32,7 @@ interface ProcessedFiles {
     inventoryFiles: string[];
     floorPlanImages: { [index: number]: string };
     assembledFilePaths: string[];
+    multerTempFilePaths: string[];
 }
 
 // Helper function to find and create file from chunk
@@ -127,6 +128,7 @@ export async function processProjectFiles(
         inventoryFiles: [],
         floorPlanImages: {},
         assembledFilePaths: [],
+        multerTempFilePaths: [],
     };
 
     if (!files || files.length === 0) {
@@ -134,9 +136,13 @@ export async function processProjectFiles(
     }
 
     // Store assembled file paths for cleanup after S3 upload
+    // Also track multer temp files (files NOT in assembled folder)
     files.forEach(file => {
         if (file.path && file.path.includes('assembled')) {
             result.assembledFilePaths.push(file.path);
+        } else if (file.path && file.path.includes('uploads') && !file.path.includes('assembled') && !file.path.includes('chunks')) {
+            // This is a multer temp file
+            result.multerTempFilePaths.push(file.path);
         }
     });
 
@@ -201,13 +207,36 @@ export async function processProjectFiles(
 
 // Clean up assembled files
 export function cleanupAssembledFiles(filePaths: string[]): void {
+    if (!filePaths || filePaths.length === 0) {
+        return;
+    }
+
     filePaths.forEach(filePath => {
         try {
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
+                logger.info(`Cleaned up assembled file: ${filePath}`);
             }
         } catch (e) {
             logger.error(`Error cleaning up assembled file ${filePath}:`, e);
+        }
+    });
+}
+
+// Clean up multer temp files
+export function cleanupMulterTempFiles(filePaths: string[]): void {
+    if (!filePaths || filePaths.length === 0) {
+        return;
+    }
+
+    filePaths.forEach(filePath => {
+        try {
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+                logger.info(`Cleaned up multer temp file: ${filePath}`);
+            }
+        } catch (e) {
+            logger.error(`Error cleaning up multer temp file ${filePath}:`, e);
         }
     });
 }
