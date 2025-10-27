@@ -1,8 +1,13 @@
 import prisma from '@/utils/prisma';
-import { AdminUserType, Prisma } from '@prisma/client';
+import { AdminUserType, Prisma, Currency } from '@prisma/client';
 import { PermissionChecker } from '@/utils/permissions';
 import { geocodeAddress } from '@/utils/geocoding';
 import logger from '@/utils/logger';
+import { Express } from 'express';
+import { AuthenticatedRequest } from '@/utils/verifyToken';
+import { uploadToS3 } from '@/utils/s3Upload';
+import fs from 'fs';
+import path from 'path';
 
 interface FloorPlanData {
     title: string;
@@ -19,6 +24,360 @@ interface ProjectCreateData
     floor_plans?: FloorPlanData[];
     inventory_files?: string[];
     company_id: string;
+}
+
+interface ProcessedFiles {
+    imageUrls: string[];
+    brochureUrl?: string;
+    inventoryFiles: string[];
+    floorPlanImages: { [index: number]: string };
+    assembledFilePaths: string[];
+}
+
+// Helper function to find and create file from chunk
+async function findAndCreateFileFromChunk(
+    assembledDir: string,
+    chunkId: string,
+    fieldName: string
+): Promise<Express.Multer.File | null> {
+    try {
+        const existingFiles = fs.readdirSync(assembledDir).filter(f => f.startsWith(chunkId));
+        
+        if (existingFiles.length === 0) {
+            return null;
+        }
+
+        const assembledPath = path.join(assembledDir, existingFiles[0]);
+        const assembledBuffer = fs.readFileSync(assembledPath);
+        const stats = fs.statSync(assembledPath);
+        
+        // Extract original filename
+        const parts = existingFiles[0].split('_');
+        const originalName = parts.slice(1).join('_'); // Remove chunkId prefix
+        
+        // Determine mime type
+        const ext = originalName.split('.').pop()?.toLowerCase();
+        const mimeType = ext === 'pdf' ? 'application/pdf' : 
+                        ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
+                        ext === 'png' ? 'image/png' : 'application/octet-stream';
+
+        const assembledFile: Express.Multer.File = {
+            fieldname: fieldName,
+            originalname: originalName,
+            encoding: '7bit',
+            mimetype: mimeType,
+            buffer: assembledBuffer,
+            size: stats.size,
+            destination: '',
+            filename: '',
+            path: assembledPath,
+            stream: fs.createReadStream(assembledPath),
+        };
+
+        return assembledFile;
+    } catch (error) {
+        logger.error(`Error retrieving assembled file for chunk ID ${chunkId}:`, error);
+        return null;
+    }
+}
+
+// Helper function to retrieve assembled chunked files
+export async function retrieveAssembledChunkedFiles(
+    files: Express.Multer.File[] | undefined,
+    req: AuthenticatedRequest
+): Promise<Express.Multer.File[] | undefined> {
+    const assembledDir = path.join(process.cwd(), 'uploads', 'assembled');
+    
+    if (!fs.existsSync(assembledDir)) {
+        return files;
+    }
+
+    const resultFiles = files ? [...files] : [];
+
+    // Check for brochure chunk fileId
+    const brochureChunkId = req.body.file_url_chunk_id;
+    
+    if (brochureChunkId) {
+        const brochureFile = await findAndCreateFileFromChunk(assembledDir, brochureChunkId, 'file_url');
+        if (brochureFile) {
+            resultFiles.push(brochureFile);
+        }
+    }
+
+    // Check for inventory chunk fileId
+    const inventoryChunkId = req.body.inventory_file_chunk_id;
+    
+    if (inventoryChunkId) {
+        const inventoryFile = await findAndCreateFileFromChunk(assembledDir, inventoryChunkId, 'inventory_file');
+        if (inventoryFile) {
+            resultFiles.push(inventoryFile);
+        }
+    }
+
+    return resultFiles.length > 0 ? resultFiles : undefined;
+}
+
+// Process project files and upload to S3
+export async function processProjectFiles(
+    files: Express.Multer.File[] | undefined
+): Promise<ProcessedFiles> {
+    const result: ProcessedFiles = {
+        imageUrls: [],
+        brochureUrl: undefined,
+        inventoryFiles: [],
+        floorPlanImages: {},
+        assembledFilePaths: [],
+    };
+
+    if (!files || files.length === 0) {
+        return result;
+    }
+
+    // Store assembled file paths for cleanup after S3 upload
+    files.forEach(file => {
+        if (file.path && file.path.includes('assembled')) {
+            result.assembledFilePaths.push(file.path);
+        }
+    });
+
+    // Organize files by field name
+    const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
+    files.forEach((file) => {
+        if (!organizedFiles[file.fieldname]) {
+            organizedFiles[file.fieldname] = [];
+        }
+        organizedFiles[file.fieldname].push(file);
+    });
+
+    // Upload project images
+    if (organizedFiles.image_urls) {
+        for (const file of organizedFiles.image_urls) {
+            const ext = file.originalname.split('.').pop();
+            const url = await uploadToS3(
+                file.path,
+                `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
+            );
+            result.imageUrls.push(url);
+        }
+    }
+
+    // Upload project brochure
+    if (organizedFiles.file_url?.[0]) {
+        const ext = organizedFiles.file_url[0].originalname.split('.').pop();
+        result.brochureUrl = await uploadToS3(
+            organizedFiles.file_url[0].path,
+            `projects/brochures/${Date.now()}_brochure.${ext}`
+        );
+    }
+
+    // Upload inventory file
+    if (organizedFiles.inventory_file?.[0]) {
+        const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
+        const url = await uploadToS3(
+            organizedFiles.inventory_file[0].path,
+            `projects/inventory/${Date.now()}_inventory.${ext}`
+        );
+        result.inventoryFiles.push(url);
+    }
+
+    // Upload floor plan images dynamically
+    for (const fieldName in organizedFiles) {
+        if (fieldName.startsWith('floor_plan_image_')) {
+            const index = parseInt(fieldName.replace('floor_plan_image_', ''));
+            if (!isNaN(index) && organizedFiles[fieldName][0]) {
+                const file = organizedFiles[fieldName][0];
+                const ext = file.originalname.split('.').pop();
+                const url = await uploadToS3(
+                    file.path,
+                    `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
+                );
+                result.floorPlanImages[index] = url;
+            }
+        }
+    }
+
+    return result;
+}
+
+// Clean up assembled files
+export function cleanupAssembledFiles(filePaths: string[]): void {
+    filePaths.forEach(filePath => {
+        try {
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        } catch (e) {
+            logger.error(`Error cleaning up assembled file ${filePath}:`, e);
+        }
+    });
+}
+
+// Parse project body data
+export function parseProjectBody(
+    body: any,
+    processedFiles: ProcessedFiles,
+    user: AuthenticatedRequest['user']
+): ProjectCreateData {
+    const {
+        title,
+        description,
+        min_price,
+        currency,
+        address,
+        city,
+        category,
+        type,
+        project_name,
+        project_age,
+        furnished,
+        unit_types,
+        amenities,
+        handover_year,
+        payment_structure,
+        floor_plans,
+        latitude,
+        longitude,
+        min_bedrooms,
+        max_bedrooms,
+    } = body;
+
+    // Parse floor plans and add images
+    let floorPlansData: FloorPlanData[] = [];
+    if (floor_plans) {
+        const parsedFloorPlans = JSON.parse(floor_plans);
+        floorPlansData = parsedFloorPlans.map((fp: any, index: number) => ({
+            title: fp.title,
+            min_price: fp.min_price,
+            max_price: fp.max_price,
+            unit_size: fp.unit_size,
+            bedrooms: fp.bedrooms,
+            bathrooms: fp.bathrooms,
+            image_urls: processedFiles.floorPlanImages[index]
+                ? [processedFiles.floorPlanImages[index]]
+                : [],
+        }));
+    }
+
+    return {
+        title,
+        description,
+        min_price: min_price ? parseFloat(min_price) : undefined,
+        currency: currency || Currency.AED,
+        address,
+        city,
+        category,
+        type: JSON.parse(type), // expects JSON string array
+        project_name,
+        project_age,
+        furnished,
+        unit_types: JSON.parse(unit_types), // expects JSON string
+        amenities: amenities ? JSON.parse(amenities) : [],
+        handover_year: handover_year ? parseInt(handover_year) : undefined,
+        payment_structure: payment_structure
+            ? JSON.stringify(JSON.parse(payment_structure))
+            : undefined,
+        latitude: latitude ? parseFloat(latitude) : undefined,
+        longitude: longitude ? parseFloat(longitude) : undefined,
+        min_bedrooms,
+        max_bedrooms,
+        image_urls: processedFiles.imageUrls,
+        brochure_url: processedFiles.brochureUrl,
+        floor_plans: floorPlansData,
+        inventory_files: processedFiles.inventoryFiles,
+        company_id: user?.companyId!,
+        developer: {
+            connect: {
+                id: user?.entityId!,
+            },
+        },
+    };
+}
+
+// Parse update project body data
+export function parseUpdateProjectBody(
+    body: any,
+    processedFiles: ProcessedFiles,
+    user: AuthenticatedRequest['user']
+): any {
+    const {
+        title,
+        description,
+        min_price,
+        currency,
+        address,
+        city,
+        category,
+        type,
+        project_name,
+        project_age,
+        furnished,
+        unit_types,
+        amenities,
+        handover_year,
+        payment_structure,
+        floor_plans,
+        existing_image_urls,
+        latitude,
+        longitude,
+        min_bedrooms,
+        max_bedrooms,
+    } = body;
+
+    // Parse floor plans and add images
+    let floorPlansData: FloorPlanData[] = [];
+    if (floor_plans) {
+        const parsedFloorPlans = JSON.parse(floor_plans);
+        floorPlansData = parsedFloorPlans.map((fp: any, index: number) => ({
+            title: fp.title,
+            min_price: fp.min_price,
+            max_price: fp.max_price,
+            unit_size: fp.unit_size,
+            bedrooms: fp.bedrooms,
+            bathrooms: fp.bathrooms,
+            image_urls: processedFiles.floorPlanImages[index]
+                ? [processedFiles.floorPlanImages[index]]
+                : fp.existing_image_urls || [],
+        }));
+    }
+
+    // Combine existing images with new ones
+    let finalImageUrls = processedFiles.imageUrls;
+    if (existing_image_urls) {
+        const existingUrls = JSON.parse(existing_image_urls);
+        finalImageUrls = [...existingUrls, ...processedFiles.imageUrls];
+    }
+
+    const updateData: any = {
+        ...(title && { title }),
+        ...(description && { description }),
+        ...(min_price && { min_price: parseFloat(min_price) }),
+        ...(currency && { currency }),
+        ...(address && { address }),
+        ...(city && { city }),
+        ...(category && { category }),
+        ...(type && { type: JSON.parse(type) }),
+        ...(project_name && { project_name }),
+        ...(project_age && { project_age }),
+        ...(furnished && { furnished }),
+        ...(unit_types && { unit_types: JSON.parse(unit_types) }),
+        ...(amenities && { amenities: JSON.parse(amenities) }),
+        ...(handover_year && { handover_year: parseInt(handover_year) }),
+        ...(payment_structure && {
+            payment_structure: JSON.stringify(
+                JSON.parse(payment_structure)
+            ),
+        }),
+        ...(latitude && { latitude: parseFloat(latitude) }),
+        ...(longitude && { longitude: parseFloat(longitude) }),
+        ...(min_bedrooms && { min_bedrooms }),
+        ...(max_bedrooms && { max_bedrooms }),
+        ...(finalImageUrls.length > 0 && { image_urls: finalImageUrls }),
+        ...(processedFiles.brochureUrl && { brochure_url: processedFiles.brochureUrl }),
+        floor_plans: floorPlansData,
+        inventory_files: processedFiles.inventoryFiles,
+    };
+
+    return updateData;
 }
 
 export const createProjectService = async (data: ProjectCreateData) => {

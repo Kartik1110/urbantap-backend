@@ -11,6 +11,7 @@ import {
     getProjectById,
     updateProject,
     deleteProject,
+    uploadChunk,
 } from './project.controller';
 import multer from 'multer';
 import { requirePermission } from '@/middlewares/rbac.middleware';
@@ -18,6 +19,14 @@ import { requirePermission } from '@/middlewares/rbac.middleware';
 const router = Router();
 
 export default (upload: multer.Multer) => {
+    /* Chunk Upload Route */
+    router.post(
+        '/admin-user/projects/chunk',
+        verifyToken,
+        upload.any(),
+        uploadChunk
+    );
+
     /* Project Routes */
     router.post(
         '/admin-user/projects',
