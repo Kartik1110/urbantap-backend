@@ -9,7 +9,7 @@ import {
     getProjectByIdWithRBACService,
     retrieveAssembledChunkedFiles,
     processProjectFiles,
-    cleanupAssembledFiles,
+    cleanupTemporaryFiles,
     parseProjectBody,
     parseUpdateProjectBody,
 } from './project.service';
@@ -74,6 +74,7 @@ export const createProject = async (
     req: AuthenticatedRequest,
     res: Response
 ) => {
+    let processedFiles: any = null;
     try {
         if (!req.user?.entityId) {
             return res.status(403).json({
@@ -87,10 +88,7 @@ export const createProject = async (
         files = await retrieveAssembledChunkedFiles(files, req);
 
         // Process files and upload to S3
-        const processedFiles = await processProjectFiles(files);
-
-        // Clean up assembled files after S3 upload
-        cleanupAssembledFiles(processedFiles.assembledFilePaths);
+        processedFiles = await processProjectFiles(files);
 
         // Parse and structure project data
         const projectData = parseProjectBody(req.body, processedFiles, req.user);
@@ -110,6 +108,15 @@ export const createProject = async (
             message: 'Failed to create project',
             error: error instanceof Error ? error.message : 'Unknown error',
         });
+    } finally {
+        // Always clean up files after S3 upload (success or failure)
+        const allFilePaths = [
+            ...(processedFiles?.assembledFilePaths || []),
+            ...(processedFiles?.multerTempFilePaths || [])
+        ];
+        if (allFilePaths.length > 0) {
+            cleanupTemporaryFiles(allFilePaths);
+        }
     }
 };
 
@@ -171,6 +178,7 @@ export const updateProject = async (
     req: AuthenticatedRequest,
     res: Response
 ) => {
+    let processedFiles: any = null;
     try {
         const { id } = req.params;
 
@@ -193,10 +201,7 @@ export const updateProject = async (
         files = await retrieveAssembledChunkedFiles(files, req);
 
         // Process files and upload to S3
-        const processedFiles = await processProjectFiles(files);
-
-        // Clean up assembled files after S3 upload
-        cleanupAssembledFiles(processedFiles.assembledFilePaths);
+        processedFiles = await processProjectFiles(files);
 
         // Parse and structure update data
         const updateData = parseUpdateProjectBody(req.body, processedFiles, req.user);
@@ -216,6 +221,15 @@ export const updateProject = async (
             message: 'Failed to update project',
             error: error instanceof Error ? error.message : 'Unknown error',
         });
+    } finally {
+        // Always clean up files after S3 upload (success or failure)
+        const allFilePaths = [
+            ...(processedFiles?.assembledFilePaths || []),
+            ...(processedFiles?.multerTempFilePaths || [])
+        ];
+        if (allFilePaths.length > 0) {
+            cleanupTemporaryFiles(allFilePaths);
+        }
     }
 };
 
