@@ -205,8 +205,8 @@ export async function processProjectFiles(
     return result;
 }
 
-// Clean up assembled files
-export function cleanupAssembledFiles(filePaths: string[]): void {
+// Clean up temporary files (assembled files or multer temp files)
+export function cleanupTemporaryFiles(filePaths: string[]): void {
     if (!filePaths || filePaths.length === 0) {
         return;
     }
@@ -215,31 +215,17 @@ export function cleanupAssembledFiles(filePaths: string[]): void {
         try {
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
-                logger.info(`Cleaned up assembled file: ${filePath}`);
+                logger.info(`Cleaned up temp file: ${filePath}`);
             }
         } catch (e) {
-            logger.error(`Error cleaning up assembled file ${filePath}:`, e);
+            logger.error(`Error cleaning up temp file ${filePath}:`, e);
         }
     });
 }
 
-// Clean up multer temp files
-export function cleanupMulterTempFiles(filePaths: string[]): void {
-    if (!filePaths || filePaths.length === 0) {
-        return;
-    }
-
-    filePaths.forEach(filePath => {
-        try {
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-                logger.info(`Cleaned up multer temp file: ${filePath}`);
-            }
-        } catch (e) {
-            logger.error(`Error cleaning up multer temp file ${filePath}:`, e);
-        }
-    });
-}
+// Legacy exports for backward compatibility
+export const cleanupAssembledFiles = cleanupTemporaryFiles;
+export const cleanupMulterTempFiles = cleanupTemporaryFiles;
 
 // Parse project body data
 export function parseProjectBody(
