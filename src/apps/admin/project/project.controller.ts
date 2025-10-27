@@ -1,6 +1,5 @@
 import logger from '@/utils/logger';
-import { Response } from 'express';
-import { Currency } from '@prisma/client';
+import { Response, Express } from 'express';
 import { AuthenticatedRequest } from '@/utils/verifyToken';
 import {
     createProjectService,
@@ -8,157 +7,16 @@ import {
     deleteProjectService,
     getProjectsWithRBACService,
     getProjectByIdWithRBACService,
+    retrieveAssembledChunkedFiles,
     processProjectFiles,
+    cleanupAssembledFiles,
+    parseProjectBody,
+    parseUpdateProjectBody,
 } from './project.service';
 import {
-    isChunkedUpload,
     getChunkInfo,
     processChunkedFile,
 } from '@/utils/chunkedFileUpload';
-import fs from 'fs';
-import path from 'path';
-
-// Helper function to retrieve assembled chunked files
-async function retrieveAssembledChunkedFiles(
-    files: Express.Multer.File[] | undefined,
-    req: AuthenticatedRequest
-): Promise<Express.Multer.File[] | undefined> {
-    const assembledDir = path.join(process.cwd(), 'uploads', 'assembled');
-    
-    if (!fs.existsSync(assembledDir)) {
-        return files;
-    }
-
-    const resultFiles = files ? [...files] : [];
-
-    // Check for brochure chunk fileId
-    const brochureChunkId = req.body.file_url_chunk_id;
-    
-    if (brochureChunkId) {
-        const brochureFile = await findAndCreateFileFromChunk(assembledDir, brochureChunkId, 'file_url');
-        if (brochureFile) {
-            resultFiles.push(brochureFile);
-        }
-    }
-
-    // Check for inventory chunk fileId
-    const inventoryChunkId = req.body.inventory_file_chunk_id;
-    
-    if (inventoryChunkId) {
-        const inventoryFile = await findAndCreateFileFromChunk(assembledDir, inventoryChunkId, 'inventory_file');
-        if (inventoryFile) {
-            resultFiles.push(inventoryFile);
-        }
-    }
-
-    return resultFiles.length > 0 ? resultFiles : undefined;
-}
-
-// Helper function to find and create file from chunk
-async function findAndCreateFileFromChunk(
-    assembledDir: string,
-    chunkId: string,
-    fieldName: string
-): Promise<Express.Multer.File | null> {
-    try {
-        const existingFiles = fs.readdirSync(assembledDir).filter(f => f.startsWith(chunkId));
-        
-        if (existingFiles.length === 0) {
-            return null;
-        }
-
-        const assembledPath = path.join(assembledDir, existingFiles[0]);
-        const assembledBuffer = fs.readFileSync(assembledPath);
-        const stats = fs.statSync(assembledPath);
-        
-        // Extract original filename
-        const parts = existingFiles[0].split('_');
-        const originalName = parts.slice(1).join('_'); // Remove chunkId prefix
-        
-        // Determine mime type
-        const ext = originalName.split('.').pop()?.toLowerCase();
-        const mimeType = ext === 'pdf' ? 'application/pdf' : 
-                        ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
-                        ext === 'png' ? 'image/png' : 'application/octet-stream';
-
-        const assembledFile: Express.Multer.File = {
-            fieldname: fieldName,
-            originalname: originalName,
-            encoding: '7bit',
-            mimetype: mimeType,
-            buffer: assembledBuffer,
-            size: stats.size,
-            destination: '',
-            filename: '',
-            path: assembledPath,
-            stream: fs.createReadStream(assembledPath),
-        };
-
-        return assembledFile;
-    } catch (error) {
-        logger.error(`Error retrieving assembled file for chunk ID ${chunkId}:`, error);
-        return null;
-    }
-}
-
-// Helper function to process chunked uploads
-async function processChunkedUploads(
-    files: Express.Multer.File[] | undefined,
-    req: AuthenticatedRequest
-): Promise<{ files: Express.Multer.File[] | undefined; returnEarly: boolean }> {
-    if (!files || files.length === 0) {
-        return { files, returnEarly: false };
-    }
-
-    // Check if this is a chunked upload request
-    if (isChunkedUpload(req)) {
-        const chunkInfo = getChunkInfo(req);
-        
-        if (chunkInfo) {
-            // Process chunk and assemble if complete
-            const assembledPath = await processChunkedFile(files[0], chunkInfo);
-            
-            if (assembledPath) {
-                // File is complete - convert to Multer file format and add to files array
-                const assembledBuffer = fs.readFileSync(assembledPath);
-                const assembledFile: Express.Multer.File = {
-                    fieldname: files[0].fieldname,
-                    originalname: chunkInfo.fileName,
-                    encoding: files[0].encoding,
-                    mimetype: chunkInfo.mimeType,
-                    buffer: assembledBuffer,
-                    size: assembledBuffer.length,
-                    destination: '',
-                    filename: '',
-                    path: assembledPath,
-                    stream: fs.createReadStream(assembledPath),
-                };
-                
-                // Clean up assembled file after use
-                process.nextTick(() => {
-                    try {
-                        fs.unlinkSync(assembledPath);
-                    } catch (e) {
-                        logger.error('Error cleaning up assembled file:', e);
-                    }
-                });
-                
-                return {
-                    files: [assembledFile],
-                    returnEarly: false,
-                };
-            } else {
-                // Waiting for more chunks
-                return {
-                    files: undefined,
-                    returnEarly: true,
-                };
-            }
-        }
-    }
-
-    return { files, returnEarly: false };
-}
 
 export const uploadChunk = async (
     req: AuthenticatedRequest,
@@ -224,110 +82,20 @@ export const createProject = async (
             });
         }
 
-        let files = req.files as Express.Multer.File[] | undefined;
-
         // Handle assembled chunked files
+        let files = req.files as Express.Multer.File[] | undefined;
         files = await retrieveAssembledChunkedFiles(files, req);
 
-        // Store assembled file paths for cleanup after S3 upload
-        const assembledFilePaths: string[] = [];
-        if (files) {
-            files.forEach(file => {
-                if (file.path && file.path.includes('assembled')) {
-                    assembledFilePaths.push(file.path);
-                }
-            });
-        }
-
-        // Process and upload files
-        const { imageUrls, brochureUrl, inventoryFiles, floorPlanImages } = await processProjectFiles(files);
+        // Process files and upload to S3
+        const processedFiles = await processProjectFiles(files);
 
         // Clean up assembled files after S3 upload
-        assembledFilePaths.forEach(filePath => {
-            try {
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
-            } catch (e) {
-                logger.error(`Error cleaning up assembled file ${filePath}:`, e);
-            }
-        });
+        cleanupAssembledFiles(processedFiles.assembledFilePaths);
 
-        // Parse body fields
-        const {
-            title,
-            description,
-            min_price,
-            currency,
-            address,
-            city,
-            category,
-            type,
-            project_name,
-            project_age,
-            furnished,
-            unit_types,
-            amenities,
-            handover_year,
-            payment_structure,
-            floor_plans,
-            latitude,
-            longitude,
-            min_bedrooms,
-            max_bedrooms,
-        } = req.body;
+        // Parse and structure project data
+        const projectData = parseProjectBody(req.body, processedFiles, req.user);
 
-        // Parse floor plans and add images
-        let floorPlansData: any[] = [];
-        if (floor_plans) {
-            const parsedFloorPlans = JSON.parse(floor_plans);
-            floorPlansData = parsedFloorPlans.map((fp: any, index: number) => ({
-                title: fp.title,
-                min_price: fp.min_price,
-                max_price: fp.max_price,
-                unit_size: fp.unit_size,
-                bedrooms: fp.bedrooms,
-                bathrooms: fp.bathrooms,
-                image_urls: floorPlanImages[index]
-                    ? [floorPlanImages[index]]
-                    : [],
-            }));
-        }
-
-        const projectData = {
-            title,
-            description,
-            min_price: min_price ? parseFloat(min_price) : undefined,
-            currency: currency || Currency.AED,
-            address,
-            city,
-            category,
-            type: JSON.parse(type), // expects JSON string array
-            project_name,
-            project_age,
-            furnished,
-            unit_types: JSON.parse(unit_types), // expects JSON string
-            amenities: amenities ? JSON.parse(amenities) : [],
-            handover_year: handover_year ? parseInt(handover_year) : undefined,
-            payment_structure: payment_structure
-                ? JSON.stringify(JSON.parse(payment_structure))
-                : undefined,
-            latitude: latitude ? parseFloat(latitude) : undefined,
-            longitude: longitude ? parseFloat(longitude) : undefined,
-            min_bedrooms,
-            max_bedrooms,
-            image_urls: imageUrls,
-            brochure_url: brochureUrl,
-            floor_plans: floorPlansData,
-            inventory_files: inventoryFiles,
-            company_id: req.user.companyId!,
-            developer: {
-                connect: {
-                    id: req.user.entityId,
-                },
-            },
-        };
-
+        // Create project
         const project = await createProjectService(projectData);
 
         res.json({
@@ -420,115 +188,20 @@ export const updateProject = async (
             });
         }
 
-        let files = req.files as Express.Multer.File[] | undefined;
-
         // Handle assembled chunked files
+        let files = req.files as Express.Multer.File[] | undefined;
         files = await retrieveAssembledChunkedFiles(files, req);
 
-        // Store assembled file paths for cleanup after S3 upload
-        const assembledFilePaths: string[] = [];
-        if (files) {
-            files.forEach(file => {
-                if (file.path && file.path.includes('assembled')) {
-                    assembledFilePaths.push(file.path);
-                }
-            });
-        }
-
-        // Process and upload files
-        const { imageUrls, brochureUrl, inventoryFiles, floorPlanImages } = await processProjectFiles(files);
+        // Process files and upload to S3
+        const processedFiles = await processProjectFiles(files);
 
         // Clean up assembled files after S3 upload
-        assembledFilePaths.forEach(filePath => {
-            try {
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
-            } catch (e) {
-                logger.error(`Error cleaning up assembled file ${filePath}:`, e);
-            }
-        });
+        cleanupAssembledFiles(processedFiles.assembledFilePaths);
 
-        // Parse body fields
-        const {
-            title,
-            description,
-            min_price,
-            currency,
-            address,
-            city,
-            category,
-            type,
-            project_name,
-            project_age,
-            furnished,
-            unit_types,
-            amenities,
-            handover_year,
-            payment_structure,
-            floor_plans,
-            existing_image_urls,
-            latitude,
-            longitude,
-            min_bedrooms,
-            max_bedrooms,
-        } = req.body;
+        // Parse and structure update data
+        const updateData = parseUpdateProjectBody(req.body, processedFiles, req.user);
 
-        // Parse floor plans and add images
-        let floorPlansData: any[] = [];
-        if (floor_plans) {
-            const parsedFloorPlans = JSON.parse(floor_plans);
-            floorPlansData = parsedFloorPlans.map((fp: any, index: number) => ({
-                title: fp.title,
-                min_price: fp.min_price,
-                max_price: fp.max_price,
-                unit_size: fp.unit_size,
-                bedrooms: fp.bedrooms,
-                bathrooms: fp.bathrooms,
-                image_urls: floorPlanImages[index]
-                    ? [floorPlanImages[index]]
-                    : fp.existing_image_urls || [],
-            }));
-        }
-
-        // Combine existing images with new ones
-        let finalImageUrls = imageUrls;
-        if (existing_image_urls) {
-            const existingUrls = JSON.parse(existing_image_urls);
-            finalImageUrls = [...existingUrls, ...imageUrls];
-        }
-
-        const updateData = {
-            ...(title && { title }),
-            ...(description && { description }),
-            ...(min_price && { min_price: parseFloat(min_price) }),
-            ...(currency && { currency }),
-            ...(address && { address }),
-            ...(city && { city }),
-            ...(category && { category }),
-            ...(type && { type: JSON.parse(type) }),
-            ...(project_name && { project_name }),
-            ...(project_age && { project_age }),
-            ...(furnished && { furnished }),
-            ...(unit_types && { unit_types: JSON.parse(unit_types) }),
-            ...(amenities && { amenities: JSON.parse(amenities) }),
-            ...(handover_year && { handover_year: parseInt(handover_year) }),
-            ...(payment_structure && {
-                payment_structure: JSON.stringify(
-                    JSON.parse(payment_structure)
-                ),
-            }),
-            ...(latitude && { latitude: parseFloat(latitude) }),
-            ...(longitude && { longitude: parseFloat(longitude) }),
-            ...(min_bedrooms && { min_bedrooms }),
-            ...(max_bedrooms && { max_bedrooms }),
-            ...(finalImageUrls.length > 0 && { image_urls: finalImageUrls }),
-            ...(brochureUrl && { brochure_url: brochureUrl }),
-            floor_plans: floorPlansData,
-            inventory_files: inventoryFiles,
-            developer_id: req.user.entityId,
-        };
-
+        // Update project
         const project = await updateProjectService(id, updateData);
 
         res.json({
