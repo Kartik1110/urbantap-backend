@@ -1,7 +1,5 @@
 import logger from '@/utils/logger';
 import { Response, Express } from 'express';
-import { uploadToS3 } from '@/utils/s3Upload';
-import { Currency } from '@prisma/client';
 import { AuthenticatedRequest } from '@/utils/verifyToken';
 import {
     createProjectService,
@@ -9,7 +7,68 @@ import {
     deleteProjectService,
     getProjectsWithRBACService,
     getProjectByIdWithRBACService,
+    retrieveAssembledChunkedFiles,
+    processProjectFiles,
+    cleanupAssembledFiles,
+    parseProjectBody,
+    parseUpdateProjectBody,
 } from './project.service';
+import {
+    getChunkInfo,
+    processChunkedFile,
+} from '@/utils/chunkedFileUpload';
+
+export const uploadChunk = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const files = req.files as Express.Multer.File[] | undefined;
+        
+        if (!files || files.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'No file provided',
+            });
+        }
+
+        const chunkInfo = getChunkInfo(req);
+        
+        if (!chunkInfo) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid chunk information',
+            });
+        }
+
+        // Process chunk and assemble if complete
+        const assembledPath = await processChunkedFile(files[0], chunkInfo);
+        
+        if (assembledPath) {
+            // File is complete
+            return res.json({
+                status: 'success',
+                message: 'File uploaded successfully',
+                chunksComplete: true,
+                fileId: chunkInfo.fileId,
+            });
+        } else {
+            // Waiting for more chunks
+            return res.json({
+                status: 'success',
+                message: 'Chunk received successfully',
+                chunksComplete: false,
+            });
+        }
+    } catch (error) {
+        logger.error('Chunk upload error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to upload chunk',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
 
 export const createProject = async (
     req: AuthenticatedRequest,
@@ -23,145 +82,20 @@ export const createProject = async (
             });
         }
 
-        const files = req.files as Express.Multer.File[] | undefined;
+        // Handle assembled chunked files
+        let files = req.files as Express.Multer.File[] | undefined;
+        files = await retrieveAssembledChunkedFiles(files, req);
 
-        // Organize files by field name
-        const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
-        if (files && Array.isArray(files)) {
-            files.forEach((file) => {
-                if (!organizedFiles[file.fieldname]) {
-                    organizedFiles[file.fieldname] = [];
-                }
-                organizedFiles[file.fieldname].push(file);
-            });
-        }
+        // Process files and upload to S3
+        const processedFiles = await processProjectFiles(files);
 
-        // Upload project images
-        let imageUrls: string[] = [];
-        if (organizedFiles.image_urls) {
-            for (const file of organizedFiles.image_urls) {
-                const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
-                    `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
-                );
-                imageUrls.push(url);
-            }
-        }
+        // Clean up assembled files after S3 upload
+        cleanupAssembledFiles(processedFiles.assembledFilePaths);
 
-        // Upload project brochure
-        let brochureUrl: string | undefined;
-        if (organizedFiles.file_url?.[0]) {
-            const ext = organizedFiles.file_url[0].originalname.split('.').pop();
-            brochureUrl = await uploadToS3(
-                organizedFiles.file_url[0].path,
-                `projects/brochures/${Date.now()}_brochure.${ext}`
-            );
-        }
+        // Parse and structure project data
+        const projectData = parseProjectBody(req.body, processedFiles, req.user);
 
-        // Upload inventory file
-        let inventoryFiles: string[] = [];
-        if (organizedFiles.inventory_file?.[0]) {
-            const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
-            const url = await uploadToS3(
-                organizedFiles.inventory_file[0].path,
-                `projects/inventory/${Date.now()}_inventory.${ext}`
-            );
-            inventoryFiles.push(url);
-        }
-
-        // Upload floor plan images dynamically
-        const floorPlanImages: { [index: number]: string } = {};
-        for (const fieldName in organizedFiles) {
-            if (fieldName.startsWith('floor_plan_image_')) {
-                const index = parseInt(fieldName.replace('floor_plan_image_', ''));
-                if (!isNaN(index) && organizedFiles[fieldName][0]) {
-                    const file = organizedFiles[fieldName][0];
-                    const ext = file.originalname.split('.').pop();
-                    const url = await uploadToS3(
-                        file.path,
-                        `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
-                    );
-                    floorPlanImages[index] = url;
-                }
-            }
-        }
-
-        // Parse body fields
-        const {
-            title,
-            description,
-            min_price,
-            currency,
-            address,
-            city,
-            category,
-            type,
-            project_name,
-            project_age,
-            furnished,
-            unit_types,
-            amenities,
-            handover_year,
-            payment_structure,
-            floor_plans,
-            latitude,
-            longitude,
-            min_bedrooms,
-            max_bedrooms,
-        } = req.body;
-
-        // Parse floor plans and add images
-        let floorPlansData: any[] = [];
-        if (floor_plans) {
-            const parsedFloorPlans = JSON.parse(floor_plans);
-            floorPlansData = parsedFloorPlans.map((fp: any, index: number) => ({
-                title: fp.title,
-                min_price: fp.min_price,
-                max_price: fp.max_price,
-                unit_size: fp.unit_size,
-                bedrooms: fp.bedrooms,
-                bathrooms: fp.bathrooms,
-                image_urls: floorPlanImages[index]
-                    ? [floorPlanImages[index]]
-                    : [],
-            }));
-        }
-
-        const projectData = {
-            title,
-            description,
-            min_price: min_price ? parseFloat(min_price) : undefined,
-            currency: currency || Currency.AED,
-            address,
-            city,
-            category,
-            type: JSON.parse(type), // expects JSON string array
-            project_name,
-            project_age,
-            furnished,
-            unit_types: JSON.parse(unit_types), // expects JSON string
-            amenities: amenities ? JSON.parse(amenities) : [],
-            handover_year: handover_year ? parseInt(handover_year) : undefined,
-            payment_structure: payment_structure
-                ? JSON.stringify(JSON.parse(payment_structure))
-                : undefined,
-            latitude: latitude ? parseFloat(latitude) : undefined,
-            longitude: longitude ? parseFloat(longitude) : undefined,
-            min_bedrooms,
-            max_bedrooms,
-            image_urls: imageUrls,
-            brochure_url: brochureUrl,
-            floor_plans: floorPlansData,
-            inventory_files: inventoryFiles,
-            company_id: req.user.companyId!,
-            developer: {
-                connect: {
-                    id: req.user.entityId,
-                },
-            },
-        };
-
+        // Create project
         const project = await createProjectService(projectData);
 
         res.json({
@@ -254,150 +188,20 @@ export const updateProject = async (
             });
         }
 
-        const files = req.files as Express.Multer.File[] | undefined;
+        // Handle assembled chunked files
+        let files = req.files as Express.Multer.File[] | undefined;
+        files = await retrieveAssembledChunkedFiles(files, req);
 
-        // Organize files by field name
-        const organizedFiles: { [key: string]: Express.Multer.File[] } = {};
-        if (files && Array.isArray(files)) {
-            files.forEach((file) => {
-                if (!organizedFiles[file.fieldname]) {
-                    organizedFiles[file.fieldname] = [];
-                }
-                organizedFiles[file.fieldname].push(file);
-            });
-        }
+        // Process files and upload to S3
+        const processedFiles = await processProjectFiles(files);
 
-        // Upload new project images if provided
-        let imageUrls: string[] = [];
-        if (organizedFiles.image_urls) {
-            for (const file of organizedFiles.image_urls) {
-                const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
-                    `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
-                );
-                imageUrls.push(url);
-            }
-        }
+        // Clean up assembled files after S3 upload
+        cleanupAssembledFiles(processedFiles.assembledFilePaths);
 
-        // Upload new project brochure if provided
-        let brochureUrl: string | undefined;
-        if (organizedFiles.file_url?.[0]) {
-            const ext = organizedFiles.file_url[0].originalname.split('.').pop();
-            brochureUrl = await uploadToS3(
-                organizedFiles.file_url[0].path,
-                `projects/brochures/${Date.now()}_brochure.${ext}`
-            );
-        }
+        // Parse and structure update data
+        const updateData = parseUpdateProjectBody(req.body, processedFiles, req.user);
 
-        // Upload new inventory file if provided
-        let inventoryFiles: string[] = [];
-        if (organizedFiles.inventory_file?.[0]) {
-            const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
-            const url = await uploadToS3(
-                organizedFiles.inventory_file[0].path,
-                `projects/inventory/${Date.now()}_inventory.${ext}`
-            );
-            inventoryFiles.push(url);
-        }
-
-        // Upload new floor plan images dynamically
-        const floorPlanImages: { [index: number]: string } = {};
-        for (const fieldName in organizedFiles) {
-            if (fieldName.startsWith('floor_plan_image_')) {
-                const index = parseInt(fieldName.replace('floor_plan_image_', ''));
-                if (!isNaN(index) && organizedFiles[fieldName][0]) {
-                    const file = organizedFiles[fieldName][0];
-                    const ext = file.originalname.split('.').pop();
-                    const url = await uploadToS3(
-                        file.path,
-                        `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
-                    );
-                    floorPlanImages[index] = url;
-                }
-            }
-        }
-
-        // Parse body fields
-        const {
-            title,
-            description,
-            min_price,
-            currency,
-            address,
-            city,
-            category,
-            type,
-            project_name,
-            project_age,
-            furnished,
-            unit_types,
-            amenities,
-            handover_year,
-            payment_structure,
-            floor_plans,
-            existing_image_urls,
-            latitude,
-            longitude,
-            min_bedrooms,
-            max_bedrooms,
-        } = req.body;
-
-        // Parse floor plans and add images
-        let floorPlansData: any[] = [];
-        if (floor_plans) {
-            const parsedFloorPlans = JSON.parse(floor_plans);
-            floorPlansData = parsedFloorPlans.map((fp: any, index: number) => ({
-                title: fp.title,
-                min_price: fp.min_price,
-                max_price: fp.max_price,
-                unit_size: fp.unit_size,
-                bedrooms: fp.bedrooms,
-                bathrooms: fp.bathrooms,
-                image_urls: floorPlanImages[index]
-                    ? [floorPlanImages[index]]
-                    : fp.existing_image_urls || [],
-            }));
-        }
-
-        // Combine existing images with new ones
-        let finalImageUrls = imageUrls;
-        if (existing_image_urls) {
-            const existingUrls = JSON.parse(existing_image_urls);
-            finalImageUrls = [...existingUrls, ...imageUrls];
-        }
-
-        const updateData = {
-            ...(title && { title }),
-            ...(description && { description }),
-            ...(min_price && { min_price: parseFloat(min_price) }),
-            ...(currency && { currency }),
-            ...(address && { address }),
-            ...(city && { city }),
-            ...(category && { category }),
-            ...(type && { type: JSON.parse(type) }),
-            ...(project_name && { project_name }),
-            ...(project_age && { project_age }),
-            ...(furnished && { furnished }),
-            ...(unit_types && { unit_types: JSON.parse(unit_types) }),
-            ...(amenities && { amenities: JSON.parse(amenities) }),
-            ...(handover_year && { handover_year: parseInt(handover_year) }),
-            ...(payment_structure && {
-                payment_structure: JSON.stringify(
-                    JSON.parse(payment_structure)
-                ),
-            }),
-            ...(latitude && { latitude: parseFloat(latitude) }),
-            ...(longitude && { longitude: parseFloat(longitude) }),
-            ...(min_bedrooms && { min_bedrooms }),
-            ...(max_bedrooms && { max_bedrooms }),
-            ...(finalImageUrls.length > 0 && { image_urls: finalImageUrls }),
-            ...(brochureUrl && { brochure_url: brochureUrl }),
-            floor_plans: floorPlansData,
-            inventory_files: inventoryFiles,
-            developer_id: req.user.entityId,
-        };
-
+        // Update project
         const project = await updateProjectService(id, updateData);
 
         res.json({
