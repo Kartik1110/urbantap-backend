@@ -9,8 +9,7 @@ import {
     getProjectByIdWithRBACService,
     retrieveAssembledChunkedFiles,
     processProjectFiles,
-    cleanupAssembledFiles,
-    cleanupMulterTempFiles,
+    cleanupTemporaryFiles,
     parseProjectBody,
     parseUpdateProjectBody,
 } from './project.service';
@@ -111,11 +110,12 @@ export const createProject = async (
         });
     } finally {
         // Always clean up files after S3 upload (success or failure)
-        if (processedFiles?.assembledFilePaths) {
-            cleanupAssembledFiles(processedFiles.assembledFilePaths);
-        }
-        if (processedFiles?.multerTempFilePaths) {
-            cleanupMulterTempFiles(processedFiles.multerTempFilePaths);
+        const allFilePaths = [
+            ...(processedFiles?.assembledFilePaths || []),
+            ...(processedFiles?.multerTempFilePaths || [])
+        ];
+        if (allFilePaths.length > 0) {
+            cleanupTemporaryFiles(allFilePaths);
         }
     }
 };
@@ -223,11 +223,12 @@ export const updateProject = async (
         });
     } finally {
         // Always clean up files after S3 upload (success or failure)
-        if (processedFiles?.assembledFilePaths) {
-            cleanupAssembledFiles(processedFiles.assembledFilePaths);
-        }
-        if (processedFiles?.multerTempFilePaths) {
-            cleanupMulterTempFiles(processedFiles.multerTempFilePaths);
+        const allFilePaths = [
+            ...(processedFiles?.assembledFilePaths || []),
+            ...(processedFiles?.multerTempFilePaths || [])
+        ];
+        if (allFilePaths.length > 0) {
+            cleanupTemporaryFiles(allFilePaths);
         }
     }
 };

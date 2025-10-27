@@ -223,10 +223,6 @@ export function cleanupTemporaryFiles(filePaths: string[]): void {
     });
 }
 
-// Legacy exports for backward compatibility
-export const cleanupAssembledFiles = cleanupTemporaryFiles;
-export const cleanupMulterTempFiles = cleanupTemporaryFiles;
-
 // Parse project body data
 export function parseProjectBody(
     body: any,
