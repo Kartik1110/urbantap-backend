@@ -11,11 +11,21 @@ ALTER COLUMN "is_certified" DROP NOT NULL,
 ALTER COLUMN "profile_pic" DROP NOT NULL;
 
 -- AlterTable
-ALTER TABLE "Project" DROP COLUMN "file_url",
-ADD COLUMN     "brochure_url" TEXT;
+ALTER TABLE "Project" DROP COLUMN IF EXISTS "file_url";
 
--- CreateTable
-CREATE TABLE "Inventory" (
+-- AlterTable (add brochure_url only if it doesn't exist)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'Project' AND column_name = 'brochure_url'
+    ) THEN
+        ALTER TABLE "Project" ADD COLUMN "brochure_url" TEXT;
+    END IF;
+END $$;
+
+-- CreateTable (only if it doesn't exist)
+CREATE TABLE IF NOT EXISTS "Inventory" (
     "id" TEXT NOT NULL,
     "file_url" TEXT NOT NULL,
     "project_id" TEXT NOT NULL,
@@ -25,5 +35,13 @@ CREATE TABLE "Inventory" (
     CONSTRAINT "Inventory_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "Inventory" ADD CONSTRAINT "Inventory_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- AddForeignKey (only if it doesn't exist)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'Inventory_project_id_fkey'
+    ) THEN
+        ALTER TABLE "Inventory" ADD CONSTRAINT "Inventory_project_id_fkey" 
+        FOREIGN KEY ("project_id") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
