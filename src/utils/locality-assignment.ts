@@ -1,4 +1,7 @@
-import { findClosestLocality, findClosestLocalityWithDistance } from './dubai-localities';
+import {
+    findClosestLocality,
+    findClosestLocalityWithDistance,
+} from './dubai-localities';
 
 /**
  * Assign locality directly from coordinates using proximity-based calculation
@@ -7,7 +10,10 @@ import { findClosestLocality, findClosestLocalityWithDistance } from './dubai-lo
  * @param lng Longitude
  * @returns Object with assigned locality and distance
  */
-export function assignLocalityFromCoordinates(lat: number, lng: number): { locality: string; distance: number } {
+export function assignLocalityFromCoordinates(
+    lat: number,
+    lng: number
+): { locality: string; distance: number } {
     return findClosestLocalityWithDistance(lat, lng);
 }
 
@@ -36,12 +42,15 @@ export async function geocodeWithProximityLocality(address: string): Promise<{
 } | null> {
     // Import geocodeAddress dynamically to avoid circular dependencies
     const { geocodeAddress } = await import('./geocoding');
-    
+
     const result = await geocodeAddress(address);
-    
+
     if (result && result.lat && result.lng) {
-        const localityResult = assignLocalityFromCoordinates(result.lat, result.lng);
-        
+        const localityResult = assignLocalityFromCoordinates(
+            result.lat,
+            result.lng
+        );
+
         return {
             formatted_address: result.formatted_address,
             lat: result.lat,
@@ -50,7 +59,7 @@ export async function geocodeWithProximityLocality(address: string): Promise<{
             locality_distance: localityResult.distance,
         };
     }
-    
+
     return null;
 }
 
@@ -60,25 +69,28 @@ export async function geocodeWithProximityLocality(address: string): Promise<{
  * @param lng Longitude
  * @returns Enhanced reverse geocode result with proximity-based locality
  */
-export async function reverseGeocodeWithProximityLocality(lat: number, lng: number): Promise<{
+export async function reverseGeocodeWithProximityLocality(
+    lat: number,
+    lng: number
+): Promise<{
     formatted_address: string;
     locality: string;
     locality_distance: number;
 } | null> {
     // Import reverseGeocode dynamically to avoid circular dependencies
     const { reverseGeocode } = await import('./geocoding');
-    
+
     const result = await reverseGeocode(lat, lng);
-    
+
     if (result) {
         const localityResult = assignLocalityFromCoordinates(lat, lng);
-        
+
         return {
             formatted_address: result.formatted_address,
             locality: localityResult.locality,
             locality_distance: localityResult.distance,
         };
     }
-    
+
     return null;
 }

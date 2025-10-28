@@ -13,18 +13,12 @@ import {
     parseProjectBody,
     parseUpdateProjectBody,
 } from './project.service';
-import {
-    getChunkInfo,
-    processChunkedFile,
-} from '@/utils/chunkedFileUpload';
+import { getChunkInfo, processChunkedFile } from '@/utils/chunkedFileUpload';
 
-export const uploadChunk = async (
-    req: AuthenticatedRequest,
-    res: Response
-) => {
+export const uploadChunk = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const files = req.files as Express.Multer.File[] | undefined;
-        
+
         if (!files || files.length === 0) {
             return res.status(400).json({
                 status: 'error',
@@ -33,7 +27,7 @@ export const uploadChunk = async (
         }
 
         const chunkInfo = getChunkInfo(req);
-        
+
         if (!chunkInfo) {
             return res.status(400).json({
                 status: 'error',
@@ -43,7 +37,7 @@ export const uploadChunk = async (
 
         // Process chunk and assemble if complete
         const assembledPath = await processChunkedFile(files[0], chunkInfo);
-        
+
         if (assembledPath) {
             // File is complete
             return res.json({
@@ -91,7 +85,11 @@ export const createProject = async (
         processedFiles = await processProjectFiles(files);
 
         // Parse and structure project data
-        const projectData = parseProjectBody(req.body, processedFiles, req.user);
+        const projectData = parseProjectBody(
+            req.body,
+            processedFiles,
+            req.user
+        );
 
         // Create project
         const project = await createProjectService(projectData);
@@ -112,7 +110,7 @@ export const createProject = async (
         // Always clean up files after S3 upload (success or failure)
         const allFilePaths = [
             ...(processedFiles?.assembledFilePaths || []),
-            ...(processedFiles?.multerTempFilePaths || [])
+            ...(processedFiles?.multerTempFilePaths || []),
         ];
         if (allFilePaths.length > 0) {
             cleanupTemporaryFiles(allFilePaths);
@@ -204,7 +202,11 @@ export const updateProject = async (
         processedFiles = await processProjectFiles(files);
 
         // Parse and structure update data
-        const updateData = parseUpdateProjectBody(req.body, processedFiles, req.user);
+        const updateData = parseUpdateProjectBody(
+            req.body,
+            processedFiles,
+            req.user
+        );
 
         // Update project
         const project = await updateProjectService(id, updateData);
@@ -225,7 +227,7 @@ export const updateProject = async (
         // Always clean up files after S3 upload (success or failure)
         const allFilePaths = [
             ...(processedFiles?.assembledFilePaths || []),
-            ...(processedFiles?.multerTempFilePaths || [])
+            ...(processedFiles?.multerTempFilePaths || []),
         ];
         if (allFilePaths.length > 0) {
             cleanupTemporaryFiles(allFilePaths);

@@ -1374,8 +1374,16 @@ export const generateProjectROIReportServiceV2 = async (
             short_term_percentage: Math.round(shortTermRoi * 100) / 100, // Round to 2 decimal places
             long_term: Math.round(longTermRent),
             long_term_percentage: Math.round(longTermRoi * 100) / 100, // Round to 2 decimal places
-            short_term_percentage_buy_at_handover: Math.round((getLongTermRoiPercentageAtHandover(propertyData) * DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER) * 100) / 100,
-            long_term_percentage_buy_at_handover: Math.round(getLongTermRoiPercentageAtHandover(propertyData) * 100) / 100,
+            short_term_percentage_buy_at_handover:
+                Math.round(
+                    getLongTermRoiPercentageAtHandover(propertyData) *
+                        DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER *
+                        100
+                ) / 100,
+            long_term_percentage_buy_at_handover:
+                Math.round(
+                    getLongTermRoiPercentageAtHandover(propertyData) * 100
+                ) / 100,
         },
         break_even_year: {
             short_term: shortTermBreakEvenYear,
@@ -1931,8 +1939,16 @@ export const getProjectAIReportServiceV2 = async (
             long_term: Math.round(longTermRent),
             short_term_percentage: Math.round(shortTermRoi * 100) / 100,
             long_term_percentage: Math.round(longTermRoi * 100) / 100,
-            short_term_percentage_buy_at_handover: Math.round((getLongTermRoiPercentageAtHandover(propertyData) * DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER) * 100) / 100,
-            long_term_percentage_buy_at_handover: Math.round(getLongTermRoiPercentageAtHandover(propertyData) * 100) / 100,
+            short_term_percentage_buy_at_handover:
+                Math.round(
+                    getLongTermRoiPercentageAtHandover(propertyData) *
+                        DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER *
+                        100
+                ) / 100,
+            long_term_percentage_buy_at_handover:
+                Math.round(
+                    getLongTermRoiPercentageAtHandover(propertyData) * 100
+                ) / 100,
         },
         developer: {
             name: project.developer.company?.name,

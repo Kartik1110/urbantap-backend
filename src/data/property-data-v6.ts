@@ -828,7 +828,7 @@ const propertyData: {
             },
             {
                 appreciation_perc: 116.14,
-                roi: 16.90,
+                roi: 16.9,
             },
             {
                 appreciation_perc: 129.64,
@@ -1106,7 +1106,7 @@ const propertyData: {
             },
             {
                 appreciation_perc: 135.5,
-                roi: 20.38, 
+                roi: 20.38,
             },
             {
                 appreciation_perc: 149.5,
@@ -3442,7 +3442,6 @@ const propertyData: {
                 appreciation_perc: 184.44,
                 roi: 23.16,
             },
-            
         ],
         Villa: [
             {

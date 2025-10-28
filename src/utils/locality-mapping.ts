@@ -2,7 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Load the 187 unique localities
-const uniqueLocalitiesPath = path.join(__dirname, '../data/Unique_Localities.json');
+const uniqueLocalitiesPath = path.join(
+    __dirname,
+    '../data/Unique_Localities.json'
+);
 const uniqueLocalitiesData = fs.readFileSync(uniqueLocalitiesPath, 'utf8');
 const uniqueLocalitiesList: string[] = JSON.parse(uniqueLocalitiesData);
 
@@ -38,7 +41,7 @@ export function mapToUniqueLocality(components: AddressComponent[]): string {
     // Check each component against our unique localities
     for (const component of components) {
         const componentName = component.long_name;
-        
+
         // Direct match
         if (uniqueLocalitiesList.includes(componentName)) {
             return componentName;
@@ -98,4 +101,3 @@ export function getUniqueLocalities(): string[] {
 export function isUniqueLocality(locality: string): boolean {
     return uniqueLocalitiesList.includes(locality);
 }
-

@@ -357,7 +357,6 @@ const DEFAULT_PROPERTY_DATA: PropertyDataPoint[] = [
         appreciation_perc: 161.09, // 147.09 + (147.09 * 0.08) = 161.09
         roi: 25.37,
     },
-
 ];
 
 /**
@@ -1020,7 +1019,9 @@ export function getLongTermRoiPercentageAtHandover(
 
         return longTermRoi;
     } catch (error) {
-        logger.error(`getLongTermRoiPercentageAtHandover: ${(error as Error).message}`);
+        logger.error(
+            `getLongTermRoiPercentageAtHandover: ${(error as Error).message}`
+        );
         logger.error(
             `getLongTermRoiPercentageAtHandover: Returning ${DEFAULT_ROI_PER_YEAR}`
         );

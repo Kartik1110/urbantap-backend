@@ -13,12 +13,12 @@ dotenv.config();
 const app = express();
 
 // Configure multer for file uploads
-const upload = multer({ 
+const upload = multer({
     dest: 'uploads/',
     limits: {
         fileSize: 200 * 1024 * 1024, // 200MB limit per file
         fieldSize: 200 * 1024 * 1024, // 200MB limit for fields
-    }
+    },
 });
 
 app.use(

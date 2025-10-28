@@ -1,6 +1,12 @@
 import prisma from '../utils/prisma';
 import dotenv from 'dotenv';
-import { mapToUniqueLocality, updateRecordLocality, GeocodeResult, ReverseGeocodeResult, AddressComponent } from '../utils/locality-mapping';
+import {
+    mapToUniqueLocality,
+    updateRecordLocality,
+    GeocodeResult,
+    ReverseGeocodeResult,
+    AddressComponent,
+} from '../utils/locality-mapping';
 
 // Load environment variables from .env file FIRST
 dotenv.config();
@@ -35,7 +41,7 @@ async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
     try {
         const encodedAddress = encodeURIComponent(address);
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${GOOGLE_MAPS_API_KEY}`;
-        
+
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`Geocoding API error: ${response.status}`);
@@ -63,15 +69,20 @@ async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
     }
 }
 
-async function reverseGeocode(lat: number, lng: number): Promise<ReverseGeocodeResult | null> {
+async function reverseGeocode(
+    lat: number,
+    lng: number
+): Promise<ReverseGeocodeResult | null> {
     if (!GOOGLE_MAPS_API_KEY) {
-        console.warn('GOOGLE_MAPS_API_KEY not configured, skipping reverse geocoding');
+        console.warn(
+            'GOOGLE_MAPS_API_KEY not configured, skipping reverse geocoding'
+        );
         return null;
     }
 
     try {
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`;
-        
+
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`Reverse geocoding API error: ${response.status}`);
@@ -138,7 +149,9 @@ async function updateExistingListingsLocality() {
                 );
             } else {
                 // No address and no coordinates: skip
-                console.log(`⚠️ Skipping listing ${listing.id} - no address or coordinates`);
+                console.log(
+                    `⚠️ Skipping listing ${listing.id} - no address or coordinates`
+                );
                 result = null;
             }
 
@@ -157,10 +170,17 @@ async function updateExistingListingsLocality() {
                 }
 
                 // Update the listing using utility function
-                await updateRecordLocality(updateData, listing.id, 'listing', prisma);
+                await updateRecordLocality(
+                    updateData,
+                    listing.id,
+                    'listing',
+                    prisma
+                );
 
                 updateCount++;
-                console.log(`✅ Updated listing ${listing.id} with locality: ${mappedLocality}`);
+                console.log(
+                    `✅ Updated listing ${listing.id} with locality: ${mappedLocality}`
+                );
             } else {
                 console.log(
                     `❌ No results for listing ${listing.id} — raw address: ${rawAddress}`
@@ -177,7 +197,10 @@ async function updateExistingListingsLocality() {
         console.log(`   • Unable to geocode: ${unfindableCount} listings`);
         console.log(`   • Total processed: ${listings.length} listings`);
     } catch (error) {
-        console.error('❌ Error during EXISTING listings locality update:', error);
+        console.error(
+            '❌ Error during EXISTING listings locality update:',
+            error
+        );
         throw error;
     }
 }
@@ -223,7 +246,9 @@ async function updateExistingProjectsLocality() {
                 );
             } else {
                 // No address and no coordinates: skip
-                console.log(`⚠️ Skipping project ${project.id} - no address or coordinates`);
+                console.log(
+                    `⚠️ Skipping project ${project.id} - no address or coordinates`
+                );
                 result = null;
             }
 
@@ -242,10 +267,17 @@ async function updateExistingProjectsLocality() {
                 }
 
                 // Update the project using utility function
-                await updateRecordLocality(updateData, project.id, 'project', prisma);
+                await updateRecordLocality(
+                    updateData,
+                    project.id,
+                    'project',
+                    prisma
+                );
 
                 updateCount++;
-                console.log(`✅ Updated project ${project.id} with locality: ${mappedLocality}`);
+                console.log(
+                    `✅ Updated project ${project.id} with locality: ${mappedLocality}`
+                );
             } else {
                 console.log(
                     `❌ No results for project ${project.id} — raw address: ${rawAddress}`
@@ -262,21 +294,28 @@ async function updateExistingProjectsLocality() {
         console.log(`   • Unable to geocode: ${unfindableCount} projects`);
         console.log(`   • Total processed: ${projects.length} projects`);
     } catch (error) {
-        console.error('❌ Error during EXISTING projects locality update:', error);
+        console.error(
+            '❌ Error during EXISTING projects locality update:',
+            error
+        );
         throw error;
     }
 }
 
 async function updateExistingLocality() {
     console.log('🚀 Starting locality update process for EXISTING data...');
-    console.log('⚠️  This will process ALL records (including those with existing locality)');
+    console.log(
+        '⚠️  This will process ALL records (including those with existing locality)'
+    );
 
     try {
         await updateExistingListingsLocality();
         console.log('\n' + '='.repeat(50) + '\n');
         await updateExistingProjectsLocality();
-        
-        console.log('\n🎉 EXISTING locality update process completed successfully!');
+
+        console.log(
+            '\n🎉 EXISTING locality update process completed successfully!'
+        );
     } catch (error) {
         console.error('❌ Script failed:', error);
         process.exit(1);
