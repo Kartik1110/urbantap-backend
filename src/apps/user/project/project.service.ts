@@ -2069,6 +2069,15 @@ export const getProjectsByLocalityService = async (locality?: string) => {
             image_urls: true,
             latitude: true,
             longitude: true,
+            developer: {
+                select: {
+                    company: {
+                        select: {
+                            logo: true,
+                        },
+                    },
+                },
+            },
         },
     });
 
@@ -2076,7 +2085,7 @@ export const getProjectsByLocalityService = async (locality?: string) => {
     return projects.map((project) => ({
         id: project.id,
         title: project.project_name,
-        image: project.image_urls[0] || '',
+        logo: project.developer.company?.logo || '',
         latitude: project.latitude,
         longitude: project.longitude,
     }));
