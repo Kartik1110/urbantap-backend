@@ -11,7 +11,10 @@ import {
     generateProjectROIReportServiceV2,
     getProjectAIReportService,
     getProjectAIReportServiceV2,
+    getProjectsByLocalityService,
+    getLocalitiesService,
 } from './project.service';
+import logger from '@/utils/logger';
 
 // GET /projects
 export const getProjects = async (req: Request, res: Response) => {
@@ -312,6 +315,49 @@ export const getAIReportV2 = async (req: Request, res: Response) => {
             status: 'error',
             message: (error as Error).message || 'Failed to fetch AI report',
             error,
+        });
+    }
+};
+
+// GET /projects/maps - Get projects filtered by locality
+export const getProjectsByLocality = async (req: Request, res: Response) => {
+    try {
+        const locality = req.query.locality as string | undefined;
+
+        const projects = await getProjectsByLocalityService(locality);
+
+        res.json({
+            status: 'success',
+            message: 'Projects fetched successfully',
+            data: projects,
+        });
+    } catch (error) {
+        logger.error('Error fetching projects by locality:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch projects',
+        });
+    }
+};
+
+export const getAllLocalites = async (req: Request, res: Response) => {
+    try {
+        const search = req.query.search as string | undefined;
+        const page = Number(req.query.page as string) || undefined;
+        const limit = Number(req.query.page_size as string) || undefined;
+
+        const localites = await getLocalitiesService(search, page, limit);
+
+        res.json({
+            status: 'success',
+            message: 'Localites fetched successfully',
+            data: localites,
+        });
+    } catch (error) {
+        logger.error('Error fetching locality:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch localities',
         });
     }
 };

@@ -1,13 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import LOCALITIES from '@/data/localities';
 
-// Load the 187 unique localities
-const uniqueLocalitiesPath = path.join(
-    __dirname,
-    '../data/Unique_Localities.json'
-);
-const uniqueLocalitiesData = fs.readFileSync(uniqueLocalitiesPath, 'utf8');
-const uniqueLocalitiesList: string[] = JSON.parse(uniqueLocalitiesData);
+const uniqueLocalitiesList: string[] = LOCALITIES;
 
 export interface AddressComponent {
     long_name: string;

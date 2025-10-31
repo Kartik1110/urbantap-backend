@@ -11,6 +11,8 @@ import {
     // getAIReport,
     generateProjectROIReportV2,
     getAIReportV2,
+    getProjectsByLocality,
+    getAllLocalites,
 } from './project.controller';
 
 const router = Router();
@@ -18,8 +20,14 @@ const router = Router();
 /* Get all projects */
 router.get('/projects', getProjects);
 
-/* Get featured projects (most recent) - MUST be before /projects/:id */
+/* Get featured projects (most recent) */
 router.get('/projects/featured', getFeaturedProjects);
+
+/* Get projects for maps filtered by locality */
+router.get('/projects/maps', getProjectsByLocality);
+
+/* Get a list of localities for projects */
+router.get('/projects/maps/localities', getAllLocalites);
 
 /* Get all projects for a specific developer */
 router.get('/projects/developer/:id', getProjectsByDeveloper);

@@ -32,6 +32,8 @@ import {
     getRentalPriceInYear as getRentalPriceInYearV2,
 } from '@/utils/roiReport-v2';
 import propertiesDataV2 from '@/data/property-data-v6';
+import LOCALITIES from '@/data/localities';
+import { createPaginationObject } from '@/helper';
 
 declare const fetch: typeof globalThis.fetch;
 
@@ -2048,3 +2050,64 @@ export async function getNearbySummary(center: LatLng) {
 
     return nearby;
 }
+
+export const getProjectsByLocalityService = async (locality?: string) => {
+    const whereClause: Prisma.ProjectWhereInput = locality
+        ? {
+              locality: {
+                  contains: locality,
+                  mode: 'insensitive' as Prisma.QueryMode,
+              },
+          }
+        : {};
+
+    const projects = await prisma.project.findMany({
+        where: whereClause,
+        select: {
+            id: true,
+            project_name: true,
+            image_urls: true,
+            latitude: true,
+            longitude: true,
+        },
+    });
+
+    // Map to return only id, title (project_name), and first image
+    return projects.map((project) => ({
+        id: project.id,
+        title: project.project_name,
+        image: project.image_urls[0] || '',
+        latitude: project.latitude,
+        longitude: project.longitude,
+    }));
+};
+
+export const getLocalitiesService = async (
+    search?: string,
+    page: number = 1,
+    limit: number = 10
+) => {
+    // Normalize and filter list based on search query
+    let filteredLocalities = LOCALITIES;
+
+    if (search) {
+        const searchLower = search.toLowerCase();
+        filteredLocalities = LOCALITIES.filter((loc) =>
+            loc.toLowerCase().includes(searchLower)
+        );
+    }
+
+    // Pagination logic
+    const total = filteredLocalities.length;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedData = filteredLocalities.slice(
+        startIndex,
+        startIndex + limit
+    );
+
+    return {
+        data: paginatedData,
+        pagination: createPaginationObject(totalPages, page, limit),
+    };
+};
