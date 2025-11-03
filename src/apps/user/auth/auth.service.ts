@@ -375,28 +375,29 @@ const verifyOTP = async (userEnteredOTP: string, storedHash: string) => {
 
 export const sendEmailOtpService = async (email: string) => {
     // Whitelisted emails check for testing purposes
-    const isWhitelisted = EMAIL_CONFIG.otp.whitelistedEmails.includes(
-        email.toLowerCase()
-    );
+    // NOTE: Company domain restriction disabled - allowing all users to login
+    // const isWhitelisted = EMAIL_CONFIG.otp.whitelistedEmails.includes(
+    //     email.toLowerCase()
+    // );
 
-    const userCompanyDomain = email.split('@')[1];
+    // const userCompanyDomain = email.split('@')[1];
 
     // Skip company validation for whitelisted emails
-    if (!isWhitelisted) {
-        const companyDomainName = await prisma.company.findUnique({
-            where: { domain_name: userCompanyDomain },
-        });
+    // if (!isWhitelisted) {
+    //     const companyDomainName = await prisma.company.findUnique({
+    //         where: { domain_name: userCompanyDomain },
+    //     });
 
-        if (!companyDomainName) {
-            throw new Error('Company is not registered with UrbanTap.');
-        }
+    //     if (!companyDomainName) {
+    //         throw new Error('Company is not registered with UrbanTap.');
+    //     }
 
-        if (userCompanyDomain !== companyDomainName.domain_name) {
-            throw new Error(
-                'You are not authorized to signup with this email.'
-            );
-        }
-    }
+    //     if (userCompanyDomain !== companyDomainName.domain_name) {
+    //         throw new Error(
+    //             'You are not authorized to signup with this email.'
+    //         );
+    //     }
+    // }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (user) {
@@ -411,19 +412,19 @@ export const sendEmailOtpService = async (email: string) => {
         },
     });
 
-    const company = await prisma.company.findUnique({
-        where: { domain_name: userCompanyDomain },
-        select: { id: true },
-    });
+    // const company = await prisma.company.findUnique({
+    //     where: { domain_name: userCompanyDomain },
+    //     select: { id: true },
+    // });
 
     /* Create an empty broker for the user mapped to the company */
     await prisma.broker.create({
         data: {
             email,
             name: '',
-            company: {
-                connect: { id: company?.id },
-            },
+            // company: {
+            //     connect: { id: company?.id },
+            // },
             user: {
                 connect: { id: newUser.id },
             },
