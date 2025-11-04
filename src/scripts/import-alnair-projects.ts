@@ -291,7 +291,14 @@ async function importProject(projectId: number): Promise<boolean | 'skipped'> {
         // Get amenities
         const amenities = mapAmenities(projectData);
 
+        // Determine category based on completion status
+        const isCompleted = projectData.completed_at !== null || 
+                           projectData.construction_percent === "100.00" ||
+                           projectData.construction_percent === 100;
+        const category = isCompleted ? Category.Ready_to_move : Category.Off_plan;
+
         // Determine project type (default to Apartment)
+        // Could be enhanced to parse from description or other fields
         const projectType: Type[] = [Type.Apartment];
 
         // Create project
@@ -337,7 +344,7 @@ async function importProject(projectId: number): Promise<boolean | 'skipped'> {
                 handover_year: handoverYear,
                 image_urls: imageUrls,
                 brochure_url: projectData.brochures && projectData.brochures.length > 0 ? projectData.brochures[0].src : null,
-                category: Category.Off_plan, // Default for Alnair projects
+                category: category,
                 type: projectType,
                 developer_id: developerId,
                 floor_plans: floorPlansData ? {
