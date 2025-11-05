@@ -324,12 +324,15 @@ export const getProjectsByLocality = async (req: Request, res: Response) => {
     try {
         const locality = req.query.locality as string | undefined;
 
-        const projects = await getProjectsByLocalityService(locality);
+        const { projects, total, total_filtered } =
+            await getProjectsByLocalityService(locality);
 
         res.json({
             status: 'success',
             message: 'Projects fetched successfully',
             data: projects,
+            total,
+            total_filtered,
         });
     } catch (error) {
         logger.error('Error fetching projects by locality:', error);

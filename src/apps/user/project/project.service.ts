@@ -2061,34 +2061,45 @@ export const getProjectsByLocalityService = async (locality?: string) => {
           }
         : {};
 
-    const projects = await prisma.project.findMany({
-        where: whereClause,
-        select: {
-            id: true,
-            project_name: true,
-            image_urls: true,
-            latitude: true,
-            longitude: true,
-            developer: {
-                select: {
-                    company: {
-                        select: {
-                            logo: true,
+    // Get total count of all projects and filtered projects in parallel
+    const [projects, totalCount, filteredCount] = await Promise.all([
+        prisma.project.findMany({
+            where: whereClause,
+            select: {
+                id: true,
+                project_name: true,
+                image_urls: true,
+                latitude: true,
+                longitude: true,
+                developer: {
+                    select: {
+                        company: {
+                            select: {
+                                logo: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        }),
+        prisma.project.count(), // Total count without any filter
+        prisma.project.count({ where: whereClause }), // Count with locality filter
+    ]);
 
     // Map to return only id, title (project_name), and first image
-    return projects.map((project) => ({
+    const projectsData = projects.map((project) => ({
         id: project.id,
         title: project.project_name,
         logo: project.developer.company?.logo || '',
         latitude: project.latitude,
         longitude: project.longitude,
     }));
+
+    return {
+        projects: projectsData,
+        total: totalCount,
+        total_filtered: filteredCount,
+    };
 };
 
 export const getLocalitiesService = async (
