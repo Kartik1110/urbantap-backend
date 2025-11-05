@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import prisma from '@/utils/prisma';
 import { City, Bedrooms, Category, Furnished, Currency, Amenities, Type } from '@prisma/client';
 import { CompanyType } from '@prisma/client';
+import { uploadToS3 } from '@/utils/s3Upload';
 
 const AUTH_TOKEN = '1958398e8c4118367eb18a9f85c3761c78005d9e6bfd5ee687746f8bad898775';
 const BASE_URL = 'https://api.alnair.ae';
@@ -23,6 +25,74 @@ const ROOM_TYPE_TO_BEDROOMS: Record<string, Bedrooms> = {
 // Convert m² to sq ft
 function m2ToSqFt(m2: number): number {
     return m2 * 10.764;
+}
+
+// Download image from URL and upload to S3
+async function downloadAndUploadToS3(imageUrl: string, projectId: number, imageType: 'cover' | 'logo' | 'gallery' | 'floorplan' | 'brochure', index?: number): Promise<string | null> {
+    try {
+        if (!imageUrl) return null;
+
+        // Download image
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+            console.warn(`⚠️  Failed to download image: ${imageUrl}`);
+            return null;
+        }
+
+        const buffer = await response.arrayBuffer();
+        const contentType = response.headers.get('content-type') || 'image/jpeg';
+        
+        // Determine file extension from content type or URL
+        let ext = 'jpg';
+        if (contentType.includes('png')) ext = 'png';
+        else if (contentType.includes('gif')) ext = 'gif';
+        else if (contentType.includes('webp')) ext = 'webp';
+        else if (contentType.includes('pdf')) ext = 'pdf';
+        else {
+            // Try to get extension from URL
+            const urlMatch = imageUrl.match(/\.([a-zA-Z0-9]+)(\?|$)/);
+            if (urlMatch) ext = urlMatch[1].toLowerCase();
+        }
+
+        // Create unique filename
+        const timestamp = Date.now();
+        const randomStr = crypto.randomBytes(4).toString('hex');
+        const fileName = `Al_nair/projects/${projectId}/${imageType}${index !== undefined ? `_${index}` : ''}_${timestamp}_${randomStr}.${ext}`;
+
+        // Save to temp file
+        const tempDir = path.join(__dirname, '../../uploads/temp');
+        if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true });
+        }
+        const tempFilePath = path.join(tempDir, `${timestamp}_${randomStr}.${ext}`);
+        fs.writeFileSync(tempFilePath, Buffer.from(buffer));
+
+        // Upload to S3
+        const s3Url = await uploadToS3(tempFilePath, fileName, contentType);
+        
+        return s3Url;
+    } catch (error) {
+        console.error(`❌ Error processing image ${imageUrl}:`, error);
+        return null;
+    }
+}
+
+// Process array of image URLs and upload to S3
+async function processImagesToS3(imageUrls: string[], projectId: number, imageType: 'cover' | 'logo' | 'gallery' | 'floorplan' | 'brochure'): Promise<string[]> {
+    const s3Urls: string[] = [];
+    
+    for (let i = 0; i < imageUrls.length; i++) {
+        const s3Url = await downloadAndUploadToS3(imageUrls[i], projectId, imageType, i);
+        if (s3Url) {
+            s3Urls.push(s3Url);
+        }
+        // Small delay between uploads
+        if (i < imageUrls.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+    }
+    
+    return s3Urls;
 }
 
 // Extract year from date string
@@ -47,7 +117,6 @@ function mapAmenities(projectData: any): Amenities[] {
     if (description.includes('garden')) amenities.push(Amenities.Garden);
     if (description.includes('spa')) amenities.push(Amenities.Spa);
     if (description.includes('restaurant') || description.includes('cafe')) amenities.push(Amenities.Restaurants_and_Cafes);
-    if (description.includes('gym') || description.includes('fitness')) amenities.push(Amenities.Gym);
     if (description.includes('co-working') || description.includes('coworking')) amenities.push(Amenities.Co_working_Spaces);
     if (description.includes('padel') || description.includes('tennis')) amenities.push(Amenities.Padel_Tennis_Court);
     if (description.includes('golf')) amenities.push(Amenities.Golf);
@@ -87,6 +156,34 @@ function formatPaymentStructure(paymentPlans: any[]): string | null {
 async function findOrCreateDeveloper(builder: any): Promise<string> {
     const companyName = builder?.title || 'Unknown Developer';
     
+    // Process logo if available
+    let logoUrl: string | null = null;
+    let coverImageUrl: string | null = null;
+    if (builder?.logo?.src) {
+        // Upload logo to S3 under developers folder
+        const logoFileName = `Al_nair/developers/${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_logo_${Date.now()}.jpg`;
+        const tempDir = path.join(__dirname, '../../uploads/temp');
+        if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true });
+        }
+        
+        try {
+            const response = await fetch(builder.logo.src);
+            if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                const contentType = response.headers.get('content-type') || 'image/jpeg';
+                const ext = contentType.includes('png') ? 'png' : 'jpg';
+                const tempFilePath = path.join(tempDir, `logo_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.${ext}`);
+                fs.writeFileSync(tempFilePath, Buffer.from(buffer));
+                
+                logoUrl = await uploadToS3(tempFilePath, logoFileName.replace('.jpg', `.${ext}`), contentType);
+                coverImageUrl = logoUrl;
+            }
+        } catch (error) {
+            console.warn(`⚠️  Failed to download developer logo: ${builder.logo.src}`);
+        }
+    }
+    
     // Find existing company
     let company = await prisma.company.findFirst({
         where: {
@@ -104,7 +201,7 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
             data: {
                 name: companyName,
                 type: CompanyType.Developer,
-                logo: builder?.logo?.src || '',
+                logo: logoUrl || '',
                 description: builder?.description || '',
                 website: builder?.website || null,
                 phone: builder?.phone ? String(builder.phone) : null,
@@ -116,7 +213,7 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
         const developer = await prisma.developer.create({
             data: {
                 company_id: company.id,
-                cover_image: builder?.logo?.src || null,
+                cover_image: coverImageUrl,
             },
         });
 
@@ -130,6 +227,14 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
         return developer.id;
     }
 
+    // Update company logo if we have a new one and it doesn't have one
+    if (logoUrl && !company.logo) {
+        await prisma.company.update({
+            where: { id: company.id },
+            data: { logo: logoUrl },
+        });
+    }
+
     // Find or create developer for existing company
     let developer = await prisma.developer.findFirst({
         where: { company_id: company.id },
@@ -139,7 +244,7 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
         developer = await prisma.developer.create({
             data: {
                 company_id: company.id,
-                cover_image: builder?.logo?.src || null,
+                cover_image: coverImageUrl,
             },
         });
 
@@ -150,6 +255,12 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
         });
 
         console.log(`      Created developer for existing company: ${companyName} (ID: ${developer.id})`);
+    } else if (coverImageUrl && !developer.cover_image) {
+        // Update developer cover image if we have a new one
+        await prisma.developer.update({
+            where: { id: developer.id },
+            data: { cover_image: coverImageUrl },
+        });
     }
 
     return developer.id;
@@ -194,7 +305,7 @@ async function fetchFloorPlans(projectId: number): Promise<any> {
 }
 
 // Process and create project
-async function importProject(projectId: number): Promise<boolean | 'skipped'> {
+async function importProject(projectId: number): Promise<boolean> {
     try {
         console.log(`\n[Processing] Project ${projectId}...`);
 
@@ -225,27 +336,33 @@ async function importProject(projectId: number): Promise<boolean | 'skipped'> {
             },
         });
 
-        if (existingProject) {
-            console.log(`⚠️  Project ${projectId}: Already exists (ID: ${existingProject.id}), skipping...`);
-            return 'skipped'; // Return special value to indicate skip
-        }
-
-        // Prepare image URLs
-        const imageUrls: string[] = [];
-        if (projectData.cover?.src) imageUrls.push(projectData.cover.src);
-        if (projectData.logo?.src) imageUrls.push(projectData.logo.src);
+        // Collect image URLs from API (will be uploaded to S3)
+        const imageUrlsToProcess: string[] = [];
+        if (projectData.cover?.src) imageUrlsToProcess.push(projectData.cover.src);
+        if (projectData.logo?.src) imageUrlsToProcess.push(projectData.logo.src);
         
         // Add gallery images
         if (projectData.galleries && Array.isArray(projectData.galleries)) {
             projectData.galleries.forEach((gallery: any) => {
                 if (gallery.photos && Array.isArray(gallery.photos)) {
                     gallery.photos.forEach((photo: any) => {
-                        if (photo.src && !imageUrls.includes(photo.src)) {
-                            imageUrls.push(photo.src);
+                        if (photo.src && !imageUrlsToProcess.includes(photo.src)) {
+                            imageUrlsToProcess.push(photo.src);
                         }
                     });
                 }
             });
+        }
+
+        // Download and upload images to S3
+        console.log(`   📥 Downloading and uploading ${imageUrlsToProcess.length} images to S3...`);
+        const imageUrls = await processImagesToS3(imageUrlsToProcess, projectId, 'gallery');
+
+        // Process brochure URL
+        let brochureUrl: string | null = null;
+        if (projectData.brochures && projectData.brochures.length > 0 && projectData.brochures[0].src) {
+            console.log(`   📥 Processing brochure...`);
+            brochureUrl = await downloadAndUploadToS3(projectData.brochures[0].src, projectId, 'brochure');
         }
 
         // Extract unit types from floor plans
@@ -301,64 +418,109 @@ async function importProject(projectId: number): Promise<boolean | 'skipped'> {
         // Could be enhanced to parse from description or other fields
         const projectType: Type[] = [Type.Apartment];
 
-        // Create project
-        const project = await prisma.project.create({
-            data: {
-                title: projectData.title || `Project ${projectId}`,
-                description: projectData.description || '',
-                project_name: projectData.title || `Project ${projectId}`,
-                project_age: projectData.property_age ? String(projectData.property_age) : 'New',
-                address: projectData.address || '',
-                city: City.Dubai,
-                latitude: projectData.latitude || null,
-                longitude: projectData.longitude || null,
-                locality: projectData.district?.title || null,
-                currency: Currency.AED,
-                min_price: projectData.statistics?.total?.price_from || null,
-                max_price: projectData.statistics?.total?.price_to || null,
-                min_bedrooms: minBedrooms,
-                max_bedrooms: maxBedrooms,
-                min_bathrooms: null, // Not available in API
-                max_bathrooms: null,
-                furnished: Furnished.Unfurnished, // Default
-                min_sq_ft: projectData.statistics?.units 
-                    ? (() => {
-                        const areas = Object.values(projectData.statistics.units)
-                            .map((u: any) => u.area_from)
-                            .filter((a: any) => a != null && !isNaN(a));
-                        return areas.length > 0 ? Math.min(...areas) * 10.764 : null;
-                    })()
-                    : null,
-                max_sq_ft: projectData.statistics?.units
-                    ? (() => {
-                        const areas = Object.values(projectData.statistics.units)
-                            .map((u: any) => u.area_to)
-                            .filter((a: any) => a != null && !isNaN(a));
-                        return areas.length > 0 ? Math.max(...areas) * 10.764 : null;
-                    })()
-                    : null,
-                payment_plan: null, // Can be set based on payment structure
-                payment_structure: paymentStructure,
-                unit_types: unitTypes,
-                amenities: amenities,
-                handover_year: handoverYear,
-                image_urls: imageUrls,
-                brochure_url: projectData.brochures && projectData.brochures.length > 0 ? projectData.brochures[0].src : null,
-                category: category,
-                type: projectType,
-                developer_id: developerId,
-                floor_plans: floorPlansData ? {
-                    create: await processFloorPlans(floorPlansData),
-                } : undefined,
-            },
-            include: {
-                floor_plans: true,
-                developer: true,
-            },
-        });
+        // Calculate max_sq_ft from floor plans
+        const calculatedMaxSqFt = projectData.statistics?.units
+            ? (() => {
+                const areas = Object.values(projectData.statistics.units)
+                    .map((u: any) => u.area_to)
+                    .filter((a: any) => a != null && !isNaN(a));
+                return areas.length > 0 ? Math.max(...areas) * 10.764 : null;
+            })()
+            : null;
 
-        console.log(`✅ Project ${projectId}: Created successfully (${project.id})`);
-        console.log(`   - ${project.floor_plans.length} floor plans created`);
+        const projectDataToSave = {
+            title: projectData.title || `Project ${projectId}`,
+            description: projectData.description || '',
+            project_name: projectData.title || `Project ${projectId}`,
+            project_age: projectData.property_age ? String(projectData.property_age) : 'New',
+            address: projectData.address || '',
+            city: City.Dubai,
+            latitude: projectData.latitude || null,
+            longitude: projectData.longitude || null,
+            locality: projectData.district?.title || null,
+            currency: Currency.AED,
+            min_price: projectData.statistics?.total?.price_from || null,
+            max_price: projectData.statistics?.total?.price_to || null,
+            max_sq_ft: calculatedMaxSqFt,
+            min_bedrooms: minBedrooms,
+            max_bedrooms: maxBedrooms,
+            min_bathrooms: null, // Not available in API
+            max_bathrooms: null,
+            furnished: Furnished.Unfurnished, // Default
+            min_sq_ft: projectData.statistics?.units 
+                ? (() => {
+                    const areas = Object.values(projectData.statistics.units)
+                        .map((u: any) => u.area_from)
+                        .filter((a: any) => a != null && !isNaN(a));
+                    return areas.length > 0 ? Math.min(...areas) * 10.764 : null;
+                })()
+                : null,
+            payment_plan: null, // Can be set based on payment structure
+            payment_structure: paymentStructure,
+            unit_types: unitTypes,
+            amenities: amenities,
+            handover_year: handoverYear,
+            image_urls: imageUrls,
+            brochure_url: brochureUrl,
+            category: category,
+            type: projectType,
+        };
+
+        let project;
+        let floorPlansProcessed = await processFloorPlans(floorPlansData || {}, projectId);
+
+        if (existingProject) {
+            // Delete existing floor plans
+            await prisma.floorPlan.deleteMany({
+                where: { project_id: existingProject.id },
+            });
+
+            // Update existing project
+            project = await prisma.project.update({
+                where: { id: existingProject.id },
+                data: {
+                    ...projectDataToSave,
+                    developer: {
+                        connect: {
+                            id: developerId,
+                        },
+                    },
+                    floor_plans: floorPlansProcessed.length > 0 ? {
+                        create: floorPlansProcessed,
+                    } : undefined,
+                },
+                include: {
+                    floor_plans: true,
+                    developer: true,
+                },
+            });
+
+            console.log(`🔄 Project ${projectId}: Updated successfully (${project.id})`);
+            console.log(`   - ${project.floor_plans.length} floor plans created`);
+        } else {
+            // Create new project
+            project = await prisma.project.create({
+                data: {
+                    ...projectDataToSave,
+                    developer: {
+                        connect: {
+                            id: developerId,
+                        },
+                    },
+                    floor_plans: floorPlansProcessed.length > 0 ? {
+                        create: floorPlansProcessed,
+                    } : undefined,
+                },
+                include: {
+                    floor_plans: true,
+                    developer: true,
+                },
+            });
+
+            console.log(`✅ Project ${projectId}: Created successfully (${project.id})`);
+            console.log(`   - ${project.floor_plans.length} floor plans created`);
+        }
+
         return true;
     } catch (error: any) {
         console.error(`❌ Project ${projectId}: Error`, error.message);
@@ -367,14 +529,15 @@ async function importProject(projectId: number): Promise<boolean | 'skipped'> {
 }
 
 // Process floor plans from API response
-async function processFloorPlans(floorPlansData: any): Promise<any[]> {
+async function processFloorPlans(floorPlansData: any, projectId: number): Promise<any[]> {
     const floorPlans: any[] = [];
 
-    Object.entries(floorPlansData).forEach(([roomType, roomData]: [string, any]) => {
-        if (!roomData.items || !Array.isArray(roomData.items)) return;
+    for (const [roomType, roomData] of Object.entries(floorPlansData)) {
+        const typedRoomData = roomData as any;
+        if (!typedRoomData.items || !Array.isArray(typedRoomData.items)) continue;
 
-        roomData.items.forEach((item: any) => {
-            if (!item.layout) return;
+        for (const item of typedRoomData.items) {
+            if (!item.layout) continue;
 
             const bedrooms = ROOM_TYPE_TO_BEDROOMS[roomType] || null;
             const areaMin = item.area_min ? m2ToSqFt(item.area_min) : null;
@@ -382,17 +545,26 @@ async function processFloorPlans(floorPlansData: any): Promise<any[]> {
             // Use average if both available, otherwise use whichever is available
             const unitSize = areaMin && areaMax ? (areaMin + areaMax) / 2 : (areaMin || areaMax || null);
 
+            // Process floor plan images
+            let floorPlanImageUrls: string[] = [];
+            if (Array.isArray(item.layout.levels) && item.layout.levels.length > 0) {
+                const imageUrlsToProcess = item.layout.levels.filter((url: any) => url && typeof url === 'string');
+                if (imageUrlsToProcess.length > 0) {
+                    floorPlanImageUrls = await processImagesToS3(imageUrlsToProcess, projectId, 'floorplan');
+                }
+            }
+
             floorPlans.push({
                 title: item.layout.title || `${bedrooms || 'Unit'} Layout`,
-                image_urls: Array.isArray(item.layout.levels) ? item.layout.levels : [],
+                image_urls: floorPlanImageUrls,
                 min_price: item.price_min || null,
                 max_price: item.price_max || null,
                 unit_size: unitSize,
                 bedrooms: bedrooms,
                 bathrooms: null, // Not available in API
             });
-        });
-    });
+        }
+    }
 
     return floorPlans;
 }
@@ -408,17 +580,14 @@ async function importAlnairProjects() {
     console.log(`🚀 Starting import process...\n`);
 
     let successCount = 0;
-    let skippedCount = 0;
     let errorCount = 0;
 
     // Process each project with delay to avoid rate limiting
     for (let i = 0; i < projectIds.length; i++) {
         const projectId = projectIds[i];
-        const result = await importProject(projectId);
+        const success = await importProject(projectId);
         
-        if (result === 'skipped') {
-            skippedCount++;
-        } else if (result) {
+        if (success) {
             successCount++;
         } else {
             errorCount++;
@@ -431,7 +600,7 @@ async function importAlnairProjects() {
     }
 
     console.log(`\n✅ Import complete!`);
-    console.log(`📊 Success: ${successCount}, Skipped: ${skippedCount}, Errors: ${errorCount}`);
+    console.log(`📊 Success: ${successCount}, Errors: ${errorCount}`);
 }
 
 // Run the import

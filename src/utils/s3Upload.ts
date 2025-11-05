@@ -11,13 +11,25 @@ const s3Client = new S3Client({
 
 export async function uploadToS3(
     filePath: string,
-    fileName: string
+    fileName: string,
+    contentType?: string
 ): Promise<string> {
+    // Determine content type from file extension if not provided
+    let detectedContentType = contentType || 'image/jpeg';
+    if (!contentType) {
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        if (ext === 'png') detectedContentType = 'image/png';
+        else if (ext === 'gif') detectedContentType = 'image/gif';
+        else if (ext === 'webp') detectedContentType = 'image/webp';
+        else if (ext === 'pdf') detectedContentType = 'application/pdf';
+        else if (ext === 'jpg' || ext === 'jpeg') detectedContentType = 'image/jpeg';
+    }
+
     const params = {
         Bucket: config.s3BucketName,
         Key: fileName,
         Body: fs.readFileSync(filePath),
-        ContentType: 'image/jpeg',
+        ContentType: detectedContentType,
     };
     try {
         await s3Client.send(new PutObjectCommand(params));
