@@ -84,6 +84,9 @@ export const createProject = async (
         // Process files and upload to S3
         processedFiles = await processProjectFiles(files);
 
+        // Process files and upload to S3
+        processedFiles = await processProjectFiles(files);
+
         // Parse and structure project data
         const projectData = parseProjectBody(
             req.body,
@@ -198,6 +201,8 @@ export const updateProject = async (
         let files = req.files as Express.Multer.File[] | undefined;
         files = await retrieveAssembledChunkedFiles(files, req);
 
+        // Process files and upload to S3
+        processedFiles = await processProjectFiles(files);
         // Process files and upload to S3
         processedFiles = await processProjectFiles(files);
 

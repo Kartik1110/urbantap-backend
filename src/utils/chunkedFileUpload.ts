@@ -3,7 +3,6 @@ import path from 'path';
 import logger from './logger';
 import { Express } from 'express';
 
-const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
 const TEMP_DIR = path.join(process.cwd(), 'uploads', 'chunks');
 const ASSEMBLED_DIR = path.join(process.cwd(), 'uploads', 'assembled');
 
@@ -34,7 +33,6 @@ export async function processChunkedFile(
     chunkInfo: ChunkInfo
 ): Promise<string | null> {
     const { fileId, chunkIndex, totalChunks, fileName, mimeType } = chunkInfo;
-
     // Validate chunk info
     if (!fileId || chunkIndex === undefined || !totalChunks || !fileName) {
         throw new Error('Invalid chunk information');
@@ -51,7 +49,6 @@ export async function processChunkedFile(
     }
 
     const chunkPath = path.join(chunkDir, `chunk_${chunkIndex}`);
-
     // Read chunk data - multer may store on disk or in memory
     let chunkData: Buffer;
     if (chunk.buffer) {
@@ -60,7 +57,6 @@ export async function processChunkedFile(
     } else if (chunk.path) {
         // File is on disk, read it
         chunkData = fs.readFileSync(chunk.path);
-
         // Clean up multer's temporary file
         try {
             fs.unlinkSync(chunk.path);
@@ -101,7 +97,6 @@ async function assembleChunks(
 ): Promise<string> {
     const chunkDir = path.join(TEMP_DIR, fileId);
     const assembledDir = path.join(process.cwd(), 'uploads', 'assembled');
-
     if (!fs.existsSync(assembledDir)) {
         fs.mkdirSync(assembledDir, { recursive: true });
     }
