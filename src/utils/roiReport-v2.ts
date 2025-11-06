@@ -18,6 +18,7 @@ export const DEFAULT_ROI_PER_YEAR = 8;
 export const DEFAULT_ROI_INCREMENT_PER_YEAR = 1.1;
 export const DEFAULT_INCREASE_IN_SHORT_TERM_ROI = 3.99;
 export const DEFAULT_PROPERTY_APPRECIATION_PER_YEAR = 8;
+export const DEFAULT_BUY_AT_HANDOVER_INCREASE_IN_SHORT_TERM_ROI_MULTIPLIER = 1.4;
 
 /**
  * Calculates the average annual ROI percentage over a given number of years.
@@ -343,6 +344,18 @@ const DEFAULT_PROPERTY_DATA: PropertyDataPoint[] = [
     {
         appreciation_perc: 115.88, // 99.89 + (99.89 * 0.08) = 115.88
         roi: 18.86,
+    },
+    {
+        appreciation_perc: 133.09, // 115.88 + (115.88 * 0.08) = 133.09
+        roi: 21.05,
+    },
+    {
+        appreciation_perc: 147.09, // 133.09 + (133.09 * 0.08) = 147.09
+        roi: 23.16,
+    },
+    {
+        appreciation_perc: 161.09, // 147.09 + (147.09 * 0.08) = 161.09
+        roi: 25.37,
     },
 ];
 
@@ -979,6 +992,38 @@ export function getLongTermRoiPercentage(
         logger.error(`getLongTermRoiPercentage: ${(error as Error).message}`);
         logger.error(
             `getLongTermRoiPercentage: Returning ${DEFAULT_ROI_PER_YEAR}`
+        );
+
+        return DEFAULT_ROI_PER_YEAR;
+    }
+}
+
+/**
+ * Get the long term ROI percentage for properties bought at handover.
+ * Uses the 0th index ROI value from property data (first year data).
+ *
+ * @param propertyData - The property data from the JSON file
+ * @returns The long term ROI percentage for handover purchase
+ */
+export function getLongTermRoiPercentageAtHandover(
+    propertyData: PropertyDataPoint[]
+): number {
+    try {
+        if (!propertyData || !propertyData.length) {
+            const message = 'Property data not provided';
+            throw new Error(message);
+        }
+
+        // Use the 0th index ROI value (first year data)
+        const longTermRoi = propertyData[0].roi;
+
+        return longTermRoi;
+    } catch (error) {
+        logger.error(
+            `getLongTermRoiPercentageAtHandover: ${(error as Error).message}`
+        );
+        logger.error(
+            `getLongTermRoiPercentageAtHandover: Returning ${DEFAULT_ROI_PER_YEAR}`
         );
 
         return DEFAULT_ROI_PER_YEAR;

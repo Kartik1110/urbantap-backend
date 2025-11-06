@@ -6,7 +6,7 @@
 -- the enum.
 
 
-ALTER TYPE "Amenities" ADD VALUE 'fPrivate_Beach_Access';
+ALTER TYPE "Amenities" ADD VALUE 'Private_Beach_Access';
 ALTER TYPE "Amenities" ADD VALUE 'Restaurants_and_Cafes';
 ALTER TYPE "Amenities" ADD VALUE 'Co_working_Spaces';
 ALTER TYPE "Amenities" ADD VALUE 'Padel_Tennis_Court';

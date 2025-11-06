@@ -3,7 +3,6 @@ import path from 'path';
 import logger from './logger';
 import { Express } from 'express';
 
-const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
 const TEMP_DIR = path.join(process.cwd(), 'uploads', 'chunks');
 const ASSEMBLED_DIR = path.join(process.cwd(), 'uploads', 'assembled');
 
@@ -34,13 +33,14 @@ export async function processChunkedFile(
     chunkInfo: ChunkInfo
 ): Promise<string | null> {
     const { fileId, chunkIndex, totalChunks, fileName, mimeType } = chunkInfo;
-    
     // Validate chunk info
     if (!fileId || chunkIndex === undefined || !totalChunks || !fileName) {
         throw new Error('Invalid chunk information');
     }
 
-    logger.info(`Processing chunk ${chunkIndex + 1}/${totalChunks} for file: ${fileName}`);
+    logger.info(
+        `Processing chunk ${chunkIndex + 1}/${totalChunks} for file: ${fileName}`
+    );
 
     // Save chunk to temporary directory
     const chunkDir = path.join(TEMP_DIR, fileId);
@@ -49,7 +49,6 @@ export async function processChunkedFile(
     }
 
     const chunkPath = path.join(chunkDir, `chunk_${chunkIndex}`);
-    
     // Read chunk data - multer may store on disk or in memory
     let chunkData: Buffer;
     if (chunk.buffer) {
@@ -58,24 +57,26 @@ export async function processChunkedFile(
     } else if (chunk.path) {
         // File is on disk, read it
         chunkData = fs.readFileSync(chunk.path);
-        
         // Clean up multer's temporary file
         try {
             fs.unlinkSync(chunk.path);
             logger.info(`Cleaned up multer temp file: ${chunk.path}`);
         } catch (error) {
-            logger.error(`Error cleaning up multer temp file ${chunk.path}:`, error);
+            logger.error(
+                `Error cleaning up multer temp file ${chunk.path}:`,
+                error
+            );
         }
     } else {
         throw new Error('Chunk has neither buffer nor path');
     }
-    
+
     fs.writeFileSync(chunkPath, chunkData);
 
     // Check if all chunks are received
-    const receivedChunks = fs.readdirSync(chunkDir).filter(
-        f => f.startsWith('chunk_')
-    ).length;
+    const receivedChunks = fs
+        .readdirSync(chunkDir)
+        .filter((f) => f.startsWith('chunk_')).length;
 
     // If all chunks are received, assemble the file
     if (receivedChunks === totalChunks) {
@@ -96,7 +97,6 @@ async function assembleChunks(
 ): Promise<string> {
     const chunkDir = path.join(TEMP_DIR, fileId);
     const assembledDir = path.join(process.cwd(), 'uploads', 'assembled');
-    
     if (!fs.existsSync(assembledDir)) {
         fs.mkdirSync(assembledDir, { recursive: true });
     }
@@ -105,8 +105,9 @@ async function assembleChunks(
     const writeStream = fs.createWriteStream(assembledFilePath);
 
     // Get all chunk files sorted by index
-    const chunkFiles = fs.readdirSync(chunkDir)
-        .filter(f => f.startsWith('chunk_'))
+    const chunkFiles = fs
+        .readdirSync(chunkDir)
+        .filter((f) => f.startsWith('chunk_'))
         .sort((a, b) => {
             const indexA = parseInt(a.split('_')[1]);
             const indexB = parseInt(b.split('_')[1]);
@@ -170,4 +171,3 @@ export function getChunkInfo(req: any): ChunkInfo | null {
         mimeType: mimeType || 'application/octet-stream',
     };
 }
-

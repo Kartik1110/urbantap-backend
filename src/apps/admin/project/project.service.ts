@@ -1,13 +1,13 @@
-import prisma from '@/utils/prisma';
-import { AdminUserType, Prisma, Currency } from '@prisma/client';
-import { PermissionChecker } from '@/utils/permissions';
-import { geocodeAddress } from '@/utils/geocoding';
-import logger from '@/utils/logger';
-import { Express } from 'express';
-import { AuthenticatedRequest } from '@/utils/verifyToken';
-import { uploadToS3 } from '@/utils/s3Upload';
 import fs from 'fs';
 import path from 'path';
+import { Express } from 'express';
+import prisma from '@/utils/prisma';
+import logger from '@/utils/logger';
+import { uploadToS3 } from '@/utils/s3Upload';
+import { geocodeAddress } from '@/utils/geocoding';
+import { PermissionChecker } from '@/utils/permissions';
+import { AdminUserType, Prisma, Currency } from '@prisma/client';
+import { AuthenticatedRequest } from '@/utils/verifyToken';
 
 interface FloorPlanData {
     title: string;
@@ -42,8 +42,10 @@ async function findAndCreateFileFromChunk(
     fieldName: string
 ): Promise<Express.Multer.File | null> {
     try {
-        const existingFiles = fs.readdirSync(assembledDir).filter(f => f.startsWith(chunkId));
-        
+        const existingFiles = fs
+            .readdirSync(assembledDir)
+            .filter((f) => f.startsWith(chunkId));
+
         if (existingFiles.length === 0) {
             return null;
         }
@@ -51,16 +53,21 @@ async function findAndCreateFileFromChunk(
         const assembledPath = path.join(assembledDir, existingFiles[0]);
         const assembledBuffer = fs.readFileSync(assembledPath);
         const stats = fs.statSync(assembledPath);
-        
+
         // Extract original filename
         const parts = existingFiles[0].split('_');
         const originalName = parts.slice(1).join('_'); // Remove chunkId prefix
-        
+
         // Determine mime type
         const ext = originalName.split('.').pop()?.toLowerCase();
-        const mimeType = ext === 'pdf' ? 'application/pdf' : 
-                        ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
-                        ext === 'png' ? 'image/png' : 'application/octet-stream';
+        const mimeType =
+            ext === 'pdf'
+                ? 'application/pdf'
+                : ext === 'jpg' || ext === 'jpeg'
+                  ? 'image/jpeg'
+                  : ext === 'png'
+                    ? 'image/png'
+                    : 'application/octet-stream';
 
         const assembledFile: Express.Multer.File = {
             fieldname: fieldName,
@@ -77,7 +84,10 @@ async function findAndCreateFileFromChunk(
 
         return assembledFile;
     } catch (error) {
-        logger.error(`Error retrieving assembled file for chunk ID ${chunkId}:`, error);
+        logger.error(
+            `Error retrieving assembled file for chunk ID ${chunkId}:`,
+            error
+        );
         return null;
     }
 }
@@ -88,7 +98,7 @@ export async function retrieveAssembledChunkedFiles(
     req: AuthenticatedRequest
 ): Promise<Express.Multer.File[] | undefined> {
     const assembledDir = path.join(process.cwd(), 'uploads', 'assembled');
-    
+
     if (!fs.existsSync(assembledDir)) {
         return files;
     }
@@ -97,9 +107,13 @@ export async function retrieveAssembledChunkedFiles(
 
     // Check for brochure chunk fileId
     const brochureChunkId = req.body.file_url_chunk_id;
-    
+
     if (brochureChunkId) {
-        const brochureFile = await findAndCreateFileFromChunk(assembledDir, brochureChunkId, 'file_url');
+        const brochureFile = await findAndCreateFileFromChunk(
+            assembledDir,
+            brochureChunkId,
+            'file_url'
+        );
         if (brochureFile) {
             resultFiles.push(brochureFile);
         }
@@ -107,9 +121,13 @@ export async function retrieveAssembledChunkedFiles(
 
     // Check for inventory chunk fileId
     const inventoryChunkId = req.body.inventory_file_chunk_id;
-    
+
     if (inventoryChunkId) {
-        const inventoryFile = await findAndCreateFileFromChunk(assembledDir, inventoryChunkId, 'inventory_file');
+        const inventoryFile = await findAndCreateFileFromChunk(
+            assembledDir,
+            inventoryChunkId,
+            'inventory_file'
+        );
         if (inventoryFile) {
             resultFiles.push(inventoryFile);
         }
@@ -137,10 +155,15 @@ export async function processProjectFiles(
 
     // Store assembled file paths for cleanup after S3 upload
     // Also track multer temp files (files NOT in assembled folder)
-    files.forEach(file => {
+    files.forEach((file) => {
         if (file.path && file.path.includes('assembled')) {
             result.assembledFilePaths.push(file.path);
-        } else if (file.path && file.path.includes('uploads') && !file.path.includes('assembled') && !file.path.includes('chunks')) {
+        } else if (
+            file.path &&
+            file.path.includes('uploads') &&
+            !file.path.includes('assembled') &&
+            !file.path.includes('chunks')
+        ) {
             // This is a multer temp file
             result.multerTempFilePaths.push(file.path);
         }
@@ -178,7 +201,9 @@ export async function processProjectFiles(
 
     // Upload inventory file
     if (organizedFiles.inventory_file?.[0]) {
-        const ext = organizedFiles.inventory_file[0].originalname.split('.').pop();
+        const ext = organizedFiles.inventory_file[0].originalname
+            .split('.')
+            .pop();
         const url = await uploadToS3(
             organizedFiles.inventory_file[0].path,
             `projects/inventory/${Date.now()}_inventory.${ext}`
@@ -211,7 +236,7 @@ export function cleanupTemporaryFiles(filePaths: string[]): void {
         return;
     }
 
-    filePaths.forEach(filePath => {
+    filePaths.forEach((filePath) => {
         try {
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
@@ -374,16 +399,16 @@ export function parseUpdateProjectBody(
         ...(amenities && { amenities: JSON.parse(amenities) }),
         ...(handover_year && { handover_year: parseInt(handover_year) }),
         ...(payment_structure && {
-            payment_structure: JSON.stringify(
-                JSON.parse(payment_structure)
-            ),
+            payment_structure: JSON.stringify(JSON.parse(payment_structure)),
         }),
         ...(latitude && { latitude: parseFloat(latitude) }),
         ...(longitude && { longitude: parseFloat(longitude) }),
         ...(min_bedrooms && { min_bedrooms }),
         ...(max_bedrooms && { max_bedrooms }),
         ...(finalImageUrls.length > 0 && { image_urls: finalImageUrls }),
-        ...(processedFiles.brochureUrl && { brochure_url: processedFiles.brochureUrl }),
+        ...(processedFiles.brochureUrl && {
+            brochure_url: processedFiles.brochureUrl,
+        }),
         floor_plans: floorPlansData,
         inventory_files: processedFiles.inventoryFiles,
     };
@@ -428,7 +453,7 @@ export const createProjectService = async (data: ProjectCreateData) => {
     // Add locality information if address is provided
     let enrichedProjectData = { ...projectData };
     if (projectData.address) {
-        const rawAddress = `${projectData.address}, Dubai`;
+        const rawAddress = `${projectData.address}, ${projectData.city}`;
         const geocodeResult = await geocodeAddress(rawAddress);
 
         if (geocodeResult) {
@@ -558,7 +583,7 @@ export const updateProjectService = async (
     // Add locality information if address is provided and being updated
     let enrichedProjectData = { ...projectData };
     if (projectData.address) {
-        const rawAddress = `${projectData.address}, Dubai`;
+        const rawAddress = `${projectData.address}, ${projectData.city}`;
         const geocodeResult = await geocodeAddress(rawAddress);
 
         if (geocodeResult) {

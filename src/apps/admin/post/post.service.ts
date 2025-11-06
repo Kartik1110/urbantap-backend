@@ -2,7 +2,7 @@ import prisma from '@/utils/prisma';
 import { PermissionChecker } from '@/utils/permissions';
 import { PostPosition, OrderType } from '@prisma/client';
 import { CREDIT_CONFIG } from '@/config/credit.config';
-import { deductCreditsAndCreateOrder } from '@/services/credit.service';
+import { deductCreditsAndCreateOrder } from '@/common/services/credit.service';
 
 /**
  * Get company posts with RBAC filtering

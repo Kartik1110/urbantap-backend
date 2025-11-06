@@ -1,8 +1,8 @@
-import prisma from '../../../utils/prisma';
+import prisma from '@/utils/prisma';
 import { Job, OrderType } from '@prisma/client';
-import { CREDIT_CONFIG } from '../../../config/credit.config';
-import { PermissionChecker } from '../../../utils/permissions';
-import { deductCreditsAndCreateOrder } from '../../../services/credit.service';
+import { CREDIT_CONFIG } from '@/config/credit.config';
+import { PermissionChecker } from '@/utils/permissions';
+import { deductCreditsAndCreateOrder } from '@/common/services/credit.service';
 
 // Create sponsored job with credit deduction
 export const createSponsoredJobService = async (

@@ -1,9 +1,33 @@
-import { PrismaClient, Role, CompanyType, BrokerType, Speciality, Category, Type, Bedrooms, Bathrooms, Furnished, Payment_Plan, City, Rental_frequency, Admin_Status, Type_of_use, DealType, CurrentStatus, Views, Market, Sale_Type, Quarter, WorkplaceType, JobType, Currency, NotificationType } from '@prisma/client';
+import {
+    Role,
+    CompanyType,
+    BrokerType,
+    Speciality,
+    Category,
+    Type,
+    Bedrooms,
+    Bathrooms,
+    Furnished,
+    Payment_Plan,
+    City,
+    Rental_frequency,
+    Admin_Status,
+    Type_of_use,
+    DealType,
+    CurrentStatus,
+    Views,
+    Market,
+    Sale_Type,
+    Quarter,
+    WorkplaceType,
+    JobType,
+    Currency,
+    NotificationType,
+} from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
-
-const prisma = new PrismaClient();
+import prisma from '@/utils/prisma';
 
 // Load images and logos from files
 const listingsImages = JSON.parse(
@@ -128,7 +152,13 @@ async function main() {
                     BrokerType.Both,
                 ]),
                 specialities: faker.helpers.arrayElements(
-                    [Speciality.Villa, Speciality.Apartment, Speciality.Townhouse, Speciality.Office, Speciality.Shop],
+                    [
+                        Speciality.Villa,
+                        Speciality.Apartment,
+                        Speciality.Townhouse,
+                        Speciality.Office,
+                        Speciality.Shop,
+                    ],
                     2
                 ),
             },
@@ -149,7 +179,10 @@ async function main() {
                     title: faker.company.catchPhrase(),
                     description: faker.lorem.paragraph(),
                     image_urls: projectImages,
-                    min_price: faker.number.float({ min: 100000, max: 5000000 }),
+                    min_price: faker.number.float({
+                        min: 100000,
+                        max: 5000000,
+                    }),
                     address: faker.location.streetAddress(),
                     city: City.Dubai,
                     brochure_url: faker.internet.url(),
@@ -240,7 +273,13 @@ async function main() {
                     BrokerType.Both,
                 ]),
                 specialities: faker.helpers.arrayElements(
-                    [Speciality.Villa, Speciality.Apartment, Speciality.Townhouse, Speciality.Office, Speciality.Shop],
+                    [
+                        Speciality.Villa,
+                        Speciality.Apartment,
+                        Speciality.Townhouse,
+                        Speciality.Office,
+                        Speciality.Shop,
+                    ],
                     2
                 ),
             },
@@ -302,7 +341,10 @@ async function main() {
                     Bedrooms.One,
                     Bedrooms.Two,
                 ]),
-                no_of_bathrooms: faker.helpers.arrayElement([Bathrooms.One, Bathrooms.Two]),
+                no_of_bathrooms: faker.helpers.arrayElement([
+                    Bathrooms.One,
+                    Bathrooms.Two,
+                ]),
                 broker_id: broker.id,
                 amenities: faker.helpers.arrayElements(
                     ['Pool', 'Gym', 'Parking'],
@@ -319,7 +361,10 @@ async function main() {
                     Payment_Plan.Payment_done,
                     Payment_Plan.Payment_Pending,
                 ]),
-                sale_type: faker.helpers.arrayElement([Sale_Type.Direct, Sale_Type.Resale]),
+                sale_type: faker.helpers.arrayElement([
+                    Sale_Type.Direct,
+                    Sale_Type.Resale,
+                ]),
                 admin_status: Admin_Status.Approved,
                 handover_year: faker.number.int({ min: 2024, max: 2030 }),
                 handover_quarter: faker.helpers.arrayElement([
@@ -333,13 +378,25 @@ async function main() {
                     Type_of_use.Commercial,
                     Type_of_use.Mixed,
                 ]),
-                deal_type: faker.helpers.arrayElement([DealType.Rental, DealType.Selling]),
+                deal_type: faker.helpers.arrayElement([
+                    DealType.Rental,
+                    DealType.Selling,
+                ]),
                 current_status: faker.helpers.arrayElement([
                     CurrentStatus.Occupied,
                     CurrentStatus.Vacant,
                 ]),
-                views: [faker.helpers.arrayElement([Views.Sea, Views.City, Views.Lagoon])] as any,
-                market: faker.helpers.arrayElement([Market.Primary, Market.Secondary]),
+                views: [
+                    faker.helpers.arrayElement([
+                        Views.Sea,
+                        Views.City,
+                        Views.Lagoon,
+                    ]),
+                ] as any,
+                market: faker.helpers.arrayElement([
+                    Market.Primary,
+                    Market.Secondary,
+                ]),
                 brokerage_id: broker.brokerageId ?? undefined,
             },
         });
