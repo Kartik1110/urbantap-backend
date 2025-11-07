@@ -22,7 +22,7 @@
     "rbac-seed": "ts-node -r tsconfig-paths/register src/scripts/rbac-demo-seed.ts",
     "populate-localities": "ts-node -r tsconfig-paths/register src/scripts/populate-listings-locality.ts",
     "script:project-locality": "ts-node -r tsconfig-paths/register src/scripts/update-projects-locality-187.ts",
-    "script:project-external": "ts-node -r tsconfig-paths/register src/scripts/import-external-project.ts"
+    "script:project-external": "ts-node -r tsconfig-paths/register src/scripts/import-external-projects.ts"
   },
   "keywords": [],
   "author": "",
