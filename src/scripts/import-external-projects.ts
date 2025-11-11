@@ -133,7 +133,9 @@ function extractYear(dateString: string | null): number | null {
 // Map amenities from project description/facilities to Amenities enum
 function mapAmenities(projectData: any): Amenities[] {
     const amenities: Amenities[] = [];
-    const description = (projectData.description || '').toLowerCase();
+    const description = (projectData.description || '')
+        .replace(/<[^>]*>/g, '')
+        .toLowerCase();
 
     // Check description for amenities
     if (description.includes('pool') || description.includes('swimming'))
@@ -515,7 +517,10 @@ async function importProject(projectId: number): Promise<boolean> {
 
         const projectDataToSave = {
             title: projectData.title,
-            description: projectData.description || '',
+            description: (projectData.description || '').replace(
+                /<[^>]*>/g,
+                ''
+            ),
             project_name: projectData.title,
             project_age: projectData.property_age
                 ? String(projectData.property_age)
