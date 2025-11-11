@@ -659,9 +659,6 @@ export const getFeaturedListingsService = async (
     const now = new Date();
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
-    // Log the filters being applied
-    logger.info(`Featured listings filters: ${JSON.stringify(filters)}`);
-
     // Clean up old views
     await prisma.listingView.updateMany({
         where: {
@@ -679,6 +676,12 @@ export const getFeaturedListingsService = async (
     const whereCondition = {
         AND: [
             { admin_status: Admin_Status.Approved },
+            // only listings with images
+            {
+                image_urls: {
+                    isEmpty: false,
+                },
+            },
             {
                 listing_views: {
                     some: {

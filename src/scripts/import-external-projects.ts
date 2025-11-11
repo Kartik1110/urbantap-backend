@@ -299,11 +299,15 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
 // Fetch project details
 async function fetchProjectDetails(projectId: number): Promise<any> {
     try {
-        const response = await fetch(`${BASE_URL}/project/look/${projectId}`, {
-            headers: {
-                'X-AUTH-TOKEN': AUTH_TOKEN,
-            },
-        });
+        const response = await fetch(
+            `https://api.alnair.ae/project/look/${projectId}`,
+            {
+                headers: {
+                    'X-AUTH-TOKEN': AUTH_TOKEN,
+                    'Accept-Language': 'en-US,en;q=0.9',
+                },
+            }
+        );
 
         if (!response.ok) {
             console.error(`❌ Project ${projectId}: HTTP ${response.status}`);
@@ -510,9 +514,9 @@ async function importProject(projectId: number): Promise<boolean> {
             : null;
 
         const projectDataToSave = {
-            title: projectData.title || `Project ${projectId}`,
+            title: projectData.title,
             description: projectData.description || '',
-            project_name: projectData.title || `Project ${projectId}`,
+            project_name: projectData.title,
             project_age: projectData.property_age
                 ? String(projectData.property_age)
                 : '1',
