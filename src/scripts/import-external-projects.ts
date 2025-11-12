@@ -479,6 +479,28 @@ async function importProject(projectId: number): Promise<boolean> {
                 ? bedroomTypes[bedroomTypes.length - 1]
                 : null;
 
+        // Extract unit types from processed floor plans
+        const unitTypes: string[] = [];
+        floorPlansProcessed.forEach((fp) => {
+            if (fp.bedrooms) {
+                const name =
+                    fp.bedrooms === Bedrooms.Studio
+                        ? 'Studio'
+                        : fp.bedrooms === Bedrooms.One
+                          ? '1 Bedroom'
+                          : fp.bedrooms === Bedrooms.Two
+                            ? '2 Bedroom'
+                            : fp.bedrooms === Bedrooms.Three
+                              ? '3 Bedroom'
+                              : fp.bedrooms === Bedrooms.Four
+                                ? '4 Bedroom'
+                                : `${fp.bedrooms} Bedroom`;
+                if (!unitTypes.includes(name)) {
+                    unitTypes.push(name);
+                }
+            }
+        });
+
         // Extract handover year
         const handoverYear = extractYear(
             projectData.planned_at || projectData.predicted_completion_at
@@ -561,6 +583,7 @@ async function importProject(projectId: number): Promise<boolean> {
             type: projectType,
         };
 
+        let project;
         if (existingProject) {
             // Delete existing floor plans
             await prisma.floorPlan.deleteMany({
