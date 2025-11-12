@@ -427,51 +427,52 @@ async function importProject(projectId: number): Promise<boolean> {
             );
         }
 
-        // Extract unit types from floor plans
-        const unitTypes: string[] = [];
-        if (floorPlansData) {
-            Object.keys(floorPlansData).forEach((roomType) => {
-                const bedroomType = ROOM_TYPE_TO_BEDROOMS[roomType];
-                if (bedroomType) {
-                    const name =
-                        bedroomType === Bedrooms.Studio
-                            ? 'Studio'
-                            : bedroomType === Bedrooms.One
-                              ? '1 Bedroom'
-                              : bedroomType === Bedrooms.Two
-                                ? '2 Bedroom'
-                                : bedroomType === Bedrooms.Three
-                                  ? '3 Bedroom'
-                                  : bedroomType === Bedrooms.Four
-                                    ? '4 Bedroom'
-                                    : `${bedroomType} Bedroom`;
-                    if (!unitTypes.includes(name)) {
-                        unitTypes.push(name);
-                    }
-                }
+        // Process floor plans first to get actual bedrooms
+        let floorPlansProcessed = await processFloorPlans(
+            floorPlansData || {},
+            projectId
+        );
+
+        // Determine min/max bedrooms from actual processed floor plans
+        let bedroomTypes = floorPlansProcessed
+            .map((fp) => fp.bedrooms)
+            .filter((bedroom): bedroom is Bedrooms => bedroom !== null)
+            .sort((a, b) => {
+                const order = [
+                    Bedrooms.Studio,
+                    Bedrooms.One,
+                    Bedrooms.Two,
+                    Bedrooms.Three,
+                    Bedrooms.Four,
+                    Bedrooms.Four_Plus,
+                    Bedrooms.Five,
+                    Bedrooms.Six,
+                    Bedrooms.Seven,
+                ];
+                return order.indexOf(a) - order.indexOf(b);
             });
+
+        // Fallback to raw floorPlansData if no bedrooms found in processed floor plans
+        if (bedroomTypes.length === 0 && floorPlansData) {
+            bedroomTypes = Object.keys(floorPlansData)
+                .map((rt) => ROOM_TYPE_TO_BEDROOMS[rt])
+                .filter(Boolean)
+                .sort((a, b) => {
+                    const order = [
+                        Bedrooms.Studio,
+                        Bedrooms.One,
+                        Bedrooms.Two,
+                        Bedrooms.Three,
+                        Bedrooms.Four,
+                        Bedrooms.Four_Plus,
+                        Bedrooms.Five,
+                        Bedrooms.Six,
+                        Bedrooms.Seven,
+                    ];
+                    return order.indexOf(a) - order.indexOf(b);
+                });
         }
 
-        // Determine min/max bedrooms
-        const bedroomTypes = floorPlansData
-            ? Object.keys(floorPlansData)
-                  .map((rt) => ROOM_TYPE_TO_BEDROOMS[rt])
-                  .filter(Boolean)
-                  .sort((a, b) => {
-                      const order = [
-                          Bedrooms.Studio,
-                          Bedrooms.One,
-                          Bedrooms.Two,
-                          Bedrooms.Three,
-                          Bedrooms.Four,
-                          Bedrooms.Four_Plus,
-                          Bedrooms.Five,
-                          Bedrooms.Six,
-                          Bedrooms.Seven,
-                      ];
-                      return order.indexOf(a) - order.indexOf(b);
-                  })
-            : [];
         const minBedrooms = bedroomTypes.length > 0 ? bedroomTypes[0] : null;
         const maxBedrooms =
             bedroomTypes.length > 0
@@ -559,12 +560,6 @@ async function importProject(projectId: number): Promise<boolean> {
             category: category,
             type: projectType,
         };
-
-        let project;
-        let floorPlansProcessed = await processFloorPlans(
-            floorPlansData || {},
-            projectId
-        );
 
         if (existingProject) {
             // Delete existing floor plans
