@@ -364,6 +364,7 @@ model Developer {
 
 model Project {
   id              String       @id @default(uuid())
+  external_id     String?
   title           String
   description     String
   image_urls      String[] // gallery images

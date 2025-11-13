@@ -279,10 +279,11 @@ export const getProjectByIdService = async (id: string) => {
                     stage: stage.stage,
                     label: stage.label,
                     percentage: parseInt(stage.percentage.toString()),
-                    price:
+                    price: Math.round(
                         (parseInt(stage.percentage.toString()) *
                             Number(project.min_price)) /
-                        100,
+                            100
+                    ),
                 }));
         } catch (error) {
             console.error('Error parsing payment_plan2:', error);
@@ -388,7 +389,7 @@ export const getProjectByIdService = async (id: string) => {
         currency: project.currency,
         min_price: project.min_price,
         max_price: project.max_price,
-        dld_price: 0.04 * Number(project.min_price),
+        dld_price: Math.round(0.04 * Number(project.min_price)),
         address: project.address,
         city: project.city,
         brochure_url: project.brochure_url,
@@ -491,10 +492,11 @@ export const getProjectByNameService = async (name: string) => {
                     stage: stage.stage,
                     label: stage.label,
                     percentage: parseInt(stage.percentage.toString()),
-                    price:
+                    price: Math.round(
                         (parseInt(stage.percentage.toString()) *
                             Number(project.min_price)) /
-                        100,
+                            100
+                    ),
                 }));
         } catch (error) {
             console.error('Error parsing payment_plan2:', error);
@@ -600,7 +602,7 @@ export const getProjectByNameService = async (name: string) => {
         currency: project.currency,
         min_price: project.min_price,
         max_price: project.max_price,
-        dld_price: 0.04 * Number(project.min_price),
+        dld_price: Math.round(0.04 * Number(project.min_price)),
         address: project.address,
         city: project.city,
         brochure_url: project.brochure_url,
@@ -1882,10 +1884,11 @@ export const getProjectAIReportServiceV2 = async (
                     stage: stage.stage,
                     label: stage.label,
                     percentage: parseInt(stage.percentage.toString()),
-                    price:
+                    price: Math.round(
                         (parseInt(stage.percentage.toString()) *
                             Number(project.min_price)) /
-                        100,
+                            100
+                    ),
                 }));
         } catch (error) {
             logger.error('Error parsing payment_plan2:', error);
@@ -1898,7 +1901,7 @@ export const getProjectAIReportServiceV2 = async (
             title: project.title,
             images: project.image_urls,
             price: Math.round(min_price),
-            dld_price: 0.04 * Number(project.min_price),
+            dld_price: Math.round(0.04 * Number(project.min_price)),
             description: project.description,
             locality: locality,
             price_after_handover: Math.round(listingPriceAtHandover),

@@ -2,11 +2,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import prisma from '@/utils/prisma';
-import { City, Bedrooms, Category, Furnished, Currency, Amenities, Type } from '@prisma/client';
+import {
+    City,
+    Bedrooms,
+    Category,
+    Furnished,
+    Currency,
+    Amenities,
+    Type,
+} from '@prisma/client';
 import { CompanyType } from '@prisma/client';
 import { uploadToS3 } from '@/utils/s3Upload';
+import { EXTERNAL_PROJECT_IDS } from '@/data/external-project-ids';
 
-const AUTH_TOKEN = '1958398e8c4118367eb18a9f85c3761c78005d9e6bfd5ee687746f8bad898775';
+const AUTH_TOKEN =
+    '1958398e8c4118367eb18a9f85c3761c78005d9e6bfd5ee687746f8bad898775';
 const BASE_URL = 'https://api.alnair.ae';
 
 // Room type to Bedrooms enum mapping
@@ -28,7 +38,12 @@ function m2ToSqFt(m2: number): number {
 }
 
 // Download image from URL and upload to S3
-async function downloadAndUploadToS3(imageUrl: string, projectId: number, imageType: 'cover' | 'logo' | 'gallery' | 'floorplan' | 'brochure', index?: number): Promise<string | null> {
+async function downloadAndUploadToS3(
+    imageUrl: string,
+    projectId: number,
+    imageType: 'cover' | 'logo' | 'gallery' | 'floorplan' | 'brochure',
+    index?: number
+): Promise<string | null> {
     try {
         if (!imageUrl) return null;
 
@@ -40,8 +55,9 @@ async function downloadAndUploadToS3(imageUrl: string, projectId: number, imageT
         }
 
         const buffer = await response.arrayBuffer();
-        const contentType = response.headers.get('content-type') || 'image/jpeg';
-        
+        const contentType =
+            response.headers.get('content-type') || 'image/jpeg';
+
         // Determine file extension from content type or URL
         let ext = 'jpg';
         if (contentType.includes('png')) ext = 'png';
@@ -57,19 +73,22 @@ async function downloadAndUploadToS3(imageUrl: string, projectId: number, imageT
         // Create unique filename
         const timestamp = Date.now();
         const randomStr = crypto.randomBytes(4).toString('hex');
-        const fileName = `Al_nair/projects/${projectId}/${imageType}${index !== undefined ? `_${index}` : ''}_${timestamp}_${randomStr}.${ext}`;
+        const fileName = `external/projects/${projectId}/${imageType}${index !== undefined ? `_${index}` : ''}_${timestamp}_${randomStr}.${ext}`;
 
         // Save to temp file
         const tempDir = path.join(__dirname, '../../uploads/temp');
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
-        const tempFilePath = path.join(tempDir, `${timestamp}_${randomStr}.${ext}`);
+        const tempFilePath = path.join(
+            tempDir,
+            `${timestamp}_${randomStr}.${ext}`
+        );
         fs.writeFileSync(tempFilePath, Buffer.from(buffer));
 
         // Upload to S3
         const s3Url = await uploadToS3(tempFilePath, fileName, contentType);
-        
+
         return s3Url;
     } catch (error) {
         console.error(`❌ Error processing image ${imageUrl}:`, error);
@@ -78,11 +97,20 @@ async function downloadAndUploadToS3(imageUrl: string, projectId: number, imageT
 }
 
 // Process array of image URLs and upload to S3
-async function processImagesToS3(imageUrls: string[], projectId: number, imageType: 'cover' | 'logo' | 'gallery' | 'floorplan' | 'brochure'): Promise<string[]> {
+async function processImagesToS3(
+    imageUrls: string[],
+    projectId: number,
+    imageType: 'cover' | 'logo' | 'gallery' | 'floorplan' | 'brochure'
+): Promise<string[]> {
     const s3Urls: string[] = [];
-    
+
     for (let i = 0; i < imageUrls.length; i++) {
-        const s3Url = await downloadAndUploadToS3(imageUrls[i], projectId, imageType, i);
+        const s3Url = await downloadAndUploadToS3(
+            imageUrls[i],
+            projectId,
+            imageType,
+            i
+        );
         if (s3Url) {
             s3Urls.push(s3Url);
         }
@@ -91,7 +119,7 @@ async function processImagesToS3(imageUrls: string[], projectId: number, imageTy
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
     }
-    
+
     return s3Urls;
 }
 
@@ -105,24 +133,33 @@ function extractYear(dateString: string | null): number | null {
 // Map amenities from project description/facilities to Amenities enum
 function mapAmenities(projectData: any): Amenities[] {
     const amenities: Amenities[] = [];
-    const description = (projectData.description || '').toLowerCase();
-    const facilities = projectData.catalogs?.project_facilities || [];
+    const description = (projectData.description || '')
+        .replace(/<[^>]*>/g, '')
+        .toLowerCase();
 
     // Check description for amenities
-    if (description.includes('pool') || description.includes('swimming')) amenities.push(Amenities.Swimming_Pool);
-    if (description.includes('gym') || description.includes('fitness')) amenities.push(Amenities.Gym);
+    if (description.includes('pool') || description.includes('swimming'))
+        amenities.push(Amenities.Swimming_Pool);
+    if (description.includes('gym') || description.includes('fitness'))
+        amenities.push(Amenities.Gym);
     if (description.includes('parking')) amenities.push(Amenities.Parking);
     if (description.includes('security')) amenities.push(Amenities.Security);
     if (description.includes('balcony')) amenities.push(Amenities.Balcony);
     if (description.includes('garden')) amenities.push(Amenities.Garden);
     if (description.includes('spa')) amenities.push(Amenities.Spa);
-    if (description.includes('restaurant') || description.includes('cafe')) amenities.push(Amenities.Restaurants_and_Cafes);
-    if (description.includes('co-working') || description.includes('coworking')) amenities.push(Amenities.Co_working_Spaces);
-    if (description.includes('padel') || description.includes('tennis')) amenities.push(Amenities.Padel_Tennis_Court);
+    if (description.includes('restaurant') || description.includes('cafe'))
+        amenities.push(Amenities.Restaurants_and_Cafes);
+    if (description.includes('co-working') || description.includes('coworking'))
+        amenities.push(Amenities.Co_working_Spaces);
+    if (description.includes('padel') || description.includes('tennis'))
+        amenities.push(Amenities.Padel_Tennis_Court);
     if (description.includes('golf')) amenities.push(Amenities.Golf);
-    if (description.includes('basketball')) amenities.push(Amenities.Basketball_Court);
-    if (description.includes('jogging') || description.includes('running')) amenities.push(Amenities.Walking_and_Jogging_Tracks);
-    if (description.includes('cinema')) amenities.push(Amenities.Open_Air_Cinema);
+    if (description.includes('basketball'))
+        amenities.push(Amenities.Basketball_Court);
+    if (description.includes('jogging') || description.includes('running'))
+        amenities.push(Amenities.Walking_and_Jogging_Tracks);
+    if (description.includes('cinema'))
+        amenities.push(Amenities.Open_Air_Cinema);
     if (description.includes('gaming')) amenities.push(Amenities.Gaming_Area);
 
     return Array.from(new Set(amenities)); // Remove duplicates
@@ -131,59 +168,73 @@ function mapAmenities(projectData: any): Amenities[] {
 // Format payment plan structure
 function formatPaymentStructure(paymentPlans: any[]): string | null {
     if (!paymentPlans || paymentPlans.length === 0) return null;
-    
+
     const plan = paymentPlans[0];
     const info = plan.info || {};
-    
+
     // Map to the required format: one, two, three, four
     // one = on_booking, two = on_construction, three = on_handover, four = post_handover
     const structure: any = {
-        one: info.on_booking_percent ? String(info.on_booking_percent) : "0",
-        two: info.on_construction_percent ? String(info.on_construction_percent) : "0",
-        three: info.on_handover_percent ? String(info.on_handover_percent) : "0",
+        one: info.on_booking_percent ? String(info.on_booking_percent) : '0',
+        two: info.on_construction_percent
+            ? String(info.on_construction_percent)
+            : '0',
+        three: info.on_handover_percent
+            ? String(info.on_handover_percent)
+            : '0',
         four: info.post_handover_percent || 0, // Keep as number if 0, otherwise convert
     };
-    
+
     // If four is 0, keep it as number; otherwise convert to string for consistency
     if (structure.four !== 0) {
         structure.four = String(structure.four);
     }
-    
+
     return JSON.stringify(structure);
 }
 
 // Find or create developer
 async function findOrCreateDeveloper(builder: any): Promise<string> {
     const companyName = builder?.title || 'Unknown Developer';
-    
+
     // Process logo if available
     let logoUrl: string | null = null;
     let coverImageUrl: string | null = null;
     if (builder?.logo?.src) {
         // Upload logo to S3 under developers folder
-        const logoFileName = `Al_nair/developers/${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_logo_${Date.now()}.jpg`;
+        const logoFileName = `external/developers/${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_logo_${Date.now()}.jpg`;
         const tempDir = path.join(__dirname, '../../uploads/temp');
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
-        
+
         try {
             const response = await fetch(builder.logo.src);
             if (response.ok) {
                 const buffer = await response.arrayBuffer();
-                const contentType = response.headers.get('content-type') || 'image/jpeg';
+                const contentType =
+                    response.headers.get('content-type') || 'image/jpeg';
                 const ext = contentType.includes('png') ? 'png' : 'jpg';
-                const tempFilePath = path.join(tempDir, `logo_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.${ext}`);
+                const tempFilePath = path.join(
+                    tempDir,
+                    `logo_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.${ext}`
+                );
                 fs.writeFileSync(tempFilePath, Buffer.from(buffer));
-                
-                logoUrl = await uploadToS3(tempFilePath, logoFileName.replace('.jpg', `.${ext}`), contentType);
+
+                logoUrl = await uploadToS3(
+                    tempFilePath,
+                    logoFileName.replace('.jpg', `.${ext}`),
+                    contentType
+                );
                 coverImageUrl = logoUrl;
             }
         } catch (error) {
-            console.warn(`⚠️  Failed to download developer logo: ${builder.logo.src}`);
+            console.warn(
+                `⚠️  Failed to download developer logo: ${builder.logo.src}`
+            );
         }
     }
-    
+
     // Find existing company
     let company = await prisma.company.findFirst({
         where: {
@@ -196,7 +247,15 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
     });
 
     if (!company) {
-        // Create new company
+        // Create developer first
+        const developer = await prisma.developer.create({
+            data: {
+                company_id: '', // Temporary placeholder
+                cover_image: coverImageUrl,
+            },
+        });
+
+        // Create company and connect to developer
         company = await prisma.company.create({
             data: {
                 name: companyName,
@@ -206,25 +265,17 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
                 website: builder?.website || null,
                 phone: builder?.phone ? String(builder.phone) : null,
                 address: builder?.address || null,
+                developer: {
+                    connect: { id: developer.id },
+                },
             },
         });
 
-        // Create developer
-        const developer = await prisma.developer.create({
-            data: {
-                company_id: company.id,
-                cover_image: coverImageUrl,
-            },
+        // Update developer with correct company_id
+        await prisma.developer.update({
+            where: { id: developer.id },
+            data: { company_id: company.id },
         });
-
-        // Link company to developer
-        await prisma.company.update({
-            where: { id: company.id },
-            data: { developerId: developer.id },
-        });
-
-        console.log(`      Created developer: ${companyName} (ID: ${developer.id})`);
-        return developer.id;
     }
 
     // Update company logo if we have a new one and it doesn't have one
@@ -236,31 +287,12 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
     }
 
     // Find or create developer for existing company
-    let developer = await prisma.developer.findFirst({
+    const developer = await prisma.developer.findFirst({
         where: { company_id: company.id },
     });
 
     if (!developer) {
-        developer = await prisma.developer.create({
-            data: {
-                company_id: company.id,
-                cover_image: coverImageUrl,
-            },
-        });
-
-        // Link company to developer
-        await prisma.company.update({
-            where: { id: company.id },
-            data: { developerId: developer.id },
-        });
-
-        console.log(`      Created developer for existing company: ${companyName} (ID: ${developer.id})`);
-    } else if (coverImageUrl && !developer.cover_image) {
-        // Update developer cover image if we have a new one
-        await prisma.developer.update({
-            where: { id: developer.id },
-            data: { cover_image: coverImageUrl },
-        });
+        return 'Developer not found';
     }
 
     return developer.id;
@@ -269,11 +301,15 @@ async function findOrCreateDeveloper(builder: any): Promise<string> {
 // Fetch project details
 async function fetchProjectDetails(projectId: number): Promise<any> {
     try {
-        const response = await fetch(`${BASE_URL}/project/look/${projectId}`, {
-            headers: {
-                'X-AUTH-TOKEN': AUTH_TOKEN,
-            },
-        });
+        const response = await fetch(
+            `https://api.alnair.ae/project/look/${projectId}`,
+            {
+                headers: {
+                    'X-AUTH-TOKEN': AUTH_TOKEN,
+                    'Accept-Language': 'en-US,en;q=0.9',
+                },
+            }
+        );
 
         if (!response.ok) {
             console.error(`❌ Project ${projectId}: HTTP ${response.status}`);
@@ -290,16 +326,23 @@ async function fetchProjectDetails(projectId: number): Promise<any> {
 // Fetch floor plans
 async function fetchFloorPlans(projectId: number): Promise<any> {
     try {
-        const response = await fetch(`${BASE_URL}/inventory/project/${projectId}/group?with_layouts=1`);
+        const response = await fetch(
+            `${BASE_URL}/inventory/project/${projectId}/group?with_layouts=1`
+        );
 
         if (!response.ok) {
-            console.error(`❌ Project ${projectId}: HTTP ${response.status} for floor plans`);
+            console.error(
+                `❌ Project ${projectId}: HTTP ${response.status} for floor plans`
+            );
             return null;
         }
 
         return await response.json();
     } catch (error) {
-        console.error(`❌ Project ${projectId}: Error fetching floor plans`, error);
+        console.error(
+            `❌ Project ${projectId}: Error fetching floor plans`,
+            error
+        );
         return null;
     }
 }
@@ -338,15 +381,20 @@ async function importProject(projectId: number): Promise<boolean> {
 
         // Collect image URLs from API (will be uploaded to S3)
         const imageUrlsToProcess: string[] = [];
-        if (projectData.cover?.src) imageUrlsToProcess.push(projectData.cover.src);
-        if (projectData.logo?.src) imageUrlsToProcess.push(projectData.logo.src);
-        
+        if (projectData.cover?.src)
+            imageUrlsToProcess.push(projectData.cover.src);
+        if (projectData.logo?.src)
+            imageUrlsToProcess.push(projectData.logo.src);
+
         // Add gallery images
         if (projectData.galleries && Array.isArray(projectData.galleries)) {
             projectData.galleries.forEach((gallery: any) => {
                 if (gallery.photos && Array.isArray(gallery.photos)) {
                     gallery.photos.forEach((photo: any) => {
-                        if (photo.src && !imageUrlsToProcess.includes(photo.src)) {
+                        if (
+                            photo.src &&
+                            !imageUrlsToProcess.includes(photo.src)
+                        ) {
                             imageUrlsToProcess.push(photo.src);
                         }
                     });
@@ -355,64 +403,126 @@ async function importProject(projectId: number): Promise<boolean> {
         }
 
         // Download and upload images to S3
-        console.log(`   📥 Downloading and uploading ${imageUrlsToProcess.length} images to S3...`);
-        const imageUrls = await processImagesToS3(imageUrlsToProcess, projectId, 'gallery');
+        console.log(
+            `   📥 Downloading and uploading ${imageUrlsToProcess.length} images to S3...`
+        );
+        const imageUrls = await processImagesToS3(
+            imageUrlsToProcess,
+            projectId,
+            'gallery'
+        );
 
         // Process brochure URL
         let brochureUrl: string | null = null;
-        if (projectData.brochures && projectData.brochures.length > 0 && projectData.brochures[0].src) {
+        if (
+            projectData.brochures &&
+            projectData.brochures.length > 0 &&
+            projectData.brochures[0].src
+        ) {
             console.log(`   📥 Processing brochure...`);
-            brochureUrl = await downloadAndUploadToS3(projectData.brochures[0].src, projectId, 'brochure');
+            brochureUrl = await downloadAndUploadToS3(
+                projectData.brochures[0].src,
+                projectId,
+                'brochure'
+            );
         }
 
-        // Extract unit types from floor plans
-        const unitTypes: string[] = [];
-        if (floorPlansData) {
-            Object.keys(floorPlansData).forEach((roomType) => {
-                const bedroomType = ROOM_TYPE_TO_BEDROOMS[roomType];
-                if (bedroomType) {
-                    const name = bedroomType === Bedrooms.Studio ? 'Studio' : 
-                                bedroomType === Bedrooms.One ? '1 Bedroom' :
-                                bedroomType === Bedrooms.Two ? '2 Bedroom' :
-                                bedroomType === Bedrooms.Three ? '3 Bedroom' :
-                                bedroomType === Bedrooms.Four ? '4 Bedroom' :
-                                `${bedroomType} Bedroom`;
-                    if (!unitTypes.includes(name)) {
-                        unitTypes.push(name);
-                    }
-                }
+        // Process floor plans first to get actual bedrooms
+        let floorPlansProcessed = await processFloorPlans(
+            floorPlansData || {},
+            projectId
+        );
+
+        // Determine min/max bedrooms from actual processed floor plans
+        let bedroomTypes = floorPlansProcessed
+            .map((fp) => fp.bedrooms)
+            .filter((bedroom): bedroom is Bedrooms => bedroom !== null)
+            .sort((a, b) => {
+                const order = [
+                    Bedrooms.Studio,
+                    Bedrooms.One,
+                    Bedrooms.Two,
+                    Bedrooms.Three,
+                    Bedrooms.Four,
+                    Bedrooms.Four_Plus,
+                    Bedrooms.Five,
+                    Bedrooms.Six,
+                    Bedrooms.Seven,
+                ];
+                return order.indexOf(a) - order.indexOf(b);
             });
-        }
 
-        // Determine min/max bedrooms
-        const bedroomTypes = floorPlansData 
-            ? Object.keys(floorPlansData)
-                .map(rt => ROOM_TYPE_TO_BEDROOMS[rt])
+        // Fallback to raw floorPlansData if no bedrooms found in processed floor plans
+        if (bedroomTypes.length === 0 && floorPlansData) {
+            bedroomTypes = Object.keys(floorPlansData)
+                .map((rt) => ROOM_TYPE_TO_BEDROOMS[rt])
                 .filter(Boolean)
                 .sort((a, b) => {
-                    const order = [Bedrooms.Studio, Bedrooms.One, Bedrooms.Two, Bedrooms.Three, Bedrooms.Four, Bedrooms.Four_Plus, Bedrooms.Five, Bedrooms.Six, Bedrooms.Seven];
+                    const order = [
+                        Bedrooms.Studio,
+                        Bedrooms.One,
+                        Bedrooms.Two,
+                        Bedrooms.Three,
+                        Bedrooms.Four,
+                        Bedrooms.Four_Plus,
+                        Bedrooms.Five,
+                        Bedrooms.Six,
+                        Bedrooms.Seven,
+                    ];
                     return order.indexOf(a) - order.indexOf(b);
-                })
-            : [];
+                });
+        }
+
         const minBedrooms = bedroomTypes.length > 0 ? bedroomTypes[0] : null;
-        const maxBedrooms = bedroomTypes.length > 0 ? bedroomTypes[bedroomTypes.length - 1] : null;
+        const maxBedrooms =
+            bedroomTypes.length > 0
+                ? bedroomTypes[bedroomTypes.length - 1]
+                : null;
+
+        // Extract unit types from processed floor plans
+        const unitTypes: string[] = [];
+        floorPlansProcessed.forEach((fp) => {
+            if (fp.bedrooms) {
+                const name =
+                    fp.bedrooms === Bedrooms.Studio
+                        ? 'Studio'
+                        : fp.bedrooms === Bedrooms.One
+                          ? '1 Bedroom'
+                          : fp.bedrooms === Bedrooms.Two
+                            ? '2 Bedroom'
+                            : fp.bedrooms === Bedrooms.Three
+                              ? '3 Bedroom'
+                              : fp.bedrooms === Bedrooms.Four
+                                ? '4 Bedroom'
+                                : `${fp.bedrooms} Bedroom`;
+                if (!unitTypes.includes(name)) {
+                    unitTypes.push(name);
+                }
+            }
+        });
 
         // Extract handover year
-        const handoverYear = extractYear(projectData.planned_at || projectData.predicted_completion_at);
+        const handoverYear = extractYear(
+            projectData.planned_at || projectData.predicted_completion_at
+        );
 
         // Get payment structure
-        const paymentStructure = projectData.payment_plans && projectData.payment_plans.length > 0
-            ? formatPaymentStructure(projectData.payment_plans)
-            : null;
+        const paymentStructure =
+            projectData.payment_plans && projectData.payment_plans.length > 0
+                ? formatPaymentStructure(projectData.payment_plans)
+                : null;
 
         // Get amenities
         const amenities = mapAmenities(projectData);
 
         // Determine category based on completion status
-        const isCompleted = projectData.completed_at !== null || 
-                           projectData.construction_percent === "100.00" ||
-                           projectData.construction_percent === 100;
-        const category = isCompleted ? Category.Ready_to_move : Category.Off_plan;
+        const isCompleted =
+            projectData.completed_at !== null ||
+            projectData.construction_percent === '100.00' ||
+            projectData.construction_percent === 100;
+        const category = isCompleted
+            ? Category.Ready_to_move
+            : Category.Off_plan;
 
         // Determine project type (default to Apartment)
         // Could be enhanced to parse from description or other fields
@@ -421,18 +531,23 @@ async function importProject(projectId: number): Promise<boolean> {
         // Calculate max_sq_ft from floor plans
         const calculatedMaxSqFt = projectData.statistics?.units
             ? (() => {
-                const areas = Object.values(projectData.statistics.units)
-                    .map((u: any) => u.area_to)
-                    .filter((a: any) => a != null && !isNaN(a));
-                return areas.length > 0 ? Math.max(...areas) * 10.764 : null;
-            })()
+                  const areas = Object.values(projectData.statistics.units)
+                      .map((u: any) => u.area_to)
+                      .filter((a: any) => a != null && !isNaN(a));
+                  return areas.length > 0 ? Math.max(...areas) * 10.764 : null;
+              })()
             : null;
 
         const projectDataToSave = {
-            title: projectData.title || `Project ${projectId}`,
-            description: projectData.description || '',
-            project_name: projectData.title || `Project ${projectId}`,
-            project_age: projectData.property_age ? String(projectData.property_age) : 'New',
+            title: projectData.title,
+            description: (projectData.description || '').replace(
+                /<[^>]*>/g,
+                ''
+            ),
+            project_name: projectData.title,
+            project_age: projectData.property_age
+                ? String(projectData.property_age)
+                : '1',
             address: projectData.address || '',
             city: City.Dubai,
             latitude: projectData.latitude || null,
@@ -447,13 +562,15 @@ async function importProject(projectId: number): Promise<boolean> {
             min_bathrooms: null, // Not available in API
             max_bathrooms: null,
             furnished: Furnished.Unfurnished, // Default
-            min_sq_ft: projectData.statistics?.units 
+            min_sq_ft: projectData.statistics?.units
                 ? (() => {
-                    const areas = Object.values(projectData.statistics.units)
-                        .map((u: any) => u.area_from)
-                        .filter((a: any) => a != null && !isNaN(a));
-                    return areas.length > 0 ? Math.min(...areas) * 10.764 : null;
-                })()
+                      const areas = Object.values(projectData.statistics.units)
+                          .map((u: any) => u.area_from)
+                          .filter((a: any) => a != null && !isNaN(a));
+                      return areas.length > 0
+                          ? Math.min(...areas) * 10.764
+                          : null;
+                  })()
                 : null,
             payment_plan: null, // Can be set based on payment structure
             payment_structure: paymentStructure,
@@ -467,8 +584,6 @@ async function importProject(projectId: number): Promise<boolean> {
         };
 
         let project;
-        let floorPlansProcessed = await processFloorPlans(floorPlansData || {}, projectId);
-
         if (existingProject) {
             // Delete existing floor plans
             await prisma.floorPlan.deleteMany({
@@ -480,14 +595,18 @@ async function importProject(projectId: number): Promise<boolean> {
                 where: { id: existingProject.id },
                 data: {
                     ...projectDataToSave,
+                    external_id: String(projectId),
                     developer: {
                         connect: {
                             id: developerId,
                         },
                     },
-                    floor_plans: floorPlansProcessed.length > 0 ? {
-                        create: floorPlansProcessed,
-                    } : undefined,
+                    floor_plans:
+                        floorPlansProcessed.length > 0
+                            ? {
+                                  create: floorPlansProcessed,
+                              }
+                            : undefined,
                 },
                 include: {
                     floor_plans: true,
@@ -495,21 +614,29 @@ async function importProject(projectId: number): Promise<boolean> {
                 },
             });
 
-            console.log(`🔄 Project ${projectId}: Updated successfully (${project.id})`);
-            console.log(`   - ${project.floor_plans.length} floor plans created`);
+            console.log(
+                `🔄 Project ${projectId}: Updated successfully (${project.id})`
+            );
+            console.log(
+                `   - ${project.floor_plans.length} floor plans created`
+            );
         } else {
             // Create new project
             project = await prisma.project.create({
                 data: {
                     ...projectDataToSave,
+                    external_id: String(projectId),
                     developer: {
                         connect: {
                             id: developerId,
                         },
                     },
-                    floor_plans: floorPlansProcessed.length > 0 ? {
-                        create: floorPlansProcessed,
-                    } : undefined,
+                    floor_plans:
+                        floorPlansProcessed.length > 0
+                            ? {
+                                  create: floorPlansProcessed,
+                              }
+                            : undefined,
                 },
                 include: {
                     floor_plans: true,
@@ -517,8 +644,12 @@ async function importProject(projectId: number): Promise<boolean> {
                 },
             });
 
-            console.log(`✅ Project ${projectId}: Created successfully (${project.id})`);
-            console.log(`   - ${project.floor_plans.length} floor plans created`);
+            console.log(
+                `✅ Project ${projectId}: Created successfully (${project.id})`
+            );
+            console.log(
+                `   - ${project.floor_plans.length} floor plans created`
+            );
         }
 
         return true;
@@ -529,12 +660,16 @@ async function importProject(projectId: number): Promise<boolean> {
 }
 
 // Process floor plans from API response
-async function processFloorPlans(floorPlansData: any, projectId: number): Promise<any[]> {
+async function processFloorPlans(
+    floorPlansData: any,
+    projectId: number
+): Promise<any[]> {
     const floorPlans: any[] = [];
 
     for (const [roomType, roomData] of Object.entries(floorPlansData)) {
         const typedRoomData = roomData as any;
-        if (!typedRoomData.items || !Array.isArray(typedRoomData.items)) continue;
+        if (!typedRoomData.items || !Array.isArray(typedRoomData.items))
+            continue;
 
         for (const item of typedRoomData.items) {
             if (!item.layout) continue;
@@ -543,14 +678,26 @@ async function processFloorPlans(floorPlansData: any, projectId: number): Promis
             const areaMin = item.area_min ? m2ToSqFt(item.area_min) : null;
             const areaMax = item.area_max ? m2ToSqFt(item.area_max) : null;
             // Use average if both available, otherwise use whichever is available
-            const unitSize = areaMin && areaMax ? (areaMin + areaMax) / 2 : (areaMin || areaMax || null);
+            const unitSize =
+                areaMin && areaMax
+                    ? (areaMin + areaMax) / 2
+                    : areaMin || areaMax || null;
 
             // Process floor plan images
             let floorPlanImageUrls: string[] = [];
-            if (Array.isArray(item.layout.levels) && item.layout.levels.length > 0) {
-                const imageUrlsToProcess = item.layout.levels.filter((url: any) => url && typeof url === 'string');
+            if (
+                Array.isArray(item.layout.levels) &&
+                item.layout.levels.length > 0
+            ) {
+                const imageUrlsToProcess = item.layout.levels.filter(
+                    (url: any) => url && typeof url === 'string'
+                );
                 if (imageUrlsToProcess.length > 0) {
-                    floorPlanImageUrls = await processImagesToS3(imageUrlsToProcess, projectId, 'floorplan');
+                    floorPlanImageUrls = await processImagesToS3(
+                        imageUrlsToProcess,
+                        projectId,
+                        'floorplan'
+                    );
                 }
             }
 
@@ -570,11 +717,8 @@ async function processFloorPlans(floorPlansData: any, projectId: number): Promis
 }
 
 // Main import function
-async function importAlnairProjects() {
-    const projectIdsPath = path.join(__dirname, '../data/Al_Nair_project_ids.json');
-
-    // Read project IDs
-    const projectIds: number[] = JSON.parse(fs.readFileSync(projectIdsPath, 'utf-8'));
+async function importExternalProjects() {
+    const projectIds = EXTERNAL_PROJECT_IDS;
 
     console.log(`📋 Found ${projectIds.length} project IDs to import`);
     console.log(`🚀 Starting import process...\n`);
@@ -586,7 +730,7 @@ async function importAlnairProjects() {
     for (let i = 0; i < projectIds.length; i++) {
         const projectId = projectIds[i];
         const success = await importProject(projectId);
-        
+
         if (success) {
             successCount++;
         } else {
@@ -604,7 +748,7 @@ async function importAlnairProjects() {
 }
 
 // Run the import
-importAlnairProjects()
+importExternalProjects()
     .then(() => {
         console.log('Import process finished');
         process.exit(0);
@@ -613,4 +757,3 @@ importAlnairProjects()
         console.error('Import process failed:', error);
         process.exit(1);
     });
-
