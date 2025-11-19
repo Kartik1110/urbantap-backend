@@ -1219,24 +1219,21 @@ export const generateProjectROIReportServiceV2 = async (
 
         floorPlan = minSizeFloorPlans[0];
 
-        logger.warn(
-            'Floor plan Id not provided, falling back to smallest unit available - ' +
-                `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
-        );
+        if (floorPlan) {
+            logger.warn(
+                'Floor plan Id not provided, falling back to smallest unit available - ' +
+                    `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
+            );
+        }
     }
 
-    if (!floorPlan) {
-        throw new Error('Floor plan not found');
-    }
-
-    const min_price = floorPlanId
+    const min_price = floorPlan
         ? floorPlan.min_price || project.min_price
         : project.min_price;
 
     const { locality, handover_year } = project;
-    const { unit_size } = floorPlan;
 
-    if (!min_price || !handover_year || !locality || !unit_size) {
+    if (!min_price || !handover_year || !locality) {
         if (!min_price) {
             throw new Error('Price not found');
         }
@@ -1247,10 +1244,6 @@ export const generateProjectROIReportServiceV2 = async (
 
         if (!locality) {
             throw new Error('Locality not found');
-        }
-
-        if (!unit_size) {
-            throw new Error('Unit size not found');
         }
     }
 
@@ -1746,24 +1739,21 @@ export const getProjectAIReportServiceV2 = async (
 
         floorPlan = minSizeFloorPlans[0];
 
-        logger.warn(
-            'Floor plan Id not provided, falling back to smallest unit available - ' +
-                `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
-        );
+        if (floorPlan) {
+            logger.warn(
+                'Floor plan Id not provided, falling back to smallest unit available - ' +
+                    `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
+            );
+        }
     }
 
-    if (!floorPlan) {
-        throw new Error('Floor plan not found');
-    }
-
-    const min_price = floorPlanId
+    const min_price = floorPlan
         ? floorPlan.min_price || project.min_price
         : project.min_price;
 
     const { locality, handover_year } = project;
-    const { unit_size } = floorPlan;
 
-    if (!min_price || !handover_year || !locality || !unit_size) {
+    if (!min_price || !handover_year || !locality) {
         if (!min_price) {
             throw new Error('Price not found');
         }
@@ -1774,10 +1764,6 @@ export const getProjectAIReportServiceV2 = async (
 
         if (!locality) {
             throw new Error('Locality not found');
-        }
-
-        if (!unit_size) {
-            throw new Error('Unit size not found');
         }
     }
 
@@ -1986,7 +1972,7 @@ export const getProjectAIReportServiceV2 = async (
         developer: {
             name: project.developer.company?.name,
             logo_url: project.developer.company?.logo,
-            floor_plan_image_urls: floorPlanId
+            floor_plan_image_urls: floorPlanId && floorPlan
                 ? floorPlan.image_urls
                 : floorPlans.flatMap((plan) => plan.image_urls),
         },
