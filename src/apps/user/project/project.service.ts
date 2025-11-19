@@ -128,6 +128,9 @@ export const getProjectsService = async ({
     const skip = (page - 1) * pageSize;
 
     const whereClause: Prisma.ProjectWhereInput = {
+        handover_year: {
+            gte: 2025,
+        },
         ...(title && {
             title: {
                 contains: title,
@@ -761,6 +764,9 @@ export const getProjectsByDeveloperService = async (
 
     const whereClause: Prisma.ProjectWhereInput = {
         developer_id: developerId,
+        handover_year: {
+            gte: 2025,
+        },
         ...(search && {
             project_name: {
                 contains: search,
@@ -820,8 +826,15 @@ export const getFeaturedProjectsService = async ({
 }) => {
     const skip = (page - 1) * pageSize;
 
+    const whereClause: Prisma.ProjectWhereInput = {
+        handover_year: {
+            gte: 2025,
+        },
+    };
+
     const [projectsRaw, totalCount] = await Promise.all([
         prisma.project.findMany({
+            where: whereClause,
             skip,
             take: pageSize,
             orderBy: {
@@ -844,7 +857,7 @@ export const getFeaturedProjectsService = async ({
                 },
             },
         }),
-        prisma.project.count(),
+        prisma.project.count({ where: whereClause }),
     ]);
 
     const projects = projectsRaw.map((proj) => ({
@@ -2070,14 +2083,17 @@ export async function getNearbySummary(center: LatLng) {
 }
 
 export const getProjectsByLocalityService = async (locality?: string) => {
-    const whereClause: Prisma.ProjectWhereInput = locality
-        ? {
-              locality: {
-                  contains: locality,
-                  mode: 'insensitive' as Prisma.QueryMode,
-              },
-          }
-        : {};
+    const whereClause: Prisma.ProjectWhereInput = {
+        handover_year: {
+            gte: 2025,
+        },
+        ...(locality && {
+            locality: {
+                contains: locality,
+                mode: 'insensitive' as Prisma.QueryMode,
+            },
+        }),
+    };
 
     // Get total count of all projects and filtered projects in parallel
     const [projects, totalCount, filteredCount] = await Promise.all([
