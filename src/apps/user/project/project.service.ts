@@ -1218,13 +1218,6 @@ export const generateProjectROIReportServiceV2 = async (
             .sort((a, b) => (a.unit_size || 0) - (b.unit_size || 0));
 
         floorPlan = minSizeFloorPlans[0];
-
-        if (floorPlan) {
-            logger.warn(
-                'Floor plan Id not provided, falling back to smallest unit available - ' +
-                    `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
-            );
-        }
     }
 
     const min_price = floorPlan
@@ -1738,13 +1731,6 @@ export const getProjectAIReportServiceV2 = async (
             .sort((a, b) => (a.unit_size || 0) - (b.unit_size || 0));
 
         floorPlan = minSizeFloorPlans[0];
-
-        if (floorPlan) {
-            logger.warn(
-                'Floor plan Id not provided, falling back to smallest unit available - ' +
-                    `bedrooms: ${floorPlan.bedrooms} and unit_size: ${floorPlan.unit_size}`
-            );
-        }
     }
 
     const min_price = floorPlan
