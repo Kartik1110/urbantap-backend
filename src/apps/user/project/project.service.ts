@@ -1997,9 +1997,10 @@ export const getProjectAIReportServiceV2 = async (
         developer: {
             name: project.developer.company?.name,
             logo_url: project.developer.company?.logo,
-            floor_plan_image_urls: floorPlanId && floorPlan
-                ? floorPlan.image_urls
-                : floorPlans.flatMap((plan) => plan.image_urls),
+            floor_plan_image_urls:
+                floorPlanId && floorPlan
+                    ? floorPlan.image_urls
+                    : floorPlans.flatMap((plan) => plan.image_urls),
         },
         nearby: await getNearbySummary({
             lat: project.latitude!,

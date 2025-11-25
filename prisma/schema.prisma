@@ -76,6 +76,7 @@ model Broker {
   brokerageId              String?
   Developer                Developer?          @relation(fields: [developerId], references: [id])
   developerId              String?
+  leads                    Lead[]
 }
 
 enum Speciality {
@@ -402,7 +403,8 @@ model Project {
   developer       Developer    @relation(fields: [developer_id], references: [id])
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
-  floor_plans     FloorPlan[] 
+  floor_plans     FloorPlan[]
+  leads           Lead[]
 }
 
 model Inventory {
@@ -672,4 +674,25 @@ enum Amenities {
   Walking_and_Jogging_Tracks
   Open_Air_Cinema
   Gaming_Area
+}
+
+model Lead {
+  id                 String     @id @default(uuid())
+  name               String
+  email              String
+  country_code       String
+  w_number           String
+  status             Status
+  project_id         String?
+  project            Project?   @relation(fields: [project_id], references: [id])
+  broker             Broker[]
+}
+
+enum Status {
+  NEW_LEAD
+  CONTACTED_LEAD
+  SITE_VISIT_SCHEDULED
+  VISIT_COMPLETED
+  DEAL_CLOSED
+  LOST_LEAD
 }

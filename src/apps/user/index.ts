@@ -12,6 +12,7 @@ import connectionRoutes from '@/apps/user/connection/connections.route';
 import developerRoutes from '@/apps/user/developer/developer.route';
 import inquiryRoutes from '@/apps/user/inquiry/inquiry.route';
 import jobRoutes from '@/apps/user/job/job.route';
+import leadRoutes from '@/apps/user/lead/lead.route';
 import listingRoutes from '@/apps/user/listing/listing.route';
 import notificationRoutes from '@/apps/user/notification/notification.route';
 import projectRoutes from '@/apps/user/project/project.route';
@@ -28,6 +29,7 @@ router.use(authMiddleware, connectionRoutes);
 router.use(authMiddleware, dashboardRoutes);
 router.use(authMiddleware, developerRoutes);
 router.use(authMiddleware, inquiryRoutes);
+router.use(authMiddleware, leadRoutes);
 router.use(authMiddleware, notificationRoutes);
 router.use(authMiddleware, projectRoutes);
 
