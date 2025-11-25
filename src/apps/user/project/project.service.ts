@@ -200,16 +200,24 @@ export const getProjectsService = async ({
         prisma.project.count({ where: whereClause }),
     ]);
 
-    const projects = projectsRaw.map((proj) => ({
-        id: proj.id,
-        category: proj.category,
-        image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
-        project_name: proj.project_name,
-        address: proj.address,
-        locality: proj.locality,
-        views: proj.views,
-        brochure_url: proj.brochure_url,
-    }));
+    const projects = projectsRaw.map((proj) => {
+        const referral_percentage = 4.5;
+        const referral_amount = proj.min_price
+            ? (proj.min_price * referral_percentage) / 100
+            : 0;
+        return {
+            id: proj.id,
+            category: proj.category,
+            image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
+            project_name: proj.project_name,
+            address: proj.address,
+            locality: proj.locality,
+            views: proj.views,
+            brochure_url: proj.brochure_url,
+            referral_percentage,
+            referral_amount,
+        };
+    });
 
     const pagination = {
         page,
@@ -384,6 +392,11 @@ export const getProjectByIdService = async (id: string) => {
 
     const { admin_user, developer, ...projectWithoutCompany } = project;
 
+    const referral_percentage = 4.5;
+    const referral_amount = project.min_price
+        ? (project.min_price * referral_percentage) / 100
+        : 0;
+
     return {
         id: project.id,
         project_name: project.project_name,
@@ -411,6 +424,8 @@ export const getProjectByIdService = async (id: string) => {
         floor_plans: project.floor_plans.flatMap(
             (floorPlan) => floorPlan.image_urls || []
         ),
+        referral_percentage,
+        referral_amount,
         broker: admin_user?.broker
             ? {
                   id: admin_user?.broker?.id,
@@ -597,6 +612,11 @@ export const getProjectByNameService = async (name: string) => {
 
     const { admin_user, developer, ...projectWithoutCompany } = project;
 
+    const referral_percentage = 4.5;
+    const referral_amount = project.min_price
+        ? (project.min_price * referral_percentage) / 100
+        : 0;
+
     return {
         id: project.id,
         project_name: project.project_name,
@@ -624,6 +644,8 @@ export const getProjectByNameService = async (name: string) => {
         floor_plans: project.floor_plans.flatMap(
             (floorPlan) => floorPlan.image_urls || []
         ),
+        referral_percentage,
+        referral_amount,
         broker: admin_user?.broker
             ? {
                   id: admin_user?.broker?.id,
@@ -785,6 +807,7 @@ export const getProjectsByDeveloperService = async (
                 project_name: true,
                 address: true,
                 locality: true,
+                min_price: true,
             },
             skip,
             take: pageSize,
@@ -798,14 +821,22 @@ export const getProjectsByDeveloperService = async (
     ]);
 
     // Format projects to match the required structure
-    const projects = projectsRaw.map((project) => ({
-        id: project.id,
-        category: project.category,
-        image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
-        project_name: project.project_name,
-        address: project.address,
-        locality: project.locality,
-    }));
+    const projects = projectsRaw.map((project) => {
+        const referral_percentage = 4.5;
+        const referral_amount = project.min_price
+            ? (project.min_price * referral_percentage) / 100
+            : 0;
+        return {
+            id: project.id,
+            category: project.category,
+            image: project.image_urls.length > 0 ? project.image_urls[0] : null, // Only first image
+            project_name: project.project_name,
+            address: project.address,
+            locality: project.locality,
+            referral_percentage,
+            referral_amount,
+        };
+    });
 
     const pagination = {
         page,
@@ -860,17 +891,25 @@ export const getFeaturedProjectsService = async ({
         prisma.project.count({ where: whereClause }),
     ]);
 
-    const projects = projectsRaw.map((proj) => ({
-        id: proj.id,
-        category: proj.category,
-        image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
-        project_name: proj.project_name,
-        address: proj.address,
-        locality: proj.locality,
-        views: proj.views,
-        company_name: proj.developer?.company?.name || null,
-        min_price: proj.min_price,
-    }));
+    const projects = projectsRaw.map((proj) => {
+        const referral_percentage = 4.5;
+        const referral_amount = proj.min_price
+            ? (proj.min_price * referral_percentage) / 100
+            : 0;
+        return {
+            id: proj.id,
+            category: proj.category,
+            image: proj.image_urls.length > 0 ? proj.image_urls[0] : null, // Only first image
+            project_name: proj.project_name,
+            address: proj.address,
+            locality: proj.locality,
+            views: proj.views,
+            company_name: proj.developer?.company?.name || null,
+            min_price: proj.min_price,
+            referral_percentage,
+            referral_amount,
+        };
+    });
 
     const pagination = {
         page,
