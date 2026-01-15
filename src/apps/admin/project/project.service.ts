@@ -47,42 +47,72 @@ async function findAndCreateFileFromChunk(
             .filter((f) => f.startsWith(chunkId));
 
         if (existingFiles.length === 0) {
+            logger.warn(
+                `No assembled files found for chunk ID: ${chunkId} in ${assembledDir}`
+            );
             return null;
         }
 
         const assembledPath = path.join(assembledDir, existingFiles[0]);
-        const assembledBuffer = fs.readFileSync(assembledPath);
-        const stats = fs.statSync(assembledPath);
 
-        // Extract original filename
-        const parts = existingFiles[0].split('_');
-        const originalName = parts.slice(1).join('_'); // Remove chunkId prefix
+        // Verify the file exists and is readable
+        if (!fs.existsSync(assembledPath)) {
+            logger.error(
+                `Assembled file path does not exist: ${assembledPath}`
+            );
+            return null;
+        }
 
-        // Determine mime type
-        const ext = originalName.split('.').pop()?.toLowerCase();
-        const mimeType =
-            ext === 'pdf'
-                ? 'application/pdf'
-                : ext === 'jpg' || ext === 'jpeg'
-                  ? 'image/jpeg'
-                  : ext === 'png'
-                    ? 'image/png'
-                    : 'application/octet-stream';
+        try {
+            const assembledBuffer = fs.readFileSync(assembledPath);
+            const stats = fs.statSync(assembledPath);
 
-        const assembledFile: Express.Multer.File = {
-            fieldname: fieldName,
-            originalname: originalName,
-            encoding: '7bit',
-            mimetype: mimeType,
-            buffer: assembledBuffer,
-            size: stats.size,
-            destination: '',
-            filename: '',
-            path: assembledPath,
-            stream: fs.createReadStream(assembledPath),
-        };
+            // Check if file is empty
+            if (stats.size === 0) {
+                logger.warn(`Assembled file is empty: ${assembledPath}`);
+                return null;
+            }
 
-        return assembledFile;
+            // Extract original filename
+            const parts = existingFiles[0].split('_');
+            const originalName = parts.slice(1).join('_'); // Remove chunkId prefix
+
+            // Determine mime type
+            const ext = originalName.split('.').pop()?.toLowerCase();
+            const mimeType =
+                ext === 'pdf'
+                    ? 'application/pdf'
+                    : ext === 'jpg' || ext === 'jpeg'
+                      ? 'image/jpeg'
+                      : ext === 'png'
+                        ? 'image/png'
+                        : 'application/octet-stream';
+
+            const assembledFile: Express.Multer.File = {
+                fieldname: fieldName,
+                originalname: originalName,
+                encoding: '7bit',
+                mimetype: mimeType,
+                buffer: assembledBuffer,
+                size: stats.size,
+                destination: '',
+                filename: '',
+                path: assembledPath,
+                stream: fs.createReadStream(assembledPath),
+            };
+
+            logger.info(
+                `Successfully created file object from chunk: ${chunkId}, file size: ${stats.size} bytes`
+            );
+
+            return assembledFile;
+        } catch (readError) {
+            logger.error(
+                `Error reading assembled file ${assembledPath}:`,
+                readError
+            );
+            return null;
+        }
     } catch (error) {
         logger.error(
             `Error retrieving assembled file for chunk ID ${chunkId}:`,
@@ -181,34 +211,73 @@ export async function processProjectFiles(
     // Upload project images
     if (organizedFiles.image_urls) {
         for (const file of organizedFiles.image_urls) {
-            const ext = file.originalname.split('.').pop();
-            const url = await uploadToS3(
-                file.path,
-                `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
-            );
-            result.imageUrls.push(url);
+            try {
+                // Verify file exists before attempting upload
+                if (!fs.existsSync(file.path)) {
+                    logger.warn(
+                        `Skipping image upload - file not found: ${file.path}`
+                    );
+                    continue;
+                }
+
+                const ext = file.originalname.split('.').pop();
+                const url = await uploadToS3(
+                    file.path,
+                    `projects/images/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`
+                );
+                result.imageUrls.push(url);
+            } catch (imageError) {
+                logger.error('Error uploading project image:', imageError);
+                throw imageError;
+            }
         }
     }
 
     // Upload project brochure
     if (organizedFiles.file_url?.[0]) {
-        const ext = organizedFiles.file_url[0].originalname.split('.').pop();
-        result.brochureUrl = await uploadToS3(
-            organizedFiles.file_url[0].path,
-            `projects/brochures/${Date.now()}_brochure.${ext}`
-        );
+        try {
+            // Verify file exists before attempting upload
+            if (!fs.existsSync(organizedFiles.file_url[0].path)) {
+                logger.warn(
+                    `Skipping brochure upload - file not found: ${organizedFiles.file_url[0].path}`
+                );
+            } else {
+                const ext = organizedFiles.file_url[0].originalname
+                    .split('.')
+                    .pop();
+                result.brochureUrl = await uploadToS3(
+                    organizedFiles.file_url[0].path,
+                    `projects/brochures/${Date.now()}_brochure.${ext}`
+                );
+            }
+        } catch (brochureError) {
+            logger.error('Error uploading project brochure:', brochureError);
+            throw brochureError;
+        }
     }
 
     // Upload inventory file
     if (organizedFiles.inventory_file?.[0]) {
-        const ext = organizedFiles.inventory_file[0].originalname
-            .split('.')
-            .pop();
-        const url = await uploadToS3(
-            organizedFiles.inventory_file[0].path,
-            `projects/inventory/${Date.now()}_inventory.${ext}`
-        );
-        result.inventoryFiles.push(url);
+        try {
+            // Verify file exists before attempting upload
+            if (!fs.existsSync(organizedFiles.inventory_file[0].path)) {
+                logger.warn(
+                    `Skipping inventory upload - file not found: ${organizedFiles.inventory_file[0].path}`
+                );
+            } else {
+                const ext = organizedFiles.inventory_file[0].originalname
+                    .split('.')
+                    .pop();
+                const url = await uploadToS3(
+                    organizedFiles.inventory_file[0].path,
+                    `projects/inventory/${Date.now()}_inventory.${ext}`
+                );
+                result.inventoryFiles.push(url);
+            }
+        } catch (inventoryError) {
+            logger.error('Error uploading inventory file:', inventoryError);
+            throw inventoryError;
+        }
     }
 
     // Upload floor plan images dynamically
@@ -216,13 +285,30 @@ export async function processProjectFiles(
         if (fieldName.startsWith('floor_plan_image_')) {
             const index = parseInt(fieldName.replace('floor_plan_image_', ''));
             if (!isNaN(index) && organizedFiles[fieldName][0]) {
-                const file = organizedFiles[fieldName][0];
-                const ext = file.originalname.split('.').pop();
-                const url = await uploadToS3(
-                    file.path,
-                    `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
-                );
-                result.floorPlanImages[index] = url;
+                try {
+                    const file = organizedFiles[fieldName][0];
+
+                    // Verify file exists before attempting upload
+                    if (!fs.existsSync(file.path)) {
+                        logger.warn(
+                            `Skipping floor plan image upload - file not found: ${file.path}`
+                        );
+                        continue;
+                    }
+
+                    const ext = file.originalname.split('.').pop();
+                    const url = await uploadToS3(
+                        file.path,
+                        `projects/floor_plans/${Date.now()}_floor_plan_${index}.${ext}`
+                    );
+                    result.floorPlanImages[index] = url;
+                } catch (floorPlanError) {
+                    logger.error(
+                        'Error uploading floor plan image:',
+                        floorPlanError
+                    );
+                    throw floorPlanError;
+                }
             }
         }
     }

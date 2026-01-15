@@ -46,7 +46,12 @@ export async function uploadToS3(
 ): Promise<string> {
     try {
         // Verify file exists before attempting upload
-        await fs.access(filePath);
+        try {
+            await fs.access(filePath);
+        } catch (accessError) {
+            logger.error(`File access failed for: ${filePath}`, accessError);
+            throw new Error(`File not found: ${filePath}`);
+        }
 
         const detectedContentType = detectContentType(fileName, contentType);
 
@@ -63,7 +68,14 @@ export async function uploadToS3(
         await s3Client.send(new PutObjectCommand(params));
 
         // Delete the file after successful upload
-        await fs.unlink(filePath);
+        try {
+            await fs.unlink(filePath);
+        } catch (unlinkError) {
+            logger.warn(
+                `Failed to clean up local file ${filePath}:`,
+                unlinkError
+            );
+        }
 
         return `https://${config.s3BucketName}.s3.${config.awsRegion}.amazonaws.com/${fileName}`;
     } catch (error) {
